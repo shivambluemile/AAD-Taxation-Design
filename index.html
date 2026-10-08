@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · AAD Taxation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #F26522;
+    --brand-strong: #CC4B0A;   /* AA on white */
+    --brand-hover: #B13F07;
+    --brand-soft: #FFF4ED;
+    --ring: rgba(242, 101, 34, .22);
+
+    --frame: #0B0E14;
+    --panel: #11151D;
+    --on-dark: #FFFFFF;
+    --on-dark-2: #8E97A8;
+
+    --ink: #101828;
+    --text: #344054;
+    --muted: #5D6B82;
+    --placeholder: #7A8597;
+    --border: #D0D5DD;
+    --border-soft: #EAECF0;
+    --bg-soft: #F9FAFB;
+
+    --error: #B42318;
+    --error-bg: #FEF3F2;
+    --error-border: #FECDCA;
+    --success: #067647;
+    --success-bg: #ECFDF3;
+    --warn-bg: #FFFAEB;
+    --warn-border: #FEDF89;
+    --warn-text: #93370D;
+
+    --r: 10px;
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --display: "Manrope", "Inter", system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    font-family: var(--font); font-size: 15px; line-height: 1.5;
+    color: var(--text); background: var(--frame);
+    -webkit-font-smoothing: antialiased;
+  }
+  img { display: block; }
+  button, input { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+
+  /* ================= Frame ================= */
+  .app {
+    min-height: 100vh; min-height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 43fr) minmax(0, 57fr);
+    gap: 12px; padding: 12px;
+  }
+
+  /* ================= Brand panel ================= */
+  .panel {
+    position: relative; overflow: hidden; isolation: isolate;
+    border-radius: 22px;
+    background: var(--panel);
+    color: var(--on-dark);
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    padding: 48px 48px 56px;
+    text-align: center;
+  }
+  /* warm light from the top-right */
+  .panel::before {
+    content: ""; position: absolute; inset: 0; z-index: -2;
+    background:
+      radial-gradient(120% 80% at 100% 0%, rgba(242,101,34,.38) 0%, rgba(242,101,34,.10) 38%, transparent 62%),
+      radial-gradient(80% 60% at 0% 100%, rgba(255,255,255,.04), transparent 70%);
+  }
+  /* soft vertical banding */
+  .panel::after {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 1px, transparent 1px 64px);
+    mask-image: linear-gradient(180deg, #000, transparent 70%);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%);
+  }
+
+  /* subtle ascending ledger bars – the only accounting visual */
+  .bars {
+    position: absolute; z-index: -1; left: 50%; top: 9%;
+    transform: translateX(-50%);
+    width: min(78%, 380px);
+  }
+  .bars svg { width: 100%; height: auto; display: block; }
+
+  .mark {
+    width: 132px; height: 84px; border-radius: 20px;
+    background: #fff;
+    display: grid; place-items: center;
+    box-shadow: 0 0 0 6px rgba(255,255,255,.04), 0 20px 40px -12px rgba(0,0,0,.6);
+    margin-bottom: 36px;
+  }
+  .mark img { width: 100px; height: auto; }
+
+  .slides { position: relative; width: 100%; max-width: 440px; min-height: 196px; }
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0; visibility: hidden;
+    transition: opacity .5s ease, visibility .5s;
+  }
+  .slide.on { opacity: 1; visibility: visible; }
+  @media (prefers-reduced-motion: reduce) { .slide { transition: none; } }
+  .slide h2 {
+    font-family: var(--display);
+    margin: 0 0 16px;
+    font-size: clamp(26px, 2.3vw, 34px);
+    line-height: 1.2; letter-spacing: -.025em; font-weight: 700;
+    color: var(--on-dark);
+  }
+  .slide h2 span { color: var(--on-dark-2); }
+  .slide p { margin: 0 auto; max-width: 380px; font-size: 15px; color: var(--on-dark-2); }
+
+  .dots { display: flex; gap: 4px; justify-content: center; margin-top: 28px; }
+  .dots button {
+    width: 28px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer;
+    display: grid; place-items: center; border-radius: 6px;
+  }
+  .dots button::before {
+    content: ""; width: 8px; height: 8px; border-radius: 999px; background: #3A4150;
+    transition: width .25s, background-color .25s;
+  }
+  .dots button[aria-current="true"]::before { width: 22px; background: var(--brand); }
+  .dots button:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; }
+
+  /* ================= Auth card ================= */
+  .auth {
+    border-radius: 22px; background: #fff;
+    display: flex; flex-direction: column;
+    padding: 24px 32px;
+  }
+  .auth-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .auth-top img { height: 40px; width: auto; }
+  .help { font-size: 14px; color: var(--muted); }
+  .help a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; border-radius: 4px; }
+  .help a:hover { color: var(--brand-strong); }
+
+  .auth-main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 0; }
+  .form-wrap { width: 100%; max-width: 400px; }
+
+  .view { display: none; }
+  .view.on { display: block; animation: in .2s ease-out; }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .view.on { animation: none; } }
+
+  .head { text-align: center; margin-bottom: 32px; }
+  .head h1 {
+    font-family: var(--display);
+    margin: 0 0 8px; font-size: 28px; line-height: 1.25; letter-spacing: -.02em; font-weight: 700; color: var(--ink);
+  }
+  .head h1:focus { outline: none; }
+  .head p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .head p strong { color: var(--ink); font-weight: 600; word-break: break-word; }
+
+  .badge {
+    width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px;
+    display: grid; place-items: center;
+    background: var(--brand-soft); color: var(--brand-strong);
+    border: 1px solid #FEDCC8;
+  }
+  .badge.ok { background: var(--success-bg); color: var(--success); border-color: #ABEFC6; }
+
+  /* Alerts */
+  .alert {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 14px; margin-bottom: 20px; border-radius: var(--r);
+    border: 1px solid; font-size: 14px; line-height: 1.45;
+  }
+  .alert svg { flex: none; margin-top: 1px; }
+  .alert b { display: block; font-weight: 600; }
+  .alert-error { background: var(--error-bg); border-color: var(--error-border); color: var(--error); }
+  .alert-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+
+  /* Fields */
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .field { margin-bottom: 18px; }
+  .lbl { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .control { position: relative; }
+  .input {
+    width: 100%; height: 48px; padding: 0 14px;
+    font-size: 15.5px; color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--border); border-radius: var(--r);
+    box-shadow: 0 1px 2px rgba(16,24,40,.05);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .input::placeholder { color: var(--placeholder); }
+  .input:hover { border-color: #B3BAC5; }
+  .input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--ring); }
+  .has-toggle .input { padding-right: 52px; }
+  .input[aria-invalid="true"] { border-color: #F04438; }
+  .input[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px rgba(240,68,56,.16); }
+  fieldset:disabled .input { background: var(--bg-soft); color: var(--muted); cursor: not-allowed; }
+
+  .toggle {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; display: grid; place-items: center;
+    background: none; border: 0; border-radius: 8px; cursor: pointer; color: #667085;
+  }
+  .toggle:hover { color: var(--ink); background: var(--bg-soft); }
+  .toggle .hide-ic { display: none; }
+  .toggle[aria-pressed="true"] .show-ic { display: none; }
+  .toggle[aria-pressed="true"] .hide-ic { display: block; }
+
+  .err { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0 0; font-size: 13.5px; color: var(--error); }
+  .err svg { flex: none; margin-top: 2px; }
+  .note { margin: 6px 0 0; font-size: 13px; color: var(--warn-text); }
+
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 2px 0 24px; }
+  .check { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text); min-height: 36px; user-select: none; }
+  .check input {
+    appearance: none; -webkit-appearance: none; margin: 0; flex: none;
+    width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 5px; background: #fff;
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .check input::after { content: ""; width: 9px; height: 5px; border: 2px solid #fff; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px,-1px); opacity: 0; }
+  .check input:checked { background: var(--brand-strong); border-color: var(--brand-strong); }
+  .check input:checked::after { opacity: 1; }
+  .check input:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--ring); border-color: var(--brand); }
+
+  .link {
+    background: none; border: 0; padding: 4px 2px; cursor: pointer; border-radius: 4px;
+    font-size: 14px; font-weight: 600; color: var(--brand-strong); text-decoration: none;
+  }
+  .link:hover { color: var(--brand-hover); text-decoration: underline; text-underline-offset: 3px; }
+  .link:disabled { color: var(--muted); font-weight: 500; cursor: default; text-decoration: none; }
+  .link-ink { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: #B3BAC5; }
+  .link-ink:hover { color: var(--brand-strong); }
+
+  /* Buttons */
+  .btn {
+    width: 100%; height: 50px; border-radius: var(--r);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 15.5px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+    transition: background-color .15s, box-shadow .15s;
+  }
+  .btn-primary {
+    background: var(--brand-strong); color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 1px 2px rgba(16,24,40,.1), 0 8px 20px -8px rgba(204,75,10,.6);
+  }
+  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:hover:not(:disabled) .arrow { transform: translateX(2px); }
+  .btn-primary:active:not(:disabled) { background: #973505; }
+  .btn-primary:disabled { background: #F2F4F7; border-color: var(--border-soft); color: #98A2B3; box-shadow: none; cursor: not-allowed; }
+  .btn-primary.loading:disabled { background: var(--brand-strong); border-color: transparent; color: #fff; cursor: progress; }
+  .arrow { transition: transform .15s; }
+  .loading .arrow { display: none; }
+
+  :where(button, a):focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+  .spin { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: r .7s linear infinite; display: none; }
+  .loading .spin { display: inline-block; }
+  @keyframes r { to { transform: rotate(360deg); } }
+
+  .below { margin: 24px 0 0; text-align: center; font-size: 14px; color: var(--muted); }
+
+  .reqs { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+  .reqs li { display: flex; align-items: center; gap: 8px; }
+  .reqs .d { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #C4CAD4; display: grid; place-items: center; flex: none; }
+  .reqs .d svg { opacity: 0; }
+  .reqs li.met { color: var(--success); }
+  .reqs li.met .d { background: var(--success); border-color: var(--success); }
+  .reqs li.met .d svg { opacity: 1; }
+
+  .auth-foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .auth-foot nav { display: flex; gap: 20px; }
+  .auth-foot a { color: var(--muted); text-decoration: none; border-radius: 4px; }
+  .auth-foot a:hover { color: var(--ink); }
+
+  .toast {
+    position: fixed; left: 50%; top: 24px; transform: translateX(-50%); z-index: 60;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; box-shadow: 0 16px 40px -12px rgba(16,24,40,.5);
+  }
+
+  /* Design-review state switcher (remove in production) */
+  .states { position: fixed; right: 28px; bottom: 64px; z-index: 50; font-size: 13px; }
+  .states details { background: #fff; border: 1px solid var(--border-soft); border-radius: 12px; box-shadow: 0 12px 32px -8px rgba(16,24,40,.25); }
+  .states summary { list-style: none; cursor: pointer; padding: 9px 14px; font-weight: 600; color: var(--ink); display: flex; gap: 8px; align-items: center; }
+  .states summary::-webkit-details-marker { display: none; }
+  .states summary::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+  .states .list { padding: 2px 8px 10px; display: grid; gap: 2px; width: 260px; max-height: 62vh; overflow: auto; }
+  .states .list button { text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 6px; cursor: pointer; color: var(--text); }
+  .states .list button:hover { background: var(--bg-soft); }
+  .states .list button[aria-current="true"] { background: var(--brand-soft); color: var(--brand-hover); font-weight: 600; }
+  .states .demo { margin-top: 6px; padding: 8px 10px 0; border-top: 1px solid var(--border-soft); color: var(--muted); font-size: 12px; }
+
+  /* ================= Responsive ================= */
+  @media (max-width: 1100px) {
+    .app { grid-template-columns: minmax(0, 40fr) minmax(0, 60fr); }
+    .panel { padding: 40px 32px 44px; }
+    .mark { width: 112px; height: 72px; border-radius: 18px; margin-bottom: 28px; }
+    .mark img { width: 84px; }
+    .slide h2 { font-size: 24px; }
+    .slide p { font-size: 14px; }
+    .slides { min-height: 180px; }
+  }
+  @media (max-width: 860px) {
+    .bars { width: 70%; top: 12%; }
+    .slides { min-height: 210px; }
+  }
+
+  /* Mobile: no decorative panel, form first */
+  @media (max-width: 720px) {
+    body { background: #fff; }
+    .app { grid-template-columns: 1fr; padding: 0; gap: 0; }
+    .panel { display: none; }
+    .auth { border-radius: 0; padding: 16px 20px; }
+    .auth-top img { height: 36px; }
+    .help span { display: none; }
+    .auth-main { align-items: flex-start; padding: 36px 0 24px; }
+    .head { margin-bottom: 28px; }
+    .head h1 { font-size: 26px; }
+    .head p { font-size: 15px; }
+    .input, .btn { height: 52px; font-size: 16px; }
+    .check { min-height: 44px; }
+    .link { padding: 10px 2px; }
+    .reqs { grid-template-columns: 1fr; }
+    .auth-foot { justify-content: center; text-align: center; }
+    .states { right: 12px; bottom: auto; top: 64px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================= Brand panel ================= -->
+  <aside class="panel" aria-label="About AAD Taxation">
+    <div class="bars" aria-hidden="true">
+      <svg viewBox="0 0 380 240">
+        <defs>
+          <linearGradient id="bar" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity=".09"/>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="barHot" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#F26522" stop-opacity=".75"/>
+            <stop offset="1" stop-color="#F26522" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect x="10"  y="150" width="44" height="90"  rx="8" fill="url(#bar)"/>
+        <rect x="84"  y="118" width="44" height="122" rx="8" fill="url(#bar)"/>
+        <rect x="158" y="128" width="44" height="112" rx="8" fill="url(#bar)"/>
+        <rect x="232" y="80"  width="44" height="160" rx="8" fill="url(#bar)"/>
+        <rect x="306" y="34"  width="44" height="206" rx="8" fill="url(#barHot)"/>
+        <path d="M14 132 C 90 120, 150 112, 200 92 S 290 52, 352 14" fill="none" stroke="#F26522" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+        <path d="M340 10 L 354 13 L 349 27" fill="none" stroke="#F26522" stroke-opacity=".55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="mark"><img src="logo.png" alt="AAD Taxation"></div>
+
+    <div class="slides" id="slides" aria-roledescription="carousel" aria-label="Highlights">
+      <div class="slide on" role="group" aria-roledescription="slide" aria-label="1 of 3">
+        <h2>Simplify your accounting. <span>Manage your business with confidence.</span></h2>
+        <p>Clients, filings, deadlines and documents — organised in one secure workspace built for tax professionals.</p>
+      </div>
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="2 of 3" aria-hidden="true">
+        <h2>Every deadline, <span>always on track.</span></h2>
+        <p>GST, TDS and ITR due dates tracked for every client, with reminders your team won’t miss.</p>
+      </div>
+      <div class="slide" role="group" aria-roledescription="slide" aria-label="3 of 3" aria-hidden="true">
+        <h2>Client records, <span>kept in one protected place.</span></h2>
+        <p>Store returns, notices and financial documents securely, with access controls for your whole team.</p>
+      </div>
+    </div>
+    <div class="dots" role="group" aria-label="Choose highlight">
+      <button type="button" aria-label="Highlight 1" aria-current="true"></button>
+      <button type="button" aria-label="Highlight 2"></button>
+      <button type="button" aria-label="Highlight 3"></button>
+    </div>
+  </aside>
+
+  <!-- ================= Auth card ================= -->
+  <div class="auth">
+    <header class="auth-top">
+      <img src="logo.png" alt="AAD Taxation">
+      <div class="help"><span>Need help? </span><a href="mailto:support@aadtaxation.com">Contact support</a></div>
+    </header>
+
+    <main class="auth-main">
+      <div class="form-wrap">
+
+        <!-- ---------- Sign in ---------- -->
+        <section class="view on" data-view="login" aria-labelledby="t-login">
+          <div class="head">
+            <h1 id="t-login" tabindex="-1">Welcome back</h1>
+            <p>Sign in to access your account.</p>
+          </div>
+
+          <div class="alert alert-warn" id="a-session" role="status" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <div><b>Your session has expired</b>For your security, please sign in again to continue.</div>
+          </div>
+          <div class="alert alert-error" id="a-creds" role="alert" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+            <div><b>Incorrect email or password.</b>Please check your details and try again.</div>
+          </div>
+          <div class="alert alert-error" id="a-locked" role="alert" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <div><b>Too many sign-in attempts.</b>For your security, try again in <span id="lock-count">0:30</span>.</div>
+          </div>
+
+          <form id="f-login" novalidate>
+            <fieldset id="fs-login">
+              <div class="field">
+                <label class="lbl" for="email">Email address</label>
+                <div class="control">
+                  <input class="input" id="email" type="email" inputmode="email" autocomplete="username" placeholder="you@company.com" aria-describedby="email-err" required>
+                </div>
+                <p class="err" id="email-err" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span></span></p>
+              </div>
+
+              <div class="field">
+                <label class="lbl" for="password">Password</label>
+                <div class="control has-toggle">
+                  <input class="input" id="password" type="password" autocomplete="current-password" placeholder="Enter your password" aria-describedby="pw-err caps" required>
+                  <button type="button" class="toggle" data-toggle="password" aria-controls="password" aria-pressed="false" aria-label="Show password">
+                    <svg class="show-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="hide-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.8 8.3 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18"/></svg>
+                  </button>
+                </div>
+                <p class="err" id="pw-err" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span>Enter your password.</span></p>
+                <p class="note" id="caps" hidden>Caps Lock is on.</p>
+              </div>
+
+              <div class="row">
+                <label class="check"><input type="checkbox" id="remember"> Remember me</label>
+                <button type="button" class="link" data-go="forgot">Forgot password?</button>
+              </div>
+            </fieldset>
+
+            <button type="submit" class="btn btn-primary" id="b-login">
+              <span class="spin" aria-hidden="true"></span><span class="lbl-t">Sign in</span>
+              <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+          </form>
+        </section>
+
+        <!-- ---------- Forgot ---------- -->
+        <section class="view" data-view="forgot" aria-labelledby="t-forgot">
+          <div class="head">
+            <div class="badge" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M18 5l2 2"/></svg></div>
+            <h1 id="t-forgot" tabindex="-1">Forgot your password?</h1>
+            <p>Enter the email you use to sign in, and we’ll send you a link to reset your password.</p>
+          </div>
+          <form id="f-forgot" novalidate>
+            <fieldset id="fs-forgot">
+              <div class="field">
+                <label class="lbl" for="f-email">Email address</label>
+                <input class="input" id="f-email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" aria-describedby="f-email-err" required>
+                <p class="err" id="f-email-err" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span></span></p>
+              </div>
+            </fieldset>
+            <button type="submit" class="btn btn-primary" id="b-forgot" style="margin-top:6px"><span class="spin" aria-hidden="true"></span><span class="lbl-t">Send reset link</span></button>
+          </form>
+          <p class="below"><button type="button" class="link link-ink" data-go="login">Back to sign in</button></p>
+        </section>
+
+        <!-- ---------- Sent ---------- -->
+        <section class="view" data-view="sent" aria-labelledby="t-sent">
+          <div class="head">
+            <div class="badge" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+            <h1 id="t-sent" tabindex="-1">Check your email</h1>
+            <p>If an account exists for <strong id="sent-to">you@company.com</strong>, you’ll receive a password reset link shortly. The link expires in 30 minutes.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-go="login">Back to sign in</button>
+          <p class="below" aria-live="polite">Didn’t get the email? <button type="button" class="link" id="b-resend">Resend link</button></p>
+        </section>
+
+        <!-- ---------- Reset ---------- -->
+        <section class="view" data-view="reset" aria-labelledby="t-reset">
+          <div class="head">
+            <div class="badge" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+            <h1 id="t-reset" tabindex="-1">Set a new password</h1>
+            <p>Choose a strong password you haven’t used before.</p>
+          </div>
+          <form id="f-reset" novalidate>
+            <fieldset id="fs-reset">
+              <div class="field">
+                <label class="lbl" for="np">New password</label>
+                <div class="control has-toggle">
+                  <input class="input" id="np" type="password" autocomplete="new-password" placeholder="Enter a new password" aria-describedby="reqs np-err" required>
+                  <button type="button" class="toggle" data-toggle="np" aria-controls="np" aria-pressed="false" aria-label="Show password">
+                    <svg class="show-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="hide-ic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1M6.6 6.6C3.8 8.3 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M3 3l18 18"/></svg>
+                  </button>
+                </div>
+                <ul class="reqs" id="reqs">
+                  <li data-r="len"><span class="d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>At least 8 characters</li>
+                  <li data-r="case"><span class="d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>Upper &amp; lowercase</li>
+                  <li data-r="num"><span class="d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>One number</li>
+                  <li data-r="sym"><span class="d"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>One special character</li>
+                </ul>
+                <p class="err" id="np-err" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span>Your password doesn’t meet all the requirements yet.</span></p>
+              </div>
+              <div class="field">
+                <label class="lbl" for="cp">Confirm new password</label>
+                <input class="input" id="cp" type="password" autocomplete="new-password" placeholder="Re-enter your new password" aria-describedby="cp-err" required>
+                <p class="err" id="cp-err" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span>Passwords don’t match.</span></p>
+              </div>
+            </fieldset>
+            <button type="submit" class="btn btn-primary" id="b-reset" style="margin-top:6px"><span class="spin" aria-hidden="true"></span><span class="lbl-t">Update password</span></button>
+          </form>
+        </section>
+
+        <!-- ---------- Reset success ---------- -->
+        <section class="view" data-view="done" aria-labelledby="t-done">
+          <div class="head">
+            <div class="badge ok" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+            <h1 id="t-done" tabindex="-1">Password updated</h1>
+            <p>Your password has been changed. For your security, you’ve been signed out of all other devices.</p>
+          </div>
+          <button type="button" class="btn btn-primary" data-go="login">
+            Continue to sign in
+            <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="auth-foot">
+      <span>© 2026 AAD Taxation</span>
+      <nav aria-label="Legal"><a href="#">Privacy Policy</a><a href="#">Terms</a><a href="mailto:support@aadtaxation.com">Support</a></nav>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" hidden>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6CE9A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+  <span id="toast-t"></span>
+</div>
+
+<!-- Design-review helper — remove for production -->
+<nav class="states" aria-label="Preview design states">
+  <details>
+    <summary>Preview states</summary>
+    <div class="list" id="states">
+      <button type="button" data-s="default">1 · Default login</button>
+      <button type="button" data-s="email-error">2 · Email validation error</button>
+      <button type="button" data-s="bad-creds">3 · Incorrect email/password</button>
+      <button type="button" data-s="pw-visible">4 · Password visible</button>
+      <button type="button" data-s="loading">5 · Loading — Signing in…</button>
+      <button type="button" data-s="disabled">6 · Disabled (too many attempts)</button>
+      <button type="button" data-s="forgot">7 · Forgot password</button>
+      <button type="button" data-s="sent">8 · Reset email sent</button>
+      <button type="button" data-s="reset">9 · Reset password</button>
+      <button type="button" data-s="done">10 · Password reset success</button>
+      <button type="button" data-s="session">11 · Session expired</button>
+      <div class="demo">Demo login: <b>demo@aadtaxation.com</b> / <b>Demo@1234</b></div>
+    </div>
+  </details>
+</nav>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const DEMO = { email: 'demo@aadtaxation.com', pw: 'Demo@1234' };
+  const timers = new Set();
+  const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); fn(); }, ms); timers.add(t); };
+  const clearTimers = () => { timers.forEach(clearTimeout); timers.clear(); };
+
+  /* ---------- Carousel (pauses on hover/focus, off for reduced motion) ---------- */
+  const slides = $$('.slide'), dots = $$('.dots button');
+  let cur = 0, auto;
+  const go = i => {
+    cur = (i + slides.length) % slides.length;
+    slides.forEach((s, k) => { s.classList.toggle('on', k === cur); s.setAttribute('aria-hidden', String(k !== cur)); });
+    dots.forEach((d, k) => d.setAttribute('aria-current', String(k === cur)));
+  };
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const play = () => { if (!reduced) { clearInterval(auto); auto = setInterval(() => go(cur + 1), 6000); } };
+  const pause = () => clearInterval(auto);
+  dots.forEach((d, k) => d.addEventListener('click', () => { go(k); play(); }));
+  const panel = $('.panel');
+  panel.addEventListener('mouseenter', pause); panel.addEventListener('mouseleave', play);
+  panel.addEventListener('focusin', pause); panel.addEventListener('focusout', play);
+  play();
+
+  /* ---------- Views ---------- */
+  function show(name, focus = true) {
+    $$('.view').forEach(v => v.classList.toggle('on', v.dataset.view === name));
+    if (focus) $(`.view[data-view="${name}"] h1`)?.focus({ preventScroll: true });
+    scrollTo(0, 0);
+  }
+  $$('[data-go]').forEach(b => b.addEventListener('click', () => {
+    clearTimers();
+    if (b.dataset.go === 'forgot' && EMAIL.test(email.value.trim())) $('#f-email').value = email.value.trim();
+    if (b.dataset.go === 'login') ['#a-creds', '#a-session'].forEach(s => $(s).hidden = true);
+    show(b.dataset.go);
+  }));
+
+  function fieldErr(input, errEl, msg) {
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    errEl.hidden = !msg;
+    if (msg) errEl.querySelector('span').textContent = msg;
+  }
+  function busy(btn, fs, on, text) {
+    btn.classList.toggle('loading', on);
+    btn.disabled = on;
+    btn.setAttribute('aria-busy', String(on));
+    fs.disabled = on;
+    if (text) $('.lbl-t', btn).textContent = text;
+  }
+  const emailMsg = v => !v ? 'Enter your email address.' : !EMAIL.test(v) ? 'Enter a valid email address, like you@company.com.' : '';
+
+  $$('[data-toggle]').forEach(b => b.addEventListener('click', () => {
+    const i = document.getElementById(b.dataset.toggle);
+    const vis = i.type === 'password';
+    i.type = vis ? 'text' : 'password';
+    b.setAttribute('aria-pressed', String(vis));
+    b.setAttribute('aria-label', vis ? 'Hide password' : 'Show password');
+  }));
+
+  /* ---------- Sign in ---------- */
+  const email = $('#email'), pw = $('#password'), bLogin = $('#b-login');
+  const emailErr = $('#email-err'), pwErr = $('#pw-err');
+  let fails = 0;
+
+  email.addEventListener('blur', () => { const v = email.value.trim(); if (v) fieldErr(email, emailErr, emailMsg(v)); });
+  email.addEventListener('input', () => { if (email.getAttribute('aria-invalid') === 'true' && !emailMsg(email.value.trim())) fieldErr(email, emailErr, ''); });
+  pw.addEventListener('input', () => { if (pw.value) fieldErr(pw, pwErr, ''); });
+  pw.addEventListener('keyup', e => $('#caps').hidden = !e.getModifierState?.('CapsLock'));
+  pw.addEventListener('blur', () => $('#caps').hidden = true);
+
+  $('#f-login').addEventListener('submit', e => {
+    e.preventDefault();
+    if (bLogin.disabled) return;
+    $('#a-creds').hidden = true;
+    const v = email.value.trim(), em = emailMsg(v);
+    fieldErr(email, emailErr, em);
+    fieldErr(pw, pwErr, pw.value ? '' : 'Enter your password.');
+    if (em) return email.focus();
+    if (!pw.value) return pw.focus();
+    busy(bLogin, $('#fs-login'), true, 'Signing in…');
+    later(() => {
+      busy(bLogin, $('#fs-login'), false, 'Sign in');
+      if (v.toLowerCase() === DEMO.email && pw.value === DEMO.pw) {
+        fails = 0; $('#a-session').hidden = true;
+        toast('Signed in. Redirecting to your dashboard…');
+      } else if (++fails >= 5) {
+        lockout(30);
+      } else {
+        pw.value = ''; $('#a-creds').hidden = false; pw.focus();
+      }
+    }, 1400);
+  });
+
+  function lockout(sec) {
+    $('#a-creds').hidden = true; $('#a-locked').hidden = false;
+    bLogin.disabled = true; $('#fs-login').disabled = true;
+    const tick = () => {
+      $('#lock-count').textContent = `0:${String(sec).padStart(2, '0')}`;
+      if (sec-- <= 0) { fails = 0; $('#a-locked').hidden = true; bLogin.disabled = false; $('#fs-login').disabled = false; return; }
+      later(tick, 1000);
+    };
+    tick();
+  }
+
+  /* ---------- Forgot ---------- */
+  const fEmail = $('#f-email'), fErr = $('#f-email-err'), bForgot = $('#b-forgot');
+  fEmail.addEventListener('input', () => { if (fEmail.getAttribute('aria-invalid') === 'true' && !emailMsg(fEmail.value.trim())) fieldErr(fEmail, fErr, ''); });
+  $('#f-forgot').addEventListener('submit', e => {
+    e.preventDefault();
+    const v = fEmail.value.trim(), m = emailMsg(v);
+    fieldErr(fEmail, fErr, m);
+    if (m) return fEmail.focus();
+    busy(bForgot, $('#fs-forgot'), true, 'Sending link…');
+    later(() => { busy(bForgot, $('#fs-forgot'), false, 'Send reset link'); $('#sent-to').textContent = v; show('sent'); }, 1100);
+  });
+  const bResend = $('#b-resend');
+  bResend.addEventListener('click', () => {
+    let s = 30; bResend.disabled = true;
+    const tick = () => {
+      if (s <= 0) { bResend.disabled = false; bResend.textContent = 'Resend link'; return; }
+      bResend.textContent = `Resend in ${s--}s`; later(tick, 1000);
+    };
+    toast('A new reset link is on its way.'); tick();
+  });
+
+  /* ---------- Reset ---------- */
+  const np = $('#np'), cp = $('#cp'), bReset = $('#b-reset');
+  const rules = { len: v => v.length >= 8, case: v => /[a-z]/.test(v) && /[A-Z]/.test(v), num: v => /\d/.test(v), sym: v => /[^A-Za-z0-9]/.test(v) };
+  const strong = v => Object.values(rules).every(f => f(v));
+  const paint = () => {
+    $$('#reqs li').forEach(li => li.classList.toggle('met', rules[li.dataset.r](np.value)));
+    if (np.getAttribute('aria-invalid') === 'true' && strong(np.value)) fieldErr(np, $('#np-err'), '');
+  };
+  np.addEventListener('input', paint);
+  cp.addEventListener('blur', () => { if (cp.value) fieldErr(cp, $('#cp-err'), cp.value !== np.value ? 'Passwords don’t match.' : ''); });
+  cp.addEventListener('input', () => { if (cp.value === np.value) fieldErr(cp, $('#cp-err'), ''); });
+  $('#f-reset').addEventListener('submit', e => {
+    e.preventDefault();
+    const ok = strong(np.value), match = cp.value && cp.value === np.value;
+    fieldErr(np, $('#np-err'), ok ? '' : 'Your password doesn’t meet all the requirements yet.');
+    fieldErr(cp, $('#cp-err'), ok && !match ? (cp.value ? 'Passwords don’t match.' : 'Confirm your new password.') : '');
+    if (!ok) return np.focus();
+    if (!match) return cp.focus();
+    busy(bReset, $('#fs-reset'), true, 'Updating password…');
+    later(() => { busy(bReset, $('#fs-reset'), false, 'Update password'); show('done'); }, 1200);
+  });
+
+  let tt;
+  function toast(msg) { $('#toast-t').textContent = msg; $('#toast').hidden = false; clearTimeout(tt); tt = setTimeout(() => $('#toast').hidden = true, 3200); }
+
+  /* ---------- Preview states ---------- */
+  function resetAll() {
+    clearTimers(); fails = 0;
+    $$('form').forEach(f => f.reset());
+    $$('.input').forEach(i => i.removeAttribute('aria-invalid'));
+    $$('.err, .alert, #caps').forEach(el => el.hidden = true);
+    $$('[data-toggle]').forEach(b => { document.getElementById(b.dataset.toggle).type = 'password'; b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', 'Show password'); });
+    busy(bLogin, $('#fs-login'), false, 'Sign in');
+    busy(bForgot, $('#fs-forgot'), false, 'Send reset link');
+    busy(bReset, $('#fs-reset'), false, 'Update password');
+    bResend.disabled = false; bResend.textContent = 'Resend link';
+    paint();
+  }
+  const SAMPLE = 'priya.sharma@company.com';
+  const presets = {
+    'default': () => show('login', false),
+    'email-error': () => { show('login', false); email.value = 'priya.sharma@company'; fieldErr(email, emailErr, emailMsg(email.value)); },
+    'bad-creds': () => { show('login', false); email.value = SAMPLE; $('#a-creds').hidden = false; },
+    'pw-visible': () => { show('login', false); email.value = SAMPLE; pw.value = 'Taxation@2026'; $('[data-toggle="password"]').click(); },
+    'loading': () => { show('login', false); email.value = SAMPLE; pw.value = 'Taxation@2026'; busy(bLogin, $('#fs-login'), true, 'Signing in…'); },
+    'disabled': () => { show('login', false); email.value = SAMPLE; lockout(30); },
+    'forgot': () => show('forgot', false),
+    'sent': () => { $('#sent-to').textContent = SAMPLE; show('sent', false); },
+    'reset': () => { show('reset', false); np.value = 'Taxation2026'; paint(); },
+    'done': () => show('done', false),
+    'session': () => { show('login', false); email.value = SAMPLE; $('#a-session').hidden = false; },
+  };
+  $$('#states [data-s]').forEach(b => b.addEventListener('click', () => {
+    resetAll(); presets[b.dataset.s]();
+    $$('#states [data-s]').forEach(x => x.setAttribute('aria-current', String(x === b)));
+    history.replaceState(null, '', '#' + b.dataset.s);
+  }));
+  ($(`#states [data-s="${location.hash.slice(1)}"]`) || $('#states [data-s="default"]')).click();
+})();
+</script>
+</body>
+</html>

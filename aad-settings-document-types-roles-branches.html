@@ -897,7 +897,7 @@ function renderDocTypes(item){
       '<td>'+chipList(d.labels)+'</td>'+
       '<td>'+(d.formatsOn?chipList(d.formats):'<span class="chip">All formats</span>')+'</td>'+
       '<td class="c"><span class="pill '+(d.expiry?'on':'off')+'">'+(d.expiry?'Enabled':'Disabled')+'</span></td>'+
-      '<td>'+chipList(mods,function(m){return d.required[m];})+'</td>'+
+      '<td>'+chipList(mods)+'</td>'+
       '<td class="c"><span class="state'+(d.active?'':' no')+'"><i></i>'+(d.active?'Active':'Inactive')+'</span></td>'+
       '<td class="c"><span class="acts">'+
         '<button class="act" data-edit="'+d.id+'" title="Edit">'+I.edit+'</button>'+

@@ -891,14 +891,8 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 /* Documents tab: same calm list, with every requirement from the reference */
 .ds-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .ds-bar .btn.xs{height:34px;flex-shrink:0}
-.ds-chips{display:flex;gap:6px;flex-shrink:0}
-.ds-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;white-space:nowrap;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12.5px;font-weight:600;color:var(--slate)}
-.ds-chip i{width:7px;height:7px;border-radius:50%;background:#10B981}
-.ds-chip.soon i{background:#F59E0B}.ds-chip.expired i{background:#FF5966}.ds-chip.none i{background:#CBD5E1}
-.ds-chip b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.ds-chip:hover{border-color:#D4D7DD}
-.ds-chip.on{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink)}
-.ds-chip.on b{color:var(--orange-ink)}
+.ds-sel{flex-shrink:0}
+.ds-sel select{height:34px;min-width:170px;font-size:13px}
 .ds-search{position:relative;flex:1;min-width:140px}
 .ds-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
 .ds-search input{width:100%;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 12px 0 34px;font-size:13px}
@@ -949,7 +943,6 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
   .ds-acts{order:4;margin-left:auto}
   .ds-prev{padding-left:16px}
   .ds-bar{flex-wrap:wrap}
-  .ds-chips{flex-wrap:wrap}
   .ds-search{flex-basis:100%;order:3}
 }
 .state.soon i{background:#F59E0B}.state.na i{background:#CBD5E1}
@@ -1460,7 +1453,7 @@ function docCard(d){
   sub.push('Version '+d.ver);
   var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
-      '<span class="ds-ic'+(st==='expired'?' bad':'')+'">'+(t.slots[0].id==='front'?I.idc:I.file)+'</span>'+
+      '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
         fileChips(d,t,0,d.cur.files)+
         '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+'</span>'+
@@ -1490,13 +1483,13 @@ function docCard(d){
 function docsBody(s){
   var docs=storeOf(s.id).docs, n={valid:0,none:0,soon:0,expired:0};
   docs.forEach(function(d){ n[stOf(d)]++; });
-  // the counts double as the status filter
-  var chips='<div class="ds-chips" role="group" aria-label="Filter by status">'+
-    [['all','All',docs.length],['expired','Expired',n.expired],['soon','Expiring soon',n.soon],['valid','Valid',n.valid],['none','No expiry',n.none]].map(function(c){
-      return '<button class="ds-chip '+c[0]+(docFilter===c[0]?' on':'')+'" data-dfilter="'+c[0]+'" aria-pressed="'+(docFilter===c[0])+'">'+(c[0]==='all'?'':'<i></i>')+c[1]+' <b>'+c[2]+'</b></button>';
-    }).join('')+'</div>';
-  var h='<div class="ds-bar">'+chips+
-    '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+
+  // one status filter; each option shows how many documents it matches
+  var filter='<div class="sel ds-sel"><select id="sd-f" aria-label="Filter by status">'+
+    [['all','All status',docs.length],['expired','Expired',n.expired],['soon','Expiring soon',n.soon],['valid','Valid',n.valid],['none','No expiry',n.none]].map(function(c){
+      return '<option value="'+c[0]+'"'+(docFilter===c[0]?' selected':'')+'>'+c[1]+' ('+c[2]+')</option>';
+    }).join('')+'</select></div>';
+  var h='<div class="ds-bar">'+
+    '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
   return h+currentList(docs);
 }
@@ -1526,10 +1519,9 @@ function viewDoc(k,vi,fi){
 }
 I.close='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 document.addEventListener('click',function(e){
-  var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-dfilter],[data-fmore]'); if(!b) return;
+  var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-fmore]'); if(!b) return;
   if(b.hasAttribute('data-fmore')){ var fk=b.getAttribute('data-fmore'); filesOpen[fk]=!filesOpen[fk]; keepScroll(renderDetail); return; }
   if(b.hasAttribute('data-view')){ var p=b.getAttribute('data-view').split('|'); viewDoc(p[0],+p[1],+p[2]); return; }
-  if(b.hasAttribute('data-dfilter')){ docFilter=b.getAttribute('data-dfilter'); keepScroll(renderDetail); return; }
   docTab=b.getAttribute('data-dtab'); keepScroll(renderDetail);
 });
 document.addEventListener('input',function(e){

@@ -6439,6 +6439,74 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-doc{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--orange-ink);white-space:nowrap}
 .ar-doc:hover{text-decoration:underline;text-underline-offset:3px}
 .ar-today td{background:#FFFBF7}
+.ar-cmt{display:block;text-align:left;max-width:240px}
+.ar-cmt:hover .ar-clip{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
+.ar-cm{border:1px solid var(--line-soft);background:#FAFBFC;border-radius:10px;padding:10px 13px}
+.ar-cm+.ar-cm{margin-top:8px}
+.ar-cm-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--mute)}
+.ar-cm-h b{font-weight:700;color:var(--slate)}
+.ar-cm-h time{font-variant-numeric:tabular-nums;white-space:nowrap}
+.ar-cm p{font-size:13.5px;color:var(--ink);line-height:1.5;margin-top:5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ar-files{display:flex;flex-direction:column;gap:8px}
+.ar-file{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.ar-file:hover{border-color:#D7DBE0}
+.ar-ft{flex-shrink:0;width:38px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;letter-spacing:.3px}
+.ar-ft.big{width:64px;height:76px;border-radius:10px;font-size:15px}
+.ar-fi{flex:1;min-width:0;text-align:left}
+.ar-fi b{display:block;font-size:13.5px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-fi:hover b{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
+.ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
+/* day panel: same header, tabs and detail sections as the Leave panel */
+.drawer.ad{max-width:720px}
+.ad-head{align-items:flex-start;padding:24px 28px 18px;display:flex;justify-content:space-between;gap:16px}
+.ad-head .eyebrow{font-size:12px;font-weight:500;color:#94A3B8;margin-bottom:4px}
+.ad-head h2{font-family:'Manrope';font-size:21px;font-weight:800;letter-spacing:-.3px;line-height:1.25;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ad-head h2 .state{font-family:'Inter';font-size:12px}
+.ad-head .x{color:var(--mute);width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ad-head .x:hover{background:#F2F4F7;color:var(--ink)}
+.ad-head .dprofile{display:flex;gap:16px;min-width:0;flex:1}
+.ad-head .dpmain{min-width:0;flex:1}
+.ad-date{width:58px;height:62px;border-radius:12px;background:var(--orange-soft);color:var(--orange-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.ad-date b{font-family:'Manrope';font-size:22px;font-weight:800;line-height:1}
+.ad-date span{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-top:4px}
+.drawer.ad .btabs{display:flex;gap:4px;padding:0 28px;border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto}
+.drawer.ad .btabs button{padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.drawer.ad .btabs button:hover{color:var(--ink)}
+.drawer.ad .btabs button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}
+.drawer.ad .tab-n{min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.drawer.ad .btabs button.on .tab-n{background:var(--orange-soft);color:var(--orange-ink)}
+.ad-body{flex:1;overflow-y:auto;padding:22px 28px 32px;display:flex;flex-direction:column;gap:16px}
+.ad-body:focus{outline:none}
+.ad-body>*{flex-shrink:0}
+.ad-body .at-tl{padding:4px 0 0 32px}
+.ad-body .at-tl:before{left:13px;top:12px}
+.ad-body .dsec{border:1px solid var(--line-soft);border-radius:10px;overflow:hidden}
+.ad-body .dsec-h{padding:12px 16px;background:#FAFBFC;border-bottom:1px solid var(--line-soft);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ad-body .dsec-h small{font-size:11.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#94A3B8}
+.ad-body .kv>div{display:grid;grid-template-columns:160px 1fr;gap:16px;padding:12px 16px;border-bottom:1px solid var(--line-soft);align-items:start}
+.ad-body .kv>div:last-child{border-bottom:0}
+.ad-body .kv dt{font-size:12.5px;color:var(--mute);font-weight:500}
+.ad-body .kv dd{font-size:13.5px;color:var(--ink);font-variant-numeric:tabular-nums;min-width:0}
+.ad-body .kv dd small{color:var(--faint);font-size:12px;margin-left:4px}
+.ad-body .kv dd b{font-weight:700}
+.ad-late{color:#B4690E;font-weight:700}
+.ad-ver{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--green)}
+.ad-ver.no{color:var(--mute)}
+.ad-list{display:flex;flex-direction:column;gap:8px}
+.ad-list .ar-cm+.ar-cm{margin-top:0}
+.ad-empty{padding:40px 16px;text-align:center;color:var(--mute);font-size:13.5px}
+.ad-empty b{display:block;color:var(--ink);font-size:14.5px;margin-bottom:4px}
+@media (max-width:600px){.ad-head,.ad-body{padding-left:18px;padding-right:18px}.drawer.ad .btabs{padding:0 12px}.ad-body .kv>div{grid-template-columns:1fr;gap:4px}}
+/* document viewer */
+#dlg .modal.ar-pv{max-width:620px}
+.ar-pv-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.ar-pv-h b{flex:1;min-width:0;font-size:14px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ar-pv-b{background:#F3F4F6;padding:28px 20px 20px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.ar-sheet{width:min(320px,100%);aspect-ratio:3/4;background:#fff;border-radius:10px;box-shadow:0 10px 30px rgba(15,23,42,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center}
+.ar-sheet b{font-size:14px;color:var(--ink);overflow-wrap:anywhere;margin-top:6px}
+.ar-sheet span{font-size:12.5px;color:var(--mute)}
+.ar-sheet small{font-size:12px;color:var(--faint)}
+.ar-pv-note{font-size:12.5px;color:var(--mute);text-align:center;max-width:420px;line-height:1.5}
 
 .drawer .dr-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 26px;border-bottom:1px solid var(--line)}
 .drawer .dr-hd h2{font-family:'Manrope';font-size:20px;font-weight:800}
@@ -6653,8 +6721,8 @@ function render(){
       '<td class="num">'+hm(T.brk)+'</td>'+
       '<td class="num">'+(T.end||r.today?hm(T.worked):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span></td>'+
-      '<td>'+(last?'<span class="ar-clip" title="'+esc(last.note)+'">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':''):'<span class="ar-dash">—</span>')+'</td>'+
-      '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.date+'" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(last?'<button class="ar-cmt" data-view="'+r.date+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.date+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="c"><span class="acts"><button class="act" data-view="'+r.date+'" title="View" aria-label="View attendance for '+dmy(d)+'">'+I.eye+'</button></span></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
@@ -6675,7 +6743,7 @@ function render(){
   });
   if(openDate) openDay(openDate,true);
 }
-content.addEventListener('click',function(e){ var b=e.target.closest('[data-view]'); if(b) openDay(b.getAttribute('data-view')); });
+content.addEventListener('click',function(e){ var b=e.target.closest('[data-view]'); if(b) openDay(b.getAttribute('data-view'),false,b.getAttribute('data-sec')); });
 
 /* ---------- CSV of the filtered days ---------- */
 function exportCsv(){
@@ -6695,31 +6763,130 @@ function exportCsv(){
   toast('Exported '+rows.length+' day'+(rows.length===1?'':'s')+' to CSV.');
 }
 
-/* ---------- one day in a side panel: totals, then every event with its comment and documents ---------- */
-function openDay(date,keep){
-  var r=days().filter(function(x){ return x.date===date; })[0]; if(!r){ closeDay(); return; }
+/* ---------- one day in a side panel: summary, comments, documents, then the timeline ---------- */
+var FT={pdf:['PDF','#FDECEC','#C2410C'],jpg:['JPG','#E8F1FD','#2563EB'],jpeg:['JPG','#E8F1FD','#2563EB'],png:['PNG','#E8F1FD','#2563EB'],doc:['DOC','#EEF2FF','#4F46E5'],docx:['DOC','#EEF2FF','#4F46E5']};
+function ftag(n,big){ var e=(String(n).split('.').pop()||'').toLowerCase(), t=FT[e]||[(e||'file').toUpperCase(),'#F1F2F4','#475569'];
+  return '<span class="ar-ft'+(big?' big':'')+'" style="background:'+t[1]+';color:'+t[2]+'">'+t[0]+'</span>'; }
+function dayOf(date){ return days().filter(function(x){ return x.date===date; })[0]; }
+/* the day split into shifts, each with its breaks */
+function shiftsOf(events){
+  var out=[], cur=null, br=null;
+  events.forEach(function(e,i){
+    if(e.type==='start'){ cur={start:e,end:null,breaks:[]}; out.push(cur); }
+    else if(!cur) return;
+    else if(e.type==='break_start'){ br={s:e,e:null}; cur.breaks.push(br); }
+    else if(e.type==='break_end'&&br){ br.e=e; br=null; }
+    else if(e.type==='end'){ cur.end=e; br=null; }
+  });
+  return out;
+}
+var dayTab='details';
+/* each fact appears once: the header names the day, Details holds the times, the tabs hold comments and documents */
+function openDay(date,keep,sec){
+  var r=dayOf(date); if(!r){ closeDay(); return; }
+  if(!keep||openDate!==date) dayTab=sec==='docs'?'docs':sec==='notes'?'notes':'details';
   openDate=date;
   var T=totals(r.events,Date.now()), d=fromKey(date), st=DAY_STATE[dayState(r,!!r.today)];
-  var m=function(k,v,muted){ return '<div class="at-m"><dt>'+k+'</dt><dd class="'+(muted?'muted':'')+'">'+v+'</dd></div>'; };
-  var scroll=keep&&ov.querySelector('.dr-bd')?ov.querySelector('.dr-bd').scrollTop:0;
-  ov.innerHTML='<div class="drawer" role="dialog" aria-modal="true" aria-labelledby="ar-dt">'+
-    '<div class="dr-hd"><div><h2 id="ar-dt">'+weekday(d)+', '+dmy(d)+'</h2><p><span class="state '+st[0]+'"><i></i>'+st[1]+'</span>'+(r.today?'<span>Today</span>':'')+'</p></div>'+
-      '<button id="ar-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="dr-bd"><dl class="at-metrics">'+
-      m('Shift start',T.start?t12(T.start):'--:--',!T.start)+m('Shift end',T.end?t12(T.end):'--:--',!T.end)+
-      m('Break',hm(T.brk),!T.brk)+m('Worked',T.end||r.today?hm(T.worked):'--',!(T.end||r.today))+'</dl>'+
-      (!T.end&&!r.today?'<div class="cam-msg info" style="margin:0">The shift wasn’t ended this day, so worked time can’t be worked out. Ask your manager to correct it.</div>':'')+
-      '<div class="sect-title">Activity and comments</div>'+shiftTimeline(r.events,'Nothing was recorded this day.')+
+  var cm=r.events.filter(function(e){ return e.note; }), docs=[];
+  r.events.forEach(function(e,ei){ (e.files||[]).forEach(function(f,fi){ docs.push({f:f,e:e,ei:ei,fi:fi}); }); });
+  var tabs=[['details','Details'],['notes','Comments',cm.length],['docs','Documents',docs.length]];
+  var keepY=keep&&document.getElementById('ad-body')?document.getElementById('ad-body').scrollTop:0;
+  ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="ad-t">'+
+    '<div class="dhead ad-head"><div class="dprofile">'+
+      '<div class="ad-date"><b>'+pad(d.getDate())+'</b><span>'+MONTHS[d.getMonth()].slice(0,3)+'</span></div>'+
+      '<div class="dpmain"><p class="eyebrow">Attendance · '+esc(ME.name)+(r.today?' · Today':'')+'</p>'+
+        '<h2 id="ad-t">'+weekday(d)+', '+dmy(d)+' <span class="state '+st[0]+'"><i></i>'+st[1]+'</span></h2></div></div>'+
+      '<div class="dhead-acts"><button class="x" id="ar-x" aria-label="Close">'+I.close+'</button></div></div>'+
+    '<div class="btabs" role="tablist" aria-label="Attendance day">'+tabs.map(function(x){
+      return '<button role="tab" data-dtab="'+x[0]+'" id="adt-'+x[0]+'" aria-controls="ad-body" aria-selected="'+(dayTab===x[0])+'" class="'+(dayTab===x[0]?'on':'')+'">'+x[1]+
+        (x[2]!=null?'<span class="tab-n">'+x[2]+'</span>':'')+'</button>';
+    }).join('')+'</div>'+
+    '<div class="ad-body" id="ad-body" role="tabpanel" aria-labelledby="adt-'+dayTab+'" tabindex="0">'+
+      (dayTab==='notes'?notesTab(cm):dayTab==='docs'?docsTab(docs):detailsTab(r,T))+
     '</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-  ov.querySelector('.dr-bd').scrollTop=scroll;
+  document.getElementById('ad-body').scrollTop=keepY;
   document.getElementById('ar-x').onclick=closeDay;
+  [].forEach.call(ov.querySelectorAll('[data-dtab]'),function(b){ b.onclick=function(){ dayTab=b.getAttribute('data-dtab'); openDay(openDate,true); document.getElementById('adt-'+dayTab).focus(); }; });
   if(!keep) document.getElementById('ar-x').focus();
 }
-function closeDay(){ openDate=null; ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; }
+function kvRow(k,v){ return '<div><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
+function breakRows(s,endAt){
+  return s.breaks.map(function(b,j){
+    var len=(b.e?b.e.at:(endAt||Date.now()))-b.s.at;
+    return kvRow(s.breaks.length>1?'Break '+(j+1):'Break',t12(b.s.at)+' → '+(b.e?t12(b.e.at):'now')+' <small>'+hm(len)+'</small>');
+  }).join('');
+}
+function detailsTab(r,T){
+  var dash='<span class="ar-dash">—</span>', sh=shiftsOf(r.events), first=sh[0]&&sh[0].start, many=sh.length>1;
+  var lateBy=first&&isLate(first.at)?first.at-new Date(first.at).setHours(SHIFT_STARTS[0],SHIFT_STARTS[1],0,0):0;
+  var manual=r.events.some(function(e){ return e.how==='prototype'; });
+  var endTxt=T.end?t12(T.end):r.today?'<small>Still on shift</small>':'<b class="ad-late">Not ended</b>';
+  var arrival=(lateBy?'<b class="ad-late">'+hm(lateBy)+' late</b>':'On time')+' <small>rostered '+pad(SHIFT_STARTS[0])+':'+pad(SHIFT_STARTS[1])+' AM</small>';
+  // one shift: its times live here. Several shifts: each gets its own section below, so the summary keeps only the totals
+  var h='<section class="dsec"><div class="dsec-h">Summary</div><dl class="kv">'+
+    (many?kvRow('Arrival',arrival):
+      kvRow('Start',first?t12(first.at)+' · '+arrival:dash)+
+      breakRows(sh[0]||{breaks:[]},T.end)+
+      kvRow('End',endTxt))+
+    (many||T.breaks!==1?kvRow(T.breaks>1||many?'Total break':'Break',T.breaks?hm(T.brk):'None'):'')+
+    (T.end||r.today?kvRow('Worked','<b>'+hm(T.worked)+'</b>'+(many?' <small>across '+sh.length+' shifts</small>':'')):'')+
+    kvRow('Verification',manual?'<span class="ad-ver no">Some actions recorded without camera (prototype)</span>':'<span class="ad-ver">Every action face verified</span>')+
+  '</dl></section>';
+  if(!T.end&&!r.today) h+='<div class="cam-msg info" style="margin:0">The shift wasn’t ended this day, so worked time can’t be worked out. Ask your manager to correct it.</div>';
+  if(many) sh.forEach(function(s,i){
+    var w=totals(r.events.filter(function(e){ return e.at>=s.start.at&&(!s.end||e.at<=s.end.at); }),Date.now());
+    h+='<section class="dsec"><div class="dsec-h">Shift '+(i+1)+'<small>'+(s.end||r.today?hm(w.worked)+' worked':'')+'</small></div><dl class="kv">'+
+      kvRow('Start',t12(s.start.at))+breakRows(s,s.end&&s.end.at)+kvRow('End',s.end?t12(s.end.at):r.today?'<small>Still on shift</small>':dash)+
+    '</dl></section>';
+  });
+  return h;
+}
+function notesTab(cm){
+  if(!cm.length) return '<div class="ad-empty"><b>No comments</b>No comments were added this day.</div>';
+  return '<div class="ad-list">'+cm.map(function(e){
+    return '<div class="ar-cm"><div class="ar-cm-h"><b>'+ACTIONS[e.type].ev+'</b><time>'+t12(e.at)+'</time></div><p>'+esc(e.note)+'</p></div>';
+  }).join('')+'</div>';
+}
+function docsTab(docs){
+  if(!docs.length) return '<div class="ad-empty"><b>No documents</b>Documents attached when ending a shift appear here.</div>';
+  return '<div class="ar-files">'+docs.map(function(x){
+    var k=x.ei+'|'+x.fi;
+    return '<div class="ar-file">'+ftag(x.f.n)+'<button class="ar-fi" data-pv="'+k+'" title="Open '+esc(x.f.n)+'"><b>'+esc(x.f.n)+'</b><small>'+x.f.s+' · '+ACTIONS[x.e.type].ev+', '+t12(x.e.at)+'</small></button>'+
+      '<span class="acts"><button class="act" data-pv="'+k+'" title="View" aria-label="View '+esc(x.f.n)+'">'+I.eye+'</button>'+
+      '<button class="act" data-dlf="'+k+'" title="Download" aria-label="Download '+esc(x.f.n)+'">'+I.csv+'</button></span></div>';
+  }).join('')+'</div>';
+}
+function closeDay(){ closeFile(); openDate=null; ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; }
 ov.addEventListener('mousedown',function(e){ if(e.target===ov) closeDay(); });
-ov.addEventListener('click',function(e){ if(e.target.closest('[data-file]')) toast('File downloads aren’t connected in this prototype yet.'); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&openDate) closeDay(); });
+ov.addEventListener('click',function(e){
+  var p=e.target.closest('[data-pv]'); if(p) return viewFile(p.getAttribute('data-pv'));
+  var dl=e.target.closest('[data-dlf]'); if(dl) return toast('Downloads aren’t connected in this prototype yet.');
+});
+
+/* a document opened from the day panel. Only the name and size are stored in this prototype, so it shows a placeholder sheet */
+var dlg=document.getElementById('dlg');
+function viewFile(k){
+  var r=dayOf(openDate); if(!r) return;
+  var p=k.split('|'), e=r.events[+p[0]], f=e&&e.files&&e.files[+p[1]]; if(!f) return;
+  dlg.innerHTML='<div class="modal ar-pv" role="dialog" aria-modal="true" aria-labelledby="pv-t">'+
+    '<div class="ar-pv-h">'+ftag(f.n)+'<b id="pv-t" title="'+esc(f.n)+'">'+esc(f.n)+'</b>'+
+      '<span class="acts"><button class="act" id="pv-dl" title="Download" aria-label="Download '+esc(f.n)+'">'+I.csv+'</button><button class="act" id="pv-x" title="Close" aria-label="Close">'+I.close+'</button></span></div>'+
+    '<div class="ar-pv-b"><div class="ar-sheet">'+ftag(f.n,true)+'<b>'+esc(f.n)+'</b><span>'+f.s+'</span>'+
+      '<small>Attached when '+ACTIONS[e.type].ev.toLowerCase().replace('shift ','the shift ').replace('break ','the break ')+' · '+dmy(fromKey(openDate))+', '+t12(e.at)+'</small></div>'+
+      '<p class="ar-pv-note">The file preview shows here once documents are stored on the server. This prototype keeps only the file name and size.</p></div></div>';
+  dlg.classList.add('open');
+  document.getElementById('pv-x').onclick=closeFile;
+  document.getElementById('pv-dl').onclick=function(){ toast('Downloads aren’t connected in this prototype yet.'); };
+  document.getElementById('pv-x').focus();
+}
+function closeFile(){ dlg.classList.remove('open'); dlg.innerHTML=''; }
+dlg.addEventListener('mousedown',function(e){ if(e.target===dlg) closeFile(); });
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  if(dlg.classList.contains('open')) return closeFile();
+  if(openDate) closeDay();
+});
 
 // a shift recorded on the Dashboard (or another tab) shows up here straight away
 window.addEventListener('storage',function(e){ if(e.key===SHIFT_KEY) render(); });
@@ -7204,7 +7371,7 @@ function dayState(day,isToday){
 var DAY_STATE = { done:['','Completed'], late:['late','Late'], notended:['no','Not ended'], progress:['open','In progress'] };
 
 /* a day's events as a timeline, each with its comment and any attached documents */
-function shiftTimeline(events,empty){
+function shiftTimeline(events,empty,bare){                   // bare: times only, when comments and files are listed elsewhere
   var tick='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
       shield='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.4 3.1 8.4 7.5 9.5 4.4-1.1 7.5-5.1 7.5-9.5V6Z"/><path d="m9 12 2 2 4-4"/></svg>',
       clip='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 11.5-8.3 8.3a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"/></svg>';
@@ -7213,8 +7380,8 @@ function shiftTimeline(events,empty){
     var a=ACTIONS[e.type];
     return '<div class="at-ev"><span class="dot '+a.tone+'">'+tick+'</span><div><b>'+a.ev+'</b>'+
       '<small>'+shield+(e.how==='prototype'?'Recorded without camera (prototype)':'Face verified')+'</small>'+
-      (e.note?'<span class="note">'+esc(e.note)+'</span>':'')+
-      (e.files&&e.files.length?'<div class="files">'+e.files.map(function(f){
+      (e.note&&!bare?'<span class="note">'+esc(e.note)+'</span>':'')+
+      (e.files&&e.files.length&&!bare?'<div class="files">'+e.files.map(function(f){
         return '<button class="fchip" data-file="'+esc(f.n)+'" title="Download '+esc(f.n)+'">'+clip+'<b>'+esc(f.n)+'</b>'+f.s+'</button>';
       }).join('')+'</div>':'')+
       '</div><time>'+t12(e.at)+'</time></div>';

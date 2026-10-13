@@ -26,8 +26,8 @@ button{background:none;border:none;cursor:pointer;font:inherit;color:inherit}
   width:232px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);
   display:flex;flex-direction:column;height:100%;transition:width .18s;overflow:hidden;
 }
-.nav-logo{padding:22px 22px 26px}
-.nav-logo img{height:56px;width:auto;max-width:100%;display:block}
+.nav-logo{padding:20px 22px 22px}
+.nav-logo img{width:160px;height:auto;max-width:100%;display:block}
 .nav-items{padding:0 14px;display:flex;flex-direction:column;gap:2px;flex:1}
 .nav-items button{
   display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;width:100%;
@@ -66,6 +66,7 @@ body.collapsed .navtoggle{display:flex}
       <button data-mod="dashboard"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></button>
       <button data-mod="staff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/><path d="M18 20c0-2.4-.9-4.2-2.4-5.3"/></svg><span>Staff</span></button>
       <button data-mod="clients"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 20v-1.5C3 16 5.2 14 8 14h2c2.8 0 5 2 5 4.5V20"/><circle cx="9" cy="8" r="3.4"/><path d="M16.5 20v-1.2c0-1.8-.9-3.3-2.3-4.1"/><path d="M21 9.5 19 11.5 17.5 10"/></svg><span>Clients</span></button>
+      <button data-mod="leave"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9.5 15 2 2 3.5-3.5"/></svg><span>Leave</span></button>
       <button data-mod="settings" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1v.3a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7h-.3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.1-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1v-.3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 2.8 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.3a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.4.9Z"/></svg><span>Settings</span></button>
     </div>
     <div class="nav-foot">
@@ -2886,7 +2887,7 @@ var IC={
   pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>'
 };
 function initials(n){ return String(n||'').trim().split(/\s+/).filter(Boolean).slice(0,2).map(function(w){return w[0].toUpperCase();}).join(''); }
-function fmtDate(t){ return new Date(t).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}); }
+function fmtDate(t){ var d=new Date(t); return ('0'+d.getDate()).slice(-2)+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+d.getFullYear(); }
 function fmtWhen(t){
   var d=new Date(t), now=new Date(), tm=d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}).toLowerCase();
   return d.toDateString()===now.toDateString() ? 'today at '+tm : fmtDate(t)+' at '+tm;
@@ -3815,6 +3816,1369 @@ route();
 </body>
 </html>
 </script>
+<script type="text/plain" id="src-leave"><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Leave Management · AAD Taxation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#F18934;
+  --orange-ink:#E46A11;
+  --orange-soft:#FFF1E8;
+  --ink:#181C1E;
+  --slate:#475569;
+  --mute:#64748B;
+  --faint:#9BA6B7;
+  --line:#EBEEF0;
+  --line-soft:#F3F4F6;
+  --field:#F3F4F6;
+  --bg:#F7F8FA;
+  --green:#059669;
+  --green-soft:#ECFDF5;
+  --red:#E11D48;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;font-size:14px;
+}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+ul{list-style:none}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ================= Shell ================= */
+.shell{display:flex;min-height:100vh}
+
+/* --- primary nav --- */
+.nav{
+  width:232px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+}
+.nav-logo{padding:22px 22px 26px}
+.nav-logo img{height:56px;width:auto;max-width:100%;display:block}
+.nav-items{padding:0 14px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-items a{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;
+  color:#475569;font-weight:500;text-decoration:none;font-size:14.5px;
+}
+.nav-items a:hover{background:#F6F7F9;color:var(--ink)}
+.nav-items a.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:600}
+.nav-items a svg{flex-shrink:0;opacity:.9}
+.nav-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.nav-foot a{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:8px;color:var(--mute);text-decoration:none;font-size:13.5px}
+.nav-foot a:hover{background:#F6F7F9;color:var(--ink)}
+
+/* collapsed icon rail */
+.nav{transition:width .18s}
+body.collapsed .nav{width:76px}
+body.collapsed .nav-logo{padding:22px 0 26px;display:flex;justify-content:center}
+body.collapsed .nav-logo img{height:30px}
+body.collapsed .nav-items,
+body.collapsed .nav-foot{padding-left:10px;padding-right:10px}
+body.collapsed .nav-items a,
+body.collapsed .nav-foot a{justify-content:center;gap:0;font-size:0;padding-left:0;padding-right:0}
+body.collapsed .nav-items a svg,
+body.collapsed .nav-foot a svg{font-size:14px}
+
+/* --- main --- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  height:62px;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;padding:0 24px;position:sticky;top:env(safe-area-inset-top,0px);z-index:30;
+}
+.burger{width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:7px;color:var(--slate)}
+.burger:hover{background:#F2F4F7}
+.topbar .spacer{flex:1}
+.top-search{position:relative;width:300px}
+.top-search input{
+  width:100%;height:38px;border:1px solid var(--line);border-radius:999px;
+  background:#fff;padding:0 40px 0 16px;font-size:13.5px;
+}
+.top-search input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.13)}
+.top-search svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--mute)}
+.icon-btn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--slate);position:relative}
+.icon-btn:hover{background:#F2F4F7}
+.icon-btn .dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--orange);border:1.5px solid #fff}
+.whoami{display:flex;align-items:center;gap:10px;padding:4px 8px 4px 4px;border-radius:999px}
+.whoami:hover{background:#F2F4F7}
+.avatar{width:34px;height:34px;border-radius:50%;background:#DCE9F7;display:flex;align-items:center;justify-content:center;color:#2563A8;font-weight:700;font-size:13px}
+.whoami .who{text-align:left;line-height:1.25}
+.whoami .who b{display:block;font-size:13.5px;font-weight:600}
+.whoami .who span{display:block;font-size:11.5px;color:var(--mute)}
+
+.work{flex:1;display:flex;min-width:0}
+
+/* --- settings sub-nav (category wise) --- */
+.subnav{
+  width:272px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);
+  padding:24px 0 32px;overflow-y:auto;max-height:calc(100vh - 62px);position:sticky;top:62px;
+}
+.subnav h2{font-family:'Manrope';font-size:21px;font-weight:800;letter-spacing:-.4px;padding:0 22px 16px}
+.subnav .group{padding:0 14px;margin-bottom:6px}
+.group-head{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:9px 10px;color:#94A3B8;font-size:11px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;
+}
+.group-head:hover{color:var(--slate)}
+.group-head svg{transition:transform .18s}
+.group.closed .group-head svg{transform:rotate(-90deg)}
+.group.closed ul{display:none}
+.group ul{display:flex;flex-direction:column;gap:1px}
+.group li button{
+  width:100%;display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:7px;
+  color:#475569;font-size:14px;font-weight:500;text-align:left;
+}
+.group li button:hover{background:#F6F7F9;color:var(--ink)}
+.group li button.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:600}
+.group li button svg{flex-shrink:0;opacity:.85}
+
+/* --- content --- */
+.content{flex:1;min-width:0;padding:22px 32px 48px;overflow-x:auto}
+
+
+.page-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:4px 0 16px}
+.page-head h1{font-family:'Manrope';font-size:22px;font-weight:800;letter-spacing:-.4px}
+
+.btn-primary{
+  background:var(--orange);color:#fff;border-radius:6px;padding:9px 18px;
+  font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 1px 1px rgba(0,0,0,.05);
+}
+.btn-primary:hover{background:#DE7A27}
+.btn-ghost{border:1px solid var(--line);background:#fff;border-radius:6px;padding:9px 18px;font-size:12.5px;font-weight:600;color:var(--slate)}
+.btn-ghost:hover{background:#F6F7F9}
+
+/* --- filter bar --- */
+.filterbar{
+  background:#fff;border:1px solid var(--line-soft);border-radius:14px;
+  padding:11px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  margin-bottom:14px;flex-wrap:wrap;
+}
+.search{position:relative;width:332px;max-width:100%}
+.search input{width:100%;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 16px 0 44px;font-size:14px;color:var(--slate)}
+.search input::placeholder{color:#6B7280}
+.search input:focus{outline:none;border-color:var(--orange);background:#fff}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#6B7280}
+.filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.filters .lbl{display:flex;align-items:center;gap:6px;color:#4B5563;font-size:14px}
+.sel{position:relative}
+.sel select{
+  appearance:none;min-width:140px;height:42px;background:var(--field);border:1px solid var(--field);
+  border-radius:8px;padding:0 38px 0 16px;font-size:14px;color:#4B5563;cursor:pointer;
+}
+.sel select:focus{outline:none;border-color:var(--orange);background:#fff}
+.sel svg{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#6B7280;pointer-events:none}
+.clearf{
+  display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+  color:var(--orange-ink);padding:6px 4px;white-space:nowrap;
+}
+.clearf:hover{text-decoration:underline}
+.clearf[hidden]{display:none}
+
+/* --- table --- */
+.card{background:#fff;border:1px solid var(--line-soft);border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{
+  text-align:left;padding:15px 24px;font-size:11px;font-weight:700;letter-spacing:1.1px;
+  text-transform:uppercase;color:var(--mute);white-space:nowrap;background:#fff;
+}
+thead th.c{text-align:center}
+thead th.r{text-align:right}
+tbody td{padding:14px 24px;border-top:1px solid var(--line);vertical-align:middle;font-size:14px;color:var(--slate)}
+tbody td.c{text-align:center}
+tbody td.r{text-align:right}
+tbody tr:hover{background:#FCFCFD}
+.name{font-family:'Manrope';font-weight:600;color:var(--ink);font-size:14px}
+
+.pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:4px;font-size:12px;font-weight:500}
+.pill.on{background:var(--green-soft);color:var(--green)}
+.pill.off{background:#F5F5F5;color:#A1A1AA}
+.chips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.chip{padding:5px 9px;border-radius:3px;font-size:11px;background:#F5F5F5;color:#4C4C5C;white-space:nowrap}
+.chip.hot{background:var(--orange-soft);color:var(--orange-ink)}
+.chip.more{color:#EF8733;background:#F5F5F5;padding:3px 6px;font-size:10px;cursor:pointer}
+.state{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#52525B;font-weight:500}
+.state i{width:8px;height:8px;border-radius:50%;background:#10B981;display:block}
+.state.no i{background:#FF5966}
+
+.acts{display:inline-flex;gap:6px}
+.act{
+  width:28px;height:28px;border:1px solid #E5E7EB;border-radius:6px;background:#fff;
+  display:inline-flex;align-items:center;justify-content:center;color:var(--slate);
+}
+.act:hover{background:#F6F7F9;border-color:#D7DBE0;color:var(--ink)}
+.act.danger:hover{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+
+.tfoot{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.tfoot p{font-size:12px;color:var(--faint);font-weight:500}
+.pager{display:flex;gap:5px}
+.pager button{
+  min-width:28px;height:28px;border:1px solid rgba(171,179,185,.3);border-radius:5px;background:#fff;
+  font-family:'Manrope';font-size:11.5px;font-weight:700;color:#313A46;
+  display:inline-flex;align-items:center;justify-content:center;padding:0 7px;
+}
+.pager button:hover:not([disabled]){background:#F6F7F9}
+.pager button.on{background:#EF8733;border-color:#EF8733;color:#fff}
+.pager button[disabled]{opacity:.45;cursor:not-allowed}
+
+.empty{padding:56px 24px;text-align:center}
+.empty h3{font-family:'Manrope';font-size:16px;font-weight:700;margin-bottom:6px}
+.empty p{color:var(--mute);font-size:13.5px;margin-bottom:18px}
+
+/* ================= Drawer ================= */
+.overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
+.drawer{
+  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
+}
+.drawer .modal-body{flex:1;overflow-y:auto}
+@keyframes slideIn{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.name-link{background:none;border:0;padding:0;text-align:left;cursor:pointer}
+.name-link:hover .name{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
+.dl{display:flex;flex-direction:column;gap:0;border:1px solid var(--line-soft);border-radius:10px;overflow:hidden}
+.dl-row{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line-soft);align-items:center}
+.dl-row:last-child{border-bottom:0}
+.dl-row dt{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B}
+.dl-row dd{font-size:13.5px;color:var(--ink)}
+.dmods{display:flex;flex-direction:column;gap:8px}
+.dmod{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#F6F7F9;border-radius:8px;padding:10px 14px;font-size:13.5px;font-weight:600}
+@media (max-width:600px){.dl-row{grid-template-columns:1fr;gap:6px}}
+
+/* tooltip */
+.tip{position:relative;display:inline-flex;align-items:center;vertical-align:middle;margin-left:6px;color:#94A3B8;cursor:help;text-transform:none;letter-spacing:0}
+.tip:hover,.tip:focus{color:var(--orange-ink);outline:none}
+.tip .tipbox{
+  position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);
+  width:max-content;max-width:260px;background:#1F2937;color:#fff;font-size:12px;font-weight:500;line-height:1.45;
+  padding:8px 11px;border-radius:7px;box-shadow:0 8px 20px rgba(15,23,42,.2);
+  opacity:0;visibility:hidden;transition:opacity .14s;z-index:5;pointer-events:none;white-space:normal
+}
+.tip .tipbox::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1F2937}
+.tip:hover .tipbox,.tip:focus .tipbox{opacity:1;visibility:visible}
+/* ================= Modal ================= */
+.overlay{
+  position:fixed;inset:0;background:rgba(15,23,42,.45);
+  display:none;align-items:flex-start;justify-content:center;padding:40px 20px;
+  z-index:100;overflow-y:auto;
+}
+.overlay.open{display:flex}
+.modal{
+  background:#fff;border-radius:14px;width:100%;max-width:672px;
+  box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;
+}
+.modal.sm{max-width:440px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 32px;border-bottom:1px solid var(--line)}
+.modal-head h2{font-family:'Manrope';font-size:21px;font-weight:800;letter-spacing:-.3px}
+.modal-head button{color:var(--mute);width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.modal-head button:hover{background:#F2F4F7;color:var(--ink)}
+.modal-body{padding:28px 32px;display:flex;flex-direction:column;gap:24px}
+.modal-foot{
+  padding:18px 32px;border-top:1px solid var(--line);background:#FBFBFC;
+  display:flex;justify-content:flex-end;align-items:center;gap:18px;
+}
+
+.flabel{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B;margin-bottom:9px}
+.fin{
+  width:100%;height:48px;background:var(--field);border:1px solid var(--field);border-radius:8px;
+  padding:0 16px;font-size:14px;
+}
+.fin:focus{outline:none;border-color:var(--orange);background:#fff;box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.fin.bad{border-color:#F3A3A3;background:#FFF7F7}
+.fnote{display:flex;align-items:center;gap:7px;font-size:12px;color:#94A3B8;margin-top:9px}
+.fnote svg{flex-shrink:0}
+.frow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:9px}
+.ferr{font-size:12px;color:var(--red);font-weight:600;display:none}
+.ferr.show{display:block}
+
+.stepper{display:flex;align-items:center;background:var(--field);border-radius:8px;overflow:hidden;width:106px;height:48px}
+.stepper button{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--slate)}
+.stepper button:hover{background:#E8EAEE}
+.stepper span{flex:1;text-align:center;font-size:16px;font-weight:600}
+.step-hint{font-size:12px;color:#94A3B8}
+
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+.toggle{
+  width:44px;height:24px;border-radius:999px;background:#D7DBE0;position:relative;flex-shrink:0;
+  transition:background .16s;
+}
+.toggle::after{
+  content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:transform .16s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle.on{background:var(--orange)}
+.toggle.on::after{transform:translateX(20px)}
+
+.block{background:#FAFBFC;border:1px solid var(--line-soft);border-radius:10px;padding:16px}
+.block-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.block-row b{display:block;font-size:13.5px;font-weight:600;margin-bottom:3px}
+.block-row span{display:block;font-size:12px;color:#94A3B8}
+
+.formats{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.fmt{
+  border:1px solid var(--line);border-radius:7px;padding:8px 14px;font-size:13px;color:var(--slate);
+  display:inline-flex;align-items:center;gap:8px;background:#fff;
+}
+.fmt.on{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink);font-weight:600}
+.fmt-note{background:var(--field);border-radius:8px;padding:13px 16px;font-size:13px;color:#6B7280;margin-top:12px}
+
+.modrow{
+  background:#F6F7F9;border-radius:9px;padding:13px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;
+}
+.modrow .left{display:flex;align-items:center;gap:11px}
+.cbox{
+  width:20px;height:20px;border-radius:5px;border:1.5px solid #CBD5E1;background:#fff;
+  display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
+}
+.cbox.on{background:var(--orange);border-color:var(--orange)}
+.cbox svg{display:none}
+.cbox.on svg{display:block}
+.modrow .right{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:600;color:var(--orange-ink)}
+.modrow.off .right{color:#B6BCC6}
+
+.sect-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B}
+.sect-sub{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:#94A3B8;margin-top:7px;margin-bottom:14px}
+
+.confirm-body{padding:26px 28px}
+.confirm-body .warn{width:44px;height:44px;border-radius:50%;background:#FEF2F2;color:var(--red);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.confirm-body h3{font-family:'Manrope';font-size:17px;font-weight:700;margin-bottom:7px}
+.confirm-body p{font-size:13.5px;color:var(--mute);line-height:1.55}
+.btn-danger{background:var(--red);color:#fff;border-radius:6px;padding:9px 18px;font-size:12.5px;font-weight:600}
+.btn-danger:hover{background:#BE123C}
+
+/* --- toast --- */
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(14px);
+  background:#101828;color:#fff;border-radius:9px;padding:12px 18px;font-size:13.5px;font-weight:500;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:200;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* ================= Roles module ================= */
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;margin-bottom:12px;flex-wrap:wrap}
+.crumbs span{color:var(--mute)}
+.crumbs button{color:var(--mute);font:inherit}
+.crumbs button:hover{color:var(--orange-ink);text-decoration:underline}
+.crumbs .sep{color:#CBD5E1;font-weight:400}
+.crumbs .cur{color:var(--orange)}
+.fcard{background:#fff;border:1px solid var(--line-soft);border-radius:14px;margin-bottom:16px}
+.fcard-pad{padding:22px 24px}
+.fcard-head{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:20px 24px;border-bottom:1px solid var(--line);flex-wrap:wrap;
+}
+.fcard-head h3{font-family:'Manrope';font-size:17px;font-weight:700;letter-spacing:-.2px}
+.fcard-head p{font-size:12.5px;color:var(--mute);margin-top:3px}
+.pill-btn{
+  border:1px solid var(--orange);color:var(--orange-ink);background:#fff;
+  border-radius:999px;padding:6px 16px;font-size:12.5px;font-weight:600;
+}
+.pill-btn:hover{background:var(--orange-soft)}
+.pill-btn.quiet{border-color:var(--line);color:var(--slate)}
+.pill-btn.quiet:hover{background:#F6F7F9}
+.req-star{color:#E11D48}
+.ftext{font-family:inherit;
+  width:100%;min-height:104px;resize:vertical;background:#fff;border:1px solid var(--line);
+  border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.55;
+}
+.ftext:focus,.fin.plain:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.fin.plain{background:#fff;border:1px solid var(--line)}
+.counter{display:block;text-align:right;font-size:11.5px;color:#9AA3B1;margin-top:6px}
+
+.matrix{width:100%;border-collapse:collapse}
+.matrix thead th{
+  background:#F8F9FB;padding:14px 20px;text-align:left;font-size:11px;font-weight:700;
+  letter-spacing:1.1px;text-transform:uppercase;color:var(--mute);white-space:nowrap;
+}
+.matrix thead th.c{text-align:center}
+.matrix thead .colsel{display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--mute)}
+.matrix tbody td{padding:13px 20px;border-top:1px solid var(--line);font-size:14px}
+.matrix tbody td.c{text-align:center}
+.matrix tbody tr:hover{background:#FCFCFD}
+.matrix .mod{font-family:'Manrope';font-weight:600;color:var(--ink)}
+.rowsel{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--orange-ink);font-weight:500}
+.cbox.sm{width:17px;height:17px;border-radius:4px}
+.cbox.sm svg{width:10px;height:10px}
+.cbox.mix{background:var(--orange);border-color:var(--orange);position:relative}
+.cbox.mix svg{display:none}
+.cbox.mix::after{content:"";width:9px;height:2px;border-radius:1px;background:#fff}
+.toggle.sm{width:36px;height:20px}
+.toggle.sm::after{width:14px;height:14px;top:3px;left:3px}
+.toggle.sm.on::after{transform:translateX(16px)}
+
+.form-actions{display:flex;align-items:center;justify-content:flex-end;gap:16px;padding-top:4px}
+.form-actions .btn-primary{padding:11px 34px;font-size:13px}
+.confirm-type{margin-top:18px}
+.confirm-type label{display:block;font-size:12.5px;font-weight:600;color:var(--slate);margin-bottom:8px}
+.confirm-body strong{color:var(--ink);font-weight:700}
+@media (max-width:980px){ .fcard{overflow-x:auto} .matrix{min-width:720px} }
+
+/* role form — reference structure */
+.rf-crumbs{font-size:15px;font-weight:500;margin:4px 0 18px}
+.rf-crumbs span{color:var(--slate)}
+.rf-crumbs button{color:var(--slate);font-weight:500}
+.rf-crumbs .cur{color:var(--orange-ink);font-weight:600}
+.rf-label{display:block;font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:8px}
+.rf-label .req-star{margin-left:2px}
+.rf-btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:10px 16px;font-size:12.5px;font-weight:600;color:var(--slate)}
+.rf-btn:hover{background:#F6F7F9}
+.rf-btn.solid{background:var(--orange);border-color:var(--orange);color:#fff}
+.rf-btn.solid:hover{background:var(--orange-ink)}
+.rf-scroll{overflow-x:auto}
+.rf-matrix thead th{text-transform:none;letter-spacing:0;font-size:13.5px;font-weight:500;color:var(--ink);padding:20px 24px}
+.rf-matrix thead .colsel{color:var(--ink)}
+.rf-matrix tbody td{padding:20px 24px}
+.rf-matrix .mod{white-space:nowrap;font-family:inherit;font-weight:500;font-size:14px}
+.rf-matrix th:first-child,.rf-matrix td:first-child{width:28%}
+@media (max-width:980px){.rf-matrix{min-width:900px}}
+
+/* ================= Responsive ================= */
+@media (max-width:1180px){ .subnav{width:230px} .content{padding:20px} }
+@media (max-width:980px){
+  .nav{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .22s}
+  body.nav-open .nav{transform:none}
+  .subnav{display:none}
+  body.sub-open .subnav{display:block;position:fixed;left:0;top:62px;bottom:0;z-index:50;width:272px;max-height:none}
+  .top-search{display:none}
+  .content{padding:18px 16px 40px}
+  .card{overflow-x:auto}
+  table{min-width:860px}
+}
+@media (max-width:600px){
+  .slots{grid-template-columns:1fr}
+  .modal-body{padding:22px 20px}
+  .modal-head,.modal-foot{padding-left:20px;padding-right:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ================= Leave module ================= */
+.page-head .ph-acts{display:flex;align-items:center;gap:10px}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px}
+.btn-primary[disabled],.btn-ghost[disabled]{opacity:.55;cursor:not-allowed}
+
+/* filter bar: the shared .filterbar/.search/.sel from the other modules, plus date fields styled to match */
+.filterbar .search{width:260px}
+.filterbar .sel select{min-width:128px}
+/* date range: a select-style button that opens presets + custom dates */
+.rsel{position:relative}
+.rbtn{
+  display:inline-flex;align-items:center;gap:8px;height:42px;min-width:168px;background:var(--field);border:1px solid var(--field);
+  border-radius:8px;padding:0 13px 0 14px;font-size:14px;color:#4B5563;white-space:nowrap;
+}
+.rbtn svg:first-child{color:#6B7280;flex-shrink:0}
+.rbtn span{flex:1;text-align:left}
+.rbtn svg:last-child{color:#6B7280;flex-shrink:0;transition:transform .15s}
+.rbtn[aria-expanded="true"]{border-color:var(--orange);background:#fff}
+.rbtn[aria-expanded="true"] svg:last-child{transform:rotate(180deg)}
+.rbtn.set{background:var(--orange-soft);border-color:var(--orange-soft);color:var(--orange-ink)}
+.rbtn.set svg{color:var(--orange-ink)!important}
+.rpop{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:40;width:340px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 18px 44px rgba(15,23,42,.16);padding:6px;
+}
+.rpop[hidden]{display:none}
+.rlist{max-height:min(560px,68vh);overflow-y:auto}
+.rlist hr{border:0;border-top:1px solid var(--line-soft);margin:5px 6px}
+.ropt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border-radius:7px;font-size:13.5px;color:var(--slate);text-align:left}
+.ropt small{font-size:11.5px;color:var(--faint);white-space:nowrap}
+.ropt:hover,.ropt:focus-visible{background:#F6F7F9;color:var(--ink);outline:none}
+.ropt.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:600}
+.ropt.on small{color:var(--orange-ink);opacity:.75}
+.rcustom{padding:10px 8px 6px}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rc-grid label span{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B;margin-bottom:6px}
+.rc-grid .fin{height:42px;padding:0 10px;font-size:13.5px}
+.rcustom .ferr{margin-top:8px}
+.rc-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+@media (max-width:600px){.rpop{right:auto;left:0;width:min(310px,calc(100vw - 40px))}}
+@media (max-width:860px){.filterbar .search{width:100%}}
+
+/* table */
+.lv-table{overflow-x:auto}
+.lv-table table{min-width:1260px}
+.lv-table thead th,.lv-table tbody td{padding-left:16px;padding-right:16px}
+.lv-table thead th:first-child,.lv-table tbody td:first-child{padding-left:22px}
+.lv-table tbody td{font-size:13.5px}
+.nowrap{white-space:nowrap}
+.who-cell{display:flex;align-items:center;gap:10px;min-width:170px}
+.who-cell .av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.who-cell .name{display:block;line-height:1.25}
+.who-cell small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
+.clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:220px;line-height:1.45}
+.cmt{display:flex;flex-direction:column;gap:4px;max-width:210px}
+.cmt .clip{max-width:210px;color:var(--slate)}
+.cmt .none{color:var(--faint)}
+.mini-link{
+  display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--orange-ink);
+  padding:2px 0;align-self:flex-start;white-space:nowrap;
+}
+.mini-link:hover{text-decoration:underline;text-underline-offset:3px}
+.mini-link .n{font-weight:500;color:var(--faint)}
+.hrs{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600;white-space:nowrap}
+.bal{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;color:var(--green)}
+.bal.neg{color:var(--red)}
+.bal.na{color:var(--faint);font-weight:500}
+.state.pend i{background:#F59E0B}
+.state.dec i{background:#FF5966}
+.state.pend{color:#92400E}
+.act.ok:hover{background:var(--green-soft);border-color:#A7F3D0;color:var(--green)}
+.act.no:hover{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+.acts{flex-wrap:nowrap}
+.dash{color:var(--faint)}
+
+/* drawer form */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px 18px}
+.fgrid .span{grid-column:1/-1}
+.req-star{color:#E11D48}
+.fin.plain,select.fin.plain,.ftext{background:#fff;border:1px solid var(--line)}
+select.fin{appearance:none;padding-right:40px;cursor:pointer}
+.fsel{position:relative}
+.fsel svg{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#6B7280;pointer-events:none}
+.ftext{min-height:92px}
+.ftext.bad{border-color:#F3A3A3;background:#FFF7F7}
+
+/* searchable dropdown */
+.combo{position:relative}
+.combo input{padding-right:40px;cursor:text}
+.combo .cv{position:absolute;right:15px;top:50%;transform:translateY(-50%);color:#6B7280;pointer-events:none}
+.combo-list{
+  position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 14px 34px rgba(15,23,42,.14);padding:6px;max-height:240px;overflow-y:auto;display:none;
+}
+.combo.open .combo-list{display:block}
+.combo-list li{padding:10px 12px;border-radius:7px;font-size:14px;color:var(--slate);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.combo-list li small{font-size:11.5px;color:var(--faint)}
+.combo-list li.hi{background:#F6F7F9;color:var(--ink)}
+.combo-list li[aria-selected="true"]{color:var(--orange-ink);font-weight:600}
+.combo-list .nomatch{color:var(--faint);cursor:default}
+
+/* calculated summary under the dates */
+.lv-sum{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:#FAFBFC;border:1px solid var(--line-soft);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--slate)}
+.lv-sum b{color:var(--ink);font-variant-numeric:tabular-nums}
+.lv-sum .neg{color:var(--red)}
+.lv-sum .pos{color:var(--green)}
+.lv-sum .muted{color:var(--faint)}
+
+/* document upload */
+.dz{
+  border:1.5px dashed #F0B98A;border-radius:10px;background:#FFFDFB;min-height:118px;width:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:16px;cursor:pointer;
+  transition:background .14s,border-color .14s;
+}
+.dz:hover,.dz.drag{background:var(--orange-soft);border-color:var(--orange)}
+.dz .dz-ic{width:38px;height:38px;border-radius:10px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center}
+.dz .dz-t{font-size:13px;color:var(--slate);font-weight:600}
+.dz .dz-t u{color:var(--orange-ink)}
+.dz .dz-s{font-size:11.5px;color:var(--faint);font-weight:500}
+.dz.bad{border-color:#F3A3A3;background:#FFF7F7}
+.filed{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;align-items:center;gap:11px;background:#fff;width:100%}
+.filed .fi{width:36px;height:36px;border-radius:8px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.3px}
+.filed .fmeta{flex:1;min-width:0}
+.filed .fn{display:block;font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filed .fs{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
+.filed .fbtns{display:flex;gap:6px}
+
+/* comments thread (comment dialog + edit drawer) */
+.thread{display:flex;flex-direction:column;gap:10px;max-height:260px;overflow-y:auto}
+.thread .c{background:#FAFBFC;border:1px solid var(--line-soft);border-radius:10px;padding:11px 14px}
+.thread .c p{font-size:13.5px;color:var(--ink);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.thread .c span{display:block;font-size:11.5px;color:var(--faint);margin-top:5px}
+.thread-empty{font-size:13px;color:var(--faint)}
+
+/* document viewer */
+.viewer{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#F6F7F9;min-height:300px;display:flex;align-items:center;justify-content:center}
+.viewer img{max-width:100%;max-height:60vh;display:block}
+.viewer iframe{width:100%;height:60vh;border:0;background:#fff}
+.viewer .ph{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 24px;text-align:center;color:var(--mute);font-size:13px}
+.viewer .ph .big{width:64px;height:76px;border-radius:8px;background:#fff;border:1px solid var(--line);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px;font-size:12px;font-weight:800;color:var(--orange-ink);box-shadow:0 6px 16px rgba(15,23,42,.06)}
+.vmeta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--mute);margin-top:12px}
+.vmeta b{color:var(--ink);font-weight:600}
+
+/* approve / decline dialog */
+.dlg-sum{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;background:#FAFBFC;border:1px solid var(--line-soft);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13px}
+.dlg-sum dt{color:var(--mute)}
+.dlg-sum dd{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.dlg-sum dd.neg{color:var(--red)}
+.confirm-body .warn.ok{background:var(--green-soft);color:var(--green)}
+.confirm-body .note-neg{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:12.5px;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 12px}
+.btn-ok{background:var(--green);color:#fff;border-radius:6px;padding:9px 18px;font-size:12.5px;font-weight:600}
+.btn-ok:hover{background:#047857}
+.dlg-field{margin-top:16px}
+
+@media (max-width:600px){
+  .fgrid{grid-template-columns:1fr}
+  .page-head{flex-wrap:wrap}
+}
+
+</style>
+<style id="aad-unify">
+/* ---------- one type system for every module ---------- */
+body,button,input,select,textarea{font-family:'Inter',system-ui,-apple-system,sans-serif}
+body{font-size:14px}
+h1,h2,h3,
+.page-head h1,.subnav h2,.dr-top h2,.dhead h2,.modal-head h2,.profile h1,
+.ins .k dd,.stat-n,.kpi-n{font-family:'Manrope',system-ui,sans-serif}
+
+.page-head h1{font-size:22px;font-weight:800;letter-spacing:-.4px}
+.page-head p,.page-sub{font-size:13.5px}
+.subnav h2{font-size:21px;font-weight:800;letter-spacing:-.4px}
+.dr-top h2,.dhead h2,.modal-head h2{font-size:22px;font-weight:800;letter-spacing:-.3px}
+.dr-top p{font-size:12.5px}
+.profile h1{font-size:26px;letter-spacing:-.6px}
+.modal .flabel,.drawer .flabel,.dr-body .flabel,.modal-body .flabel,
+.dt,.stat dt{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+
+/* "Filter By:" reads the same in every module (Staff calls it .flabel, the others .lbl) */
+.filters .flabel,.filters .lbl,.mini-bar .lbl{
+  display:flex;align-items:center;gap:6px;margin-left:auto;
+  color:#4B5563;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;white-space:nowrap;
+}
+.filters .flabel svg,.filters .lbl svg,.mini-bar .lbl svg{flex-shrink:0}
+@media (max-width:860px){.filters .flabel,.filters .lbl,.mini-bar .lbl{margin-left:0}}
+.fin,.fsel,select.fin,textarea.fin{font-size:14px}
+table,td,th{font-size:13.5px}
+
+/* ---------- one status pill for every module ---------- */
+.state{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#52525B;font-weight:500}
+.state i{width:8px;height:8px;border-radius:50%;background:#10B981;display:block;flex-shrink:0}
+.state.no i{background:#FF5966}
+
+/* ---------- outer shell owns the primary nav ---------- */
+.nav{display:none!important}
+.burger{display:none!important}
+.topbar{padding-left:22px}
+
+</style>
+<style id="aad-drawerise">
+/* add / edit always opens as a right-side drawer */
+.overlay{align-items:stretch;justify-content:flex-end;padding:0;background:rgba(16,22,30,.42)}
+.overlay>.modal{
+  width:min(760px,96vw);max-width:min(760px,96vw);height:100%;max-height:100%;
+  border-radius:0;display:flex;flex-direction:column;
+  box-shadow:-18px 0 50px rgba(16,22,30,.16);
+}
+.overlay>.modal.sm{width:min(520px,96vw);max-width:min(520px,96vw)}
+.overlay>.modal>.modal-head{padding:22px 30px;flex-shrink:0}
+.overlay>.modal>.modal-body{flex:1;overflow-y:auto;padding:26px 30px}
+.overlay>.modal>.modal-foot{flex-shrink:0;padding:18px 30px}
+
+/* dialogs (password options, confirms) stay centered cards — same as the Staff module */
+#dlg.overlay{align-items:center;justify-content:center;padding:40px 20px;overflow-y:auto;background:rgba(15,23,42,.45)}
+#dlg.overlay>.modal{position:relative}
+.dlg-x{
+  position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;color:var(--mute);
+  background:transparent;border:0;cursor:pointer;z-index:2;
+}
+.dlg-x:hover{background:#F2F4F7;color:var(--ink)}
+#dlg .confirm-body{padding-right:52px}
+#dlg.overlay>.modal{
+  width:100%;max-width:672px;height:auto;max-height:none;
+  border-radius:14px;display:block;
+  box-shadow:0 24px 60px rgba(15,23,42,.22);
+}
+#dlg.overlay>.modal.sm{width:100%;max-width:440px}
+#dlg.overlay>.modal>.modal-head{padding:22px 32px}
+#dlg.overlay>.modal>.modal-body{padding:28px 32px;overflow:visible}
+#dlg.overlay>.modal>.modal-foot{padding:18px 28px}
+@media (max-width:600px){#dlg.overlay{align-items:center;padding:20px 16px}}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" aria-label="Toggle menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h11M4 17h16"/></svg>
+      </button>
+      <div class="spacer"></div>
+      <div class="top-search">
+        <label class="sr" for="globalsearch">Search</label>
+        <input id="globalsearch" type="search" placeholder="Search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      </div>
+      <button class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="whoami">
+        <span class="avatar">JD</span>
+        <span class="who"><b>John Doe</b><span>Admin</span></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </header>
+
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="overlay dlg-layer" id="dlg"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+/* ================= Leave Management ================= */
+var I = {
+  chev:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
+  search:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
+  filter:'<svg width="15" height="11" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h20M5 9h14M9 15h6"/></svg>',
+  plus:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>',
+  close:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  tick:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+  ok:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+  no:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+  eye:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  csv:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
+  up:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"/><path d="m7.5 9.5 4.5-4.5 4.5 4.5"/><path d="M5 19h14"/></svg>',
+  warnSm:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+  warn:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+  okBig:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>'
+};
+
+/* ---------- business rules (prototype values; swap for the backend's when connected) ---------- */
+var HOURS_PER_DAY = 7.6;                                  // standard full-time day
+var MAX_FILE = 5 * 1024 * 1024;                           // 5 MB
+var FILE_TYPES = { pdf:'application/pdf', jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
+var STATUS = { pending:'Pending', approved:'Approved', declined:'Declined' };
+var ME = 'John Doe';
+
+var TYPES = [
+  { k:'annual', n:'Annual Leave' },
+  { k:'sick',   n:'Sick Leave' },
+  { k:'lsl',    n:'Long Service Leave' },
+  { k:'unpaid', n:'Unpaid Leave', noBalance:true }
+];
+var AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
+// staff and divisions come from the Staff module; opening balances are hours available before the leave below
+var STAFF = [
+  { id:'KPG1001', n:'Alexender Doe', div:'Bookkeeping',  open:{ annual:98.8,  sick:45.6, lsl:0 } },
+  { id:'KPG1002', n:'Jonny',         div:'Admin',        open:{ annual:30.4,  sick:22.8, lsl:0 } },
+  { id:'KPG1003', n:'Marthew',       div:'Accountant',   open:{ annual:121.6, sick:76,   lsl:304 } },
+  { id:'KPG1004', n:'Harry Potter',  div:'Receptionist', open:{ annual:15.2,  sick:7.6,  lsl:0 } },
+  { id:'KPG1009', n:'Priya Nair',    div:'Bookkeeping',  open:{ annual:60.8,  sick:38,   lsl:0 } },
+  { id:'KPG1010', n:'Daniel Wu',     div:'Accountant',   open:{ annual:83.6,  sick:53.2, lsl:0 } }
+];
+var DIVISIONS = STAFF.map(function(s){ return s.div; }).filter(function(d,i,a){ return a.indexOf(d)===i; }).sort();
+
+function at(d,h,m){ var t=new Date(d+'T00:00:00'); t.setHours(h||9,m||0,0,0); return t.getTime(); }
+var LEAVES = [
+  { id:1,  staff:'KPG1001', type:'annual', from:'2026-10-19', to:'2026-10-23', reason:'Family trip to Queensland.', status:'approved',
+    comments:[{by:'John Doe',at:at('2026-10-02',10,12),text:'Approved — handover to Priya for BAS lodgements.'}], doc:null },
+  { id:2,  staff:'KPG1002', type:'sick',   from:'2026-10-06', to:'2026-10-08', reason:'Flu, doctor advised rest.', status:'approved',
+    comments:[], doc:{name:'medical_certificate_jonny.pdf',size:182400,mime:'application/pdf',by:'Jonny',at:at('2026-10-06',8,40)} },
+  { id:3,  staff:'KPG1004', type:'annual', from:'2026-11-02', to:'2026-11-06', reason:'Moving house.', status:'pending',
+    comments:[{by:'Harry Potter',at:at('2026-10-09',14,5),text:'Can take two of these days unpaid if balance runs short.'}], doc:null },
+  { id:4,  staff:'KPG1003', type:'lsl',    from:'2026-12-07', to:'2026-12-18', reason:'Long service leave, overseas travel.', status:'pending',
+    comments:[], doc:null },
+  { id:5,  staff:'KPG1009', type:'sick',   from:'2026-10-12', to:'2026-10-12', reason:'Dental surgery.', status:'pending',
+    comments:[], doc:{name:'dental_appointment.jpg',size:96200,mime:'image/jpeg',by:'Priya Nair',at:at('2026-10-11',19,30)} },
+  { id:6,  staff:'KPG1002', type:'annual', from:'2026-11-16', to:'2026-11-27', reason:'Wedding and honeymoon.', status:'pending',
+    comments:[], doc:null },
+  { id:7,  staff:'KPG1010', type:'annual', from:'2026-09-28', to:'2026-10-02', reason:'School holidays with the kids.', status:'approved',
+    comments:[], doc:null },
+  { id:8,  staff:'KPG1001', type:'unpaid', from:'2026-12-21', to:'2026-12-24', reason:'Extra days around Christmas.', status:'declined',
+    comments:[{by:'John Doe',at:at('2026-10-05',11,0),text:'Declined — end-of-year lodgement peak. Happy to revisit for January.'}], doc:null },
+  { id:9,  staff:'KPG1004', type:'sick',   from:'2026-09-21', to:'2026-09-22', reason:'Migraine.', status:'approved',
+    comments:[], doc:{name:'gp_certificate.pdf',size:240100,mime:'application/pdf',by:'Harry Potter',at:at('2026-09-23',9,15)} },
+  { id:10, staff:'KPG1003', type:'annual', from:'2026-10-26', to:'2026-10-27', reason:'Personal appointments.', status:'approved',
+    comments:[], doc:null },
+  { id:11, staff:'KPG1009', type:'annual', from:'2026-12-28', to:'2027-01-08', reason:'Christmas break with family in Kerala.', status:'pending',
+    comments:[], doc:null },
+  { id:12, staff:'KPG1010', type:'sick',   from:'2026-10-14', to:'2026-10-14', reason:'Carer’s leave, child unwell.', status:'declined',
+    comments:[{by:'John Doe',at:at('2026-10-14',12,20),text:'Please resubmit with a certificate or statutory declaration.'}], doc:null }
+];
+var nextId = 13;
+
+/* ---------- helpers ---------- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function staffById(id){ for(var i=0;i<STAFF.length;i++) if(STAFF[i].id===id) return STAFF[i]; return null; }
+function typeByKey(k){ for(var i=0;i<TYPES.length;i++) if(TYPES[i].k===k) return TYPES[i]; return null; }
+function leaveById(id){ for(var i=0;i<LEAVES.length;i++) if(LEAVES[i].id===id) return LEAVES[i]; return null; }
+function ini(n){ var p=n.trim().split(/\s+/); return (p[0][0]+(p[1]?p[1][0]:(p[0][1]||''))).toUpperCase(); }
+function av(id){ var i=0; for(var k=0;k<STAFF.length;k++) if(STAFF[k].id===id) i=k; return AV[i%AV.length]; }
+function parse(d){ return d?new Date(d+'T00:00:00'):null; }
+function dmy(x){ return String(x.getDate()).padStart(2,'0')+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+x.getFullYear(); }   // dd-mm-yyyy across the app
+function fmtD(d){ return d?dmy(parse(d)):''; }
+function fmtWhen(t){ var d=new Date(t); return dmy(d)+', '+d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}).toLowerCase(); }
+function fmtH(h){ var r=Math.round(h*100)/100; return (r<0?'−':'')+Math.abs(r).toFixed(r%1===0?0:(Math.round(r*10)===r*10?1:2))+' h'; }
+function fmtSize(b){ return b<1024*1024?Math.max(1,Math.round(b/1024))+' KB':(b/1048576).toFixed(1)+' MB'; }
+function ext(name){ var m=/\.([a-z0-9]+)$/i.exec(name||''); return m?m[1].toLowerCase():''; }
+
+// working days (Mon-Fri) between two ISO dates, inclusive
+function workDays(from,to){
+  var a=parse(from), b=parse(to); if(!a||!b||b<a) return 0;
+  var n=0; for(var d=new Date(a); d<=b; d.setDate(d.getDate()+1)){ var w=d.getDay(); if(w!==0&&w!==6) n++; }
+  return n;
+}
+function hoursOf(l){ return workDays(l.from,l.to)*HOURS_PER_DAY; }
+// hours already approved for this staff member and leave type, leaving one record out
+function usedHours(staff,type,exceptId){
+  return LEAVES.reduce(function(s,l){ return s+(l.staff===staff&&l.type===type&&l.status==='approved'&&l.id!==exceptId?hoursOf(l):0); },0);
+}
+// balance after this leave: opening - other approved leave - this leave (a declined request takes nothing)
+function balanceAfter(staff,type,hours,status,exceptId){
+  var t=typeByKey(type), s=staffById(staff); if(!t||!s||t.noBalance) return null;
+  return (s.open[type]||0)-usedHours(staff,type,exceptId)-(status==='declined'?0:hours);
+}
+function overlaps(rec){
+  return LEAVES.filter(function(l){ return l.id!==rec.id&&l.staff===rec.staff&&l.status!=='declined'&&l.from<=rec.to&&rec.from<=l.to; });
+}
+
+/* ---------- state ---------- */
+var content=document.getElementById('content'), overlay=document.getElementById('overlay'), dlg=document.getElementById('dlg');
+var DEFAULT_RANGE='this_month';
+var blankF=function(){ var r=rangeOf(DEFAULT_RANGE); return {q:'',status:'',type:'',div:'',range:DEFAULT_RANGE,from:r[0],to:r[1]}; };
+var state={ f:blankF(), page:1, per:10 };
+
+function toast(msg,err){
+  var t=document.getElementById('toast'); t.innerHTML=(err?I.warnSm:I.tick)+esc(msg);
+  t.style.background=err?'#BE123C':'';
+  t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('show');},2800);
+}
+function lockScroll(){ document.body.style.overflow=(overlay.classList.contains('open')||dlg.classList.contains('open'))?'hidden':''; }
+function showDrawer(html){ overlay.innerHTML=html; overlay.classList.add('open'); lockScroll(); }
+function closeDrawer(){ overlay.classList.remove('open'); overlay.innerHTML=''; form=null; lockScroll(); }
+function showModal(html){ dlg.innerHTML=html; dlg.classList.add('open'); lockScroll();
+  var m=dlg.querySelector('.modal'); if(m&&!m.querySelector('.dlg-x')){ var x=document.createElement('button'); x.className='dlg-x'; x.setAttribute('aria-label','Close'); x.innerHTML=I.close; x.onclick=closeModal; m.appendChild(x); }
+  Array.prototype.forEach.call(dlg.querySelectorAll('[data-cancel]'),function(b){ b.onclick=closeModal; });
+  var f=dlg.querySelector('textarea,input,.btn-ok,.btn-danger,.btn-primary'); if(f) f.focus();
+}
+function closeModal(){ dlg.classList.remove('open'); dlg.innerHTML=''; lockScroll(); }
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape') return;
+  if(dlg.classList.contains('open')){ closeModal(); return; }
+  if(overlay.classList.contains('open')&&form) leaveForm();
+});
+dlg.addEventListener('mousedown',function(e){ if(e.target===dlg) closeModal(); });
+overlay.addEventListener('mousedown',function(e){ if(e.target===overlay&&form) leaveForm(); });
+
+/* ---------- filtering ---------- */
+function filtered(){
+  var f=state.f, q=f.q.trim().toLowerCase();
+  return LEAVES.filter(function(l){
+    var s=staffById(l.staff);
+    if(q&&(s.n+" "+s.id+" "+l.reason).toLowerCase().indexOf(q)<0) return false;
+    if(f.status&&l.status!==f.status) return false;
+    if(f.type&&l.type!==f.type) return false;
+    if(f.div&&s.div!==f.div) return false;
+    if(f.from&&l.to<f.from) return false;          // leave overlaps the chosen range
+    if(f.to&&l.from>f.to) return false;
+    return true;
+  }).sort(function(a,b){ return a.from<b.from?1:a.from>b.from?-1:b.id-a.id; });
+}
+function anyFilter(f){ return !!(f.q.trim()||f.status||f.type||f.div||f.range!==DEFAULT_RANGE); }
+
+function selHtml(id,all,opts,val){
+  return '<div class="sel"><select id="'+id+'" aria-label="'+esc(all)+'"><option value="">'+all+'</option>'+
+    opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+
+    '</select>'+I.chev+'</div>';
+}
+function pager(total){
+  var pages=Math.max(1,Math.ceil(total/state.per));
+  if(state.page>pages) state.page=pages;
+  var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total);
+  var h='<div class="tfoot"><p>Showing '+from+' to '+to+' of '+total+' entries</p><div class="pager">';
+  h+='<button data-p="'+(state.page-1)+'"'+(state.page===1?' disabled':'')+' aria-label="Previous">‹</button>';
+  for(var i=1;i<=pages;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
+  h+='<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button>';
+  return h+'</div></div>';
+}
+function statusHtml(s){
+  return '<span class="state'+(s==='pending'?' pend':s==='declined'?' dec':'')+'"><i></i>'+STATUS[s]+'</span>';
+}
+
+/* ---------- date range filter (presets + custom) ---------- */
+function isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function rangeOf(key){
+  var t=new Date(); t.setHours(0,0,0,0);
+  var y=t.getFullYear(), m=t.getMonth(), mon=addDays(t,-((t.getDay()+6)%7));   // weeks run Monday to Sunday
+  var q=Math.floor(m/3), fy=m>=6?y:y-1;                                           // financial year: 1 July to 30 June
+  var R=function(a,b){ return [isoOf(a),isoOf(b)]; };
+  switch(key){
+    case 'today':        return R(t,t);
+    case 'this_week':    return R(mon,addDays(mon,6));
+    case 'last_week':    return R(addDays(mon,-7),addDays(mon,-1));
+    case 'next_week':    return R(addDays(mon,7),addDays(mon,13));
+    case 'this_month':   return R(new Date(y,m,1),new Date(y,m+1,0));
+    case 'last_month':   return R(new Date(y,m-1,1),new Date(y,m,0));
+    case 'next_month':   return R(new Date(y,m+1,1),new Date(y,m+2,0));
+    case 'last_30':      return R(addDays(t,-29),t);
+    case 'next_30':      return R(t,addDays(t,29));
+    case 'this_quarter': return R(new Date(y,q*3,1),new Date(y,q*3+3,0));
+    case 'last_quarter': return R(new Date(y,q*3-3,1),new Date(y,q*3,0));
+    case 'this_fy':      return R(new Date(fy,6,1),new Date(fy+1,5,30));
+    case 'last_fy':      return R(new Date(fy-1,6,1),new Date(fy,5,30));
+    case 'this_year':    return R(new Date(y,0,1),new Date(y,11,31));
+    case 'last_year':    return R(new Date(y-1,0,1),new Date(y-1,11,31));
+    default:             return ['',''];                                           // all dates
+  }
+}
+var RANGES=[
+  [['today','Today'],['this_week','This Week'],['this_month','This Month'],['this_year','This Year']]
+];
+function rangeName(key){ for(var g=0;g<RANGES.length;g++) for(var i=0;i<RANGES[g].length;i++) if(RANGES[g][i][0]===key) return RANGES[g][i][1]; return 'Custom Range'; }
+function fmtRange(a,b){
+  if(!a&&!b) return 'Any date';
+  return a===b?fmtD(a):fmtD(a)+' – '+fmtD(b);
+}
+var CAL='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+function rangeHtml(f){
+  var label=f.range==='custom'?fmtRange(f.from,f.to):rangeName(f.range);
+  var h='<div class="rsel" id="rsel"><button type="button" class="rbtn'+(f.range!==DEFAULT_RANGE?' set':'')+'" id="rbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="rpop" title="'+esc(fmtRange(f.from,f.to))+'">'+
+    CAL+'<span>'+esc(label)+'</span>'+I.chev+'</button><div class="rpop" id="rpop" role="dialog" aria-label="Choose a date range" hidden><div class="rlist">';
+  RANGES.forEach(function(g,gi){
+    if(gi) h+='<hr>';
+    g.forEach(function(r){
+      var rr=rangeOf(r[0]);
+      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span><small>'+(r[0]==='all'?'':esc(fmtRange(rr[0],rr[1])))+'</small></button>';
+    });
+  });
+  h+='<hr><button type="button" class="ropt'+(f.range==='custom'?' on':'')+'" data-r="custom"><span>Custom Range</span><small>'+(f.range==='custom'?esc(fmtRange(f.from,f.to)):'Pick dates')+'</small></button></div>'+
+    '<div class="rcustom" id="rcustom" hidden><div class="rc-grid">'+
+    '<label><span>From</span><input type="date" id="rc-from" class="fin plain"></label>'+
+    '<label><span>To</span><input type="date" id="rc-to" class="fin plain"></label></div>'+
+    '<p class="ferr" id="rc-err" role="alert"></p>'+
+    '<div class="rc-btns"><button type="button" class="btn-ghost" id="rc-back">Back</button><button type="button" class="btn-primary" id="rc-apply">Apply</button></div></div>'+
+    '</div></div>';
+  return h;
+}
+function bindRange(){
+  var btn=document.getElementById('rbtn'), pop=document.getElementById('rpop'), list=pop.querySelector('.rlist'), cust=document.getElementById('rcustom');
+  var from=document.getElementById('rc-from'), to=document.getElementById('rc-to'), err=document.getElementById('rc-err');
+  function open(){ pop.hidden=false; btn.setAttribute('aria-expanded','true'); list.hidden=false; cust.hidden=true; var on=pop.querySelector('.ropt.on')||pop.querySelector('.ropt'); on.focus(); }
+  function close(focus){ pop.hidden=true; btn.setAttribute('aria-expanded','false'); if(focus) btn.focus(); }
+  function apply(key,a,b){ var f=state.f; f.range=key; f.from=a; f.to=b; state.page=1; renderList(); document.getElementById('rbtn').focus(); }
+  function showCustom(){
+    var f=state.f, t=isoOf(new Date());
+    from.value=f.from||t; to.value=f.to||f.from||t; to.min=from.value;
+    err.classList.remove('show'); list.hidden=true; cust.hidden=false; from.focus();
+  }
+  btn.onclick=function(){ pop.hidden?open():close(); };
+  list.onclick=function(e){
+    var o=e.target.closest('.ropt'); if(!o) return;
+    var k=o.getAttribute('data-r');
+    if(k==='custom'){ showCustom(); return; }
+    var r=rangeOf(k); apply(k,r[0],r[1]);
+  };
+  list.onkeydown=function(e){
+    var opts=[].slice.call(list.querySelectorAll('.ropt')), i=opts.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); opts[Math.min(opts.length-1,i+1)].focus(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); opts[Math.max(0,i-1)].focus(); }
+  };
+  from.onchange=function(){ to.min=from.value; if(to.value&&to.value<from.value) to.value=from.value; err.classList.remove('show'); };
+  to.onchange=function(){ err.classList.remove('show'); };
+  document.getElementById('rc-back').onclick=function(){ cust.hidden=true; list.hidden=false; (pop.querySelector('.ropt[data-r="custom"]')).focus(); };
+  document.getElementById('rc-apply').onclick=function(){
+    if(!from.value||!to.value){ err.textContent='Choose both a From and a To date.'; err.classList.add('show'); return; }
+    if(to.value<from.value){ err.textContent='To date can’t be earlier than From date.'; err.classList.add('show'); return; }
+    apply('custom',from.value,to.value);
+  };
+  pop.onkeydown=function(e){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(true); } };
+}
+// click outside closes the range menu
+document.addEventListener('mousedown',function(e){
+  var p=document.getElementById('rpop'); if(!p||p.hidden) return;
+  if(!e.target.closest('#rsel')){ p.hidden=true; document.getElementById('rbtn').setAttribute('aria-expanded','false'); }
+});
+
+/* ---------- listing ---------- */
+function renderList(){
+  var rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), d=state.f;
+  var h='<div class="page-head"><h1>Leave Management</h1><div class="ph-acts">'+
+    '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered leave records as CSV">'+I.csv+'CSV</button>'+
+    '<button class="btn-primary" id="add">'+I.plus+'Add Leave</button></div></div>';
+  // same filter bar as the other modules: search on the left, "Filter By:" dropdowns, Clear filters when any is set
+  h+='<div class="filterbar"><div class="search">'+I.search+
+    '<input type="search" id="q" placeholder="Search by staff name, ID or reason" aria-label="Search leave" value="'+esc(d.q)+'"></div><div class="filters">'+
+    '<span class="lbl">'+I.filter+'Filter By:</span>'+
+    selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){return [k,STATUS[k]];}),d.status)+
+    selHtml('f-type','All Types',TYPES.map(function(t){return [t.k,t.n];}),d.type)+
+    selHtml('f-div','All Divisions',DIVISIONS.map(function(x){return [x,x];}),d.div)+
+    rangeHtml(d)+
+    '<button class="clearf" id="clearf"'+(anyFilter(d)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
+
+  h+='<div class="card lv-table"><table><thead><tr>'+
+    '<th>Staff</th><th>Reason</th><th>Comment</th><th>Leave Type</th><th>From Date</th><th>To Date</th>'+
+    '<th class="r">Leave Hours</th><th class="r">Leave Balance</th><th>Status</th><th>Document</th><th class="c">Action</th>'+
+    '</tr></thead><tbody>';
+  if(!LEAVES.length){
+    h+='<tr><td colspan="11"><div class="empty"><h3>No leave requests yet</h3><p>Add the first leave request for a staff member.</p><button class="btn-primary" id="add2">'+I.plus+'Add Leave</button></div></td></tr>';
+  } else if(!page.length){
+    h+='<tr><td colspan="11"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+  }
+  page.forEach(function(l){
+    var s=staffById(l.staff), t=typeByKey(l.type), c=av(l.staff), hrs=hoursOf(l), bal=balanceAfter(l.staff,l.type,hrs,l.status,l.id);
+    var last=l.comments[l.comments.length-1];
+    h+='<tr>'+
+      '<td><div class="who-cell"><span class="av" style="background:'+c[0]+';color:'+c[1]+'">'+esc(ini(s.n))+'</span><span><span class="name">'+esc(s.n)+'</span><small>'+esc(s.div)+'</small></span></div></td>'+
+      '<td><span class="clip" title="'+esc(l.reason)+'">'+esc(l.reason)+'</span></td>'+
+      '<td><div class="cmt">'+(last?'<span class="clip" title="'+esc(last.text)+'">'+esc(last.text)+'</span>':'<span class="none">No comments</span>')+
+        '<button class="mini-link" data-cmt="'+l.id+'" aria-label="Add comment for '+esc(s.n)+'">'+I.plus+'Add'+(l.comments.length>1?' <span class="n">('+l.comments.length+')</span>':'')+'</button></div></td>'+
+      '<td class="nowrap">'+esc(t.n)+'</td>'+
+      '<td class="nowrap">'+fmtD(l.from)+'</td>'+
+      '<td class="nowrap">'+fmtD(l.to)+'</td>'+
+      '<td class="r"><span class="hrs">'+fmtH(hrs)+'</span></td>'+
+      '<td class="r">'+(bal===null?'<span class="bal na" title="'+esc(t.n)+' has no balance">—</span>':'<span class="bal'+(bal<0?' neg':'')+'" title="'+esc(t.n)+' balance after this leave">'+fmtH(bal)+'</span>')+'</td>'+
+      '<td class="nowrap">'+statusHtml(l.status)+'</td>'+
+      '<td>'+(l.doc?'<button class="mini-link" data-doc="'+l.id+'" title="'+esc(l.doc.name)+'">'+I.eye+'View</button>':'<span class="dash">—</span>')+'</td>'+
+      '<td class="c"><span class="acts">'+
+        (l.status==='pending'?
+          '<button class="act ok" data-approve="'+l.id+'" title="Approve" aria-label="Approve leave for '+esc(s.n)+'">'+I.ok+'</button>'+
+          '<button class="act no" data-decline="'+l.id+'" title="Decline" aria-label="Decline leave for '+esc(s.n)+'">'+I.no+'</button>':'')+
+        '<button class="act" data-edit="'+l.id+'" title="Edit" aria-label="Edit leave for '+esc(s.n)+'">'+I.edit+'</button>'+
+        '<button class="act danger" data-del="'+l.id+'" title="Delete" aria-label="Delete leave for '+esc(s.n)+'">'+I.trash+'</button>'+
+      '</span></td></tr>';
+  });
+  h+='</tbody></table>'+pager(rows.length)+'</div>';
+  content.innerHTML=h;
+
+  // filters apply as soon as they change, like the other modules
+  var q=document.getElementById('q');
+  q.oninput=function(){ state.f.q=q.value; state.page=1; renderList(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+  [['f-status','status'],['f-type','type'],['f-div','div']].forEach(function(p){
+    document.getElementById(p[0]).onchange=function(){
+      var f=state.f; f[p[1]]=this.value;
+      state.page=1; renderList();
+    };
+  });
+  bindRange();
+  var clear=function(){ state.f=blankF(); state.page=1; renderList(); };
+  document.getElementById('clearf').onclick=clear;
+  var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
+  document.getElementById('add').onclick=function(){ openForm(null); };
+  var a2=document.getElementById('add2'); if(a2) a2.onclick=function(){ openForm(null); };
+  document.getElementById('csv').onclick=exportCsv;
+  Array.prototype.forEach.call(content.querySelectorAll('.pager button'),function(b){
+    b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); renderList(); content.scrollTop=0; };
+  });
+  content.querySelector('tbody').onclick=function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    var id;
+    if((id=b.getAttribute('data-edit'))) openForm(+id);
+    else if((id=b.getAttribute('data-del'))) confirmDelete(+id);
+    else if((id=b.getAttribute('data-approve'))) decide(+id,'approved');
+    else if((id=b.getAttribute('data-decline'))) decide(+id,'declined');
+    else if((id=b.getAttribute('data-cmt'))) openComments(+id);
+    else if((id=b.getAttribute('data-doc'))) viewDoc(+id);
+  };
+}
+/* ---------- CSV ---------- */
+function exportCsv(){
+  var rows=filtered(); if(!rows.length){ toast('There are no leave records to export.',true); return; }
+  var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  var out=[['Staff ID','Staff','Division','Reason','Comments','Leave Type','From Date','To Date','Leave Hours','Leave Balance (h)','Status','Document']];
+  rows.forEach(function(l){
+    var s=staffById(l.staff), t=typeByKey(l.type), hrs=hoursOf(l), bal=balanceAfter(l.staff,l.type,hrs,l.status,l.id);
+    out.push([s.id,s.n,s.div,l.reason,l.comments.map(function(c){return c.by+': '+c.text;}).join(' | '),t.n,fmtD(l.from),fmtD(l.to),
+      (Math.round(hrs*100)/100).toFixed(2),bal===null?'':(Math.round(bal*100)/100).toFixed(2),STATUS[l.status],l.doc?l.doc.name:'']);
+  });
+  var csv='﻿'+out.map(function(r){ return r.map(q).join(','); }).join('\r\n');
+  var a=document.createElement('a'), url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.href=url; a.download='leave-records-'+new Date().toISOString().slice(0,10)+'.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+  toast('Exported '+rows.length+' leave record'+(rows.length===1?'':'s')+' to CSV.');
+}
+
+/* ---------- approve / decline ---------- */
+function decide(id,to){
+  var l=leaveById(id); if(!l) return;
+  if(l.status!=='pending'){ toast('Only pending requests can be approved or declined.',true); return; }
+  var s=staffById(l.staff), t=typeByKey(l.type), hrs=hoursOf(l), bal=balanceAfter(l.staff,l.type,hrs,'approved',l.id), ap=to==='approved';
+  var clash=ap?overlaps(l).filter(function(o){return o.status==='approved';}):[];
+  showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="d-t"><div class="confirm-body">'+
+    '<div class="warn'+(ap?' ok':'')+'">'+(ap?I.okBig:I.warn)+'</div>'+
+    '<h3 id="d-t">'+(ap?'Approve':'Decline')+' leave request?</h3>'+
+    '<p><strong>'+esc(s.n)+'</strong> · '+esc(t.n)+', '+fmtD(l.from)+(l.to!==l.from?' to '+fmtD(l.to):'')+'.</p>'+
+    '<dl class="dlg-sum"><dt>Leave hours</dt><dd>'+fmtH(hrs)+'</dd>'+
+      (bal===null?'':'<dt>Balance after approval</dt><dd class="'+(bal<0?'neg':'')+'">'+fmtH(bal)+'</dd>')+'</dl>'+
+    (ap&&bal!==null&&bal<0?'<div class="note-neg">'+I.warnSm+'<span>Approving takes '+esc(s.n)+'’s '+esc(t.n.toLowerCase())+' balance below zero.</span></div>':'')+
+    (clash.length?'<div class="note-neg">'+I.warnSm+'<span>This overlaps approved leave from '+fmtD(clash[0].from)+' to '+fmtD(clash[0].to)+'.</span></div>':'')+
+    '<div class="dlg-field"><label class="flabel" for="d-note">'+(ap?'Comment (optional)':'Reason for declining')+(ap?'':' <span class="req-star">*</span>')+'</label>'+
+    '<textarea class="ftext" id="d-note" maxlength="500" placeholder="'+(ap?'Add a note for the staff member':'Let the staff member know why')+'"></textarea>'+
+    '<p class="ferr" id="d-err">Enter a reason so the staff member knows why.</p></div>'+
+    '</div><div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button>'+
+    '<button class="'+(ap?'btn-ok':'btn-danger')+'" id="d-go">'+(ap?'Approve':'Decline')+'</button></div></div>');
+  document.getElementById('d-go').onclick=function(){
+    var note=document.getElementById('d-note').value.trim();
+    if(!ap&&!note){ document.getElementById('d-note').classList.add('bad'); document.getElementById('d-err').classList.add('show'); document.getElementById('d-note').focus(); return; }
+    if(l.status!=='pending'){ closeModal(); toast('This request was already updated.',true); renderList(); return; }
+    l.status=to;
+    if(note) l.comments.push({by:ME,at:Date.now(),text:note});
+    closeModal(); renderList();
+    toast('Leave '+(ap?'approved':'declined')+' for '+s.n+'.');
+  };
+}
+
+/* ---------- delete ---------- */
+function confirmDelete(id){
+  var l=leaveById(id); if(!l) return;
+  var s=staffById(l.staff), t=typeByKey(l.type);
+  showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="x-t"><div class="confirm-body">'+
+    '<div class="warn">'+I.trash.replace('width="14" height="14"','width="20" height="20"')+'</div>'+
+    '<h3 id="x-t">Delete this leave request?</h3>'+
+    '<p><strong>'+esc(s.n)+'</strong> · '+esc(t.n)+', '+fmtD(l.from)+(l.to!==l.from?' to '+fmtD(l.to):'')+' ('+fmtH(hoursOf(l))+'). '+
+    (l.status==='approved'&&!t.noBalance?'The '+fmtH(hoursOf(l))+' will be returned to their '+esc(t.n.toLowerCase())+' balance. ':'')+
+    'This can’t be undone.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-danger" id="x-go">Delete</button></div></div>');
+  document.getElementById('x-go').onclick=function(){
+    LEAVES=LEAVES.filter(function(x){ return x.id!==id; });
+    closeModal(); renderList(); toast('Leave request deleted.');
+  };
+}
+
+/* ---------- comments ---------- */
+function threadHtml(list){
+  if(!list.length) return '<p class="thread-empty">No comments yet.</p>';
+  return '<div class="thread">'+list.map(function(c){ return '<div class="c"><p>'+esc(c.text)+'</p><span>'+esc(c.by)+' · '+fmtWhen(c.at)+'</span></div>'; }).join('')+'</div>';
+}
+function openComments(id){
+  var l=leaveById(id); if(!l) return;
+  var s=staffById(l.staff);
+  showModal('<div class="modal" role="dialog" aria-modal="true" aria-labelledby="c-t"><div class="modal-head"><h2 id="c-t">Comments</h2></div>'+
+    '<div class="modal-body"><p style="font-size:13px;color:var(--mute);margin-top:-8px">'+esc(s.n)+' · '+esc(typeByKey(l.type).n)+', '+fmtD(l.from)+(l.to!==l.from?' to '+fmtD(l.to):'')+'</p>'+
+    threadHtml(l.comments)+
+    '<div><label class="flabel" for="c-new">Add comment <span class="req-star">*</span></label><textarea class="ftext" id="c-new" maxlength="500" placeholder="Write a comment"></textarea>'+
+    '<div class="frow"><p class="ferr" id="c-err">Write a comment before adding it.</p><span class="counter" id="c-cnt">0/500</span></div></div></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Close</button><button class="btn-primary" id="c-go">'+I.plus+'Add Comment</button></div></div>');
+  var ta=document.getElementById('c-new');
+  ta.oninput=function(){ document.getElementById('c-cnt').textContent=ta.value.length+'/500'; ta.classList.remove('bad'); document.getElementById('c-err').classList.remove('show'); };
+  document.getElementById('c-go').onclick=function(){
+    var v=ta.value.trim();
+    if(!v){ ta.classList.add('bad'); document.getElementById('c-err').classList.add('show'); ta.focus(); return; }
+    l.comments.push({by:ME,at:Date.now(),text:v});
+    closeModal(); renderList(); toast('Comment added.');
+  };
+}
+
+/* ---------- document viewer ---------- */
+function viewDoc(id){
+  var l=leaveById(id); if(!l||!l.doc) return;
+  var d=l.doc, e=ext(d.name), body;
+  if(d.url&&/^image\//.test(d.mime)) body='<img src="'+d.url+'" alt="'+esc(d.name)+'">';
+  else if(d.url&&d.mime==='application/pdf') body='<iframe src="'+d.url+'" title="'+esc(d.name)+'"></iframe>';
+  else body='<div class="ph"><span class="big">'+esc(e.toUpperCase())+'</span><b style="color:var(--ink)">'+esc(d.name)+'</b>'+
+    '<span>'+(d.url?'This file type can’t be previewed here. Download it to open.':'Preview opens from document storage once the module is connected to the backend.')+'</span></div>';
+  showModal('<div class="modal" role="dialog" aria-modal="true" aria-labelledby="v-t"><div class="modal-head"><h2 id="v-t">Document</h2></div>'+
+    '<div class="modal-body" style="gap:0"><div class="viewer">'+body+'</div>'+
+    '<div class="vmeta"><span><b>'+esc(d.name)+'</b></span><span>'+fmtSize(d.size)+'</span><span>Uploaded by '+esc(d.by)+' · '+fmtWhen(d.at)+'</span></div></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Close</button>'+
+    (d.url?'<a class="btn-primary" href="'+d.url+'" download="'+esc(d.name)+'" style="text-decoration:none">'+I.csv+'Download</a>':'')+'</div></div>');
+}
+
+/* ---------- add / edit form ---------- */
+var form=null;
+function openForm(id){
+  var l=id?leaveById(id):null;
+  form={ id:id, dirty:false, errs:{}, d: l?{ staff:l.staff, type:l.type, from:l.from, to:l.to, reason:l.reason, comment:'', status:l.status, doc:l.doc }
+                                       :{ staff:'', type:'', from:'', to:'', reason:'', comment:'', status:'pending', doc:null } };
+  renderForm();
+}
+function field(label,req,inner,err,cls){
+  return '<div class="'+(cls||'')+'"><label class="flabel"'+(inner.id?' for="'+inner.id+'"':'')+'>'+label+(req?' <span class="req-star">*</span>':'')+'</label>'+inner.html+
+    '<p class="ferr'+(err?' show':'')+'" role="alert">'+esc(err||'')+'</p></div>';
+}
+function summaryHtml(){
+  var d=form.d, t=typeByKey(d.type), days=workDays(d.from,d.to);
+  if(!d.from||!d.to||d.to<d.from) return '<span class="muted">Pick the dates to see the leave hours and balance.</span>';
+  var hrs=days*HOURS_PER_DAY, h='<span>Working days <b>'+days+'</b></span><span>Leave hours <b>'+fmtH(hrs)+'</b></span>';
+  if(d.staff&&t){
+    var bal=balanceAfter(d.staff,d.type,hrs,d.status,form.id);
+    h+=bal===null?'<span class="muted">'+esc(t.n)+' has no balance</span>':'<span>Balance after <b class="'+(bal<0?'neg':'pos')+'">'+fmtH(bal)+'</b></span>';
+  }
+  if(!days) h+='<span class="neg">These dates fall on a weekend.</span>';
+  return h;
+}
+function docHtml(){
+  var d=form.d.doc, err=form.errs.doc;
+  var h=d?'<div class="filed"><span class="fi">'+esc(ext(d.name).toUpperCase())+'</span><span class="fmeta"><span class="fn" title="'+esc(d.name)+'">'+esc(d.name)+'</span><span class="fs">'+fmtSize(d.size)+'</span></span>'+
+      '<span class="fbtns"><button type="button" class="act" id="doc-rep" title="Replace" aria-label="Replace document">'+I.up.replace('width="18" height="18"','width="14" height="14"')+'</button>'+
+      '<button type="button" class="act danger" id="doc-rm" title="Remove" aria-label="Remove document">'+I.trash+'</button></span></div>'
+    :'<div class="dz'+(err?' bad':'')+'" id="dz" role="button" tabindex="0" aria-describedby="dz-hint"><span class="dz-ic">'+I.up+'</span>'+
+      '<span class="dz-t">Drag and drop a file here, or <u>click to upload</u></span><span class="dz-s" id="dz-hint">PDF, JPG, PNG or DOCX · up to 5 MB</span></div>';
+  return h+'<input type="file" id="doc-in" class="sr" tabindex="-1" accept=".pdf,.jpg,.jpeg,.png,.docx">'+
+    '<p class="ferr'+(err?' show':'')+'" role="alert">'+esc(err||'')+'</p>';
+}
+function renderForm(){
+  var d=form.d, e=form.errs, edit=!!form.id, l=edit?leaveById(form.id):null;
+  var typeName=d.type?typeByKey(d.type).n:'';
+  var h='<div class="modal" role="dialog" aria-modal="true" aria-labelledby="lf-t">'+
+    '<div class="modal-head"><h2 id="lf-t">'+(edit?'Edit Leave':'Add Leave')+'</h2><button id="lf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body" id="lf-body"><div class="fgrid">'+
+    field('Staff',true,{id:'lf-staff',html:'<div class="fsel"><select class="fin plain'+(e.staff?' bad':'')+'" id="lf-staff"><option value="">Select staff member</option>'+
+      STAFF.map(function(s){ return '<option value="'+s.id+'"'+(s.id===d.staff?' selected':'')+'>'+esc(s.n)+' · '+esc(s.div)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.staff)+
+    field('Leave Type',true,{id:'lf-type',html:'<div class="combo" id="combo"><input class="fin plain'+(e.type?' bad':'')+'" id="lf-type" role="combobox" aria-expanded="false" aria-controls="lf-types" aria-autocomplete="list" autocomplete="off" placeholder="Search leave type" value="'+esc(typeName)+'">'+
+      '<span class="cv">'+I.chev+'</span><ul class="combo-list" id="lf-types" role="listbox"></ul></div>'},e.type)+
+    field('From Date',true,{id:'lf-from',html:'<input type="date" class="fin plain'+(e.from?' bad':'')+'" id="lf-from" value="'+esc(d.from)+'">'},e.from)+
+    field('To Date',true,{id:'lf-to',html:'<input type="date" class="fin plain'+(e.to?' bad':'')+'" id="lf-to" value="'+esc(d.to)+'"'+(d.from?' min="'+esc(d.from)+'"':'')+'>'},e.to)+
+    '<div class="span lv-sum" id="lf-sum" aria-live="polite">'+summaryHtml()+'</div>'+
+    field('Reason',true,{id:'lf-reason',html:'<textarea class="ftext'+(e.reason?' bad':'')+'" id="lf-reason" maxlength="500" placeholder="Why is the leave needed?">'+esc(d.reason)+'</textarea>'},e.reason,'span')+
+    (edit&&l.comments.length?'<div class="span"><span class="flabel">Comments</span>'+threadHtml(l.comments)+'</div>':'')+
+    field(edit?'Add Comment':'Comment',false,{id:'lf-comment',html:'<textarea class="ftext" id="lf-comment" maxlength="500" placeholder="Any additional comments (optional)">'+esc(d.comment)+'</textarea>'},'','span')+
+    '<div class="span"><span class="flabel">Document</span><div id="lf-doc">'+docHtml()+'</div></div>'+
+    field('Status',true,{id:'lf-status',html:'<div class="fsel"><select class="fin plain" id="lf-status">'+
+      Object.keys(STATUS).map(function(k){ return '<option value="'+k+'"'+(k===d.status?' selected':'')+'>'+STATUS[k]+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.status)+
+    '</div></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="lf-cancel">Cancel</button><button class="btn-primary" id="lf-save">'+(edit?'Save Changes':'Submit')+'</button></div></div>';
+  var keep=document.getElementById('lf-body'), y=keep?keep.scrollTop:0;
+  showDrawer(h);
+  document.getElementById('lf-body').scrollTop=y;
+  bindForm();
+}
+function setDirty(){ form.dirty=true; }
+function refreshSum(){ var s=document.getElementById('lf-sum'); if(s) s.innerHTML=summaryHtml(); }
+function clearErr(k,el){ if(!form.errs[k]) return; delete form.errs[k]; if(el){ el.classList.remove('bad'); var p=el.closest('div:not(.fsel):not(.combo)').querySelector('.ferr'); if(p){ p.classList.remove('show'); p.textContent=''; } } }
+function bindForm(){
+  var d=form.d;
+  document.getElementById('lf-x').onclick=leaveForm;
+  document.getElementById('lf-cancel').onclick=leaveForm;
+  document.getElementById('lf-save').onclick=submitForm;
+  var staff=document.getElementById('lf-staff');
+  staff.onchange=function(){ d.staff=staff.value; setDirty(); clearErr('staff',staff); refreshSum(); };
+  var from=document.getElementById('lf-from'), to=document.getElementById('lf-to');
+  from.onchange=function(){ d.from=from.value; to.min=d.from||''; setDirty(); clearErr('from',from); if(form.errs.to&&(!d.to||d.to>=d.from)) clearErr('to',to); refreshSum(); };
+  to.onchange=function(){ d.to=to.value; setDirty(); clearErr('to',to); refreshSum(); };
+  var reason=document.getElementById('lf-reason');
+  reason.oninput=function(){ d.reason=reason.value; setDirty(); clearErr('reason',reason); };
+  var cm=document.getElementById('lf-comment');
+  cm.oninput=function(){ d.comment=cm.value; setDirty(); };
+  var st=document.getElementById('lf-status');
+  st.onchange=function(){ d.status=st.value; setDirty(); refreshSum(); };
+  bindCombo();
+  bindDoc();
+}
+
+/* searchable leave-type dropdown */
+function bindCombo(){
+  var box=document.getElementById('combo'), inp=document.getElementById('lf-type'), list=document.getElementById('lf-types'), hi=0, shown=[];
+  function draw(q){
+    q=(q||'').trim().toLowerCase();
+    shown=TYPES.filter(function(t){ return !q||t.n.toLowerCase().indexOf(q)>-1; });
+    if(hi>=shown.length) hi=0;
+    list.innerHTML=shown.length?shown.map(function(t,i){
+      return '<li role="option" id="lt-'+t.k+'" data-k="'+t.k+'" class="'+(i===hi?'hi':'')+'" aria-selected="'+(t.k===form.d.type)+'">'+esc(t.n)+(t.noBalance?'<small>No balance</small>':'')+'</li>';
+    }).join(''):'<li class="nomatch" aria-disabled="true">No leave type matches “'+esc(q)+'”</li>';
+    inp.setAttribute('aria-activedescendant',shown[hi]?'lt-'+shown[hi].k:'');
+  }
+  function open(){ box.classList.add('open'); inp.setAttribute('aria-expanded','true'); draw(inp.value===(form.d.type?typeByKey(form.d.type).n:'')?'':inp.value); }
+  function close(){ box.classList.remove('open'); inp.setAttribute('aria-expanded','false'); inp.value=form.d.type?typeByKey(form.d.type).n:''; }
+  function pick(k){ form.d.type=k; setDirty(); clearErr('type',inp); close(); refreshSum(); }
+  inp.onfocus=function(){ inp.select(); open(); };
+  inp.onclick=open;
+  inp.oninput=function(){ hi=0; box.classList.add('open'); inp.setAttribute('aria-expanded','true'); draw(inp.value); };
+  inp.onkeydown=function(e){
+    if(e.key==='ArrowDown'){ e.preventDefault(); if(!box.classList.contains('open')) open(); else { hi=Math.min(shown.length-1,hi+1); draw(inp.value===(form.d.type?typeByKey(form.d.type).n:'')?'':inp.value); } }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); hi=Math.max(0,hi-1); draw(inp.value===(form.d.type?typeByKey(form.d.type).n:'')?'':inp.value); }
+    else if(e.key==='Enter'){ if(box.classList.contains('open')&&shown[hi]){ e.preventDefault(); pick(shown[hi].k); } }
+    else if(e.key==='Escape'){ if(box.classList.contains('open')){ e.stopPropagation(); e.preventDefault(); close(); } }
+    else if(e.key==='Tab'){ if(box.classList.contains('open')&&shown[hi]&&inp.value.trim()&&inp.value!==(form.d.type?typeByKey(form.d.type).n:'')) pick(shown[hi].k); else close(); }
+  };
+  inp.onblur=function(){ setTimeout(function(){ if(document.activeElement!==inp) close(); },120); };
+  list.onmousedown=function(e){ e.preventDefault(); var li=e.target.closest('li[data-k]'); if(li) pick(li.getAttribute('data-k')); };
+}
+
+/* document upload: drag-and-drop or click, checked against the allowed types and size */
+function takeFile(f){
+  if(!f) return;
+  var e=ext(f.name);
+  if(!FILE_TYPES[e]){ form.errs.doc='“'+f.name+'” isn’t supported. Upload a PDF, JPG, PNG or DOCX file.'; redrawDoc(); return; }
+  if(f.size>MAX_FILE){ form.errs.doc='“'+f.name+'” is '+fmtSize(f.size)+'. Files must be 5 MB or smaller.'; redrawDoc(); return; }
+  if(!f.size){ form.errs.doc='“'+f.name+'” is empty. Choose another file.'; redrawDoc(); return; }
+  delete form.errs.doc;
+  form.d.doc={ name:f.name, size:f.size, mime:f.type||FILE_TYPES[e], by:ME, at:Date.now(), url:URL.createObjectURL(f) };
+  setDirty(); redrawDoc(); toast('Document attached.');
+}
+function redrawDoc(){ document.getElementById('lf-doc').innerHTML=docHtml(); bindDoc(); }
+function bindDoc(){
+  var inp=document.getElementById('doc-in'), dz=document.getElementById('dz');
+  inp.onchange=function(){ takeFile(inp.files[0]); inp.value=''; };
+  if(dz){
+    dz.onclick=function(){ inp.click(); };
+    dz.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); inp.click(); } };
+    dz.ondragover=function(e){ e.preventDefault(); dz.classList.add('drag'); };
+    dz.ondragleave=function(){ dz.classList.remove('drag'); };
+    dz.ondrop=function(e){ e.preventDefault(); dz.classList.remove('drag'); var fs=e.dataTransfer.files; if(fs.length>1){ form.errs.doc='Upload one document at a time.'; redrawDoc(); return; } takeFile(fs[0]); };
+  }
+  var rep=document.getElementById('doc-rep'), rm=document.getElementById('doc-rm');
+  if(rep) rep.onclick=function(){ inp.click(); };
+  if(rm) rm.onclick=function(){ form.d.doc=null; setDirty(); redrawDoc(); };
+}
+
+function validate(){
+  var d=form.d, e={};
+  if(!d.staff) e.staff='Select a staff member.';
+  if(!d.type) e.type='Select a leave type.';
+  if(!d.from) e.from='Select the start date.';
+  if(!d.to) e.to='Select the end date.';
+  else if(d.from&&d.to<d.from) e.to='To Date can’t be earlier than From Date.';
+  else if(d.from&&!workDays(d.from,d.to)) e.to='The leave must include at least one working day.';
+  if(!d.reason.trim()) e.reason='Enter the reason for the leave.';
+  else if(d.reason.trim().length<3) e.reason='Reason must be at least 3 characters.';
+  if(!e.staff&&!e.from&&!e.to&&d.status!=='declined'){
+    var clash=overlaps({id:form.id,staff:d.staff,from:d.from,to:d.to});
+    if(clash.length) e.to=staffById(d.staff).n+' already has '+STATUS[clash[0].status].toLowerCase()+' leave from '+fmtD(clash[0].from)+' to '+fmtD(clash[0].to)+'.';
+  }
+  if(form.errs.doc) e.doc=form.errs.doc;
+  return e;
+}
+function submitForm(){
+  var d=form.d;
+  form.errs=validate();
+  var keys=Object.keys(form.errs);
+  if(keys.length){
+    renderForm();
+    var first={staff:'lf-staff',type:'lf-type',from:'lf-from',to:'lf-to',reason:'lf-reason',doc:'dz'}[keys[0]];
+    var el=document.getElementById(first); if(el){ el.scrollIntoView({block:'center'}); if(first!=='lf-type') el.focus(); }
+    toast(keys.length===1?'Fix the highlighted field to continue.':'Fix the '+keys.length+' highlighted fields to continue.',true);
+    return;
+  }
+  var btn=document.getElementById('lf-save'); btn.disabled=true; btn.textContent='Saving…';
+  setTimeout(function(){                                           // stands in for the backend call
+    var s=staffById(d.staff), edit=!!form.id;
+    if(edit){
+      var l=leaveById(form.id);
+      if(!l){ closeDrawer(); toast('This leave request no longer exists.',true); renderList(); return; }
+      l.staff=d.staff; l.type=d.type; l.from=d.from; l.to=d.to; l.reason=d.reason.trim(); l.status=d.status; l.doc=d.doc;
+      if(d.comment.trim()) l.comments.push({by:ME,at:Date.now(),text:d.comment.trim()});
+    } else {
+      LEAVES.push({ id:nextId++, staff:d.staff, type:d.type, from:d.from, to:d.to, reason:d.reason.trim(), status:d.status,
+        comments:d.comment.trim()?[{by:ME,at:Date.now(),text:d.comment.trim()}]:[], doc:d.doc });
+    }
+    closeDrawer(); renderList();
+    toast(edit?'Leave request updated.':'Leave request added for '+s.n+'.');
+  },350);
+}
+function leaveForm(){
+  if(!form||!form.dirty){ closeDrawer(); return; }
+  showModal('<div class="modal sm" role="dialog" aria-modal="true"><div class="confirm-body">'+
+    '<h3>Unsaved changes</h3><p>Your changes haven’t been saved. If you leave now, all unsaved changes will be lost.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Keep editing</button><button class="btn-danger" id="discard">Discard changes</button></div></div>');
+  document.getElementById('discard').onclick=function(){ closeModal(); closeDrawer(); };
+}
+
+renderList();
+})();
+
+<\/script>
+</body>
+</html></script>
 <script type="text/plain" id="src-settings"><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5354,30 +6718,30 @@ var ADDR_BOOK=[
 ];
 function mapLinkFor(a){ return 'https://maps.google.com/?q='+encodeURIComponent(a.address+', '+a.suburb+' '+a.state+' '+a.postcode); }
 var BRANCHES=[
-  {id:1,name:'Sydney Central',type:'Franchise',email:'sydney@aadtax.com.au',phone:'03 9876 5432',accName:'AAD Sydney Central',bsb:'062000',accNo:'10234567',address:'310 George Street',suburb:'Sydney',state:'NSW',postcode:'2000',created:'12 March 2018',active:true},
-  {id:2,name:'Melbourne West',type:'Standard',email:'melbwest@aadtax.com.au',phone:'03 9123 4567',accName:'AAD Melbourne West',bsb:'083004',accNo:'55871203',address:'200 Collins Street',suburb:'Melbourne',state:'VIC',postcode:'3000',created:'4 June 2019',active:true},
-  {id:3,name:'Brisbane North',type:'Franchise',email:'brisbane@aadtax.com.au',phone:'03 3456 7890',accName:'AAD Brisbane North',bsb:'064001',accNo:'90012844',address:'45 Adelaide Street',suburb:'Brisbane City',state:'QLD',postcode:'4000',created:'21 August 2020',active:true},
-  {id:4,name:'Perth City Hub',type:'Standard',email:'perth.hub@aadtax.com.au',phone:'0412 583 947',accName:'AAD Perth Hub',bsb:'086001',accNo:'449231102',address:'123 St Georges Terrace',suburb:'Perth',state:'WA',postcode:'6000',created:'12 March 2018',active:false},
-  {id:5,name:'Craigieburn',type:'Standard',email:'craigieburn@aadtax.com.au',phone:'03 9308 1122',accName:'AAD Craigieburn',bsb:'033021',accNo:'71230098',address:'9 Hume Highway',suburb:'Craigieburn',state:'VIC',postcode:'3064',created:'2 February 2021',active:true},
-  {id:6,name:'Point Cook',type:'Franchise',email:'pointcook@aadtax.com.au',phone:'03 9395 7788',accName:'AAD Point Cook',bsb:'063112',accNo:'33445566',address:'15 Point Cook Road',suburb:'Point Cook',state:'VIC',postcode:'3030',created:'18 October 2022',active:true},
-  {id:7,name:'Parramatta',type:'Standard',email:'parramatta@aadtax.com.au',phone:'02 8821 4410',accName:'AAD Parramatta',bsb:'063100',accNo:'20000000',address:'120 Church Street',suburb:'Parramatta',state:'NSW',postcode:'2150',created:'9 April 2019',active:true},
-  {id:8,name:'Liverpool',type:'Franchise',email:'liverpool@aadtax.com.au',phone:'02 8740 2255',accName:'AAD Liverpool',bsb:'064107',accNo:'20131071',address:'55 Macquarie Street',suburb:'Liverpool',state:'NSW',postcode:'2170',created:'17 July 2019',active:true},
-  {id:9,name:'Blacktown',type:'Standard',email:'blacktown@aadtax.com.au',phone:'02 9621 7733',accName:'AAD Blacktown',bsb:'065114',accNo:'20262142',address:'18 Main Street',suburb:'Blacktown',state:'NSW',postcode:'2148',created:'3 December 2019',active:true},
-  {id:10,name:'Geelong',type:'Standard',email:'geelong@aadtax.com.au',phone:'03 5229 6611',accName:'AAD Geelong',bsb:'066121',accNo:'20393213',address:'88 Moorabool Street',suburb:'Geelong',state:'VIC',postcode:'3220',created:'22 January 2020',active:true},
-  {id:11,name:'Dandenong',type:'Franchise',email:'dandenong@aadtax.com.au',phone:'03 9792 3344',accName:'AAD Dandenong',bsb:'067128',accNo:'20524284',address:'210 Lonsdale Street',suburb:'Dandenong',state:'VIC',postcode:'3175',created:'14 May 2020',active:false},
-  {id:12,name:'Shepparton',type:'Standard',email:'shepparton@aadtax.com.au',phone:'03 5821 9900',accName:'AAD Shepparton',bsb:'068135',accNo:'20655355',address:'72 Wyndham Street',suburb:'Shepparton',state:'VIC',postcode:'3630',created:'30 September 2020',active:true},
-  {id:13,name:'Tarneit',type:'Standard',email:'tarneit@aadtax.com.au',phone:'03 8742 1166',accName:'AAD Tarneit',bsb:'069142',accNo:'20786426',address:'5 Leakes Road',suburb:'Tarneit',state:'VIC',postcode:'3029',created:'11 November 2020',active:true},
-  {id:14,name:'Hoppers Crossing',type:'Franchise',email:'hoppers@aadtax.com.au',phone:'03 9749 5522',accName:'AAD Hoppers Crossing',bsb:'063149',accNo:'20917497',address:'14 Old Geelong Road',suburb:'Hoppers Crossing',state:'VIC',postcode:'3029',created:'8 March 2021',active:true},
-  {id:15,name:'Epping',type:'Standard',email:'epping@aadtax.com.au',phone:'03 9408 7744',accName:'AAD Epping',bsb:'064156',accNo:'21048568',address:'32 High Street',suburb:'Epping',state:'VIC',postcode:'3076',created:'19 June 2021',active:true},
-  {id:16,name:'Pakenham',type:'Standard',email:'pakenham@aadtax.com.au',phone:'03 5941 2288',accName:'AAD Pakenham',bsb:'065163',accNo:'21179639',address:'101 Main Street',suburb:'Pakenham',state:'VIC',postcode:'3810',created:'27 October 2021',active:true},
-  {id:17,name:'Gold Coast',type:'Franchise',email:'goldcoast@aadtax.com.au',phone:'03 5531 8800',accName:'AAD Gold Coast',bsb:'066170',accNo:'21310710',address:'45 Surf Parade',suburb:'Broadbeach',state:'QLD',postcode:'4218',created:'5 February 2022',active:true},
-  {id:18,name:'Logan Central',type:'Standard',email:'logan@aadtax.com.au',phone:'03 3299 4466',accName:'AAD Logan Central',bsb:'067177',accNo:'21441781',address:'9 Wembley Road',suburb:'Logan Central',state:'QLD',postcode:'4114',created:'23 April 2022',active:true},
-  {id:19,name:'Adelaide City',type:'Franchise',email:'adelaide@aadtax.com.au',phone:'03 8231 7799',accName:'AAD Adelaide City',bsb:'068184',accNo:'21572852',address:'180 Rundle Mall',suburb:'Adelaide',state:'SA',postcode:'5000',created:'12 August 2022',active:false},
-  {id:20,name:'Salisbury',type:'Standard',email:'salisbury@aadtax.com.au',phone:'03 8258 3311',accName:'AAD Salisbury',bsb:'069191',accNo:'21703923',address:'26 John Street',suburb:'Salisbury',state:'SA',postcode:'5108',created:'1 December 2022',active:true},
-  {id:21,name:'Joondalup',type:'Standard',email:'joondalup@aadtax.com.au',phone:'03 9300 5566',accName:'AAD Joondalup',bsb:'063198',accNo:'21834994',address:'7 Boas Avenue',suburb:'Joondalup',state:'WA',postcode:'6027',created:'16 March 2023',active:true},
-  {id:22,name:'Canning Vale',type:'Franchise',email:'canningvale@aadtax.com.au',phone:'03 9455 2277',accName:'AAD Canning Vale',bsb:'064205',accNo:'21966065',address:'60 Bannister Road',suburb:'Canning Vale',state:'WA',postcode:'6155',created:'29 July 2023',active:true},
-  {id:23,name:'Hobart City',type:'Standard',email:'hobart@aadtax.com.au',phone:'03 6234 1199',accName:'AAD Hobart City',bsb:'065212',accNo:'22097136',address:'42 Elizabeth Street',suburb:'Hobart',state:'TAS',postcode:'7000',created:'10 November 2023',active:false},
-  {id:24,name:'Canberra City',type:'Franchise',email:'canberra@aadtax.com.au',phone:'03 6247 8822',accName:'AAD Canberra City',bsb:'066219',accNo:'22228207',address:'15 London Circuit',suburb:'Canberra',state:'ACT',postcode:'2601',created:'4 February 2024',active:true}
+  {id:1,name:'Sydney Central',type:'Franchise',email:'sydney@aadtax.com.au',phone:'03 9876 5432',accName:'AAD Sydney Central',bsb:'062000',accNo:'10234567',address:'310 George Street',suburb:'Sydney',state:'NSW',postcode:'2000',created:'12-03-2018',active:true},
+  {id:2,name:'Melbourne West',type:'Standard',email:'melbwest@aadtax.com.au',phone:'03 9123 4567',accName:'AAD Melbourne West',bsb:'083004',accNo:'55871203',address:'200 Collins Street',suburb:'Melbourne',state:'VIC',postcode:'3000',created:'04-06-2019',active:true},
+  {id:3,name:'Brisbane North',type:'Franchise',email:'brisbane@aadtax.com.au',phone:'03 3456 7890',accName:'AAD Brisbane North',bsb:'064001',accNo:'90012844',address:'45 Adelaide Street',suburb:'Brisbane City',state:'QLD',postcode:'4000',created:'21-08-2020',active:true},
+  {id:4,name:'Perth City Hub',type:'Standard',email:'perth.hub@aadtax.com.au',phone:'0412 583 947',accName:'AAD Perth Hub',bsb:'086001',accNo:'449231102',address:'123 St Georges Terrace',suburb:'Perth',state:'WA',postcode:'6000',created:'12-03-2018',active:false},
+  {id:5,name:'Craigieburn',type:'Standard',email:'craigieburn@aadtax.com.au',phone:'03 9308 1122',accName:'AAD Craigieburn',bsb:'033021',accNo:'71230098',address:'9 Hume Highway',suburb:'Craigieburn',state:'VIC',postcode:'3064',created:'02-02-2021',active:true},
+  {id:6,name:'Point Cook',type:'Franchise',email:'pointcook@aadtax.com.au',phone:'03 9395 7788',accName:'AAD Point Cook',bsb:'063112',accNo:'33445566',address:'15 Point Cook Road',suburb:'Point Cook',state:'VIC',postcode:'3030',created:'18-10-2022',active:true},
+  {id:7,name:'Parramatta',type:'Standard',email:'parramatta@aadtax.com.au',phone:'02 8821 4410',accName:'AAD Parramatta',bsb:'063100',accNo:'20000000',address:'120 Church Street',suburb:'Parramatta',state:'NSW',postcode:'2150',created:'09-04-2019',active:true},
+  {id:8,name:'Liverpool',type:'Franchise',email:'liverpool@aadtax.com.au',phone:'02 8740 2255',accName:'AAD Liverpool',bsb:'064107',accNo:'20131071',address:'55 Macquarie Street',suburb:'Liverpool',state:'NSW',postcode:'2170',created:'17-07-2019',active:true},
+  {id:9,name:'Blacktown',type:'Standard',email:'blacktown@aadtax.com.au',phone:'02 9621 7733',accName:'AAD Blacktown',bsb:'065114',accNo:'20262142',address:'18 Main Street',suburb:'Blacktown',state:'NSW',postcode:'2148',created:'03-12-2019',active:true},
+  {id:10,name:'Geelong',type:'Standard',email:'geelong@aadtax.com.au',phone:'03 5229 6611',accName:'AAD Geelong',bsb:'066121',accNo:'20393213',address:'88 Moorabool Street',suburb:'Geelong',state:'VIC',postcode:'3220',created:'22-01-2020',active:true},
+  {id:11,name:'Dandenong',type:'Franchise',email:'dandenong@aadtax.com.au',phone:'03 9792 3344',accName:'AAD Dandenong',bsb:'067128',accNo:'20524284',address:'210 Lonsdale Street',suburb:'Dandenong',state:'VIC',postcode:'3175',created:'14-05-2020',active:false},
+  {id:12,name:'Shepparton',type:'Standard',email:'shepparton@aadtax.com.au',phone:'03 5821 9900',accName:'AAD Shepparton',bsb:'068135',accNo:'20655355',address:'72 Wyndham Street',suburb:'Shepparton',state:'VIC',postcode:'3630',created:'30-09-2020',active:true},
+  {id:13,name:'Tarneit',type:'Standard',email:'tarneit@aadtax.com.au',phone:'03 8742 1166',accName:'AAD Tarneit',bsb:'069142',accNo:'20786426',address:'5 Leakes Road',suburb:'Tarneit',state:'VIC',postcode:'3029',created:'11-11-2020',active:true},
+  {id:14,name:'Hoppers Crossing',type:'Franchise',email:'hoppers@aadtax.com.au',phone:'03 9749 5522',accName:'AAD Hoppers Crossing',bsb:'063149',accNo:'20917497',address:'14 Old Geelong Road',suburb:'Hoppers Crossing',state:'VIC',postcode:'3029',created:'08-03-2021',active:true},
+  {id:15,name:'Epping',type:'Standard',email:'epping@aadtax.com.au',phone:'03 9408 7744',accName:'AAD Epping',bsb:'064156',accNo:'21048568',address:'32 High Street',suburb:'Epping',state:'VIC',postcode:'3076',created:'19-06-2021',active:true},
+  {id:16,name:'Pakenham',type:'Standard',email:'pakenham@aadtax.com.au',phone:'03 5941 2288',accName:'AAD Pakenham',bsb:'065163',accNo:'21179639',address:'101 Main Street',suburb:'Pakenham',state:'VIC',postcode:'3810',created:'27-10-2021',active:true},
+  {id:17,name:'Gold Coast',type:'Franchise',email:'goldcoast@aadtax.com.au',phone:'03 5531 8800',accName:'AAD Gold Coast',bsb:'066170',accNo:'21310710',address:'45 Surf Parade',suburb:'Broadbeach',state:'QLD',postcode:'4218',created:'05-02-2022',active:true},
+  {id:18,name:'Logan Central',type:'Standard',email:'logan@aadtax.com.au',phone:'03 3299 4466',accName:'AAD Logan Central',bsb:'067177',accNo:'21441781',address:'9 Wembley Road',suburb:'Logan Central',state:'QLD',postcode:'4114',created:'23-04-2022',active:true},
+  {id:19,name:'Adelaide City',type:'Franchise',email:'adelaide@aadtax.com.au',phone:'03 8231 7799',accName:'AAD Adelaide City',bsb:'068184',accNo:'21572852',address:'180 Rundle Mall',suburb:'Adelaide',state:'SA',postcode:'5000',created:'12-08-2022',active:false},
+  {id:20,name:'Salisbury',type:'Standard',email:'salisbury@aadtax.com.au',phone:'03 8258 3311',accName:'AAD Salisbury',bsb:'069191',accNo:'21703923',address:'26 John Street',suburb:'Salisbury',state:'SA',postcode:'5108',created:'01-12-2022',active:true},
+  {id:21,name:'Joondalup',type:'Standard',email:'joondalup@aadtax.com.au',phone:'03 9300 5566',accName:'AAD Joondalup',bsb:'063198',accNo:'21834994',address:'7 Boas Avenue',suburb:'Joondalup',state:'WA',postcode:'6027',created:'16-03-2023',active:true},
+  {id:22,name:'Canning Vale',type:'Franchise',email:'canningvale@aadtax.com.au',phone:'03 9455 2277',accName:'AAD Canning Vale',bsb:'064205',accNo:'21966065',address:'60 Bannister Road',suburb:'Canning Vale',state:'WA',postcode:'6155',created:'29-07-2023',active:true},
+  {id:23,name:'Hobart City',type:'Standard',email:'hobart@aadtax.com.au',phone:'03 6234 1199',accName:'AAD Hobart City',bsb:'065212',accNo:'22097136',address:'42 Elizabeth Street',suburb:'Hobart',state:'TAS',postcode:'7000',created:'10-11-2023',active:false},
+  {id:24,name:'Canberra City',type:'Franchise',email:'canberra@aadtax.com.au',phone:'03 6247 8822',accName:'AAD Canberra City',bsb:'066219',accNo:'22228207',address:'15 London Circuit',suburb:'Canberra',state:'ACT',postcode:'2601',created:'04-02-2024',active:true}
 ];
 BRANCHES.forEach(function(b){ b.map=mapLinkFor(b); });
 var branchSeq=25;
@@ -5526,7 +6890,7 @@ function branchForm(id){
     if(Object.keys(errs).length){ paint(); var first=bb.querySelector('.bad'); if(first) first.focus(); toast('Please fix the highlighted fields'); return; }
     FIELDS.forEach(function(k){ d[k]=String(d[k]||'').trim(); });
     if(editing){ for(var k in d) src[k]=d[k]; toast('Branch has been updated successfully'); }
-    else { d.id=branchSeq++; d.created=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'}); d.active=true; BRANCHES.unshift(d); toast('Branch has been created successfully'); }
+    else { d.id=branchSeq++; d.created=(function(x){ return String(x.getDate()).padStart(2,'0')+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+x.getFullYear(); })(new Date()); d.active=true; BRANCHES.unshift(d); toast('Branch has been created successfully'); }
     overlay._guard=null; closeModal(); render();
   };
   paint();

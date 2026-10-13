@@ -97,6 +97,10 @@
     background: linear-gradient(180deg, #3A3A3D 0%, #1C1C1E 55%, #111113 100%); color: #fff; font: 500 15.5px/1 var(--display);
     box-shadow: 0 10px 20px -12px rgba(17,17,19,.8), inset 0 1px 0 rgba(255,255,255,.14); transition: filter .15s, transform .15s; }
   .btn:hover:not(:disabled) { filter: brightness(1.18); }
+  .btn-demo { width: 100%; height: 46px; margin-top: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 999px; cursor: pointer;
+    background: #fff; border: 1.5px dashed var(--brand); color: var(--brand-ink); font: 500 14.5px/1 var(--display); transition: background .15s; }
+  .btn-demo:hover:not(:disabled) { background: #FFF4EC; }
+  .btn-demo:disabled { opacity: .6; cursor: progress; }
   .btn:active:not(:disabled) { transform: translateY(1px); }
   .btn:disabled { cursor: progress; opacity: .92; }
   .btn .arrow { transition: transform .2s; }
@@ -259,6 +263,7 @@
             </div>
           </fieldset>
           <button type="submit" class="btn" id="b-login"><span class="spin" aria-hidden="true"></span><span class="t">Sign in</span><svg class="arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button type="button" class="btn-demo" id="b-demo" title="Prototype only: fills the demo email, password and code, then signs in"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Auto Login (Demo)</button>
         </form>
       </section>
 
@@ -457,6 +462,8 @@
   const email = $('#email'), pw = $('#password');
   const emailError = v => !v ? 'Enter your email address' : !EMAIL.test(v) ? 'Enter a valid email address, like name@example.com' : '';
   let accountPassword = DEMO_PASSWORD;   // updated by Reset Password, so the new password works at Sign In
+  const DEMO_EMAIL = 'admin@aadtaxation.com.au';
+  let autoDemo = false;   // set by Auto Login (Demo): fills each step and continues on its own
   let otpMode = 'signin', otpAddr = '', otpIssuedAt = 0;
   const OTP_TTL = 10 * 60 * 1000;        // codes expire after 10 minutes
 
@@ -531,6 +538,16 @@
     }, 1200);
   });
 
+  /* ---- Auto Login (prototype): fill the demo details, sign in, then fill the code ---- */
+  $('#b-demo').addEventListener('click', () => {
+    if ($('#b-login').disabled) return;
+    $('#email').value = DEMO_EMAIL; $('#password').value = accountPassword;
+    ['#email', '#password'].forEach(s => $(s).dispatchEvent(new Event('input', { bubbles: true })));
+    autoDemo = true; $('#b-demo').disabled = true;
+    setTimeout(() => { $('#b-demo').disabled = false; }, 4000);
+    $('#f-login').requestSubmit();
+  });
+
   /* ---- OTP (shared by sign in and forgot password) ---- */
   const boxes = $$('.otp input');
   const code = () => boxes.map(b => b.value).join('');
@@ -539,6 +556,10 @@
     otpMode = mode; otpAddr = addr; otpIssuedAt = Date.now();
     $('#otp-email').textContent = addr; clearOtp(); $('#a-otp').hidden = true; otpAttempts = 0;
     show('v-otp'); startResend(); boxes[0].focus();
+    if (autoDemo && mode === 'signin') {
+      autoDemo = false;
+      setTimeout(() => { fill(0, DEMO_OTP); $('#f-otp').requestSubmit(); }, 700);
+    }
   }
   function startResend() {
     let s = 30; clearInterval(resendTimer);

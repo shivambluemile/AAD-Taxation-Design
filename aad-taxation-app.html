@@ -921,6 +921,8 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-file .x.e-pdf{background:#FDECEC;color:#C2410C}
 .ds-file b{font-weight:600;color:var(--ink)}
 .ds-file .sdt-ib{width:24px;height:24px}
+.ds-fmore{height:30px;padding:0 11px;border:1px dashed var(--line);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--orange-ink)}
+.ds-fmore:hover{border-color:var(--orange);background:var(--orange-soft)}
 .ds-by{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:12px;color:var(--faint)}
 .ds-by b{color:var(--slate);font-weight:600}
 .ds-more{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--orange-ink)}
@@ -1336,7 +1338,7 @@ var DOC_TYPES=[
   {k:'police',name:'Police Check',cat:'Compliance',num:true,exp:true,slots:[{id:'main',label:'Certificate'}]},
   {k:'wwc',name:'Working With Children Check',cat:'Compliance',num:true,exp:true,slots:[{id:'main',label:'Card'}]},
   {k:'tfn',name:'TFN Declaration',cat:'Payroll',exp:false,slots:[{id:'main',label:'Declaration form'}]},
-  {k:'contract',name:'Employment Contract',cat:'HR',exp:false,slots:[{id:'main',label:'Signed contract'}]},
+  {k:'contract',name:'Employment Contract',cat:'HR',exp:false,slots:[{id:'main',label:'Signed contract'},{id:'pd',label:'Position description'},{id:'pay',label:'Pay schedule'},{id:'policy',label:'Policy sign-off'},{id:'nda',label:'Confidentiality agreement'}]},
   {k:'super',name:'Superannuation Choice Form',cat:'Payroll',exp:false,slots:[{id:'main',label:'Form'}]}
 ];
 /* document numbers are stored in full but only the last 4 characters are shown */
@@ -1376,7 +1378,7 @@ function seedDocs(id){
     {k:'tfn',ver:1,
      cur:{files:[F('main','tfn_declaration.pdf','0.6 MB')],exp:null,on:dayOff(-590,11,0),by:'Jonny'},hist:[]},
     {k:'contract',ver:3,
-     cur:{files:[F('main','employment_contract_2026.pdf','0.8 MB')],exp:null,on:dayOff(-12,15,5),by:'John Doe',note:'Updated salary schedule after annual review'},
+     cur:{files:[F('main','employment_contract_2026.pdf','0.8 MB'),F('pd','position_description.pdf','0.3 MB'),F('pay','pay_schedule_2026.pdf','0.2 MB'),F('policy','policy_signoff.pdf','0.4 MB'),F('nda','confidentiality_agreement.pdf','0.3 MB')],exp:null,on:dayOff(-12,15,5),by:'John Doe',note:'Updated salary schedule after annual review'},
      hist:[{ver:2,files:[F('main','employment_contract_2025.pdf','0.8 MB')],exp:null,on:dayOff(-380,10,10),by:'Admin',rOn:dayOff(-12,15,5),rBy:'John Doe'},
            {ver:1,files:[F('main','employment_contract_signed.pdf','0.7 MB')],exp:null,on:dayOff(-590,11,0),by:'Jonny',rOn:dayOff(-380,10,10),rBy:'Admin'}]}
   ];
@@ -1436,6 +1438,14 @@ function fileChip(d,t,vi,fi,f){
     '<button class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="View" aria-label="View '+esc(f.n)+'">'+I.eye+'</button>'+
     '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>';
 }
+/* a version's files: the first 3 show, the rest sit behind "+N more" so the card stays one row tall */
+var MAX_FILES=3, filesOpen={};
+function fileChips(d,t,vi,files){
+  var key=d.k+'|'+vi, all=filesOpen[key]||files.length<=MAX_FILES, shown=all?files:files.slice(0,MAX_FILES);
+  return '<div class="ds-files">'+shown.map(function(f,fi){ return fileChip(d,t,vi,fi,f); }).join('')+
+    (files.length>MAX_FILES?'<button class="ds-fmore" data-fmore="'+key+'" aria-expanded="'+all+'">'+(all?'Show less':'+'+(files.length-MAX_FILES)+' more')+'</button>':'')+
+  '</div>';
+}
 function verTag(v,i){
   if(i===0) return '<span class="ds-tag cur">Current</span>';
   if(v.exp&&daysTo(v.exp)<0) return '<span class="ds-tag bad">Expired</span>';
@@ -1450,9 +1460,9 @@ function docCard(d){
   sub.push('Version '+d.ver);
   var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
-      '<span class="ds-ic'+(st==='expired'?' bad':'')+'">'+(t.slots.length>1?I.idc:I.file)+'</span>'+
+      '<span class="ds-ic'+(st==='expired'?' bad':'')+'">'+(t.slots[0].id==='front'?I.idc:I.file)+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
-        '<div class="ds-files">'+d.cur.files.map(function(f,fi){ return fileChip(d,t,0,fi,f); }).join('')+'</div>'+
+        fileChips(d,t,0,d.cur.files)+
         '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+'</span>'+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
         '</div>'+
@@ -1472,7 +1482,7 @@ function docCard(d){
       if(v.rOn) m.push('Replaced '+fmtD(v.rOn));
       return '<div class="ds-pr"><div class="ds-prh"><b>Version '+v.ver+'</b>'+verTag(v,vi)+'</div>'+
         '<div class="ds-sub">'+m.join(' · ')+'</div>'+
-        '<div class="ds-files">'+v.files.map(function(f,fi){ return fileChip(d,t,vi,fi,f); }).join('')+'</div></div>';
+        fileChips(d,t,vi,v.files)+'</div>';
     }).join('')+'</div>';
   }
   return h+'</div>';
@@ -1516,7 +1526,8 @@ function viewDoc(k,vi,fi){
 }
 I.close='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
 document.addEventListener('click',function(e){
-  var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-dfilter]'); if(!b) return;
+  var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-dfilter],[data-fmore]'); if(!b) return;
+  if(b.hasAttribute('data-fmore')){ var fk=b.getAttribute('data-fmore'); filesOpen[fk]=!filesOpen[fk]; keepScroll(renderDetail); return; }
   if(b.hasAttribute('data-view')){ var p=b.getAttribute('data-view').split('|'); viewDoc(p[0],+p[1],+p[2]); return; }
   if(b.hasAttribute('data-dfilter')){ docFilter=b.getAttribute('data-dfilter'); keepScroll(renderDetail); return; }
   docTab=b.getAttribute('data-dtab'); keepScroll(renderDetail);

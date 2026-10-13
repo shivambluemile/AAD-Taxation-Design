@@ -785,6 +785,7 @@ body.gridmode .listview{display:none}
 .up-sec:last-of-type{margin-bottom:0}
 .up-lbl{display:block;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:8px;letter-spacing:0;text-transform:none}
 .up-lbl .req{color:var(--orange)}
+.up-lbl .up-opt{font-weight:500;color:var(--faint)}
 .up-in{width:100%;height:42px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:0 13px;font-size:13.5px;color:var(--ink);font-family:inherit}
 select.up-in{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.2' stroke-linecap='round'><path d='m6 9 6 6 6-6'/></svg>") no-repeat right 12px center;padding-right:36px;cursor:pointer}
 .up-in:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.14)}
@@ -886,6 +887,87 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .sdt .state{white-space:nowrap}
 .state.soon i{background:#F59E0B}
 .sdt-hist{margin-top:26px}
+/* ===== documents tab v3 ===== */
+/* Documents tab: same calm list, with every requirement from the reference */
+.ds-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.ds-bar .btn.xs{height:34px;flex-shrink:0}
+.ds-chips{display:flex;gap:6px;flex-shrink:0}
+.ds-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;white-space:nowrap;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12.5px;font-weight:600;color:var(--slate)}
+.ds-chip i{width:7px;height:7px;border-radius:50%;background:#10B981}
+.ds-chip.soon i{background:#F59E0B}.ds-chip.expired i{background:#FF5966}.ds-chip.none i{background:#CBD5E1}
+.ds-chip b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.ds-chip:hover{border-color:#D4D7DD}
+.ds-chip.on{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink)}
+.ds-chip.on b{color:var(--orange-ink)}
+.ds-search{position:relative;flex:1;min-width:140px}
+.ds-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.ds-search input{width:100%;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 12px 0 34px;font-size:13px}
+.ds-search input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.ds-list{display:flex;flex-direction:column;gap:10px}
+.ds-item{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+@keyframes dvflash{0%{background:#FFF4EA}100%{background:#fff}}
+.ds-item.flash{animation:dvflash 2.4s ease-out}
+.ds-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px}
+.ds-ic{width:36px;height:36px;border-radius:9px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ds-ic svg{width:17px;height:17px}
+.ds-ic.bad{background:var(--red-soft);color:var(--red)}
+.ds-tt{flex:1;min-width:0}
+.ds-tt>b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.ds-sub{font-size:12.5px;color:var(--mute);margin-top:2px}
+.ds-sub em{font-style:normal;font-weight:600;color:var(--ink)}
+.ds-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ds-file{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 4px 0 6px;border:1px solid var(--line-soft);border-radius:8px;background:#FAFBFC;font-size:12px;color:var(--slate);max-width:100%}
+.ds-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}
+.ds-file .x.e-pdf{background:#FDECEC;color:#C2410C}
+.ds-file b{font-weight:600;color:var(--ink)}
+.ds-file .sdt-ib{width:24px;height:24px}
+.ds-by{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:12px;color:var(--faint)}
+.ds-by b{color:var(--slate);font-weight:600}
+.ds-more{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--orange-ink)}
+.ds-more:hover{text-decoration:underline}
+.ds-more svg{transition:transform .15s}
+.ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.ds-st{width:150px;flex-shrink:0;padding-top:2px}
+.ds-st .state{white-space:nowrap}
+.ds-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ds-acts .btn.xs{height:32px;padding:0 12px;font-size:12.5px;gap:6px}
+.ds-prev{background:#FAFBFC;border-top:1px solid var(--line-soft);padding:4px 16px 6px 64px}
+.ds-pr{padding:10px 0}
+.ds-pr+.ds-pr{border-top:1px dashed var(--line)}
+.ds-prh{display:flex;align-items:center;gap:8px;font-size:13px}
+.ds-prh b{font-weight:700;color:var(--ink)}
+.ds-pr .ds-sub{margin-top:3px}
+.ds-pr .ds-files{margin-top:6px}
+.ds-tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#F1F2F4;color:var(--mute)}
+.ds-tag.cur{background:var(--orange-soft);color:var(--orange-ink)}
+.ds-tag.bad{background:var(--red-soft);color:var(--red)}
+@media (max-width:640px){
+  .ds-row,.ds-hrow{flex-wrap:wrap}
+  .ds-st{width:auto;order:3;margin-left:48px}
+  .ds-acts{order:4;margin-left:auto}
+  .ds-prev{padding-left:16px}
+  .ds-bar{flex-wrap:wrap}
+  .ds-chips{flex-wrap:wrap}
+  .ds-search{flex-basis:100%;order:3}
+}
+.state.soon i{background:#F59E0B}.state.na i{background:#CBD5E1}
+td.docn{font-weight:600;font-variant-numeric:tabular-nums}
+td[data-comp] .state{white-space:nowrap}
+/* viewer */
+#m-prev .prev-stage{flex-direction:column;align-items:stretch;gap:12px;background:#fff;padding:14px 16px 20px;border-radius:14px;box-shadow:0 24px 60px rgba(16,22,30,.28);width:min(640px,92vw)}
+#m-prev .pv-head{display:flex;align-items:center;gap:8px}
+#m-prev .pv-head b{flex:1;font-size:14.5px;font-weight:800;color:var(--ink)}
+#m-prev .pv-head em{font-style:normal;font-weight:500;color:var(--mute);font-size:12.5px}
+#m-prev .pv-sides{display:flex;gap:6px}
+#m-prev .pv-sides button{height:30px;padding:0 13px;border-radius:8px;border:1px solid var(--line);font-size:12.5px;font-weight:700;color:var(--slate);background:#fff}
+#m-prev .pv-sides button.on{background:var(--orange);border-color:var(--orange);color:#fff}
+#m-prev .pv-doc{align-self:center;width:min(440px,100%);aspect-ratio:1.586;border-radius:12px;padding:18px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;
+  background:linear-gradient(135deg,#C2560F,#F18934);box-shadow:0 10px 30px rgba(16,22,30,.2)}
+#m-prev .pv-doc.back{background:linear-gradient(135deg,#334155,#64748B)}
+#m-prev .pv-r{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+#m-prev .pv-lines i{display:block;height:8px;background:rgba(255,255,255,.4);border-radius:4px;margin:7px 0}
+#m-prev .pv-doc small{font-size:12px;opacity:.9}
+@media (max-width:640px){.dv-sum{grid-template-columns:1fr 1fr}.dv-hrow{grid-template-columns:1fr}.dv-ha{justify-content:flex-start}}
 .sdt-file span{display:block;font-size:13px;color:var(--slate);line-height:1.45;overflow-wrap:anywhere}
 .sdt-date{font-size:13.5px;font-weight:600;color:var(--slate);font-variant-numeric:tabular-nums;white-space:nowrap}
 .al-main b em{font-style:normal;font-weight:600;font-size:11.5px;color:var(--faint);margin-left:4px}
@@ -1108,6 +1190,7 @@ function listView(){
      '<td><div class="contact">'+s.e+I.copy+'<br>'+s.p+I.copy+'</div></td>'+
      '<td style="font-size:13px;font-weight:600">'+s.t+'</td>'+
      '<td><div class="chips">'+chips+'</div></td>'+
+     docCells(s)+
      '<td><span class="state'+(s.s?'':' no')+'"><i></i>'+(s.s?'Active':'Inactive')+'</span></td>'+
      '<td><div class="meta">28-10-2025, 08:16 PM<span>by Admin</span></div></td>'+
      '<td><div class="acts"><button data-edit="'+s.id+'" title="Edit">'+I.edit+'</button><button data-pw="'+s.id+'" title="Password options">'+I.key+'</button></div></td>'+
@@ -1130,7 +1213,7 @@ function listView(){
      '<button class="fclear" id="clearfilters" style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>Clear filters</button>'+
    '</div>'+
    '<div class="listview card"><div class="tablewrap"><table>'+
-     '<thead><tr><th>Name</th><th>Contact Info</th><th>Role</th><th>Branches</th><th>Status</th><th>Created By</th><th>Actions</th></tr></thead>'+
+     '<thead><tr><th>Name</th><th>Contact Info</th><th>Role</th><th>Branches</th><th>Documents</th><th>Compliance</th><th>Status</th><th>Created By</th><th>Actions</th></tr></thead>'+
      '<tbody>'+rows+'</tbody></table></div>'+
      '<div class="tfoot"><span class="cnt">Showing 1 to 10 of 42 staff</span>'+
        '<div class="pager"><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>›</button></div></div>'+
@@ -1138,12 +1221,33 @@ function listView(){
    '';
 }
 
+/* Documents count + compliance, worked out from each staff member's current documents */
+function compliance(s){
+  var docs=storeOf(s.id).docs, ex=0, soon=0;
+  docs.forEach(function(d){ var st=stOf(d); if(st==='expired') ex++; else if(st==='soon') soon++; });
+  if(!docs.length) return '<span class="state na"><i></i>No documents</span>';
+  if(ex) return '<span class="state no"><i></i>'+ex+' expired</span>';
+  if(soon) return '<span class="state soon"><i></i>'+soon+' expiring soon</span>';
+  return '<span class="state"><i></i>All valid</span>';
+}
+function docCells(s){
+  return '<td class="docn" data-docn="'+s.id+'">'+storeOf(s.id).docs.length+'</td>'+
+    '<td data-comp="'+s.id+'">'+compliance(s)+'</td>';
+}
+function refreshCompliance(){
+  STAFF.forEach(function(s){
+    var n=content.querySelector('[data-docn="'+s.id+'"]'), c=content.querySelector('[data-comp="'+s.id+'"]');
+    if(n) n.textContent=storeOf(s.id).docs.length;
+    if(c) c.innerHTML=compliance(s);
+  });
+}
+
 /* ================= Detail ================= */
 var detailStaff=null, detailTab='docs';
 
 function openDetail(id){
   detailStaff=STAFF.filter(function(x){return x.id===id})[0]||STAFF[0];
-  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; docFilter='all'; auditFilter='all'; flashK=null;
+  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null;
   renderDetail(); drawer.classList.add('show'); scrim.classList.add('show'); drawer.setAttribute('aria-hidden','false');
 }
 
@@ -1226,15 +1330,17 @@ ACT.deleted='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 
 /* document types enabled for the Staff module (Settings → Document Types) */
 var DOC_TYPES=[
-  {k:'lic',name:"Driver's Licence",exp:true,slots:[{id:'front',label:'Front'},{id:'back',label:'Back'}]},
-  {k:'pass',name:'Passport',exp:true,slots:[{id:'main',label:'Photo page'}]},
-  {k:'visa',name:'Visa Document',exp:true,slots:[{id:'main',label:'Visa grant notice'}]},
-  {k:'police',name:'Police Check',exp:true,slots:[{id:'main',label:'Certificate'}]},
-  {k:'wwc',name:'Working With Children Check',exp:true,slots:[{id:'main',label:'Card'}]},
-  {k:'tfn',name:'TFN Declaration',exp:false,slots:[{id:'main',label:'Declaration form'}]},
-  {k:'contract',name:'Employment Contract',exp:false,slots:[{id:'main',label:'Signed contract'}]},
-  {k:'super',name:'Superannuation Choice Form',exp:false,slots:[{id:'main',label:'Form'}]}
+  {k:'lic',name:"Driver's Licence",cat:'Identity',num:true,exp:true,slots:[{id:'front',label:'Front'},{id:'back',label:'Back'}]},
+  {k:'pass',name:'Passport',cat:'Identity',num:true,exp:true,slots:[{id:'main',label:'Photo page'}]},
+  {k:'visa',name:'Visa Document',cat:'Identity',num:true,exp:true,slots:[{id:'main',label:'Visa grant notice'}]},
+  {k:'police',name:'Police Check',cat:'Compliance',num:true,exp:true,slots:[{id:'main',label:'Certificate'}]},
+  {k:'wwc',name:'Working With Children Check',cat:'Compliance',num:true,exp:true,slots:[{id:'main',label:'Card'}]},
+  {k:'tfn',name:'TFN Declaration',cat:'Payroll',exp:false,slots:[{id:'main',label:'Declaration form'}]},
+  {k:'contract',name:'Employment Contract',cat:'HR',exp:false,slots:[{id:'main',label:'Signed contract'}]},
+  {k:'super',name:'Superannuation Choice Form',cat:'Payroll',exp:false,slots:[{id:'main',label:'Form'}]}
 ];
+/* document numbers are stored in full but only the last 4 characters are shown */
+function maskNo(n){ n=String(n||'').replace(/\s+/g,''); return n?'•••• '+n.slice(-4):''; }
 var SOON_DAYS=60;
 function typeOf(k){ for(var i=0;i<DOC_TYPES.length;i++) if(DOC_TYPES[i].k===k) return DOC_TYPES[i]; return null; }
 function slotLabel(k,id){ var t=typeOf(k); for(var i=0;i<t.slots.length;i++) if(t.slots[i].id===id) return t.slots[i].label; return 'File'; }
@@ -1254,15 +1360,18 @@ function names(v){ return v.files.map(function(f){return f.n}).join(', '); }
 function dayLabel(d){ var n=daysTo(new Date(d.getFullYear(),d.getMonth(),d.getDate())); return n===0?'Today':n===-1?'Yesterday':fmtD(d); }
 
 function F(slot,n,s){ return {slot:slot,n:n,s:s}; }
-function seedDocs(){
+/* sample sets so the Staff list shows different compliance states:
+   0 = all document types incl. expired + expiring, 1 = all valid, 2 = one expiring, 3 = nothing uploaded */
+var SEED_SETS=[null,['lic','tfn','contract'],['lic','visa','tfn'],[]];
+function seedDocs(id){
   var docs=[
-    {k:'lic',ver:2,
+    {k:'lic',ver:2,no:'DL0904821',
      cur:{files:[F('front','licence_front_2026.jpg','1.8 MB'),F('back','licence_back_2026.jpg','2.1 MB')],exp:dayOff(612),on:dayOff(-4,10,24),by:'John Doe',note:'Renewed licence — new card issued by Service NSW'},
      hist:[{ver:1,files:[F('front','licence_front_2021.jpg','1.6 MB'),F('back','licence_back_2021.jpg','1.9 MB')],exp:dayOff(-6),on:dayOff(-1735,11,0),by:'Admin',rOn:dayOff(-4,10,24),rBy:'John Doe'}]},
-    {k:'pass',ver:2,
+    {k:'pass',ver:2,no:'PA7713920',
      cur:{files:[F('main','passport_2016.pdf','1.2 MB')],exp:dayOff(-21),on:dayOff(-640,9,15),by:'Marthew'},
      hist:[{ver:1,files:[F('main','passport_scan_old.pdf','0.9 MB')],exp:dayOff(-650),on:dayOff(-1100,14,2),by:'Admin',rOn:dayOff(-640,9,15),rBy:'Marthew'}]},
-    {k:'visa',ver:1,
+    {k:'visa',ver:1,no:'VGN4826117',
      cur:{files:[F('main','visa_grant_482.pdf','0.4 MB')],exp:dayOff(24),on:dayOff(-700,16,40),by:'Admin'},hist:[]},
     {k:'tfn',ver:1,
      cur:{files:[F('main','tfn_declaration.pdf','0.6 MB')],exp:null,on:dayOff(-590,11,0),by:'Jonny'},hist:[]},
@@ -1271,6 +1380,9 @@ function seedDocs(){
      hist:[{ver:2,files:[F('main','employment_contract_2025.pdf','0.8 MB')],exp:null,on:dayOff(-380,10,10),by:'Admin',rOn:dayOff(-12,15,5),rBy:'John Doe'},
            {ver:1,files:[F('main','employment_contract_signed.pdf','0.7 MB')],exp:null,on:dayOff(-590,11,0),by:'Jonny',rOn:dayOff(-380,10,10),rBy:'Admin'}]}
   ];
+  var idx=0; STAFF.forEach(function(s,i){ if(s.id===id) idx=i; });
+  var set=SEED_SETS[idx%SEED_SETS.length];
+  if(set) docs=docs.filter(function(d){ return set.indexOf(d.k)>=0; });
   var audit=[];
   docs.forEach(function(d){
     var t=typeOf(d.k), chain=d.hist.slice().reverse().concat([d.cur]);
@@ -1280,13 +1392,13 @@ function seedDocs(){
         from:names(chain[i-1]),to:names(chain[i]),expFrom:chain[i-1].exp,expTo:chain[i].exp,note:chain[i].note});
     }
   });
-  audit.push({act:'deleted',k:'police',name:'Police Check',on:dayOff(-45,13,20),by:'Admin',files:'police_check_2023.pdf',prev:0,note:'Uploaded against the wrong staff profile'});
+  if(!set) audit.push({act:'deleted',k:'police',name:'Police Check',on:dayOff(-45,13,20),by:'Admin',files:'police_check_2023.pdf',prev:0,note:'Uploaded against the wrong staff profile'});
   audit.sort(function(a,b){return b.on-a.on});
   return {docs:docs,audit:audit};
 }
 var docStore={}, docOpen={}, docFilter='all', auditFilter='all', flashK=null;
-var updMode=null, pend={}, updExp='', updNote='', delK=null;
-function storeOf(id){ if(!docStore[id]) docStore[id]=seedDocs(); return docStore[id]; }
+var updMode=null, pend={}, updExp='', updNote='', updNo='', delK=null;
+function storeOf(id){ if(!docStore[id]) docStore[id]=seedDocs(id); return docStore[id]; }
 function findDoc(k){ var a=storeOf(detailStaff.id).docs; for(var i=0;i<a.length;i++) if(a[i].k===k) return a[i]; return null; }
 
 /* status is always derived from the current version's expiry */
@@ -1301,101 +1413,128 @@ function rel(n){
 }
 
 /* ---------- documents list ---------- */
-/* status as a coloured dot + label, the same indicator the other modules use */
-function stateH(st){ var k={valid:'',none:'',soon:' soon',expired:' no'}[st]; return '<span class="state'+k+'"><i></i>'+ST[st][1]+'</span>'; }
-function docRowH(d){
-  var t=typeOf(d.k), st=stOf(d), n=d.cur.files.length;
-  var files=n+(n===1?' file':' files')+(t.slots.length>1?' · '+t.slots.map(function(s){return s.label;}).join(', '):'');
-  var exp = st==='none'
-    ? '<span class="sdt-muted">No expiry</span>'
-    : '<b class="'+(st==='expired'?'bad':st==='soon'?'warn':'')+'">'+fmtD(d.cur.exp)+'</b><small>'+(st==='expired'?'Expired '+rel(daysTo(d.cur.exp)):'Expires '+rel(daysTo(d.cur.exp)))+'</small>';
-  var first=d.cur.files[0];
-  return '<tr class="sdt-row st-'+st+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    '<td><div class="sdt-doc"><span class="sdt-ic">'+I.file+'</span><span><b>'+t.name+'</b><small>'+esc(files)+'</small></span></div></td>'+
-    '<td>'+stateH(st)+'</td>'+
-    '<td><div class="sdt-two">'+exp+'</div></td>'+
-    '<td><div class="sdt-two"><b>'+fmtD(d.cur.on)+'</b><small>by '+esc(d.cur.by)+'</small></div></td>'+
-    '<td class="r"><div class="sdt-acts">'+
-      '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+(st==='expired'?'Renew':'Replace')+'</button>'+
-      '<button class="sdt-ib" data-preview="'+esc(t.name+' · '+slotLabel(d.k,first.slot))+'" title="View '+esc(t.name)+'" aria-label="View '+esc(t.name)+'">'+I.eye+'</button>'+
-      '<button class="sdt-ib" data-dl="'+esc(names(d.cur))+'" title="Download" aria-label="Download '+esc(t.name)+'">'+I.dl+'</button>'+
-      '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+
-    '</div></td>'+
-  '</tr>';
+/* ================= Documents tab ================= */
+var docTab='current', docQ='';
+I.hist='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3.5 4v4h4M12 8v4.5l3 2"/></svg>';
+I.idc='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.2"/><circle cx="8.5" cy="12" r="2.2"/><path d="M14 10h4.5M14 14h4.5"/></svg>';
+I.srch='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>';
+function versionsOf(d){ return [{ver:d.ver,no:d.no,files:d.cur.files,exp:d.cur.exp,on:d.cur.on,by:d.cur.by,cur:true}].concat(d.hist); }
+function stLabel(d){
+  var st=stOf(d);
+  if(st==='expired') return 'Expired '+rel(daysTo(d.cur.exp));
+  if(st==='soon') return 'Expires '+rel(daysTo(d.cur.exp));
+  return st==='none'?'No expiry':'Valid';
 }
-function docBodyH(d){
-  var t=typeOf(d.k);
-  return '<div class="dl-body">'+
-    '<div class="dl-h">Current file'+(d.cur.files.length>1?'s':'')+'</div>'+
-    d.cur.files.map(function(f){
-      var ext=f.n.split('.').pop().toLowerCase();
-      return '<div class="dl-file" data-preview="'+esc(t.name+' · '+slotLabel(d.k,f.slot))+'">'+
-        '<span class="dl-ext e-'+ext+'">'+ext.toUpperCase()+'</span>'+
-        '<span class="dl-fn"><b>'+esc(f.n)+'</b><small>'+(t.slots.length>1?slotLabel(d.k,f.slot)+' · ':'')+f.s+' · uploaded '+fmtDT(d.cur.on)+' by '+esc(d.cur.by)+'</small></span>'+
-        '<button class="dl-ib" title="View">'+I.eye+'</button>'+
-        '<button class="dl-ib pdl" data-dl="'+esc(f.n)+'" title="Download">'+I.dl+'</button>'+
-      '</div>';
-    }).join('')+
-    (d.cur.note?'<p class="dl-note">“'+esc(d.cur.note)+'”</p>':'')+
-    '<div class="dl-h">Previous versions <span>('+d.hist.length+')</span></div>'+
-    (d.hist.length ? d.hist.map(function(h){
-      return '<div class="dl-old">'+
-        '<span class="dl-fn"><b>'+esc(names(h))+'</b>'+
-        '<small>Replaced '+fmtDT(h.rOn)+' by '+esc(h.rBy)+(h.exp?' · expiry was '+fmtD(h.exp):'')+'</small></span>'+
-        '<button class="dl-ib pdl" data-dl="'+esc(names(h))+'" title="Download">'+I.dl+'</button>'+
-      '</div>';
-    }).join('') : '<p class="dl-empty">None yet. When you replace this document, the current file is kept here.</p>')+
-    '<div class="dl-foot"><button class="dl-del" data-deldoc="'+d.k+'">Delete document</button></div>'+
-  '</div>';
+function stDot(st,label){ var k={valid:'',none:' na',soon:' soon',expired:' no'}[st]; return '<span class="state'+k+'"><i></i>'+esc(label)+'</span>'; }
+I.chev='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+function extOf(n){ return n.split('.').pop().toLowerCase(); }
+function sideName(d,t,f){ return t.slots.length>1?slotLabel(d.k,f.slot):'Document'; }
+/* a file chip: type, side, size, view + download */
+function fileChip(d,t,vi,fi,f){
+  var e=extOf(f.n);
+  return '<span class="ds-file" title="'+esc(f.n)+'"><span class="x e-'+e+'">'+e.toUpperCase()+'</span><b>'+esc(sideName(d,t,f))+'</b>'+f.s+
+    '<button class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="View" aria-label="View '+esc(f.n)+'">'+I.eye+'</button>'+
+    '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>';
 }
-/* older copies kept when a document is replaced or renewed */
-function prevBody(s){
-  var rows=[];
-  storeOf(s.id).docs.forEach(function(d){ d.hist.forEach(function(h){ rows.push({d:d,h:h}); }); });
-  rows.sort(function(a,b){ return b.h.rOn-a.h.rOn; });
-  var h='<section class="sdt-hist"><div class="sdt-hist-h"><h3>Previous versions</h3><span>Older copies kept when a document is replaced or renewed</span></div>';
-  if(!rows.length) return h+'<div class="dl-none"><b>No previous versions yet</b>When a document is replaced or renewed, the old copy will appear here.</div></section>';
-  h+='<div class="sdt-wrap"><table class="sdt prev"><thead><tr><th>Document</th><th>File</th><th>Expiry was</th><th>Replaced</th><th class="r">Actions</th></tr></thead><tbody>';
-  rows.forEach(function(r){
-    var t=typeOf(r.d.k), v=r.h, n=v.files.length;
-    h+='<tr>'+
-      '<td><div class="sdt-two"><b>'+t.name+'</b><small>Version '+v.ver+'</small></div></td>'+
-      '<td><div class="sdt-file">'+v.files.map(function(x){ return '<span>'+esc(x.n)+'</span>'; }).join('')+'</div></td>'+
-      '<td>'+(v.exp?'<span class="sdt-date">'+fmtD(v.exp)+'</span>':'<span class="sdt-muted">No expiry</span>')+'</td>'+
-      '<td><div class="sdt-two"><b>'+fmtD(v.rOn)+'</b><small>by '+esc(v.rBy)+'</small></div></td>'+
-      '<td class="r"><div class="sdt-acts">'+
-        '<button class="sdt-ib" data-preview="'+esc(t.name+' · version '+v.ver)+'" title="View" aria-label="View '+esc(t.name)+' version '+v.ver+'">'+I.eye+'</button>'+
-        '<button class="sdt-ib" data-dl="'+esc(names(v))+'" title="Download" aria-label="Download '+esc(t.name)+' version '+v.ver+'">'+I.dl+'</button>'+
-      '</div></td></tr>';
-  });
-  return h+'</tbody></table></div></section>';
+function verTag(v,i){
+  if(i===0) return '<span class="ds-tag cur">Current</span>';
+  if(v.exp&&daysTo(v.exp)<0) return '<span class="ds-tag bad">Expired</span>';
+  return '<span class="ds-tag">Replaced</span>';
+}
+/* one row per document type: details, files, who uploaded it, status, actions; older versions open underneath */
+function docCard(d){
+  var t=typeOf(d.k), st=stOf(d), vs=versionsOf(d), prev=vs.length-1, open=!!docOpen[d.k];
+  var sub=[t.cat];
+  if(d.no) sub.push('No. <em>'+maskNo(d.no)+'</em>');
+  sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>');
+  sub.push('Version '+d.ver);
+  var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+    '<div class="ds-row">'+
+      '<span class="ds-ic'+(st==='expired'?' bad':'')+'">'+(t.slots.length>1?I.idc:I.file)+'</span>'+
+      '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
+        '<div class="ds-files">'+d.cur.files.map(function(f,fi){ return fileChip(d,t,0,fi,f); }).join('')+'</div>'+
+        '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+'</span>'+
+          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
+        '</div>'+
+      '</div>'+
+      '<div class="ds-st">'+stDot(st,stLabel(d))+'</div>'+
+      '<div class="ds-acts">'+
+        '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+(st==='expired'||st==='soon'?'Renew':'Replace')+'</button>'+
+        '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete document" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+
+      '</div>'+
+    '</div>';
+  if(prev&&open){
+    h+='<div class="ds-prev">'+vs.slice(1).map(function(v,j){
+      var vi=j+1, m=[];
+      if(v.no) m.push('No. '+maskNo(v.no));
+      if(t.exp) m.push('Expiry '+(v.exp?fmtD(v.exp):'--'));
+      m.push('Uploaded '+fmtD(v.on)+' by '+esc(v.by));
+      if(v.rOn) m.push('Replaced '+fmtD(v.rOn));
+      return '<div class="ds-pr"><div class="ds-prh"><b>Version '+v.ver+'</b>'+verTag(v,vi)+'</div>'+
+        '<div class="ds-sub">'+m.join(' · ')+'</div>'+
+        '<div class="ds-files">'+v.files.map(function(f,fi){ return fileChip(d,t,vi,fi,f); }).join('')+'</div></div>';
+    }).join('')+'</div>';
+  }
+  return h+'</div>';
 }
 function docsBody(s){
-  var docs=storeOf(s.id).docs, ex=0, so=0;
-  docs.forEach(function(d){ var st=stOf(d); if(st==='expired') ex++; if(st==='soon') so++; });
-  var order={expired:0,soon:1,valid:2,none:2};
-  var list=docs.slice().sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });
-  var att=[];
-  if(ex) att.push('<b class="bad">'+ex+' expired</b>');
-  if(so) att.push('<b class="warn">'+so+' expiring soon</b>');
-  return '<div class="dl-top">'+
-      '<div><div class="dl-count">'+docs.length+' document'+(docs.length===1?'':'s')+'</div>'+
-        (att.length?'<span class="dl-att">'+att.join(' · ')+'</span>':'<span class="dl-att">All documents are up to date</span>')+'</div>'+
-      '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload document</button>'+
-    '</div>'+
-    (list.length
-      ? '<div class="sdt-wrap"><table class="sdt"><thead><tr><th>Document</th><th>Status</th><th>Expiry date</th><th>Last updated</th><th class="r">Actions</th></tr></thead>'+
-        '<tbody>'+list.map(docRowH).join('')+'</tbody></table></div>'
-      : '<div class="dl-none"><b>No documents yet</b>Upload this staff member’s first document.</div>')+
-    prevBody(s);
+  var docs=storeOf(s.id).docs, n={valid:0,none:0,soon:0,expired:0};
+  docs.forEach(function(d){ n[stOf(d)]++; });
+  // the counts double as the status filter
+  var chips='<div class="ds-chips" role="group" aria-label="Filter by status">'+
+    [['all','All',docs.length],['expired','Expired',n.expired],['soon','Expiring soon',n.soon],['valid','Valid',n.valid],['none','No expiry',n.none]].map(function(c){
+      return '<button class="ds-chip '+c[0]+(docFilter===c[0]?' on':'')+'" data-dfilter="'+c[0]+'" aria-pressed="'+(docFilter===c[0])+'">'+(c[0]==='all'?'':'<i></i>')+c[1]+' <b>'+c[2]+'</b></button>';
+    }).join('')+'</div>';
+  var h='<div class="ds-bar">'+chips+
+    '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+
+    '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
+  return h+currentList(docs);
 }
+function currentList(docs){
+  var q=docQ.trim().toLowerCase(), order={expired:0,soon:1,valid:2,none:3};
+  if(!docs.length) return '<div class="dl-none"><b>No documents yet</b>Upload this staff member’s first document.</div>';
+  var list=docs.filter(function(d){ var t=typeOf(d.k); return (!q||(t.name+' '+t.cat).toLowerCase().indexOf(q)>=0)&&(docFilter==='all'||stOf(d)===docFilter); })
+    .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
+  if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
+  return '<div class="ds-list">'+list.map(docCard).join('')+'</div>';
+}
+/* viewer: one version of a document, switching between its sides */
+function viewDoc(k,vi,fi){
+  var d=findDoc(k); if(!d) return;
+  var t=typeOf(d.k), v=versionsOf(d)[vi]; if(!v) return;
+  var stage=document.querySelector('#m-prev .prev-stage');
+  function show(i){
+    var f=v.files[i];
+    stage.innerHTML='<div class="pv-head"><b>'+t.name+' · Version '+v.ver+(vi?' <em>(previous version)</em>':'')+'</b>'+
+      '<button class="pvbtn pdl" data-dl="'+esc(f.n)+'" title="Download">'+I.dl+'</button><button class="pvbtn" data-close title="Close">'+I.close+'</button></div>'+
+      (v.files.length>1?'<div class="pv-sides">'+v.files.map(function(x,j){ return '<button data-pvside="'+j+'" class="'+(j===i?'on':'')+'">'+esc(slotLabel(k,x.slot))+'</button>'; }).join('')+'</div>':'')+
+      '<div class="pv-doc'+(f.slot==='back'?' back':'')+'"><div class="pv-r"><b>'+esc(t.name.toUpperCase())+'</b><span>'+esc(slotLabel(k,f.slot))+'</span></div>'+
+      '<div class="pv-lines"><i style="width:70%"></i><i style="width:50%"></i><i style="width:60%"></i></div><small>'+esc(f.n)+' · '+f.s+'</small></div>';
+    [].forEach.call(stage.querySelectorAll('[data-pvside]'),function(b){ b.onclick=function(e){ e.stopPropagation(); show(+b.getAttribute('data-pvside')); }; });
+  }
+  show(fi||0); openModal('m-prev');
+}
+I.close='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-dfilter]'); if(!b) return;
+  if(b.hasAttribute('data-view')){ var p=b.getAttribute('data-view').split('|'); viewDoc(p[0],+p[1],+p[2]); return; }
+  if(b.hasAttribute('data-dfilter')){ docFilter=b.getAttribute('data-dfilter'); keepScroll(renderDetail); return; }
+  docTab=b.getAttribute('data-dtab'); keepScroll(renderDetail);
+});
+document.addEventListener('input',function(e){
+  if(e.target.id!=='sd-q') return;
+  docQ=e.target.value; keepScroll(renderDetail);
+  var n=document.getElementById('sd-q'); if(n){ n.focus(); n.setSelectionRange(n.value.length,n.value.length); }
+});
+document.addEventListener('change',function(e){ if(e.target.id==='sd-f'){ docFilter=e.target.value; keepScroll(renderDetail); } });
 
 /* ---------- upload / replace window ---------- */
 I.upcl='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17a4 4 0 0 1-.6-8A5.6 5.6 0 0 1 17.3 9 3.8 3.8 0 0 1 17 17"/><path d="M12 20v-8m0 0-2.6 2.6M12 12l2.6 2.6"/></svg>';
 I.hist='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.5-6"/><path d="M3.5 4v4h4M12 8v4.5l3 2"/></svg>';
 function extTag(n){ var e=n.split('.').pop().toLowerCase(); return '<span class="dl-ext e-'+e+'">'+e.toUpperCase()+'</span>'; }
 function openUpd(k){
-  updMode={k:k||null, fixed:!!k}; pend={}; updExp=''; updNote='';
+  var d=k?findDoc(k):null;
+  updMode={k:k||null, fixed:!!k}; pend={}; updExp=''; updNote=''; updNo=d&&d.no||'';
   paintUpd(); openModal('m-upd');
 }
 function paintUpd(){
@@ -1423,6 +1562,11 @@ function paintUpd(){
     '</div>';
   }
   if(t){
+    if(t.num){
+      h+='<div class="up-sec"><label class="up-lbl" for="upd-no">Document number <span class="up-opt">(optional)</span></label>'+
+        '<input id="upd-no" class="up-in" autocomplete="off" placeholder="e.g. 12345678" value="'+esc(updNo)+'">'+
+        '<div class="up-hint">'+(d?'Change it if the new document has a different number. ':'')+'Only the last 4 characters are shown on the profile.</div></div>';
+    }
     h+='<div class="up-sec"><span class="up-lbl">'+(d?'New file':'File')+(t.slots.length>1?'s':'')+' <span class="req">*</span></span>'+
       '<div class="up-drops'+(t.slots.length>1?' two':'')+'">'+t.slots.map(function(sl){
         var p=pend[sl.id], cap=t.slots.length>1?'<span class="up-side">'+sl.label+'</span>':'';
@@ -1471,23 +1615,24 @@ function saveUpd(){
   }
   var store=storeOf(detailStaff.id), d=findDoc(k), now=new Date(), note=updNote.trim();
   var files=t.slots.map(function(sl){ return F(sl.id,pend[sl.id].n,pend[sl.id].s); });
+  var no=t.num?updNo.trim():'';
   if(d){
     var prev=d.cur, before=stOf(d);
-    d.hist.unshift({ver:d.ver,files:prev.files,exp:prev.exp,on:prev.on,by:prev.by,note:prev.note,rOn:now,rBy:ME});
-    d.ver++;
+    d.hist.unshift({ver:d.ver,no:d.no,files:prev.files,exp:prev.exp,on:prev.on,by:prev.by,note:prev.note,rOn:now,rBy:ME});
+    d.ver++; d.no=no;
     d.cur={files:files,exp:exp,on:now,by:ME,note:note};
     store.audit.unshift({act:'replaced',k:k,name:t.name,ver:d.ver,on:now,by:ME,from:names(prev),to:names(d.cur),expFrom:prev.exp,expTo:exp,note:note});
     var after=stOf(d);
     toast(t.name+' replaced · old file moved to previous versions'+(t.exp&&before!==after?' · now '+ST[after][1]:''));
   } else {
-    d={k:k,ver:1,cur:{files:files,exp:exp,on:now,by:ME,note:note},hist:[]};
+    d={k:k,ver:1,no:no,cur:{files:files,exp:exp,on:now,by:ME,note:note},hist:[]};
     store.docs.push(d);
     store.audit.unshift({act:'uploaded',k:k,name:t.name,ver:1,on:now,by:ME,files:names(d.cur),exp:exp,note:note});
     toast(t.name+' uploaded');
   }
   docOpen[k]=true; flashK=k; docFilter='all'; detailTab='docs'; pend={};
   closeAll(); renderDetail();
-  var row=drawer.querySelector('.sd-item[data-doc="'+k+'"]'); if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
+  var row=drawer.querySelector('.ds-item[data-doc="'+k+'"]'); if(row) row.scrollIntoView({block:'nearest',behavior:'smooth'});
   clearTimeout(saveUpd.t); saveUpd.t=setTimeout(function(){ flashK=null; }, 2800);
 }
 
@@ -1634,7 +1779,7 @@ function initAddressSearch(){
 }
 window.initStaffMaps=initAddressSearch; // Maps API &callback target
 function openDrawer(s){drawerMode='form';editing=s||null;drawerStep=1;renderDrawer();drawer.classList.add('show');scrim.classList.add('show');drawer.setAttribute('aria-hidden','false')}
-function closeDrawer(){drawer.classList.remove('show');scrim.classList.remove('show');drawer.setAttribute('aria-hidden','true')}
+function closeDrawer(){drawer.classList.remove('show');scrim.classList.remove('show');drawer.setAttribute('aria-hidden','true');refreshCompliance()}
 
 /* ================= Modals ================= */
 function openModal(id){document.getElementById(id).classList.add('show');scrim.classList.add('show')}
@@ -1739,7 +1884,7 @@ document.addEventListener('click',function(e){
 
 
 function keepScroll(fn){ var bd=drawer.querySelector('.dr-body'), y=bd?bd.scrollTop:0; fn(); var nb=drawer.querySelector('.dr-body'); if(nb) nb.scrollTop=y; }
-function toggleDoc(k){ docOpen[k]=!docOpen[k]; keepScroll(renderDetail); var r=drawer.querySelector('.sd-row[data-toggle="'+k+'"]'); if(r) r.focus({preventScroll:true}); }
+function toggleDoc(k){ docOpen[k]=!docOpen[k]; keepScroll(renderDetail); var r=drawer.querySelector('[data-toggle="'+k+'"]'); if(r) r.focus({preventScroll:true}); }
 document.addEventListener('keydown',function(e){
   var r=e.target.closest&&e.target.closest('.sd-row');
   if(r&&e.target===r&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); toggleDoc(r.getAttribute('data-toggle')); }
@@ -1748,6 +1893,7 @@ document.addEventListener('input',function(e){
   var el=e.target;
   if(el.id==='upd-exp'){ updExp=el.value; el.classList.remove('bad'); var er=document.getElementById('err-exp'); if(er) er.classList.remove('show'); paintPrev(); }
   if(el.id==='upd-note'){ updNote=el.value; }
+  if(el.id==='upd-no'){ updNo=el.value; }
 });
 function dropZone(e){ return e.target.closest&&e.target.closest('#upd-body .rdrop'); }
 document.addEventListener('dragover',function(e){ var l=dropZone(e); if(!l) return; e.preventDefault(); l.classList.add('drag'); });

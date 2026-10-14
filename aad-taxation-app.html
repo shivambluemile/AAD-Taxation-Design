@@ -7871,12 +7871,12 @@ function render(){
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
 
   h+='<div class="card ar-table"><table><thead><tr>'+
-    '<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th><th class="c">Action</th>'+
+    '<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+
     '</tr></thead><tbody>';
   if(!all.length){
-    h+='<tr><td colspan="9"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
+    h+='<tr><td colspan="8"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
   } else if(!page.length){
-    h+='<tr><td colspan="9"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+    h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[dayState(r,!!r.today)], n=notes(r), fl=files(r), last=n[n.length-1];
@@ -7889,7 +7889,7 @@ function render(){
       '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span></td>'+
       '<td>'+(last?'<button class="ar-cmt" data-view="'+r.date+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.date+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
-      '<td class="c"><span class="acts"><button class="act" data-view="'+r.date+'" title="View" aria-label="View attendance for '+dmy(d)+'">'+I.eye+'</button></span></td></tr>';
+      '</tr>';   // the date opens the day, so no separate View action
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;

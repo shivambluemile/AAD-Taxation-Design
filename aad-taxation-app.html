@@ -2264,6 +2264,7 @@ tbody tr:hover{background:#FCFCFD}
 .bsec svg{color:var(--orange)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2+.grid3{margin-top:16px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .fin.sm{height:44px;font-size:13.5px}
 .selbox{position:relative}
@@ -2696,9 +2697,9 @@ tbody tr:hover{background:#FCFCFD}
 
 /* add / edit side panel (same fields as the Add Branch panel) */
 .dlg-layer{z-index:120}
-#cfb .fin,#cfb .selbox select{background:#fff;border:1px solid var(--line)}
-#cfb .fin:focus,#cfb .selbox select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
-#cfb .fin.bad,#cfb .selbox select.bad{border-color:#F3A3A3;background:#FFF7F7}
+#cfb .fin,#cfb .selbox select,#rqb .fin,#rqb .selbox select{background:#fff;border:1px solid var(--line)}
+#cfb .fin:focus,#cfb .selbox select:focus,#rqb .fin:focus,#rqb .selbox select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+#cfb .fin.bad,#cfb .selbox select.bad,#rqb .fin.bad,#rqb .selbox select.bad{border-color:#F3A3A3;background:#FFF7F7}
 #cfb .bsec svg{color:var(--orange)}
 .cl-sec{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .cl-dirs{display:flex;flex-direction:column;gap:14px}
@@ -2889,7 +2890,7 @@ tbody tr:hover{background:#FCFCFD}
 .wz-intro{display:flex;flex-direction:column;gap:3px;margin-bottom:18px}
 .wz-intro b{font-family:'Manrope';font-size:15.5px;font-weight:800;color:var(--ink)}
 .wz-intro span{font-size:13px;color:var(--mute);line-height:1.5}
-.wz-sec+.wz-sec{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.wz-sec+.wz-sec{padding-top:20px;border-top:1px solid var(--line)}   /* the drawer body's 24px gap already sits above the line */
 
 /* service picker */
 .sp{display:flex;flex-direction:column;gap:12px}
@@ -2955,7 +2956,8 @@ tbody tr:hover{background:#FCFCFD}
 .ss-chk svg{width:11px;height:11px;opacity:0}
 .ss-chc.on .ss-chk{background:var(--orange);border-color:var(--orange)}
 .ss-chc.on .ss-chk svg{opacity:1}
-.ss-chs,.ss-card,.ss-lbl,.wz-intro{flex-shrink:0}
+.ss,.ss-chs,.ss-card,.ss-lbl,.wz-intro{flex-shrink:0}
+.ss .alert-err{margin-top:16px}
 .ss-card{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
 .ss-card header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FAFBFC;border-bottom:1px solid var(--line)}
 .ss-card header b{display:flex;align-items:center;gap:8px;font-family:'Manrope';font-size:14.5px;font-weight:800;color:var(--ink)}
@@ -3892,7 +3894,8 @@ function renderForm(){
     '<div><label class="flabel" for="addr-search">Search address</label><div class="addr-search">'+
       '<input class="fin sm" id="addr-search" placeholder="Search address" autocomplete="off" value="'+esc(f.search)+'"><span class="ico">'+I.search+'</span><div id="sugg"></div></div></div>'+
     '<div class="grid2">'+
-      field('addr.street','Address',d.address.street,{req:true,ph:'e.g. 200 Collins Street',auto:'off'})+
+      field('addr.street','Address',d.address.street,{req:true,ph:'e.g. 200 Collins Street',auto:'off',span:true})+
+    '</div><div class="grid3">'+
       field('addr.suburb','Suburb',d.address.suburb,{req:true,ph:'e.g. Melbourne',auto:'off'})+
       sel('addr.state','State',AU_STATES,'Select state')+
       field('addr.postcode','Postcode',d.address.postcode,{req:true,ph:'e.g. 3000',mode:'numeric',max:4,auto:'off'})+
@@ -4030,6 +4033,30 @@ function removeDirector(i){
   document.getElementById('rd-go').onclick=doIt;
 }
 
+/* Add Client step 1: Next fills every empty field with sample details, so nothing has to be typed by hand; anything typed is kept */
+function autoFill(){
+  var d=form.d, co=d.type==='company', r=function(n){ return Math.floor(Math.random()*n); }, pick=function(a){ return a[r(a.length)]; };
+  var num=function(n){ var x=''; while(x.length<n) x+=r(10); return x; };
+  var gen=function(len,ok,fmt,used){ for(var i=0;i<5000;i++){ var v=num(len); if(v[0]!=='0'&&ok(v)&&used.indexOf(v)<0) return fmt(v); } return ''; };
+  var abns=CLIENTS.map(function(c){ return digits(c.abn); }), acns=CLIENTS.map(function(c){ return digits(c.acn); });
+  var person=function(){ return pick(['Olivia','Jack','Mia','Noah','Ava','Liam','Chloe','Ethan','Grace','Lucas'])+' '+pick(['Bennett','Nguyen','Walsh','Patel','Murphy','Kelly','Singh','Roberts','Chen','Taylor']); };
+  var mail=function(n){ return n.toLowerCase().replace(/[^a-z]+/g,'.').replace(/^[.]+|[.]+$/g,'')+num(3)+'@example.com'; };
+  var mob=function(){ return fmtPhone('04'+num(8)); };
+  var fill=function(k,v){ if(!String(getK(k)||'').trim()) setK(k,v); };
+  fill('name',co?pick(['Harbour','Summit','Bluegum','Coastal','Ironbark','Redgum'])+' '+pick(['Building','Logistics','Consulting','Electrical','Hospitality'])+' Pty Ltd':person());
+  fill('email',mail(d.name)); fill('phone',mob());
+  fill('abn',gen(11,validABN,fmtABN,abns)); fill('tfn',gen(9,validTFN,fmtTFN,[]));
+  fill('addr.street',(1+r(240))+' '+pick(['Collins','George','Queen','King','Elizabeth','Bourke'])+' Street');
+  var place=pick([['Melbourne','VIC','3000'],['Sydney','NSW','2000'],['Brisbane','QLD','4000'],['Adelaide','SA','5000'],['Perth','WA','6000']]);
+  fill('addr.suburb',place[0]); fill('addr.state',place[1]); fill('addr.postcode',place[2]);
+  if(co){
+    if(!d.entity) d.entity='Company';
+    if(d.entity==='Company') fill('acn',gen(9,validACN,fmtACN,acns));
+    if(!d.directors.length) d.directors.push(blankDirector());
+    d.directors.forEach(function(x,i){ var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(x.name)); fill(p+'phone',mob()); fill(p+'abn',gen(11,validABN,fmtABN,abns)); fill(p+'tfn',gen(9,validTFN,fmtTFN,[])); });
+  }
+  form.dirty=true;
+}
 function validate(){
   var d=form.d, e={}, co=d.type==='company';
   var req=function(k,label){ if(!String(getK(k)||'').trim()) e[k]=label+' is required'; };
@@ -4475,7 +4502,7 @@ function sendScreen(body,foot,cfg){
           :'<div class="ss-phone"><span class="ss-bubble">'+esc(smsText)+'</span></div>')+
         '<div class="ss-cnt">'+smsText.length+' characters · '+segs+' SMS'+(segs>1?' messages':'')+'</div>'+err('smsBody')+'</div></div></section>';
     if(s.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent. Check the details and try again.</span></div>';
-    body.innerHTML=h;
+    body.innerHTML='<div class="ss">'+h+'</div>';   // one block, so the drawer's gap doesn't space out every part
     foot.innerHTML='<button class="btn-ghost" id="ss-back"'+(s.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
       '<button class="btn-primary" id="ss-send"'+(s.busy?' disabled':'')+'>'+(s.busy?'<span class="spin"></span>Sending…':OI.send+(cfg.sendLabel||'Send'))+'</button>';
     wire();
@@ -4578,7 +4605,7 @@ function wzPaint(){
 }
 function wzNext(){
   if(wiz.step===1){
-    readForm(); form.errs=validate();
+    readForm(); autoFill(); form.errs=validate();
     if(Object.keys(form.errs).length){ renderForm(); var b=formBody().querySelector('.bad, .alert-err'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast('Please fix the highlighted fields',true); return; }
   }
   if(wiz.step===2){
@@ -8995,6 +9022,7 @@ tbody tr:hover{background:#FCFCFD}
 .bsec svg{color:var(--orange)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2+.grid3{margin-top:16px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .fin.sm{height:44px;font-size:13.5px}
 .selbox{position:relative}
@@ -11364,6 +11392,7 @@ button{background:none;border:0;cursor:pointer}
 .card>p.sub{font-size:13.5px;color:var(--mute);margin-bottom:20px;line-height:1.5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .span2{grid-column:1/-1}
+.grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-top:16px}
 label.l{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px}
 .req{color:var(--orange)}.opt{font-weight:500;color:var(--faint)}
 .in{width:100%;height:46px;background:var(--field);border:1px solid var(--field);border-radius:9px;padding:0 14px;font-size:14px}
@@ -11408,7 +11437,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .grow{flex:1}
 .btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:9px;font-size:14px;font-weight:700}
 .btn.pri{background:var(--orange);color:#fff}.btn.pri:hover{background:var(--orange-ink)}
-.btn.sec{background:#fff;border:1px solid var(--line);color:var(--slate)}.btn.sec:hover{background:#F6F7F9}
+.btn.sec{background:#fff;border:1px solid var(--line);color:var(--slate);text-transform:none;letter-spacing:normal;margin:0;padding:0 20px}   /* not the .sec section heading */.btn.sec:hover{background:#F6F7F9}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
 .done{text-align:center;padding:40px 20px}
 .done .big{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:#ECFDF5;color:#047857}
@@ -11418,7 +11447,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);background:#101828;color:#fff;border-radius:9px;padding:12px 18px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.bad{background:#BE123C}
-@media (max-width:640px){.card{padding:20px 16px}.grid2,.rv dl{grid-template-columns:1fr}.el-sign{grid-template-columns:1fr!important}}
+@media (max-width:640px){.card{padding:20px 16px}.grid3{grid-template-columns:1fr 1fr}.grid3>:first-child{grid-column:1/-1}.grid2,.rv dl{grid-template-columns:1fr}.el-sign{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
@@ -11531,7 +11560,8 @@ function detailsStep(co){
   h+=fld('email','Email address',f.email,{type:'email',auto:'email'})+fld('phone','Phone number',f.phone,{mode:'tel',auto:'tel'})+
      fld('abn','ABN',f.abn,{mode:'numeric',ph:'e.g. 51 824 753 556'})+fld('tfn','TFN',f.tfn,{mode:'numeric',ph:'e.g. 123 456 789',hint:'Your tax file number is stored securely and shown masked to our team.'})+
      fld('commEmail','Email for correspondence',f.commEmail,{opt:true,type:'email'})+fld('commPhone','Phone for correspondence',f.commPhone,{opt:true,mode:'tel'})+'</div>'+
-     '<div class="sec">Address</div><div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+fld('addr.suburb','Suburb',a.suburb)+sel('addr.state','State',STATES,a.state)+fld('addr.postcode','Postcode',a.postcode,{mode:'numeric'})+'</div>';
+     '<div class="sec">Address</div><div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+'</div>'+
+     '<div class="grid3">'+fld('addr.suburb','Suburb',a.suburb)+sel('addr.state','State',STATES,a.state)+fld('addr.postcode','Postcode',a.postcode,{mode:'numeric'})+'</div>';
   if(co){
     h+='<div class="sec">Directors</div>'+f.directors.map(function(d,i){
       return '<div class="dir"><div class="dir-h">Director '+(i+1)+(f.directors.length>1?'<button class="lnk dng" data-rmd="'+i+'">Remove</button>':'')+'</div><div class="grid2">'+
@@ -11578,7 +11608,7 @@ function wire(){
   app.querySelectorAll('[data-k]').forEach(function(el){ el.oninput=function(){ setK(el.dataset.k,el.value); }; el.onchange=function(){ setK(el.dataset.k,el.value); if(el.dataset.k==='entity'){ paint(); } }; });
   app.querySelectorAll('[data-go]').forEach(function(b){ b.onclick=function(){ read(); go(+b.dataset.go); }; });
   var bk=document.getElementById('bk'); if(bk) bk.onclick=function(){ read(); go(step-1); };
-  var nx=document.getElementById('nx'); if(nx) nx.onclick=function(){ read(); if(!checkStep(step)) return; go(step+1); };
+  var nx=document.getElementById('nx'); if(nx) nx.onclick=function(){ read(); if(step===1){ autoFill(); paint(); } if(!checkStep(step)) return; go(step+1); };
   var sv=document.getElementById('sv'); if(sv) sv.onclick=function(){ read(); persist(true); };
   var sb=document.getElementById('sb'); if(sb) sb.onclick=submit;
   var ad=document.getElementById('addd'); if(ad) ad.onclick=function(){ read(); f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''}); paint(); };
@@ -11595,6 +11625,26 @@ function persist(explicit){
   x.form=JSON.parse(JSON.stringify(f)); x.step=step;
   if(explicit) audit(x,'Draft saved by client',f.name||R.name,'','','Step '+step+' of 5 · status stays '+ONB_STATUS[x.status][0]);
   if(saveOnb(ONB)){ R=x; if(explicit) toast('Saved. You can come back to this link any time before '+dmyOf(R.expires)+'.'); } else toast('We couldn’t save your progress. Please try again.',true);
+}
+/* Continue on the details step fills every empty field with sample details, so nothing has to be typed by hand; anything typed is kept */
+function autoFill(){
+  var co=R.type==='company', r=function(n){ return Math.floor(Math.random()*n); }, pick=function(a){ return a[r(a.length)]; };
+  var num=function(n){ var x=''; while(x.length<n) x+=r(10); return x; };
+  var gen=function(len,ok,fmt){ for(var i=0;i<5000;i++){ var v=num(len); if(v[0]!=='0'&&ok(v)) return fmt(v); } return ''; };
+  var person=function(){ return pick(['Olivia','Jack','Mia','Noah','Ava','Liam','Chloe','Ethan','Grace','Lucas'])+' '+pick(['Bennett','Nguyen','Walsh','Patel','Murphy','Kelly','Singh','Roberts','Chen','Taylor']); };
+  var mail=function(n){ return n.toLowerCase().replace(/[^a-z]+/g,'.').replace(/^[.]+|[.]+$/g,'')+num(3)+'@example.com'; };
+  var mob=function(){ return fmtPhone('04'+num(8)); };
+  var fill=function(k,v){ if(!String(getK(k)||'').trim()) setK(k,v); };
+  fill('name',R.name||person()); fill('email',R.email||mail(f.name)); fill('phone',R.phone?fmtPhone(R.phone):mob());
+  fill('abn',gen(11,validABN,fmtABN)); fill('tfn',gen(9,validTFN,fmtTFN));
+  var place=pick([['Melbourne','VIC','3000'],['Sydney','NSW','2000'],['Brisbane','QLD','4000'],['Adelaide','SA','5000'],['Perth','WA','6000']]);
+  fill('addr.street',(1+r(240))+' '+pick(['Collins','George','Queen','King','Elizabeth','Bourke'])+' Street'); fill('addr.suburb',place[0]); fill('addr.state',place[1]); fill('addr.postcode',place[2]);
+  if(co){
+    if(!f.entity) f.entity='Company';
+    if(f.entity==='Company') fill('acn',gen(9,validACN,fmtACN));
+    if(!f.directors.length) f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''});
+    f.directors.forEach(function(d,i){ var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(d.name)); fill(p+'phone',mob()); fill(p+'tfn',gen(9,validTFN,fmtTFN)); });
+  }
 }
 function validateDetails(){
   var er={}, co=R.type==='company', req=function(k,l){ if(!String(getK(k)||'').trim()) er[k]=l+' is required'; };

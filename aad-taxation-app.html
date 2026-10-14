@@ -5817,6 +5817,18 @@ select.fin{appearance:none;padding-right:40px;cursor:pointer}
 .dlg-sum dt{color:var(--mute)}
 .dlg-sum dd{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .dlg-sum dd.neg{color:var(--red)}
+/* approve / decline dialog: icon beside the title, two equal figures, everything on the same edges as the footer */
+#dlg .confirm-body.dlg-dec{padding:24px 28px}
+.dlg-head{display:flex;gap:14px;align-items:flex-start;padding-right:32px}
+.dlg-head .warn{margin:0!important;flex-shrink:0;width:42px!important;height:42px!important}
+.dlg-head h3{margin:2px 0 4px!important}
+.dlg-head .nw{white-space:nowrap}
+.dlg-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px;background:none;border:0;padding:0;margin-top:20px}
+.dlg-tiles>div{background:#FAFBFC;border:1px solid var(--line);border-radius:10px;padding:11px 14px;min-width:0}
+.dlg-tiles dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7A8597}
+.dlg-tiles dd{font-family:'Manrope';font-size:18px;font-weight:800;margin-top:4px}
+.dlg-dec .dlg-field{margin-top:20px}.dlg-dec .dlg-field .ftext{min-height:88px}
+.dlg-dec .note-neg{margin-top:12px}
 .confirm-body .warn.ok{background:var(--green-soft);color:var(--green)}
 .confirm-body .note-neg{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:12.5px;color:#9A3412;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 12px}
 .btn-ok{background:var(--green);color:#fff;border-radius:6px;padding:9px 18px;font-size:12.5px;font-weight:600}
@@ -6442,12 +6454,12 @@ function decide(id,to){
   if(l.status!=='pending'){ toast('Only pending requests can be approved or declined.',true); return; }
   var s=staffById(l.staff), t=typeByKey(l.type), hrs=hoursOf(l), bal=balanceAfter(l.staff,l.type,hrs,'approved',l.id), ap=to==='approved';
   var clash=ap?overlaps(l).filter(function(o){return o.status==='approved';}):[];
-  showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="d-t"><div class="confirm-body">'+
-    '<div class="warn'+(ap?' ok':'')+'">'+(ap?I.okBig:I.warn)+'</div>'+
-    '<h3 id="d-t">'+(ap?'Approve':'Decline')+' leave request?</h3>'+
-    '<p><strong>'+esc(s.n)+'</strong> · '+esc(t.n)+', '+fmtD(l.from)+(l.to!==l.from?' to '+fmtD(l.to):'')+'.</p>'+
-    '<dl class="dlg-sum"><dt>Leave hours</dt><dd>'+fmtH(hrs)+'</dd>'+
-      (bal===null?'':'<dt>Balance after approval</dt><dd class="'+(bal<0?'neg':'')+'">'+fmtH(bal)+'</dd>')+'</dl>'+
+  showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="d-t"><div class="confirm-body dlg-dec">'+
+    '<div class="dlg-head"><div class="warn'+(ap?' ok':'')+'">'+(ap?I.okBig:I.warn)+'</div><div>'+
+      '<h3 id="d-t">'+(ap?'Approve':'Decline')+' leave request?</h3>'+
+      '<p><strong>'+esc(s.n)+'</strong> · '+esc(t.n)+', <span class="nw">'+fmtD(l.from)+'</span>'+(l.to!==l.from?' to <span class="nw">'+fmtD(l.to)+'</span>':'')+'</p></div></div>'+
+    '<dl class="dlg-sum dlg-tiles"><div><dt>Leave hours</dt><dd>'+fmtH(hrs)+'</dd></div>'+
+      (bal===null?'':'<div><dt>Balance after approval</dt><dd class="'+(bal<0?'neg':'')+'">'+fmtH(bal)+'</dd></div>')+'</dl>'+
     (ap&&bal!==null&&bal<0?'<div class="note-neg">'+I.warnSm+'<span>Approving takes '+esc(s.n)+'’s '+esc(t.n.toLowerCase())+' balance below zero.</span></div>':'')+
     (clash.length?'<div class="note-neg">'+I.warnSm+'<span>This overlaps approved leave from '+fmtD(clash[0].from)+' to '+fmtD(clash[0].to)+'.</span></div>':'')+
     '<div class="dlg-field"><label class="flabel" for="d-note">'+(ap?'Comment (optional)':'Reason for declining')+(ap?'':' <span class="req-star">*</span>')+'</label>'+

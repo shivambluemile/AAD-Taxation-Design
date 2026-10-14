@@ -4651,8 +4651,8 @@ function wzPaint(){
   st.innerHTML=WZ.map(function(x,i){ var n=i+1; return '<li class="'+(n===wiz.step?'on':n<wiz.step?'done':'')+'"><span>'+(n<wiz.step?I.tick:n)+'</span>'+x[0]+'</li>'; }).join('');
   body.scrollTop=0;
   var back='<button class="btn-ghost" id="wz-back">'+(wiz.step===1?'Cancel':'Back')+'</button><span class="sp-grow"></span>';
-  if(wiz.step===1){ renderForm(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Services &amp; KYC</button>'; }
-  if(wiz.step===2){ paintSvcStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Engagement letter</button>'; }
+  if(wiz.step===1){ renderForm(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next</button>'; }
+  if(wiz.step===2){ paintSvcStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next</button>'; }
   if(wiz.step===3){ paintLetterStep(); return; }
   document.getElementById('wz-back').onclick=function(){ if(wiz.step===1){ readForm(); leaveWizard(); return; } saveKycNote(); wiz.step--; wzPaint(); };
   document.getElementById('wz-next').onclick=wzNext;
@@ -4782,7 +4782,7 @@ function rqPaint(){
       '<div class="grid2" style="margin-top:16px">'+f('name',co?'Company name':'Client name',{span:true,ph:co?'e.g. Bright Spark Electrical Pty Ltd':'e.g. Liam Carter'})+f('email','Email address',{type:'email',ph:'client@example.com'})+f('phone','Mobile number',{ph:'04XX XXX XXX'})+'</div></section>'+
       '<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+I.tag+'Services</div></div>'+
       '<p class="cl-hint wz-sub">Prices can’t go below the minimum set in Settings → Services.</p><div id="rq-sp"></div></section>';
-    foot.innerHTML='<button class="btn-ghost" id="rq-back">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="rq-next">Next: Send request</button>';
+    foot.innerHTML='<button class="btn-ghost" id="rq-back">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="rq-next">Next</button>';
     body.querySelectorAll('[data-rqt]').forEach(function(b){ b.onclick=function(){ rqRead(); rq.type=b.dataset.rqt; rqPaint(); }; });
     mountSvcPicker(document.getElementById('rq-sp'),rq.services,rq.errs);
     document.getElementById('rq-back').onclick=leaveRequest;
@@ -12005,7 +12005,7 @@ function paint(){
   h+='<ol class="steps">'+STEPS.map(function(s,i){ var n=i+1, st=n===step?'on':n<step?'done':''; return '<li class="'+st+'"'+(n===step?' aria-current="step"':'')+'>'+(n<step?'<button data-go="'+n+'"><i>✓</i><span>'+s+'</span></button>':'<span class="st"><i>'+n+'</i><span>'+s+'</span></span>')+'</li>'; }).join('')+'</ol>';
   h+='<div class="card">'+[detailsStep,svcDocsStep,letterStep,reviewStep][step-1](co)+
     '<div class="foot">'+(step>1?'<button class="btn sec" id="bk">Back</button>':'')+'<span class="grow"></span>'+
-      (step<4?'<button class="btn sec" id="sv">Save and finish later</button><button class="btn pri" id="nx">Continue</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
+      (step<4?'<button class="btn sec" id="sv">Save and finish later</button><button class="btn pri" id="nx">Next</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
   app.innerHTML=h; wire(); window.scrollTo(0,0);
 }
 function fld(k,label,val,o){ o=o||{}; var er=errs[k]; return '<div'+(o.span?' class="span2"':'')+'><label class="l" for="p-'+k.replace(/\./g,'-')+'">'+label+(o.opt?' <span class="opt">(optional)</span>':' <span class="req">*</span>')+'</label>'+

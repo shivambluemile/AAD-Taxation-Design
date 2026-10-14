@@ -8205,13 +8205,6 @@ var I = {
 };
 var MATCH_THRESHOLD = 0.6, MAX_TRIES = 3;
 var MAX_FILES = 3, MAX_BYTES = 5*1048576, OK_EXT = ['pdf','jpg','jpeg','png','doc','docx'];
-var QUOTES = [
-  ['What people think about you is not important. What you think about yourself means everything.','Thought for the day'],
-  ['Small steps every day add up to big results.','Thought for the day'],
-  ['Quality is not an act, it is a habit.','Aristotle'],
-  ['The secret of getting ahead is getting started.','Mark Twain'],
-  ['Do the best you can until you know better. Then when you know better, do better.','Maya Angelou']
-];
 /* the comment step for each action that needs one */
 var NOTE = {
   start:      { title:'Start your shift', sub:'Add a note for your team if you like, such as what you’re working on today.', btn:'Start shift', ph:'e.g. Working from the office today', opt:true,
@@ -8262,9 +8255,9 @@ function actions(s){
 }
 function render(){
   data=loadShift();
-  var s=data.today.status, st=STATUS[s], T=totals(data.today.events,Date.now()), d=new Date(), q=QUOTES[d.getDate()%QUOTES.length];
+  var s=data.today.status, st=STATUS[s], T=totals(data.today.events,Date.now()), d=new Date();
   var h='<div class="page-head db-hello"><div><h1>'+greet()+', '+esc(ME.name.split(' ')[0])+'</h1><p class="sub">'+weekday(d)+', '+dmy(d)+'</p></div></div>';
-  // the shift card and the thought for the day share the right-hand column; the rest of the grid is free for more widgets
+  // the shift card sits in the right-hand column; the rest of the grid is free for more widgets
   var n=data.today.events.length;
   h+='<div class="db-row"><div class="db-stack"><section class="at-card db-shift" aria-labelledby="db-t">'+
       '<div class="db-sh"><h2 id="db-t">Today’s shift</h2><span class="at-badge '+st[0]+'" role="status"><i></i>'+st[1]+'</span></div>'+
@@ -8275,7 +8268,7 @@ function render(){
         '<button class="db-lnk" id="db-all">Attendance'+I.chev+'</button></span></div>'+
       '<div class="db-act" id="db-act"'+(actOpen?'':' hidden')+'>'+shiftTimeline(data.today.events)+'</div>'+
     '</section>'+
-    '<aside class="at-quote db-quote">'+I.quote+'<span class="k">'+esc(q[1])+'</span><blockquote>“'+esc(q[0])+'”</blockquote><cite>Have a great day, '+esc(ME.name.split(' ')[0])+'.</cite></aside></div></div>';
+    '</div></div>';
   content.innerHTML=h;
   document.getElementById('db-actbtn').onclick=function(){ actOpen=!actOpen; this.setAttribute('aria-expanded',actOpen); document.getElementById('db-act').hidden=!actOpen; };
   [].forEach.call(content.querySelectorAll('[data-act]'),function(b){ b.onclick=function(){ request(b.getAttribute('data-act')); }; });

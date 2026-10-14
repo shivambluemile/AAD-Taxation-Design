@@ -4317,7 +4317,7 @@ document.addEventListener('keydown',function(e){
    Add Client is a four-step wizard; Request Client sends a secure link the client completes themselves.
    Services come from Settings → Services (shared catalogue); records live in the onboarding core store.
 ========================================================= */
-var STAFF={name:ME, role:'Admin'};
+var STAFF={name:ME, role:(function(){ try{ return localStorage.getItem('aad-view-as')==='staff'?'Accountant':'Admin'; }catch(e){ return 'Admin'; } })()};   // Admin, or Accountant while the admin previews the staff view
 var OI={
   up:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17a4 4 0 0 1-.6-8A5.6 5.6 0 0 1 17.3 9 3.8 3.8 0 0 1 17 17"/><path d="M12 20v-8m0 0-2.6 2.6M12 12l2.6 2.6"/></svg>',
   dl:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
@@ -6066,7 +6066,10 @@ var HOURS_PER_DAY = 7.6;                                  // standard full-time 
 var MAX_FILE = 5 * 1024 * 1024;                           // 5 MB
 var FILE_TYPES = { pdf:'application/pdf', jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
 var STATUS = { pending:'Pending', approved:'Approved', declined:'Declined' };
-var ME = 'John Doe';
+var ME = 'John Doe', MY_ID = 'KPG1000';
+var ROLE = (function(){ try{ return localStorage.getItem('aad-view-as')==='staff'?'Accountant':'Admin'; }catch(e){ return 'Admin'; } })();
+function canApprove(){ return ROLE==='Admin'||ROLE==='Manager'; }
+function canChange(l){ return canApprove()||(l.staff===MY_ID&&l.status==='pending'); }   // staff may change their own request until it's decided
 
 var TYPES = [
   { k:'annual', n:'Annual Leave' },
@@ -6191,6 +6194,7 @@ function filtered(){
   var f=state.f, q=f.q.trim().toLowerCase();
   return LEAVES.filter(function(l){
     var s=staffById(l.staff);
+    if(!canApprove()&&l.staff!==MY_ID) return false;
     if(q&&(s.n+" "+s.id+" "+l.reason).toLowerCase().indexOf(q)<0) return false;
     if(f.status&&l.status!==f.status) return false;
     if(f.type&&l.type!==f.type) return false;
@@ -6320,7 +6324,7 @@ document.addEventListener('mousedown',function(e){
 function renderList(){
   persistLeaves();
   var rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), d=state.f;
-  var h='<div class="page-head"><h1>Leave Management</h1><div class="ph-acts">'+
+  var h='<div class="page-head"><h1>'+(canApprove()?'Leave Management':'My Leave')+'</h1><div class="ph-acts">'+
     '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered leave records as CSV">'+I.csv+'CSV</button>'+
     '<button class="btn-primary" id="add">'+I.plus+'Add Leave</button></div></div>';
   // same filter bar as the other modules: search on the left, "Filter By:" dropdowns, Clear filters when any is set
@@ -6358,12 +6362,11 @@ function renderList(){
       '<td class="nowrap">'+statusHtml(l.status)+'</td>'+
       '<td>'+(l.doc?'<button class="mini-link" data-doc="'+l.id+'" title="'+esc(l.doc.name)+'">'+I.eye+'View</button>':'<span class="dash">—</span>')+'</td>'+
       '<td class="c"><span class="acts">'+
-        (l.status==='pending'?
+        (l.status==='pending'&&canApprove()?
           '<button class="ld-btn ok sm" data-approve="'+l.id+'" aria-label="Approve leave for '+esc(s.n)+'">'+I.ok+'Approve</button>'+
           '<button class="ld-btn no sm" data-decline="'+l.id+'" aria-label="Decline leave for '+esc(s.n)+'">'+I.no+'Decline</button>':'')+
-        '<button class="act" data-view="'+l.id+'" title="View" aria-label="View leave request for '+esc(s.n)+'">'+I.eye+'</button>'+
-        '<button class="act" data-edit="'+l.id+'" title="Edit" aria-label="Edit leave for '+esc(s.n)+'">'+I.edit+'</button>'+
-        '<button class="act danger" data-del="'+l.id+'" title="Delete" aria-label="Delete leave for '+esc(s.n)+'">'+I.trash+'</button>'+
+        (canChange(l)?'<button class="act" data-edit="'+l.id+'" title="Edit" aria-label="Edit leave for '+esc(s.n)+'">'+I.edit+'</button>'+
+        '<button class="act danger" data-del="'+l.id+'" title="Delete" aria-label="Delete leave for '+esc(s.n)+'">'+I.trash+'</button>':'')+
       '</span></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
@@ -6534,6 +6537,7 @@ function viewDoc(id){
 var form=null;
 function openForm(id,fromDetail,pre){
   var l=id?leaveById(id):null; pre=pre||{};
+  if(!canApprove()&&!pre.staff) pre.staff=MY_ID;
   form={ id:id, fromDetail:!!fromDetail, dirty:false, errs:{}, d: l?{ staff:l.staff, type:l.type, from:l.from, to:l.to, reason:l.reason, comment:'', status:l.status, doc:l.doc }
                                        :{ staff:pre.staff||'', type:'', from:pre.from||'', to:pre.to||pre.from||'', reason:'', comment:'', status:'pending', doc:null } };
   renderForm();
@@ -6570,7 +6574,7 @@ function renderForm(){
     '<div class="modal-head"><h2 id="lf-t">'+(edit?'Edit Leave':'Add Leave')+'</h2><button id="lf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="lf-body"><div class="fgrid">'+
     field('Staff',true,{id:'lf-staff',html:'<div class="fsel"><select class="fin plain'+(e.staff?' bad':'')+'" id="lf-staff"><option value="">Select staff member</option>'+
-      STAFF.map(function(s){ return '<option value="'+s.id+'"'+(s.id===d.staff?' selected':'')+'>'+esc(s.n)+' · '+esc(s.div)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.staff)+
+      STAFF.filter(function(s){ return canApprove()||s.id===MY_ID; }).map(function(s){ return '<option value="'+s.id+'"'+(s.id===d.staff?' selected':'')+'>'+esc(s.n)+' · '+esc(s.div)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.staff)+
     field('Leave Type',true,{id:'lf-type',html:'<div class="combo" id="combo"><input class="fin plain'+(e.type?' bad':'')+'" id="lf-type" role="combobox" aria-expanded="false" aria-controls="lf-types" aria-autocomplete="list" autocomplete="off" placeholder="Search leave type" value="'+esc(typeName)+'">'+
       '<span class="cv">'+I.chev+'</span><ul class="combo-list" id="lf-types" role="listbox"></ul></div>'},e.type)+
     field('From Date',true,{id:'lf-from',html:'<input type="date" class="fin plain'+(e.from?' bad':'')+'" id="lf-from" value="'+esc(d.from)+'">'},e.from)+
@@ -6580,8 +6584,8 @@ function renderForm(){
     (edit&&l.comments.length?'<div class="span"><span class="flabel">Comments</span>'+threadHtml(l.comments)+'</div>':'')+
     field(edit?'Add Comment':'Comment',false,{id:'lf-comment',html:'<textarea class="ftext" id="lf-comment" maxlength="500" placeholder="Any additional comments (optional)">'+esc(d.comment)+'</textarea>'},'','span')+
     '<div class="span"><span class="flabel">Document</span><div id="lf-doc">'+docHtml()+'</div></div>'+
-    field('Status',true,{id:'lf-status',html:'<div class="fsel"><select class="fin plain" id="lf-status">'+
-      Object.keys(STATUS).map(function(k){ return '<option value="'+k+'"'+(k===d.status?' selected':'')+'>'+STATUS[k]+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.status)+
+    field('Status',true,{id:'lf-status',html:'<div class="fsel"><select class="fin plain" id="lf-status"'+(canApprove()?'':' disabled title="An admin or manager decides on your request"')+'>'+
+      Object.keys(STATUS).filter(function(k){ return canApprove()||k==='pending'; }).map(function(k){ return '<option value="'+k+'"'+(k===d.status?' selected':'')+'>'+STATUS[k]+'</option>'; }).join('')+'</select>'+I.chev+'</div>'},e.status)+
     '</div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="lf-cancel">Cancel</button><button class="btn-primary" id="lf-save">'+(edit?'Save Changes':'Submit')+'</button></div></div>';
   var keep=document.getElementById('lf-body'), y=keep?keep.scrollTop:0;
@@ -6791,9 +6795,9 @@ function renderDetail(swap){
           '<span class="dc"><i class="dci">'+DI.clock+'</i>'+fmtH(hrs)+' · '+days+' working day'+(days===1?'':'s')+'</span>'+
         '</div></div></div>'+
       '<div class="dhead-acts">'+
-        (l.status==='pending'?'<button class="ld-btn ok" id="ld-approve">'+I.ok+'Approve</button><button class="ld-btn no" id="ld-decline">'+I.no+'Decline</button>':'')+
-        '<button class="ld-btn" id="ld-edit">'+I.edit+'Edit</button>'+
-        '<button class="act danger" id="ld-del" title="Delete" aria-label="Delete leave request">'+I.trash+'</button>'+
+        (l.status==='pending'&&canApprove()?'<button class="ld-btn ok" id="ld-approve">'+I.ok+'Approve</button><button class="ld-btn no" id="ld-decline">'+I.no+'Decline</button>':'')+
+        (canChange(l)?'<button class="ld-btn" id="ld-edit">'+I.edit+'Edit</button>'+
+        '<button class="act danger" id="ld-del" title="Delete" aria-label="Delete leave request">'+I.trash+'</button>':'')+
         '<button class="x" id="ld-x" aria-label="Close">'+I.close+'</button>'+
       '</div></div>'+
     '<div class="btabs" role="tablist" aria-label="Leave request">'+tabs.map(function(x){
@@ -6883,8 +6887,8 @@ function activityTab(l){
 function bindDetail(l){
   var id=l.id;
   document.getElementById('ld-x').onclick=closeDetail;
-  document.getElementById('ld-edit').onclick=function(){ openForm(id,true); };
-  document.getElementById('ld-del').onclick=function(){ confirmDelete(id); };
+  var le=document.getElementById('ld-edit'); if(le) le.onclick=function(){ openForm(id,true); };
+  var ldl=document.getElementById('ld-del'); if(ldl) ldl.onclick=function(){ confirmDelete(id); };
   var ap=document.getElementById('ld-approve'), dc=document.getElementById('ld-decline');
   if(ap) ap.onclick=function(){ decide(id,'approved'); };
   if(dc) dc.onclick=function(){ decide(id,'declined'); };
@@ -8774,7 +8778,7 @@ render();
    Shared by the app shell (header timer), Dashboard (shift actions) and Attendance (records).
    Prototype store: this browser's localStorage; the server is the record once one is connected. */
 var SHIFT_KEY = 'aad-attendance-v2';
-var ME = { name:'John Doe', role:'Admin', id:'KPG1000', branch:'Blacktown Sydney', initials:'JD' };
+var ME = { name:'John Doe', role:(function(){ try{ return localStorage.getItem('aad-view-as')==='staff'?'Accountant':'Admin'; }catch(e){ return 'Admin'; } })(), id:'KPG1000', branch:'Blacktown Sydney', initials:'JD' };
 
 /* the four actions, the state each one starts from, and whether it needs a comment */
 var ACTIONS = {
@@ -12064,7 +12068,7 @@ function submit(){
       f.className = 'frame';
       f.title = mod;
       f.setAttribute('allow', 'camera');
-      f.addEventListener('load', function(){ paintPill(mod, f); });
+      f.addEventListener('load', function(){ paintPill(mod, f); paintUser(f); });
       f.setAttribute('srcdoc', page(mod));
       main.appendChild(f);
       frames[mod] = f;
@@ -12078,11 +12082,63 @@ function submit(){
     if(window.innerWidth <= 860) document.body.classList.add('collapsed');
   }
   function select(mod){
+    if(ADMIN_ONLY.indexOf(mod) >= 0 && staffView()) mod = 'dashboard';   // staff can't open admin pages
+    cur = mod;
     var nav = document.getElementById('navitems');
     Array.prototype.forEach.call(nav.querySelectorAll('button'), function(x){ x.classList.toggle('on', x.dataset.mod === mod); });
     show(mod);
   }
   window.AADNav = select;                     // modules call parent.AADNav('attendance') etc.
+
+  /* ---------- profile menu: the admin can preview the app as a staff member and switch back ---------- */
+  var VIEW_KEY = 'aad-view-as', ADMIN_ONLY = ['staff', 'settings'], cur = 'dashboard';
+  function staffView(){ try{ return localStorage.getItem(VIEW_KEY) === 'staff'; }catch(e){ return false; } }
+  var MENU_CSS =
+    '.aad-um{position:fixed;z-index:200;min-width:240px;background:#fff;border:1px solid #EBEEF0;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.14);padding:6px;font:13.5px Inter,system-ui,sans-serif}'+
+    '.aad-um .h{padding:10px 12px 10px;border-bottom:1px solid #F1F2F4;margin-bottom:4px}.aad-um .h b{display:block;font-size:13.5px;color:#0F172A}.aad-um .h span{font-size:12px;color:#64748B}'+
+    '.aad-um button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:8px;font:600 13px Inter,system-ui,sans-serif;color:#334155;text-align:left;background:none;border:0;cursor:pointer}'+
+    '.aad-um button:hover{background:#FFF4EA;color:#C2630F}.aad-um button svg{flex-shrink:0}'+
+    '.whoami .who .aad-sv{color:#C2630F;font-weight:700}'+
+    '.aad-svbar{display:flex;align-items:center;gap:8px;margin-right:4px;height:30px;padding:0 12px;border-radius:999px;background:#FFF4EA;color:#C2630F;font:700 12px Inter,system-ui,sans-serif;white-space:nowrap}'+
+    '@media (max-width:700px){.aad-svbar{display:none}}';
+  var SW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/></svg>';
+  function paintUser(f){
+    var doc; try{ doc = f.contentDocument; }catch(e){ return; }
+    var who = doc && doc.querySelector('.whoami'); if(!who || who.dataset.menu) return;
+    who.dataset.menu = '1'; who.setAttribute('aria-haspopup', 'menu'); who.setAttribute('aria-expanded', 'false');
+    var st = doc.createElement('style'); st.textContent = MENU_CSS; doc.head.appendChild(st);
+    var sv = staffView(), role = who.querySelector('.who span');
+    if(role) role.innerHTML = sv ? '<span class="aad-sv">Staff view</span> · Accountant' : 'Admin';
+    if(sv){ var bar = doc.createElement('span'); bar.className = 'aad-svbar'; bar.textContent = 'Previewing as staff'; who.parentNode.insertBefore(bar, who); }
+    var menu = null;
+    function close(){ if(menu){ menu.remove(); menu = null; who.setAttribute('aria-expanded', 'false'); } }
+    who.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(menu) return close();
+      var r = who.getBoundingClientRect();
+      menu = doc.createElement('div'); menu.className = 'aad-um'; menu.setAttribute('role', 'menu');
+      menu.innerHTML = '<div class="h"><b>John Doe</b><span>' + (staffView() ? 'Admin · previewing the staff view' : 'Admin') + '</span></div>' +
+        '<button role="menuitem" id="aad-sw">' + SW + (staffView() ? 'Switch to Admin' : 'Switch to Staff') + '</button>';
+      menu.style.top = (r.bottom + 6) + 'px'; menu.style.right = Math.max(8, doc.documentElement.clientWidth - r.right) + 'px';
+      doc.body.appendChild(menu); who.setAttribute('aria-expanded', 'true');
+      menu.querySelector('#aad-sw').onclick = function(){ close(); switchView(!staffView()); };
+      menu.querySelector('#aad-sw').focus();
+    });
+    doc.addEventListener('click', function(e){ if(menu && !menu.contains(e.target)) close(); });
+    doc.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+  }
+  /* every page reads the role when it loads, so switching reloads them; admin-only pages leave the menu */
+  function applyView(){
+    var sv = staffView();
+    ADMIN_ONLY.forEach(function(m){ var b = document.querySelector('#navitems [data-mod="' + m + '"]'); if(b) b.hidden = sv; });
+    window.AADBadges && window.AADBadges();
+  }
+  function switchView(toStaff){
+    try{ if(toStaff) localStorage.setItem(VIEW_KEY, 'staff'); else localStorage.removeItem(VIEW_KEY); }catch(e){}
+    Object.keys(frames).forEach(function(m){ frames[m].remove(); delete frames[m]; });
+    applyView();
+    select(toStaff && ADMIN_ONLY.indexOf(cur) >= 0 ? 'dashboard' : cur);
+  }
   /* one module asking another to open something: kept until that module picks it up */
   var intents = {};
   window.AADTakeIntent = function(mod){ var x = intents[mod]; delete intents[mod]; return x; };
@@ -12096,7 +12152,7 @@ function submit(){
     var n = 0, list = null; try{ list = JSON.parse(localStorage.getItem('aad-leave-v1') || 'null'); }catch(e){}
     if(!Array.isArray(list)){ make('leave'); return; }          // first visit: the Leave page loads in the background and saves its records
     list.forEach(function(l){ if(l.status === 'pending') n++; });
-    var bd = document.getElementById('nb-leave'); bd.textContent = n ? n : ''; bd.title = n + ' pending leave request' + (n === 1 ? '' : 's');
+    var bd = document.getElementById('nb-leave'); if(staffView()) n = 0; bd.textContent = n ? n : ''; bd.title = n + ' pending leave request' + (n === 1 ? '' : 's');
   };
   window.addEventListener('storage', function(e){ if(e.key === 'aad-leave-v1') window.AADBadges(); });
 
@@ -12166,8 +12222,8 @@ function submit(){
     document.body.appendChild(pf); document.title='AAD Taxation · Secure link';
     return;
   }
+  applyView();
   select('dashboard');
-  window.AADBadges();
 })();
 </script>
 </body>

@@ -4424,7 +4424,7 @@ function kycRows(files,o){
   return '<div class="kyc-list">'+files.map(function(f,i){
     var e=extTag(f.name);
     return '<div class="kyc-row"><span class="kyc-ext e-'+e+'">'+esc(e.toUpperCase())+'</span>'+
-      '<div class="kyc-info"><b title="'+esc(f.name)+'">'+esc(f.name)+'</b><small>'+fsize(f.size)+(f.at?' · '+whenOf(f.at):'')+(f.by?' · '+esc(f.by):'')+'</small></div>'+
+      '<div class="kyc-info"><b title="'+esc(f.name)+'">'+esc(f.name)+'</b><small>'+(f.doc?esc(f.doc)+' · ':'')+fsize(f.size)+(f.at?' · '+whenOf(f.at):'')+(f.by?' · '+esc(f.by):'')+'</small></div>'+
       '<span class="acts">'+(canViewKyc()?'<button class="act" data-kpv="'+i+'" title="Preview" aria-label="Preview '+esc(f.name)+'">'+I.eye+'</button>'+
         '<button class="act" data-kdl="'+i+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+
       (o.remove?'<button class="act danger" data-krm="'+i+'" title="Remove" aria-label="Remove '+esc(f.name)+'">'+I.trash+'</button>':'')+'</span></div>';
@@ -11667,6 +11667,22 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .drop b{display:block;font-size:13.5px}.drop small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 .ic{width:40px;height:40px;border-radius:10px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .files{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.kslots{display:flex;flex-direction:column;gap:12px;margin-top:4px}
+.kslot{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;transition:border-color .15s,background .15s}
+.kslot.done{border-color:#BBF7D0}.kslot.bad{border-color:#FECDD3;background:#FFF8F8}.kslot.drag{border-color:var(--orange);background:var(--orange-soft)}
+.ks-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.ks-h b{display:block;font-size:14px}.ks-h small{display:block;font-size:12.5px;color:var(--mute);margin-top:3px;line-height:1.45}
+.kslot .files{margin-top:10px}
+.ks-up{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;height:42px;border:1.5px dashed #D6DBE1;border-radius:10px;font-size:13px;font-weight:600;color:var(--orange-ink);cursor:pointer;background:#FCFCFD}
+.ks-up:hover{border-color:var(--orange);background:var(--orange-soft)}.ks-up svg{width:16px;height:16px}
+.kst{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.kst.sm{height:22px;font-size:11.5px;padding:0 8px}
+.kst.ok{background:#DCFCE7;color:#15803D}.kst.need{background:#FFE4E6;color:#BE123C}.kst.opt{background:#F1F2F4;color:#64748B}
+.rv-t{display:inline-flex;align-items:center;gap:10px}
+.rv-docs{display:flex;flex-direction:column;gap:8px}
+.rv-doc{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.rv-doc b{display:block;font-size:13.5px}.rv-doc small{display:block;font-size:12px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.note.ok{background:#F0FDF4;border-color:#BBF7D0;color:#166534;align-items:center}.note.ok svg{flex-shrink:0}
 .file{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .file .x{width:40px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:#E8F1FD;color:#2563EB;flex-shrink:0}
 .file .x.pdf{background:#FDECEC;color:#C2410C}
@@ -11760,7 +11776,7 @@ function clientNameFor(L){ try{ var cl=JSON.parse(localStorage.getItem('aad-clie
 
 /* ================= onboarding form ================= */
 var R=null, step=1, errs={}, f=null, mem={kyc:[],sig:null};
-var STEPS=['Your details','Services & ID documents','Engagement letter','Review & submit'];
+var STEPS=['Your details','Services & KYC documents','Engagement letter','Review & submit'];
 if(KIND==='onboard') bootOnboard();
 function bootOnboard(){
   R=ONB.requests.filter(function(x){ return x.token===TOKEN; })[0];
@@ -11777,7 +11793,7 @@ function bootOnboard(){
   ['abn','tfn','acn','commEmail','commPhone','entity'].forEach(function(k){ if(f[k]==null) f[k]=''; });
   f.address=f.address||{street:'',suburb:'',state:'',postcode:''};
   if(R.type==='company'){ f.entity=f.entity||'Company'; f.directors=f.directors&&f.directors.length?f.directors:[{name:'',email:'',phone:'',abn:'',tfn:''}]; }
-  step=Math.min(R.steps===4?(R.step||1):(R.step>=3?R.step-1:(R.step||1)),4);   // drafts saved before services and ID documents were one step
+  step=Math.min(R.steps===4?(R.step||1):(R.step>=3?R.step-1:(R.step||1)),4);   // drafts saved before services and KYC documents were one step
   paint();
 }
 function kycList(){ return PREVIEW?R.kyc.concat(mem.kyc):R.kyc; }
@@ -11823,14 +11839,41 @@ function servicesStep(){
     '<table class="svc"><thead><tr><th>Service</th><th>Fee (inc. GST)</th></tr></thead><tbody>'+R.services.map(function(s){ return '<tr><td>'+e(s.name)+'</td><td>'+money(s.price)+'</td></tr>'; }).join('')+
     '<tr class="tot"><td>Total</td><td>'+money(totalOf(R.services))+'</td></tr></tbody></table>';
 }
-/* step 2: the agreed services, then the ID upload */
-function svcDocsStep(){ return servicesStep()+docsStep().replace('<h2>ID documents</h2>','<div class="sec">ID documents</div>'); }
+/* step 2: the agreed services, then the KYC documents */
+function svcDocsStep(){ return servicesStep()+docsStep(); }
+/* the KYC documents we ask for. Individuals: photo ID (proof of address optional). Companies: photo ID for each director and an ASIC extract */
+function kycReqs(){
+  var co=R.type==='company', list=[];
+  if(co){
+    (f.directors.length?f.directors:[{name:''}]).forEach(function(d,i){ list.push({k:'id-'+i,n:'Photo ID · '+(String(d.name||'').trim()||'Director '+(i+1)),hint:'Driver licence or passport. Include the back of a licence too.'}); });
+    list.push({k:'asic',n:'ASIC company extract',hint:'A current company extract from ASIC, less than 3 months old.'});
+  } else {
+    list.push({k:'id',n:'Photo ID',hint:'Driver licence or passport. Include the back of a licence too.'});
+    list.push({k:'address',n:'Proof of address',hint:'A utility bill, bank statement or rates notice from the last 3 months.',opt:true});
+  }
+  var known=list.map(function(x){ return x.k; });
+  if(kycList().some(function(x){ return known.indexOf(x.slot)<0; })) list.push({k:'other',n:'Other documents',hint:'Files uploaded earlier.',opt:true});
+  return list;
+}
+function slotFiles(k){ var known=kycReqs().map(function(x){ return x.k; }); return kycList().map(function(x,i){ return {x:x,i:i}; }).filter(function(o){ return k==='other'?known.indexOf(o.x.slot)<0||o.x.slot==='other':o.x.slot===k; }); }
+function missingDocs(){ return kycReqs().filter(function(q){ return !q.opt&&!slotFiles(q.k).length; }); }
+function okI(){ return '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>'; }   // a function, so it's ready before the page first paints
 function docsStep(){
-  var list=kycList();
-  return '<h2>ID documents</h2><p class="sub">Upload photo ID (driver licence or passport)'+(R.type==='company'?' for each director, and an ASIC company extract':'')+'. PDF or photos, up to 10 MB each.</p>'+
-    '<label class="drop" id="dz"><input type="file" id="fi" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*" hidden><span class="ic">'+IC.up+'</span><span><b>Click to upload or drag files here</b><small>Your documents are stored privately and only seen by our team</small></span></label>'+
-    (errs.kyc?'<span class="err">'+e(errs.kyc)+'</span>':'')+
-    (list.length?'<div class="files">'+list.map(function(x,i){ var t=extTag(x.name); return '<div class="file"><span class="x'+(t==='pdf'?' pdf':'')+'">'+e(t.toUpperCase())+'</span><div><b>'+e(x.name)+'</b><small>'+fsize(x.size)+' · '+whenOf(x.at)+'</small></div><button class="lnk dng" data-rmk="'+i+'">Remove</button></div>'; }).join('')+'</div>':'');
+  var miss=errs.kyc?missingDocs().map(function(q){ return q.k; }):[];
+  return '<div class="sec">KYC documents</div><p class="sub">We need these to confirm your identity, as the law requires for tax agents. Upload a clear photo or scan of each one: PDF, JPG or PNG, up to 10 MB per file. Every detail should be easy to read.</p>'+
+    (errs.kyc?'<div class="note bad" role="alert"><span>'+e(errs.kyc)+'</span></div>':'')+
+    '<div class="kslots">'+kycReqs().map(function(q){
+      var got=slotFiles(q.k), bad=miss.indexOf(q.k)>=0;
+      var st=got.length?'<span class="kst ok">'+okI()+'Uploaded</span>':q.opt?'<span class="kst opt">Optional</span>':'<span class="kst need">Required</span>';
+      return '<div class="kslot'+(bad?' bad':'')+(got.length?' done':'')+'" data-slot="'+q.k+'">'+
+        '<div class="ks-h"><div><b>'+e(q.n)+(q.opt?'':' <span class="req">*</span>')+'</b><small>'+e(q.hint)+'</small></div>'+st+'</div>'+
+        (got.length?'<div class="files">'+got.map(function(o){ var x=o.x, t=extTag(x.name);
+          return '<div class="file"><span class="x'+(t==='pdf'?' pdf':'')+'">'+e(t.toUpperCase())+'</span><div><b title="'+e(x.name)+'">'+e(x.name)+'</b><small>'+fsize(x.size)+' · '+whenOf(x.at)+'</small></div>'+
+            '<span class="kst ok sm">'+okI()+(PREVIEW&&o.i>=R.kyc.length?'Added (preview)':'Received')+'</span><button class="lnk dng" data-rmk="'+o.i+'" aria-label="Remove '+e(x.name)+'">Remove</button></div>'; }).join('')+'</div>':'')+
+        (q.k==='other'?'':'<label class="ks-up"><input type="file" multiple accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" hidden data-up="'+q.k+'">'+IC.up+'<span>'+(got.length?'Add another file':'Upload or drag a file here')+'</span></label>')+
+      '</div>';
+    }).join('')+'</div>'+
+    '<p class="hint">Your documents are stored privately and only seen by our team.</p>';
 }
 function letterStep(){
   var signed=letterSigned(), sig=PREVIEW&&mem.sig?mem.sig:R.letter.signature;
@@ -11843,12 +11886,18 @@ function letterStep(){
 }
 function reviewStep(co){
   var a=f.address, row=function(k,v){ return '<div><dt>'+k+'</dt><dd>'+(v?e(v):'—')+'</dd></div>'; };
+  var done=function(ok,todo){ return ok?'<span class="kst ok">'+okI()+'Complete</span>':'<span class="kst need">'+todo+'</span>'; };
+  var dOk=!Object.keys(validateDetails()).length, miss=missingDocs(), signed=letterSigned(), all=dOk&&!miss.length&&signed;
+  var head=function(t,go,ok,todo,lbl){ return '<h3><span class="rv-t">'+t+done(ok,todo)+'</span>'+(go?'<button class="lnk" data-go="'+go+'">'+(lbl||'Edit')+'</button>':'')+'</h3>'; };
   var h='<div class="rv"><h2>Check and submit</h2><p class="sub" style="margin-bottom:0">Once you submit, '+FIRM.name+' reviews your details. You won’t be able to change them through this link.</p>'+
-    '<h3>Details <button class="lnk" data-go="1">Edit</button></h3><dl>'+row(co?'Business name':'Full name',f.name)+(co?row('Entity type',f.entity):'')+row('Email',f.email)+row('Phone',f.phone)+row('ABN',fmtABN(f.abn))+row('TFN',f.tfn?'•••• '+digits(f.tfn).slice(-3):'')+
+    (all?'<div class="note ok">'+okI()+'<span><b>Everything is ready.</b> Check the details below, then submit.</span></div>':'')+
+    head('Details',1,dOk,'Needs attention')+'<dl>'+row(co?'Business name':'Full name',f.name)+(co?row('Entity type',f.entity):'')+row('Email',f.email)+row('Phone',f.phone)+row('ABN',fmtABN(f.abn))+row('TFN',f.tfn?'•••• '+digits(f.tfn).slice(-3):'')+
       row('Address',[a.street,[a.suburb,a.state,a.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '))+(co?row('Directors',f.directors.map(function(d){ return d.name; }).join(', ')):'')+'</dl>'+
-    '<h3>Services</h3><dl>'+row(R.services.length+' service'+(R.services.length===1?'':'s'),money(totalOf(R.services)))+'</dl>'+
-    '<h3>ID documents <button class="lnk" data-go="2">Edit</button></h3><dl>'+row('Uploaded',kycList().length+' file'+(kycList().length===1?'':'s'))+'</dl>'+
-    '<h3>Engagement letter <button class="lnk" data-go="3">'+(letterSigned()?'View':'Sign')+'</button></h3><dl>'+row('Status',letterSigned()?'Signed':'Not signed yet')+'</dl></div>';
+    head('Services',0,true)+'<dl>'+row(R.services.length+' service'+(R.services.length===1?'':'s'),money(totalOf(R.services)))+'</dl>'+
+    head('KYC documents',2,!miss.length,miss.length+' missing')+'<div class="rv-docs">'+kycReqs().map(function(q){ var got=slotFiles(q.k);
+      return '<div class="rv-doc"><div><b>'+e(q.n)+'</b>'+(got.length?got.map(function(o){ return '<small>'+e(o.x.name)+' · '+fsize(o.x.size)+'</small>'; }).join(''):'<small>'+(q.opt?'Not provided (optional)':'Not uploaded yet')+'</small>')+'</div>'+
+        (got.length?'<span class="kst ok sm">'+okI()+'Received</span>':q.opt?'<span class="kst opt sm">Optional</span>':'<span class="kst need sm">Missing</span>')+'</div>'; }).join('')+'</div>'+
+    head('Engagement letter',3,signed,'Not signed yet',signed?'View':'Sign')+(signed?'<dl>'+row('Signed by',(PREVIEW&&mem.sig?mem.sig:R.letter.signature||{}).name)+row('Signed on',dmyOf(R.letter.signedAt||Date.now()))+'</dl>':'')+'</div>';
   if(errs.submit) h+='<div class="note bad"><span>'+e(errs.submit)+'</span></div>';
   return h;
 }
@@ -11918,30 +11967,32 @@ function validateDetails(){
   }
   return er;
 }
+function missText(){ var m=missingDocs().map(function(q){ return q.n; }); return 'Still needed: '+m.join(', ')+'.'; }
 function checkStep(n){
   if(n===1){ errs=validateDetails(); if(Object.keys(errs).length){ paint(); var b=app.querySelector('.bad'); if(b){ b.scrollIntoView({block:'center'}); b.focus(); } toast('Please fix the highlighted fields',true); return false; } }
-  if(n===2&&!kycList().length){ errs={kyc:'Upload at least one ID document'}; paint(); return false; }
+  if(n===2&&missingDocs().length){ errs={kyc:missText()}; paint(); var bd=app.querySelector('.kslot.bad'); if(bd) bd.scrollIntoView({block:'center'}); return false; }
   if(n===3&&!letterSigned()){ errs={sig:'Sign the engagement letter to continue'}; paint(); return false; }
   return true;
 }
 function wireDocs(){
-  var inp=document.getElementById('fi'), dz=document.getElementById('dz');
-  var add=function(list){
+  var add=function(list,slot){
+    var q=kycReqs().filter(function(x){ return x.k===slot; })[0]||{n:'Document'};
     var files=[].filter.call(list||[],function(x){ if(!KYC_TYPES.test(x.type)){ toast(x.name+' isn’t a PDF or image',true); return false; } if(x.size>KYC_MAX){ toast(x.name+' is larger than 10 MB',true); return false; } return true; });
     if(!files.length) return;
     var now=Date.now();
-    if(PREVIEW){ files.forEach(function(x){ mem.kyc.push({name:x.name,type:x.type,size:x.size,at:now}); }); errs={}; paint(); toast('Preview only: files aren’t uploaded'); return; }
+    if(PREVIEW){ files.forEach(function(x){ mem.kyc.push({name:x.name,type:x.type,size:x.size,at:now,slot:slot,doc:q.n}); }); errs={}; paint(); toast('Preview only: files aren’t uploaded'); return; }
     Promise.all(files.map(function(x,i){ var key='kyc-'+TOKEN.slice(0,10)+'-'+now+'-'+i;
-      return putKyc(key,x,{owner:TOKEN,name:x.name,type:x.type,size:x.size,at:now,by:f.name||R.name}).then(function(){ return {key:key,name:x.name,type:x.type,size:x.size,at:now,by:f.name||R.name}; }); }))
+      return putKyc(key,x,{owner:TOKEN,name:x.name,type:x.type,size:x.size,at:now,by:f.name||R.name}).then(function(){ return {key:key,name:x.name,type:x.type,size:x.size,at:now,by:f.name||R.name,slot:slot,doc:q.n}; }); }))
     .then(function(metas){
       ONB=loadOnb(); var r=ONB.requests.filter(function(y){ return y.token===TOKEN; })[0];
-      metas.forEach(function(m){ r.kyc.push(m); }); audit(r,'Documents uploaded by client',f.name||R.name,'','',metas.length+' file'+(metas.length===1?'':'s'));
-      r.form=JSON.parse(JSON.stringify(f)); saveOnb(ONB); R=r; errs={}; paint(); toast('Uploaded');
+      metas.forEach(function(m){ r.kyc.push(m); }); audit(r,'Documents uploaded by client',f.name||R.name,'','',q.n+' · '+metas.length+' file'+(metas.length===1?'':'s'));
+      r.form=JSON.parse(JSON.stringify(f)); saveOnb(ONB); R=r; var keep=errs.kyc&&missingDocs().length; errs={}; if(keep) errs.kyc=missText(); paint(); toast(q.n+' uploaded');
     },function(){ toast('The upload didn’t work. Please try again.',true); });
   };
-  inp.onchange=function(){ add(inp.files); inp.value=''; };
-  dz.ondragover=function(ev){ ev.preventDefault(); dz.classList.add('drag'); }; dz.ondragleave=function(){ dz.classList.remove('drag'); };
-  dz.ondrop=function(ev){ ev.preventDefault(); dz.classList.remove('drag'); add(ev.dataTransfer.files); };
+  app.querySelectorAll('[data-up]').forEach(function(inp){ inp.onchange=function(){ add(inp.files,inp.dataset.up); inp.value=''; }; });
+  app.querySelectorAll('.kslot').forEach(function(z){ var k=z.dataset.slot; if(k==='other') return;
+    z.ondragover=function(ev){ ev.preventDefault(); z.classList.add('drag'); }; z.ondragleave=function(){ z.classList.remove('drag'); };
+    z.ondrop=function(ev){ ev.preventDefault(); z.classList.remove('drag'); add(ev.dataTransfer.files,k); }; });
   app.querySelectorAll('[data-rmk]').forEach(function(b){ b.onclick=function(){
     var i=+b.dataset.rmk;
     if(PREVIEW){ if(i>=R.kyc.length){ mem.kyc.splice(i-R.kyc.length,1); paint(); } else toast('Preview only: nothing is removed'); return; }
@@ -11967,7 +12018,7 @@ function wireSign(){
 function submit(){
   errs={};
   var d=validateDetails();
-  var miss=Object.keys(d).length?'Some of your details need attention.':!kycList().length?'Upload at least one ID document.':!letterSigned()?'Sign the engagement letter.':'';
+  var miss=Object.keys(d).length?'Some of your details need attention.':missingDocs().length?'Some KYC documents are missing ('+missingDocs().map(function(q){ return q.n; }).join(', ')+').':!letterSigned()?'Sign the engagement letter.':'';
   if(miss){ errs={submit:miss+' Use the links above to finish them.'}; paint(); return; }
   if(PREVIEW){ toast('Preview only: in the real link this submits the onboarding'); return; }
   var btn=document.getElementById('sb'); btn.disabled=true; btn.textContent='Submitting…';

@@ -36,6 +36,7 @@ button{background:none;border:none;cursor:pointer;font:inherit;color:inherit}
 .nav-items button:hover{background:#F6F7F9;color:var(--ink)}
 .nav-items button.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:700}
 .nav-items button svg{flex-shrink:0;opacity:.9}
+.nav-items button[hidden]{display:none}
 .nav-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 .nav-badge:empty{display:none}
 .nav-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
@@ -7645,6 +7646,7 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
 .drawer.ad{max-width:580px}
+.confirm-body .dt-ic{background:#EEF4FF;color:#2563EB}
 .ad-tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 14px;flex-shrink:0}
 .btn-ghost.sm{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12.5px}
 .btn-ghost.danger{color:var(--red)}.btn-ghost.danger:hover{background:#FEF2F2;border-color:#FECACA}
@@ -8501,7 +8503,7 @@ function caption(s,T){
 }
 function actions(s){
   var dis=busy?' disabled':'';
-  if(s==='off') return '<button class="at-btn pri" data-act="start"'+dis+'>'+I.play+'Start Shift</button>';
+  if(s==='off'||s==='ended') return '<button class="at-btn pri" data-act="start"'+dis+'>'+I.play+'Start Shift</button>';   // after End Shift it explains why it can't start again
   if(s==='on') return '<button class="at-btn sec" data-act="break_start"'+dis+'>'+I.coffee+'Break</button><button class="at-btn stop" data-act="end"'+dis+'>'+I.stop+'End Shift</button>';
   if(s==='break') return '<button class="at-btn pri" data-act="break_end"'+dis+'>'+I.back+'End Break</button>';
   return '';
@@ -8540,11 +8542,20 @@ setInterval(function(){
 window.addEventListener('storage',function(e){ if(e.key===SHIFT_KEY && !dlg.classList.contains('open')) render(); });
 
 /* ---------- actions: sequence check → comment (and document) → face check → record ---------- */
+function doneForToday(){
+  var T=totals(data.today.events,Date.now());
+  showModal('<div class="modal sm" role="alertdialog" aria-modal="true" aria-labelledby="dt-t" aria-describedby="dt-p"><div class="confirm-body">'+
+    '<div class="warn dt-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>'+
+    '<h3 id="dt-t">You’re done for today</h3><p id="dt-p">Your shift ended at <strong>'+t12(T.end)+'</strong> after <strong>'+hm(T.worked)+'</strong> of work. Only one shift can be started each day, so you can start a new one tomorrow.</p></div>'+
+    '<div class="modal-foot"><button class="btn-primary" id="dt-ok">OK</button></div></div>');
+  var ok=document.getElementById('dt-ok'); ok.onclick=closeModal; ok.focus();
+}
 var busy=false, verifying=false, pending=null;
 function request(type){
   var a=ACTIONS[type]; if(!a||busy) return;
   data=loadShift();
   var s=data.today.status;
+  if(type==='start'&&s==='ended') return doneForToday();
   if(!canDo(type,s)){
     toast(s==='break'&&type!=='break_end'?'End your break first.':
           s==='ended'?'Your shift has ended for today.':s==='off'?'Start your shift first.':'That action isn’t available right now.',true);
@@ -12048,6 +12059,10 @@ function submit(){
   /* the shared shift code runs here too, for the header timer */
   var core = document.getElementById('src-shift-core').textContent;
   var cs = document.createElement('script'); cs.text = core; document.head.appendChild(cs);
+  /* prototype: every time the app is opened, today starts fresh (earlier days stay in the history) */
+  try{ var day = loadShift(); if(day.today.events.length || day.today.status !== 'off'){
+    deletePhotos(day.today.events.filter(function(e){ return e.photo; }).map(function(e){ return e.photo; }));
+    day.today = { date: dayKey(), status: 'off', events: [] }; saveShift(day); } }catch(e){}
 
   function text(id){ var el=document.getElementById('src-'+id); return el?el.textContent:''; }
   function source(id){
@@ -12108,7 +12123,7 @@ function submit(){
     who.dataset.menu = '1'; who.setAttribute('aria-haspopup', 'menu'); who.setAttribute('aria-expanded', 'false');
     var st = doc.createElement('style'); st.textContent = MENU_CSS; doc.head.appendChild(st);
     var sv = staffView(), role = who.querySelector('.who span');
-    if(role) role.innerHTML = sv ? '<span class="aad-sv">Staff view</span> · Accountant' : 'Admin';
+    if(role) role.innerHTML = sv ? '<span class="aad-sv">Accountant</span>' : 'Admin';
     if(sv){ var bar = doc.createElement('span'); bar.className = 'aad-svbar'; bar.textContent = 'Previewing as staff'; who.parentNode.insertBefore(bar, who); }
     var menu = null;
     function close(){ if(menu){ menu.remove(); menu = null; who.setAttribute('aria-expanded', 'false'); } }

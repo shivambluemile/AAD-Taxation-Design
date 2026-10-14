@@ -11290,7 +11290,7 @@ var SIG_FONTS=[['Classic',"'Dancing Script',cursive"],['Elegant',"'Great Vibes',
 function sigPad(el,defaultName){
   var mode='draw', drawn=false, typed=defaultName||'', font=0, upload=null, cv, ctx;
   function paint(){
-    el.innerHTML='<div class="sg"><div class="sg-tabs" role="tablist">'+[['draw','Draw'],['type','Type'],['upload','Upload']].map(function(t){
+    el.innerHTML='<div class="sg"><div class="sg-tabs" role="tablist">'+[['draw','Draw'],['type','Select'],['upload','Upload']].map(function(t){
       return '<button type="button" role="tab" aria-selected="'+(mode===t[0])+'" class="'+(mode===t[0]?'on':'')+'" data-sgm="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div><div class="sg-body">'+
       (mode==='draw'?'<canvas aria-label="Signature drawing area"></canvas><div class="sg-row"><span>Sign with your mouse, finger or stylus</span><button type="button" data-sgclear>Clear</button></div>':
        mode==='type'?'<p class="sg-hint">Choose a style for the signer’s name</p><div class="sg-styles" role="radiogroup" aria-label="Signature style">'+SIG_FONTS.map(function(f,i){
@@ -11514,7 +11514,7 @@ function clientNameFor(L){ try{ var cl=JSON.parse(localStorage.getItem('aad-clie
 
 /* ================= onboarding form ================= */
 var R=null, step=1, errs={}, f=null, mem={kyc:[],sig:null};
-var STEPS=['Your details','Services & fees','ID documents','Engagement letter','Review & submit'];
+var STEPS=['Your details','Services & ID documents','Engagement letter','Review & submit'];
 if(KIND==='onboard') bootOnboard();
 function bootOnboard(){
   R=ONB.requests.filter(function(x){ return x.token===TOKEN; })[0];
@@ -11531,7 +11531,7 @@ function bootOnboard(){
   ['abn','tfn','acn','commEmail','commPhone','entity'].forEach(function(k){ if(f[k]==null) f[k]=''; });
   f.address=f.address||{street:'',suburb:'',state:'',postcode:''};
   if(R.type==='company'){ f.entity=f.entity||'Company'; f.directors=f.directors&&f.directors.length?f.directors:[{name:'',email:'',phone:'',abn:'',tfn:''}]; }
-  step=Math.min(R.step||1,5);
+  step=Math.min(R.steps===4?(R.step||1):(R.step>=3?R.step-1:(R.step||1)),4);   // drafts saved before services and ID documents were one step
   paint();
 }
 function kycList(){ return PREVIEW?R.kyc.concat(mem.kyc):R.kyc; }
@@ -11539,12 +11539,12 @@ function letterSigned(){ return PREVIEW?!!mem.sig||R.letter.status==='signed':R.
 function paint(){
   var co=R.type==='company';
   var h='<div class="hello"><h1>'+(step===1?'Welcome'+(R.form?' back':'')+', '+e(R.type==='company'?R.name:String(R.name).split(' ')[0]):STEPS[step-1])+'</h1><p>'+
-    (step===1?FIRM.name+' has asked you to complete your onboarding. Your progress is saved as you go, so you can come back to this link any time before '+dmyOf(R.expires)+'.':'Step '+step+' of 5')+'</p></div>';
+    (step===1?FIRM.name+' has asked you to complete your onboarding. Your progress is saved as you go, so you can come back to this link any time before '+dmyOf(R.expires)+'.':'Step '+step+' of 4')+'</p></div>';
   if(R.status==='info'&&R.reason) h+='<div class="note warn"><span><b>'+FIRM.name+' needs more information:</b> '+e(R.reason)+'</span></div>';
   h+='<ol class="steps">'+STEPS.map(function(s,i){ var n=i+1, st=n===step?'on':n<step?'done':''; return '<li class="'+st+'">'+(n<step?'<button data-go="'+n+'"><i>✓</i>'+s+'</button>':'<i>'+n+'</i>'+s)+'</li>'; }).join('')+'</ol>';
-  h+='<div class="card">'+[detailsStep,servicesStep,docsStep,letterStep,reviewStep][step-1](co)+
+  h+='<div class="card">'+[detailsStep,svcDocsStep,letterStep,reviewStep][step-1](co)+
     '<div class="foot">'+(step>1?'<button class="btn sec" id="bk">Back</button>':'')+'<span class="grow"></span>'+
-      (step<5?'<button class="btn sec" id="sv">Save and finish later</button><button class="btn pri" id="nx">Continue</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
+      (step<4?'<button class="btn sec" id="sv">Save and finish later</button><button class="btn pri" id="nx">Continue</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
   app.innerHTML=h; wire(); window.scrollTo(0,0);
 }
 function fld(k,label,val,o){ o=o||{}; var er=errs[k]; return '<div'+(o.span?' class="span2"':'')+'><label class="l" for="p-'+k.replace(/\./g,'-')+'">'+label+(o.opt?' <span class="opt">(optional)</span>':' <span class="req">*</span>')+'</label>'+
@@ -11576,6 +11576,8 @@ function servicesStep(){
     '<table class="svc"><thead><tr><th>Service</th><th>Fee (inc. GST)</th></tr></thead><tbody>'+R.services.map(function(s){ return '<tr><td>'+e(s.name)+'</td><td>'+money(s.price)+'</td></tr>'; }).join('')+
     '<tr class="tot"><td>Total</td><td>'+money(totalOf(R.services))+'</td></tr></tbody></table>';
 }
+/* step 2: the agreed services, then the ID upload */
+function svcDocsStep(){ return servicesStep()+docsStep().replace('<h2>ID documents</h2>','<div class="sec">ID documents</div>'); }
 function docsStep(){
   var list=kycList();
   return '<h2>ID documents</h2><p class="sub">Upload photo ID (driver licence or passport)'+(R.type==='company'?' for each director, and an ASIC company extract':'')+'. PDF or photos, up to 10 MB each.</p>'+
@@ -11598,8 +11600,8 @@ function reviewStep(co){
     '<h3>Details <button class="lnk" data-go="1">Edit</button></h3><dl>'+row(co?'Business name':'Full name',f.name)+(co?row('Entity type',f.entity):'')+row('Email',f.email)+row('Phone',f.phone)+row('ABN',fmtABN(f.abn))+row('TFN',f.tfn?'•••• '+digits(f.tfn).slice(-3):'')+
       row('Address',[a.street,[a.suburb,a.state,a.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '))+(co?row('Directors',f.directors.map(function(d){ return d.name; }).join(', ')):'')+'</dl>'+
     '<h3>Services</h3><dl>'+row(R.services.length+' service'+(R.services.length===1?'':'s'),money(totalOf(R.services)))+'</dl>'+
-    '<h3>ID documents <button class="lnk" data-go="3">Edit</button></h3><dl>'+row('Uploaded',kycList().length+' file'+(kycList().length===1?'':'s'))+'</dl>'+
-    '<h3>Engagement letter <button class="lnk" data-go="4">'+(letterSigned()?'View':'Sign')+'</button></h3><dl>'+row('Status',letterSigned()?'Signed':'Not signed yet')+'</dl></div>';
+    '<h3>ID documents <button class="lnk" data-go="2">Edit</button></h3><dl>'+row('Uploaded',kycList().length+' file'+(kycList().length===1?'':'s'))+'</dl>'+
+    '<h3>Engagement letter <button class="lnk" data-go="3">'+(letterSigned()?'View':'Sign')+'</button></h3><dl>'+row('Status',letterSigned()?'Signed':'Not signed yet')+'</dl></div>';
   if(errs.submit) h+='<div class="note bad"><span>'+e(errs.submit)+'</span></div>';
   return h;
 }
@@ -11613,17 +11615,17 @@ function wire(){
   var sb=document.getElementById('sb'); if(sb) sb.onclick=submit;
   var ad=document.getElementById('addd'); if(ad) ad.onclick=function(){ read(); f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''}); paint(); };
   app.querySelectorAll('[data-rmd]').forEach(function(b){ b.onclick=function(){ read(); f.directors.splice(+b.dataset.rmd,1); errs={}; paint(); }; });
-  if(step===3) wireDocs();
-  if(step===4&&!letterSigned()) wireSign();
+  if(step===2) wireDocs();
+  if(step===3&&!letterSigned()) wireSign();
 }
-function go(n){ errs={}; step=Math.max(1,Math.min(5,n)); persist(false); paint(); }
+function go(n){ errs={}; step=Math.max(1,Math.min(4,n)); persist(false); paint(); }
 /* saving keeps the request in Draft (or Needs Information); only Submit changes the status */
 function persist(explicit){
   if(PREVIEW){ if(explicit) toast('Preview only: in the real link this saves the client’s progress'); return; }
   ONB=loadOnb(); var x=ONB.requests.filter(function(y){ return y.token===TOKEN; })[0];
   if(['draft','info'].indexOf(x.status)<0){ R=x; return bootOnboard(); }
-  x.form=JSON.parse(JSON.stringify(f)); x.step=step;
-  if(explicit) audit(x,'Draft saved by client',f.name||R.name,'','','Step '+step+' of 5 · status stays '+ONB_STATUS[x.status][0]);
+  x.form=JSON.parse(JSON.stringify(f)); x.step=step; x.steps=4;
+  if(explicit) audit(x,'Draft saved by client',f.name||R.name,'','','Step '+step+' of 4 · status stays '+ONB_STATUS[x.status][0]);
   if(saveOnb(ONB)){ R=x; if(explicit) toast('Saved. You can come back to this link any time before '+dmyOf(R.expires)+'.'); } else toast('We couldn’t save your progress. Please try again.',true);
 }
 /* Continue on the details step fills every empty field with sample details, so nothing has to be typed by hand; anything typed is kept */
@@ -11669,8 +11671,8 @@ function validateDetails(){
 }
 function checkStep(n){
   if(n===1){ errs=validateDetails(); if(Object.keys(errs).length){ paint(); var b=app.querySelector('.bad'); if(b){ b.scrollIntoView({block:'center'}); b.focus(); } toast('Please fix the highlighted fields',true); return false; } }
-  if(n===3&&!kycList().length){ errs={kyc:'Upload at least one ID document'}; paint(); return false; }
-  if(n===4&&!letterSigned()){ errs={sig:'Sign the engagement letter to continue'}; paint(); return false; }
+  if(n===2&&!kycList().length){ errs={kyc:'Upload at least one ID document'}; paint(); return false; }
+  if(n===3&&!letterSigned()){ errs={sig:'Sign the engagement letter to continue'}; paint(); return false; }
   return true;
 }
 function wireDocs(){
@@ -11722,7 +11724,7 @@ function submit(){
   var btn=document.getElementById('sb'); btn.disabled=true; btn.textContent='Submitting…';
   ONB=loadOnb(); var r=ONB.requests.filter(function(y){ return y.token===TOKEN; })[0];
   if(['draft','info'].indexOf(r.status)<0){ R=r; return bootOnboard(); }     // already submitted (double click or another tab)
-  var from=r.status; r.form=JSON.parse(JSON.stringify(f)); r.status='submitted'; r.submittedAt=Date.now(); r.step=5;
+  var from=r.status; r.form=JSON.parse(JSON.stringify(f)); r.status='submitted'; r.submittedAt=Date.now(); r.step=4; r.steps=4;
   audit(r,'Onboarding submitted',f.name||R.name,from,'submitted','All steps complete');
   if(!saveOnb(ONB)){ r.status=from; btn.disabled=false; btn.textContent='Submit onboarding'; toast('We couldn’t submit your onboarding. Please try again.',true); return; }
   R=r; closed('tick','Thanks, your onboarding is submitted',FIRM.name+' will review your details and documents and let you know if anything else is needed.');

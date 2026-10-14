@@ -2892,27 +2892,20 @@ tbody tr:hover{background:#FCFCFD}
 .wz-sec+.wz-sec{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
 
 /* service picker */
-.sp{display:flex;flex-direction:column;gap:10px}
-.sp-empty{border:1.5px dashed #DDE1E6;border-radius:10px;padding:16px;text-align:center;font-size:13px;color:var(--mute)}
-.sp-head,.sp-row{display:grid;grid-template-columns:minmax(0,1fr) 150px 36px;gap:12px;align-items:center}
-.sp-head{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#94A3B8;padding:0 2px}
-.sp-row{border:1px solid var(--line);border-radius:10px;padding:10px 10px 10px 14px}
-.sp-name b{display:block;font-size:13.5px;font-weight:600;color:var(--ink)}
-.sp-name small{font-size:12px;color:var(--faint)}
-.sp-name em{font-style:normal;color:var(--orange-ink);font-weight:600}
-.sp-price{display:flex;align-items:center;gap:6px;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:#fff}
-.sp-price:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
-.sp-price.bad{border-color:#F3A3A3;background:#FFF7F7}
-.sp-price.ro{background:#F6F7F9}
-.sp-price span{color:var(--mute);font-size:13px}
-.sp-price input{border:0;background:none;width:100%;font:inherit;font-size:13.5px;font-variant-numeric:tabular-nums;color:var(--ink);outline:none}
-.sp-rm{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}
-.sp-rm:hover{background:#FEF2F2;color:var(--red)}
-.sp-err{grid-column:1/-1;margin-top:0}
-.sp-add{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.sp-add .selbox{flex:1;min-width:220px}
-.sp-total{display:flex;justify-content:space-between;align-items:center;padding:10px 4px 0;border-top:1px dashed var(--line);font-size:13px;color:var(--mute)}
-.sp-total b{font-family:'Manrope';font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.sp{display:flex;flex-direction:column;gap:12px}
+.sp-row{display:grid;grid-template-columns:minmax(0,1fr) 150px 44px;gap:12px;align-items:end}
+.sp-rm{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}
+.sp-rm:hover:not([disabled]){background:#FEF2F2;color:var(--red)}
+.sp-rm[disabled]{opacity:.35;cursor:default}
+.sp-err{grid-column:1/-1;margin-top:-4px}
+.sp-pr .fin{font-variant-numeric:tabular-nums}
+.sp-pr .fin:disabled{opacity:.6}
+.selbox select.bad{border-color:#F3A3A3;background:#FFF7F7}
+.sp-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:2px}
+.sp-total{font-family:'Manrope';font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.wz-sub{margin:-2px 0 14px}
+.wz-sec .cl-sec{margin-bottom:8px}
+.wz-note{display:block}
 
 /* KYC */
 .kyc-drop{display:flex;align-items:center;gap:12px;border:1.5px dashed #D6DBE1;border-radius:10px;padding:14px 16px;background:#FCFCFD;cursor:pointer}
@@ -2964,29 +2957,24 @@ tbody tr:hover{background:#FCFCFD}
 .ss-chc.on .ss-chk svg{opacity:1}
 .ss-chs,.ss-card,.ss-lbl,.wz-intro{flex-shrink:0}
 .ss-card{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-.ss-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px 10px 16px;background:#FAFBFC;border-bottom:1px solid var(--line)}
+.ss-card header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#FAFBFC;border-bottom:1px solid var(--line)}
 .ss-card header b{display:flex;align-items:center;gap:8px;font-family:'Manrope';font-size:14.5px;font-weight:800;color:var(--ink)}
 .ss-card header b svg{width:16px;height:16px;color:var(--orange)}
-.ss-tpl select,.ss-ins select{height:34px;font-size:12.5px;background:#fff;border:1px solid var(--line);padding:0 30px 0 11px;min-width:0}
-.ss-tpl{max-width:60%}
-.ss-tpl select{max-width:100%}
-.ss-rows{padding:0 16px}
-.ss-row{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line-soft);min-height:46px}
-.ss-row label{width:58px;flex-shrink:0;font-size:12.5px;font-weight:600;color:var(--mute)}
-.ss-row input{flex:1;min-width:0;height:44px;border:0;background:none;font:inherit;font-size:13.5px;color:var(--ink);outline:none}
-.ss-row:focus-within label{color:var(--orange-ink)}
-.ss-row.bad{background:#FFF7F7;margin:0 -16px;padding:0 16px}
-.ss-ccb{font-size:12px;font-weight:600;color:var(--mute);padding:4px 8px;border-radius:6px;white-space:nowrap}
-.ss-ccb:hover{background:#F2F4F7;color:var(--ink)}
+.ss-in{padding:16px;display:flex;flex-direction:column;gap:16px}
+.ss-lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;min-height:22px}
+.ss-lrow .flabel{margin-bottom:0}
+.ss-ccl{display:flex;gap:14px}
+.ss-ccl .linkbtn{padding:0;font-size:12px}
+.ss-codes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.ss-codes>span{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.ss-code{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--slate)}
+.ss-code:hover{border-color:var(--orange);color:var(--orange-ink);background:#FFFBF7}
 .ss-err{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--red);margin:6px 0}
-.ss-rows .ss-err{margin:6px 0 4px}
-.ss-msg{padding:12px 16px 16px}
-.ss-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .ss-seg{display:inline-flex;background:#F1F2F4;border-radius:8px;padding:3px}
-.ss-seg button{padding:6px 14px;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--mute)}
+.ss-seg button{padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;color:var(--mute)}
 .ss-seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.08)}
-.ss-area{width:100%;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);resize:vertical;background:#fff}
-.ss-area:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.ss-area{display:block}
+.ss-area.sms{min-height:84px}
 .ss-area.bad{border-color:#F3A3A3;background:#FFF7F7}
 .ss-mail{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#FCFCFD}
 .ss-mail b{display:block;font-size:14px;color:var(--ink)}
@@ -3052,7 +3040,7 @@ table.mini .tot td{font-weight:700;color:var(--ink)}
 .ntl-h b{color:var(--slate)}
 .ntl-i p{font-size:13.5px;line-height:1.55;color:var(--ink);margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
 @media (max-width:640px){
-  .sp-head{display:none}.sp-row{grid-template-columns:minmax(0,1fr) 36px}.sp-price{grid-column:1/2;grid-row:2}
+  .sp-row{grid-template-columns:minmax(0,1fr) 44px}.sp-svc{grid-column:1/-1}.sp-pr{grid-column:1/2}
   .cl-vbody .vsec{padding-left:18px;padding-right:18px}.svh-why{padding-left:0}
 }
 </style>
@@ -4293,45 +4281,76 @@ function cleanPrice(v){ return Math.round(Number(v)*100)/100; }
 /* the client details a letter is addressed to, kept with the letter so the signing page can show it */
 function snap(c){ return {name:c.name,type:c.type,entity:c.entity,email:c.email,address:c.address}; }
 
-/* ---------- service picker (Add Client step 2, Request Client, assign) ---------- */
+/* ---------- service picker (Add Client step 2, Request Client) ---------- */
+/* one entry per service: choose it, then set its price; the price in Settings → Services is the minimum */
+function blankSvc(){ return {svcId:null,name:'',price:'',adminPrice:0}; }
+function chosen(list){ return list.filter(function(x){ return x.svcId; }); }
+function minOf(x){ var s=svcById(x.svcId); return s?s.price:x.adminPrice; }
 function svcPickerHtml(list,errs){
   refreshCatalog();
   errs=errs||{};
-  var avail=activeServices().filter(function(s){ return !list.some(function(x){ return x.svcId===s.id; }); });
-  var h='<div class="sp">';
-  if(!list.length) h+='<div class="sp-empty">No services added yet. Choose one below, then add more if needed.</div>';
-  else h+='<div class="sp-head"><span>Service</span><span>Price (inc. GST)</span><span></span></div>'+list.map(function(x,i){
-    var changed=Number(x.price)!==Number(x.adminPrice);
-    return '<div class="sp-row"><div class="sp-name"><b>'+esc(x.name)+'</b><small>Admin price '+money(x.adminPrice)+(changed?' · <em>adjusted</em>':'')+'</small></div>'+
-      '<label class="sp-price'+(errs['p'+i]?' bad':'')+(canEditPrice()?'':' ro')+'"><span>$</span><input type="number" min="0" step="0.01" inputmode="decimal" data-sp-price="'+i+'" value="'+esc(x.price)+'"'+
-        (canEditPrice()?'':' readonly title="Only admins and managers can change prices"')+' aria-label="Price for '+esc(x.name)+'"></label>'+
-      '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove '+esc(x.name)+'">'+I.trash+'</button>'+
-      (errs['p'+i]?'<span class="cl-err sp-err">'+I.info+esc(errs['p'+i])+'</span>':'')+'</div>';
+  if(!list.length) list.push(blankSvc());
+  var act=activeServices(), edit=canEditPrice();
+  var h='<div class="sp">'+list.map(function(x,i){
+    var taken=list.filter(function(y,j){ return j!==i&&y.svcId; }).map(function(y){ return y.svcId; });
+    var opts=act.filter(function(s){ return taken.indexOf(s.id)<0||s.id===x.svcId; });
+    var es=errs['s'+i], ep=errs['p'+i], first=i===0;
+    return '<div class="sp-row">'+
+      '<div class="sp-svc"><label class="flabel'+(first?'':' sr')+'" for="sp-s'+i+'">Service</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
+        '<option value="">Choose a service</option>'+opts.map(function(s){ return '<option value="'+s.id+'"'+(s.id===x.svcId?' selected':'')+'>'+esc(s.name)+' · min '+money(s.price)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'+
+      '<div class="sp-pr"><label class="flabel'+(first?'':' sr')+'" for="sp-p'+i+'">Price (inc. GST)</label><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
+        (x.svcId?' min="'+minOf(x)+'" placeholder="'+minOf(x)+'"':' placeholder="0.00" disabled')+' value="'+esc(x.price)+'"'+(edit||!x.svcId?'':' readonly title="Only admins and managers can change prices"')+'></div>'+
+      '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove service '+(i+1)+'"'+(list.length===1&&!x.svcId?' disabled':'')+'>'+I.trash+'</button>'+
+      (es||ep?'<span class="cl-err sp-err">'+I.info+esc(es||ep)+'</span>':'')+'</div>';
   }).join('');
-  h+='<div class="sp-add"><span class="selbox"><select id="sp-sel" aria-label="Choose a service">'+
-      '<option value="">'+(avail.length?'Choose a service':'Every active service is already added')+'</option>'+
-      avail.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name)+' · '+money(s.price)+'</option>'; }).join('')+'</select>'+I.chev+'</span>'+
-    '<button type="button" class="pill-btn" id="sp-add"'+(avail.length?'':' disabled')+'>'+I.plus+(list.length?'Add more':'Add service')+'</button></div>';
-  if(list.length) h+='<div class="sp-total"><span>'+list.length+' service'+(list.length===1?'':'s')+'</span><b>Total '+money(totalOf(list))+'</b></div>';
+  var more=act.length>chosen(list).length, last=list[list.length-1];
+  h+='<div class="sp-foot"><button type="button" class="pill-btn quiet" id="sp-add"'+(more?'':' disabled')+(more?'':' title="Every active service is already added"')+'>'+I.plus+'Add another service</button>'+
+    (chosen(list).length?'<b class="sp-total">Total '+money(totalOf(chosen(list)))+'</b>':'')+'</div>';
   if(errs.list) h+='<span class="cl-err">'+I.info+esc(errs.list)+'</span>';
-  if(!canEditPrice()) h+='<p class="cl-hint">Prices come from Settings → Services. Only admins and managers can adjust them for a client.</p>';
+  if(!edit) h+='<p class="cl-hint">Prices come from Settings → Services. Only admins and managers can raise them for a client.</p>';
   return h+'</div>';
 }
-function wireSvcPicker(root,list,repaint,onChange){
-  root.querySelectorAll('[data-sp-price]').forEach(function(inp){
-    inp.oninput=function(){ list[+inp.dataset.spPrice].price=inp.value; var t=root.querySelector('.sp-total b'); if(t) t.textContent='Total '+money(totalOf(list)); if(onChange) onChange(); };
-    inp.onchange=function(){ repaint(); };
-  });
-  root.querySelectorAll('[data-sp-rm]').forEach(function(b){ b.onclick=function(){ list.splice(+b.dataset.spRm,1); if(onChange) onChange(); repaint(); }; });
-  var add=root.querySelector('#sp-add'), sel=root.querySelector('#sp-sel');
-  if(add) add.onclick=function(){
-    var s=svcById(+sel.value); if(!s){ sel.focus(); toast('Choose a service to add',true); return; }
-    list.push({svcId:s.id,name:s.name,price:s.price,adminPrice:s.price}); if(onChange) onChange(); repaint();
-  };
+/* paints the picker into `el` and keeps it live; errs is the caller's error object (only the picker's keys are touched) */
+function mountSvcPicker(el,list,errs,onChange){
+  function clear(){ Object.keys(errs).forEach(function(k){ if(/^(s|p)\d+$|^list$/.test(k)) delete errs[k]; }); }
+  function paint(){ el.innerHTML=svcPickerHtml(list,errs); wire(); }
+  function priceErr(x){ var v=Number(x.price), m=minOf(x);
+    if(String(x.price).trim()===''||isNaN(v)) return 'Enter a price';
+    return v<m?'The price can’t be below the minimum of '+money(m):''; }
+  function wire(){
+    el.querySelectorAll('[data-sp-svc]').forEach(function(sel){ sel.onchange=function(){
+      var i=+sel.dataset.spSvc, s=svcById(+sel.value), x=list[i];
+      if(s){ x.svcId=s.id; x.name=s.name; x.adminPrice=s.price; x.price=s.price; } else list[i]=blankSvc();
+      delete errs['s'+i]; delete errs['p'+i]; delete errs.list; if(onChange) onChange(); paint();
+      var p=el.querySelector('#sp-p'+i); if(p&&!p.disabled&&!p.readOnly) p.focus();
+    }; });
+    el.querySelectorAll('[data-sp-price]').forEach(function(inp){
+      var i=+inp.dataset.spPrice;
+      inp.oninput=function(){ list[i].price=inp.value; var t=el.querySelector('.sp-total'); if(t) t.textContent='Total '+money(totalOf(chosen(list))); if(onChange) onChange(); };
+      inp.onchange=function(){ var e=priceErr(list[i]); if(e) errs['p'+i]=e; else delete errs['p'+i]; paint(); };
+    });
+    el.querySelectorAll('[data-sp-rm]').forEach(function(b){ b.onclick=function(){ list.splice(+b.dataset.spRm,1); clear(); if(onChange) onChange(); paint(); }; });
+    var add=el.querySelector('#sp-add');
+    /* fills the next row on its own: the next service not yet added, at its minimum price (an empty last row is filled instead of adding another) */
+    if(add) add.onclick=function(){
+      var taken=chosen(list).map(function(y){ return y.svcId; }), nx=activeServices().filter(function(sv){ return taken.indexOf(sv.id)<0; })[0]; if(!nx) return;
+      var row=list[list.length-1]; if(!row||row.svcId){ row=blankSvc(); list.push(row); }
+      row.svcId=nx.id; row.name=nx.name; row.adminPrice=nx.price; row.price=nx.price;
+      clear(); if(onChange) onChange(); paint(); var s=el.querySelector('#sp-s'+(list.length-1)); if(s) s.focus();
+    };
+  }
+  paint();
+  return {paint:paint, check:function(){ clear(); var e=svcErrs(list); for(var k in e) errs[k]=e[k]; paint(); return !Object.keys(e).length; }};
 }
 function svcErrs(list){
-  var e={}; if(!list.length) e.list='Add at least one service';
-  list.forEach(function(x,i){ var v=Number(x.price); if(String(x.price).trim()===''||isNaN(v)||v<0) e['p'+i]='Enter a price of $0 or more'; });
+  var e={}, any=chosen(list).length;
+  list.forEach(function(x,i){
+    if(!x.svcId){ if(any||i>0) e['s'+i]='Choose a service, or remove this row'; else e['s'+i]='Choose at least one service'; return; }
+    var v=Number(x.price), m=minOf(x);
+    if(String(x.price).trim()===''||isNaN(v)) e['p'+i]='Enter a price';
+    else if(v<m) e['p'+i]='The price can’t be below the minimum of '+money(m);
+  });
+  if(!list.length) e.list='Add at least one service';
   return e;
 }
 function assignment(x,source,by,at){ return {aid:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),svcId:x.svcId,name:x.name,price:cleanPrice(x.price),adminPrice:x.adminPrice,at:at||Date.now(),by:by||ME,status:'active',source:source}; }
@@ -4423,13 +4442,14 @@ function sendScreen(body,foot,cfg){
   var et=EMAIL_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; }), stp=SMS_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; });
   var s={email:true,sms:true,eTpl:et[0].id,sTpl:stp[0].id,to:cfg.to.email||'',cc:'',bcc:'',subject:et[0].subject,body:et[0].body,smsTo:cfg.to.phone||'',smsBody:stp[0].body,errs:{},busy:false,fail:'',pv:false,last:'body'};
   var codes=SHORTCODES.filter(function(c){ return !(cfg.kind==='engagement'&&c[0]==='onboarding_link')&&!(cfg.kind==='onboarding'&&c[0]==='signing_link'); });
-  s.cc2=false; s.eMode='write'; s.sMode='write';
-  function tplSel(id,list,val){ return '<span class="selbox ss-tpl"><label class="sr" for="'+id+'">Template</label><select id="'+id+'">'+list.map(function(t){ return '<option value="'+t.id+'"'+(t.id===val?' selected':'')+'>'+esc(t.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span>'; }
-  function row(id,label,ph,extra){ var e=s.errs[id];
-    return '<div class="ss-row'+(e?' bad':'')+'"><label for="ss-'+id+'">'+label+'</label><input id="ss-'+id+'" data-ss="'+id+'" value="'+esc(s[id])+'" placeholder="'+esc(ph)+'" autocomplete="off">'+(extra||'')+'</div>'+
-      (e?'<p class="ss-err">'+I.info+esc(e)+'</p>':''); }
-  function insert(target){ return '<span class="selbox ss-ins"><label class="sr" for="ss-ins-'+target+'">Insert a field</label><select id="ss-ins-'+target+'" data-ins="'+target+'"><option value="">Insert field</option>'+
-    codes.map(function(c){ return '<option value="'+c[0]+'">'+esc(c[1])+'</option>'; }).join('')+'</select>'+I.chev+'</span>'; }
+  s.showCc=false; s.showBcc=false; s.eMode='write'; s.sMode='write';
+  function err(id){ return s.errs[id]?'<span class="cl-err">'+I.info+esc(s.errs[id])+'</span>':''; }
+  function tplSel(id,list,val){ return '<div class="ss-f"><label class="flabel" for="'+id+'">Template</label><span class="selbox"><select id="'+id+'">'+list.map(function(t){ return '<option value="'+t.id+'"'+(t.id===val?' selected':'')+'>'+esc(t.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'; }
+  function field(id,label,ph,extra){
+    return '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-'+id+'">'+label+'</label>'+(extra||'')+'</div>'+
+      '<input class="fin sm'+(s.errs[id]?' bad':'')+'" id="ss-'+id+'" data-ss="'+id+'" value="'+esc(s[id])+'" placeholder="'+esc(ph)+'" autocomplete="off">'+err(id)+'</div>'; }
+  /* shortcodes sit under the message: click one to put it where the cursor is */
+  function chips(target){ return '<div class="ss-codes" aria-label="Insert a shortcode"><span>Insert</span>'+codes.map(function(c){ return '<button type="button" class="ss-code" data-code="'+target+'|'+c[0]+'" title="Inserts {'+c[0]+'}">'+esc(c[1])+'</button>'; }).join('')+'</div>'; }
   function modes(key){ return '<div class="ss-seg" role="tablist">'+[['write','Write'],['preview','Preview']].map(function(m){ var on=s[key]===m[0]; return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-mode="'+key+'|'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'; }
   function chCard(key,icon,label,dest){
     var on=s[key];
@@ -4438,23 +4458,22 @@ function sendScreen(body,foot,cfg){
   }
   function paint(){
     var smsText=fillTpl(s.smsBody,cfg.ctx), segs=Math.max(1,Math.ceil(smsText.length/160));
-    var h=(cfg.intro||'')+'<div class="ss-lbl">Send by</div><div class="ss-chs">'+chCard('email',IC.mail,'Email',s.to)+chCard('sms',IC.phone,'SMS',s.smsTo)+'</div>'+
-      (s.errs.channel?'<p class="ss-err">'+I.info+esc(s.errs.channel)+'</p>':'');
-    if(s.email) h+='<section class="ss-card"><header><b>'+IC.mail+'Email</b>'+tplSel('ss-etpl',et,s.eTpl)+'</header>'+
-      '<div class="ss-rows">'+row('to','To','client@example.com',s.cc2||s.cc||s.bcc?'':'<button type="button" class="ss-ccb" id="ss-ccb">Cc / Bcc</button>')+
-        (s.cc2||s.cc||s.bcc?row('cc','Cc','Separate addresses with commas')+row('bcc','Bcc','Separate addresses with commas'):'')+
-        row('subject','Subject','Subject')+'</div>'+
-      '<div class="ss-msg"><div class="ss-bar">'+modes('eMode')+(s.eMode==='write'?insert('body'):'')+'</div>'+
-        (s.eMode==='write'?'<textarea class="ss-area'+(s.errs.body?' bad':'')+'" id="ss-body" data-ss="body" rows="10" aria-label="Email message">'+esc(s.body)+'</textarea>'
-          :'<div class="ss-mail"><b>'+esc(fillTpl(s.subject,cfg.ctx))+'</b><span>To '+esc(s.to||'—')+'</span><pre>'+esc(fillTpl(s.body,cfg.ctx))+'</pre></div>')+
-        (s.errs.body?'<p class="ss-err">'+I.info+esc(s.errs.body)+'</p>':'')+'</div></section>';
-    if(s.sms) h+='<section class="ss-card"><header><b>'+IC.phone+'SMS</b>'+tplSel('ss-stpl',stp,s.sTpl)+'</header>'+
-      '<div class="ss-rows">'+row('smsTo','To','04XX XXX XXX')+'</div>'+
-      '<div class="ss-msg"><div class="ss-bar">'+modes('sMode')+(s.sMode==='write'?insert('smsBody'):'')+'</div>'+
-        (s.sMode==='write'?'<textarea class="ss-area sms'+(s.errs.smsBody?' bad':'')+'" id="ss-smsBody" data-ss="smsBody" rows="3" aria-label="SMS message">'+esc(s.smsBody)+'</textarea>'
+    var cc=s.showCc||!!s.cc, bcc=s.showBcc||!!s.bcc;
+    var h=(cfg.intro||'')+'<div class="ss-lbl">Send by</div><div class="ss-chs">'+chCard('email',IC.mail,'Email',s.to)+chCard('sms',IC.phone,'SMS',s.smsTo)+'</div>'+err('channel');
+    if(s.email) h+='<section class="ss-card"><header><b>'+IC.mail+'Email</b></header><div class="ss-in">'+
+      tplSel('ss-etpl',et,s.eTpl)+
+      field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>')+
+      (cc?field('cc','Cc','Separate addresses with commas'):'')+(bcc?field('bcc','Bcc','Separate addresses with commas'):'')+
+      field('subject','Subject','Subject')+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-body">Message</label>'+modes('eMode')+'</div>'+
+        (s.eMode==='write'?'<textarea class="ftext ss-area'+(s.errs.body?' bad':'')+'" id="ss-body" data-ss="body" rows="10">'+esc(s.body)+'</textarea>'+chips('body')
+          :'<div class="ss-mail"><b>'+esc(fillTpl(s.subject,cfg.ctx))+'</b><span>To '+esc(s.to||'—')+'</span><pre>'+esc(fillTpl(s.body,cfg.ctx))+'</pre></div>')+err('body')+'</div></div></section>';
+    if(s.sms) h+='<section class="ss-card"><header><b>'+IC.phone+'SMS</b></header><div class="ss-in">'+
+      tplSel('ss-stpl',stp,s.sTpl)+field('smsTo','To','04XX XXX XXX')+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-smsBody">Message</label>'+modes('sMode')+'</div>'+
+        (s.sMode==='write'?'<textarea class="ftext ss-area sms'+(s.errs.smsBody?' bad':'')+'" id="ss-smsBody" data-ss="smsBody" rows="3">'+esc(s.smsBody)+'</textarea>'+chips('smsBody')
           :'<div class="ss-phone"><span class="ss-bubble">'+esc(smsText)+'</span></div>')+
-        '<div class="ss-cnt">'+smsText.length+' characters · '+segs+' SMS'+(segs>1?' messages':'')+'</div>'+
-        (s.errs.smsBody?'<p class="ss-err">'+I.info+esc(s.errs.smsBody)+'</p>':'')+'</div></section>';
+        '<div class="ss-cnt">'+smsText.length+' characters · '+segs+' SMS'+(segs>1?' messages':'')+'</div>'+err('smsBody')+'</div></div></section>';
     if(s.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent. Check the details and try again.</span></div>';
     body.innerHTML=h;
     foot.innerHTML='<button class="btn-ghost" id="ss-back"'+(s.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
@@ -4464,10 +4483,10 @@ function sendScreen(body,foot,cfg){
   function wire(){
     body.querySelectorAll('[data-ss]').forEach(function(el){
       el.oninput=function(){
-        s[el.dataset.ss]=el.value;
-        if(s.errs[el.dataset.ss]){ delete s.errs[el.dataset.ss]; var w=el.closest('.ss-row')||el; w.classList.remove('bad'); var nx=(el.closest('.ss-row')||el).nextElementSibling; if(nx&&nx.classList.contains('ss-err')) nx.remove(); }
-        if(el.dataset.ss==='smsBody'){ var t=fillTpl(s.smsBody,cfg.ctx), n=Math.max(1,Math.ceil(t.length/160)); body.querySelector('.ss-cnt').textContent=t.length+' characters · '+n+' SMS'+(n>1?' messages':''); }
-        if(el.dataset.ss==='to'||el.dataset.ss==='smsTo'){ var k=el.dataset.ss==='to'?'email':'sms', sm=body.querySelector('#ss-'+k).parentNode.querySelector('small'); if(sm) sm.textContent=el.value||'Add a recipient below'; }
+        var k=el.dataset.ss; s[k]=el.value;
+        if(s.errs[k]){ delete s.errs[k]; el.classList.remove('bad'); var nx=el.parentNode.querySelector('.cl-err'); if(nx) nx.remove(); }
+        if(k==='smsBody'){ var t=fillTpl(s.smsBody,cfg.ctx), n=Math.max(1,Math.ceil(t.length/160)); body.querySelector('.ss-cnt').textContent=t.length+' characters · '+n+' SMS'+(n>1?' messages':''); }
+        if(k==='to'||k==='smsTo'){ var sm=body.querySelector('#ss-'+(k==='to'?'email':'sms')).parentNode.querySelector('small'); if(sm) sm.textContent=el.value||'Add a recipient below'; }
       };
     });
     var ce=document.getElementById('ss-email'), cs=document.getElementById('ss-sms');
@@ -4475,13 +4494,16 @@ function sendScreen(body,foot,cfg){
     cs.onchange=function(){ s.sms=cs.checked; delete s.errs.channel; paint(); };
     var e1=document.getElementById('ss-etpl'); if(e1) e1.onchange=function(){ var t=et.filter(function(x){return x.id===e1.value;})[0]; s.eTpl=t.id; s.subject=t.subject; s.body=t.body; paint(); };
     var e2=document.getElementById('ss-stpl'); if(e2) e2.onchange=function(){ var t=stp.filter(function(x){return x.id===e2.value;})[0]; s.sTpl=t.id; s.smsBody=t.body; paint(); };
-    var cb=document.getElementById('ss-ccb'); if(cb) cb.onclick=function(){ s.cc2=true; paint(); var c=document.getElementById('ss-cc'); if(c) c.focus(); };
+    var c1=document.getElementById('ss-showcc'); if(c1) c1.onclick=function(){ s.showCc=true; paint(); document.getElementById('ss-cc').focus(); };
+    var c2=document.getElementById('ss-showbcc'); if(c2) c2.onclick=function(){ s.showBcc=true; paint(); document.getElementById('ss-bcc').focus(); };
     body.querySelectorAll('[data-mode]').forEach(function(b){ b.onclick=function(){ var p=b.dataset.mode.split('|'); s[p[0]]=p[1]; paint(); }; });
-    body.querySelectorAll('[data-ins]').forEach(function(sel){ sel.onchange=function(){
-      if(!sel.value) return;
-      var ta=document.getElementById('ss-'+sel.dataset.ins), code='{'+sel.value+'}', a=ta.selectionStart, z=ta.selectionEnd;
-      ta.value=ta.value.slice(0,a)+code+ta.value.slice(z); ta.focus(); ta.selectionStart=ta.selectionEnd=a+code.length; ta.oninput(); sel.value='';
-    }; });
+    body.querySelectorAll('[data-code]').forEach(function(b){
+      b.onmousedown=function(e){ e.preventDefault(); };          // keep the cursor in the message
+      b.onclick=function(){
+        var p=b.dataset.code.split('|'), ta=document.getElementById('ss-'+p[0]), code='{'+p[1]+'}', a=ta.selectionStart, z=ta.selectionEnd;
+        ta.value=ta.value.slice(0,a)+code+ta.value.slice(z); ta.focus(); ta.selectionStart=ta.selectionEnd=a+code.length; ta.oninput();
+      };
+    });
     document.getElementById('ss-back').onclick=function(){ if(!s.busy) cfg.back(); };
     document.getElementById('ss-send').onclick=send;
   }
@@ -4506,7 +4528,7 @@ function sendScreen(body,foot,cfg){
   }
   function send(){
     s.errs=validate(); s.fail='';
-    if(Object.keys(s.errs).length){ if(s.errs.body) s.eMode='write'; if(s.errs.smsBody) s.sMode='write'; if(s.errs.cc||s.errs.bcc) s.cc2=true; paint(); var b=body.querySelector('.ss-row.bad input, .ss-area.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
+    if(Object.keys(s.errs).length){ if(s.errs.body) s.eMode='write'; if(s.errs.smsBody) s.sMode='write'; if(s.errs.cc) s.showCc=true; if(s.errs.bcc) s.showBcc=true; paint(); var b=body.querySelector('.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
     s.busy=true; paint();
     var msg={email:s.email?{to:s.to.trim(),cc:s.cc,bcc:s.bcc,subject:fillTpl(s.subject,cfg.ctx),body:fillTpl(s.body,cfg.ctx),template:s.eTpl}:null,
              sms:s.sms?{to:fmtPhone(s.smsTo),body:fillTpl(s.smsBody,cfg.ctx),template:s.sTpl}:null};
@@ -4521,13 +4543,13 @@ function sendScreen(body,foot,cfg){
 }
 
 /* =========================================================
-   Add Client: details → services → KYC & notes → engagement letter
+   Add Client: details → services & KYC → engagement letter
 ========================================================= */
 var wiz=null;
-var WZ=[['Client details'],['Services'],['KYC & notes'],['Engagement letter']];
+var WZ=[['Client details'],['Services & KYC'],['Engagement letter']];
 function openWizard(){
   startForm(null); form.fromDetail=false;
-  wiz={step:1,services:[],files:[],note:'',topic:'Onboarding',sig:null,svcErr:{},sending:false};
+  wiz={step:1,services:[],files:[],note:'',sig:null,svcErr:{},sending:false};
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
     '<div class="modal-head wz-head"><div><h2 id="cf-t">Add Client</h2><ol class="wz-steps" id="wz-steps"></ol></div><button id="cf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="cfb"></div><div class="modal-foot" id="wz-foot"></div></div>');
@@ -4538,7 +4560,7 @@ function openWizard(){
 }
 function leaveWizard(){
   if(wiz&&wiz.step===1) readForm();
-  var dirty=form&&(form.dirty||wiz.services.length||wiz.files.length||wiz.note.trim());
+  var dirty=form&&(form.dirty||chosen(wiz.services).length||wiz.files.length||wiz.note.trim());
   var done=function(){ form=null; wiz=null; closeDrawer(); };
   if(!dirty){ done(); return; }
   confirmLeave(done);
@@ -4548,11 +4570,10 @@ function wzPaint(){
   st.innerHTML=WZ.map(function(x,i){ var n=i+1; return '<li class="'+(n===wiz.step?'on':n<wiz.step?'done':'')+'"><span>'+(n<wiz.step?I.tick:n)+'</span>'+x[0]+'</li>'; }).join('');
   body.scrollTop=0;
   var back='<button class="btn-ghost" id="wz-back">'+(wiz.step===1?'Cancel':'Back')+'</button><span class="sp-grow"></span>';
-  if(wiz.step===1){ renderForm(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Services</button>'; }
-  if(wiz.step===2){ paintSvcStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: KYC &amp; notes</button>'; }
-  if(wiz.step===3){ paintKycStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Engagement letter</button>'; }
-  if(wiz.step===4){ paintLetterStep(); return; }
-  document.getElementById('wz-back').onclick=function(){ if(wiz.step===1){ readForm(); leaveWizard(); return; } if(wiz.step===3) saveKycNote(); wiz.step--; wzPaint(); };
+  if(wiz.step===1){ renderForm(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Services &amp; KYC</button>'; }
+  if(wiz.step===2){ paintSvcStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next: Engagement letter</button>'; }
+  if(wiz.step===3){ paintLetterStep(); return; }
+  document.getElementById('wz-back').onclick=function(){ if(wiz.step===1){ readForm(); leaveWizard(); return; } saveKycNote(); wiz.step--; wzPaint(); };
   document.getElementById('wz-next').onclick=wzNext;
 }
 function wzNext(){
@@ -4560,27 +4581,33 @@ function wzNext(){
     readForm(); form.errs=validate();
     if(Object.keys(form.errs).length){ renderForm(); var b=formBody().querySelector('.bad, .alert-err'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast('Please fix the highlighted fields',true); return; }
   }
-  if(wiz.step===2){ wiz.svcErr=svcErrs(wiz.services); if(Object.keys(wiz.svcErr).length){ paintSvcStep(); toast('Check the services and prices',true); return; } }
-  if(wiz.step===3) saveKycNote();
+  if(wiz.step===2){
+    saveKycNote();
+    if(!wiz.picker.check()){ var b2=formBody().querySelector('#wz-sp .bad'); if(b2){ b2.scrollIntoView({block:'center'}); b2.focus(); } toast('Check the services and prices',true); return; }
+  }
   wiz.step++; wzPaint();
 }
+/* step 2: services, KYC documents and a note on one page */
 function paintSvcStep(){
-  var body=formBody(), d=form.d;
-  body.innerHTML='<div class="wz-intro"><b>Which services is '+esc(d.name||'this client')+' signing up for?</b><span>Prices start at the admin price set in Settings → Services. Each service is kept as its own record on the client.</span></div>'+
-    '<div id="wz-sp">'+svcPickerHtml(wiz.services,wiz.svcErr)+'</div>';
-  wireSvcPicker(body,wiz.services,function(){ wiz.svcErr={}; paintSvcStep(); },function(){ form.dirty=true; });
-}
-function paintKycStep(){
   var body=formBody();
-  body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+OI.shield+'KYC documents</div><span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span></div>'+
-      '<p class="cl-hint" style="margin:-4px 0 12px">Photo ID, proof of address, company extracts. Files are stored privately; only admins, managers and accountants can open them.</p>'+
-      dropZone('wz-kyc')+kycRows(wiz.files,{remove:true,empty:'No documents yet. You can also add them later from the client’s record.'})+'</section>'+
-    '<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+OI.note+'Notes</div></div>'+
-      '<label class="flabel" for="wz-note">Note</label><textarea class="ftext" id="wz-note" rows="4" maxlength="2000" placeholder="Anything the team should know about this client, their services or their ID check">'+esc(wiz.note)+'</textarea></section>';
-  wireDrop('wz-kyc',function(list){ acceptFiles(list).forEach(function(f){ wiz.files.push({file:f,name:f.name,type:f.type,size:f.size,at:Date.now(),by:ME}); }); form.dirty=true; saveKycNote(); paintKycStep(); });
-  body.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ saveKycNote(); wiz.files.splice(+b.dataset.krm,1); paintKycStep(); }; });
-  body.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kpv]); }; });
-  body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kdl],true); }; });
+  body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+I.tag+'Services</div></div>'+
+      '<p class="cl-hint wz-sub">Each service is kept as its own record on '+esc(form.d.name||'the client')+'. Prices can’t go below the minimum set in Settings → Services.</p>'+
+      '<div id="wz-sp"></div></section>'+
+    '<section class="wz-sec" id="wz-kyc-sec"></section>'+
+    '<section class="wz-sec"><div class="cl-sec"><label class="bsec" for="wz-note">'+OI.note+'Notes</label></div>'+
+      '<textarea class="ftext wz-note" id="wz-note" rows="4" maxlength="2000" placeholder="Anything the team should know about this client, their services or their ID check">'+esc(wiz.note)+'</textarea></section>';
+  wiz.picker=mountSvcPicker(document.getElementById('wz-sp'),wiz.services,wiz.svcErr,function(){ form.dirty=true; });
+  paintKyc();
+}
+function paintKyc(){
+  var sec=document.getElementById('wz-kyc-sec'); if(!sec) return;
+  sec.innerHTML='<div class="cl-sec"><div class="bsec">'+OI.shield+'KYC documents</div>'+(wiz.files.length?'<span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span>':'')+'</div>'+
+    '<p class="cl-hint wz-sub">Photo ID, proof of address, company extracts. Only admins, managers and accountants can open them.</p>'+
+    dropZone('wz-kyc')+kycRows(wiz.files,{remove:true,empty:'No documents yet. You can also add them later from the client’s record.'});
+  wireDrop('wz-kyc',function(list){ acceptFiles(list).forEach(function(f){ wiz.files.push({file:f,name:f.name,type:f.type,size:f.size,at:Date.now(),by:ME}); }); form.dirty=true; paintKyc(); });
+  sec.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ wiz.files.splice(+b.dataset.krm,1); paintKyc(); }; });
+  sec.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kpv]); }; });
+  sec.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kdl],true); }; });
 }
 function saveKycNote(){ var n=document.getElementById('wz-note'); if(n) wiz.note=n.value; }
 function wzClient(){ var d=form.d; return {name:d.name.trim(),type:d.type,entity:d.type==='company'?d.entity:'Individual',email:d.email.trim().toLowerCase(),address:d.address}; }
@@ -4592,7 +4619,7 @@ function paintLetterStep(){
   foot.innerHTML='<button class="btn-ghost" id="wz-back">Back</button><button class="linkbtn" id="wz-pdf">'+OI.print+'Open as PDF</button><span class="sp-grow"></span>'+
     (wiz.sig?'<button class="btn-ghost" id="wz-resign">Change signature</button><button class="btn-primary" id="wz-confirm">'+I.tick+'Confirm &amp; create client</button>'
             :'<button class="btn-ghost" id="wz-sign">'+OI.pen+'Sign manually</button><button class="btn-primary" id="wz-send">'+OI.send+'Send for signature</button>');
-  document.getElementById('wz-back').onclick=function(){ if(wiz.sig){ wiz.sig=null; paintLetterStep(); return; } wiz.step=3; wzPaint(); };
+  document.getElementById('wz-back').onclick=function(){ if(wiz.sig){ wiz.sig=null; paintLetterStep(); return; } wiz.step=2; wzPaint(); };
   document.getElementById('wz-pdf').onclick=function(){ printLetter(html); };
   var sign=function(){ signDialog(c.name,function(sig){ wiz.sig=sig; paintLetterStep(); }); };
   if(wiz.sig){ document.getElementById('wz-resign').onclick=sign; document.getElementById('wz-confirm').onclick=function(){ finalizeClient({mode:'signed',sig:wiz.sig}); }; }
@@ -4658,7 +4685,7 @@ function openRequest(){
 }
 function leaveRequest(){
   if(rq&&rq.step===1) rqRead();
-  var dirty=rq&&rq.step<3&&(rq.name||rq.email||rq.phone||rq.services.length);
+  var dirty=rq&&rq.step<3&&(rq.name||rq.email||rq.phone||chosen(rq.services).length);
   var done=function(){ rq=null; closeDrawer(); };
   if(!dirty) done(); else confirmLeave(done);
 }
@@ -4668,13 +4695,15 @@ function rqPaint(){
   document.getElementById('rq-steps').innerHTML=[['Client & services'],['Send request']].map(function(x,i){ var n=i+1; return '<li class="'+(n===rq.step?'on':n<rq.step?'done':'')+'"><span>'+(n<rq.step||rq.step===3?I.tick:n)+'</span>'+x[0]+'</li>'; }).join('');
   if(rq.step===1){
     var co=rq.type==='company', e=rq.errs, f=function(k,label,o){ o=o||{}; return '<div'+(o.span?' class="span2"':'')+'><label class="flabel" for="rq-'+k+'">'+label+' <span class="req">*</span></label><input class="fin sm'+(e[k]?' bad':'')+'" id="rq-'+k+'" value="'+esc(rq[k])+'"'+(o.ph?' placeholder="'+o.ph+'"':'')+(o.type?' type="'+o.type+'"':'')+' autocomplete="off">'+(e[k]?'<span class="cl-err">'+I.info+esc(e[k])+'</span>':'')+'</div>'; };
-    body.innerHTML='<div class="wz-intro"><b>Who are you inviting?</b><span>They’ll get a secure link to fill in the rest of their details, upload ID and sign the engagement letter themselves.</span></div>'+
+    body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+I.user+'Client</div></div>'+
+      '<p class="cl-hint wz-sub">They’ll get a secure link to add the rest of their details, upload ID and sign the engagement letter.</p>'+
       '<div class="seg-wrap"><p>Is this client a person or a business?</p><div class="seg" role="radiogroup" aria-label="Client type">'+[['individual','Individual'],['company','Company']].map(function(t){ var on=rq.type===t[0]; return '<button role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-rqt="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div></div>'+
-      '<div class="grid2" style="margin-top:18px">'+f('name',co?'Company name':'Client name',{span:true,ph:co?'e.g. Bright Spark Electrical Pty Ltd':'e.g. Liam Carter'})+f('email','Email address',{type:'email',ph:'client@example.com'})+f('phone','Mobile number',{ph:'04XX XXX XXX'})+'</div>'+
-      '<div class="cl-sec" style="margin-top:22px"><div class="bsec">'+I.tag+'Services requested</div></div><div id="rq-sp">'+svcPickerHtml(rq.services,e)+'</div>';
+      '<div class="grid2" style="margin-top:16px">'+f('name',co?'Company name':'Client name',{span:true,ph:co?'e.g. Bright Spark Electrical Pty Ltd':'e.g. Liam Carter'})+f('email','Email address',{type:'email',ph:'client@example.com'})+f('phone','Mobile number',{ph:'04XX XXX XXX'})+'</div></section>'+
+      '<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+I.tag+'Services</div></div>'+
+      '<p class="cl-hint wz-sub">Prices can’t go below the minimum set in Settings → Services.</p><div id="rq-sp"></div></section>';
     foot.innerHTML='<button class="btn-ghost" id="rq-back">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="rq-next">Next: Send request</button>';
     body.querySelectorAll('[data-rqt]').forEach(function(b){ b.onclick=function(){ rqRead(); rq.type=b.dataset.rqt; rqPaint(); }; });
-    wireSvcPicker(body,rq.services,function(){ rqRead(); rq.errs={}; rqPaint(); });
+    mountSvcPicker(document.getElementById('rq-sp'),rq.services,rq.errs);
     document.getElementById('rq-back').onclick=leaveRequest;
     document.getElementById('rq-next').onclick=function(){
       rqRead(); var er={};
@@ -4934,11 +4963,12 @@ function assignDialog(c,done){
     '<p class="cl-hint" id="as-h"></p><span class="cl-err" id="as-e" hidden></span></div>'+
     '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-primary" id="as-go">Assign service</button></div></div>');
   var sel=document.getElementById('as-s'), pr=document.getElementById('as-p');
-  sel.onchange=function(){ var s=svcById(+sel.value); pr.value=s?s.price:''; document.getElementById('as-h').textContent=s?'Admin price '+money(s.price)+(canEditPrice()?'. You can adjust it for this client.':'.'):''; };
+  sel.onchange=function(){ var s=svcById(+sel.value); pr.value=s?s.price:''; pr.min=s?s.price:0; document.getElementById('as-h').textContent=s?'Minimum '+money(s.price)+(canEditPrice()?'. You can raise it for this client.':'.'):''; };
   document.getElementById('as-go').onclick=function(){
     var s=svcById(+sel.value), e=document.getElementById('as-e'), v=Number(pr.value);
     if(!s){ e.innerHTML=I.info+'Choose a service'; e.hidden=false; return; }
-    if(pr.value===''||isNaN(v)||v<0){ e.innerHTML=I.info+'Enter a price of $0 or more'; e.hidden=false; return; }
+    if(pr.value===''||isNaN(v)){ e.innerHTML=I.info+'Enter a price'; e.hidden=false; return; }
+    if(v<s.price){ e.innerHTML=I.info+'The price can’t be below the minimum of '+money(s.price); e.hidden=false; return; }
     var a=assignment({svcId:s.id,name:s.name,price:v,adminPrice:s.price},'Assigned',ME);
     (c.services=c.services||[]).push(a); logEvent(c,'service','Service assigned',a.name+' · '+money(a.price));
     closeModal(); toast(a.name+' assigned'); done();
@@ -7577,6 +7607,19 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .drawer.ad .ad-head{padding-bottom:14px}
 .ad-privnote{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--faint)}
 /* break entries */
+.ad-bks{list-style:none;margin:0;padding:0}
+.ad-bk{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line-soft,#F1F2F4)}
+.ad-bk:first-child{border-top:0;padding-top:4px}
+.ad-bk-len{flex-shrink:0;width:64px;height:30px;border-radius:8px;background:#FFF7ED;color:#B45309;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.ad-bk-len.open{background:#ECFDF5;color:#047857}
+.ad-bk-main{flex:1;min-width:0}
+.ad-bk-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-height:30px;align-items:center}
+.ad-bk-h b{font-size:13.5px;font-weight:700;color:var(--ink)}
+.ad-bk-h span{font-size:12.5px;color:var(--mute);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ad-bk-q{display:flex;gap:8px;font-size:13px;line-height:1.45;color:var(--slate);margin-top:2px;overflow-wrap:anywhere}
+.ad-bk-q span{flex-shrink:0;width:42px;white-space:nowrap;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--faint);padding-top:2px}
+.ad-bk-grp{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint);margin:14px 0 2px}
+.ad-bk-grp:first-child{margin-top:0}
 .ad-brks{display:flex;flex-direction:column;gap:12px}
 .ad-brk{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .ad-brk-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
@@ -7957,14 +8000,21 @@ function breakHead(r,x){
   return '<div class="ad-brk-h"><b>Break '+b.n+(x.many?' <small>Shift '+x.shift+'</small>':'')+'</b>'+
     '<span>'+t12(b.s.at)+' – '+(b.e?t12(b.e.at):r.today&&!x.shiftEnd?'now':'not ended')+' · '+hm(len)+'</span></div>';
 }
-/* Details: each break with when it started and ended and the comments; its photos are in the Photos tab */
+/* Details: one row per break — length, time range once, then the two comments; its photos are in the Photos tab */
 function breaksSec(r){
   var list=breakList(r);
   if(!list.length) return '<p class="ad-none">No breaks were taken this day.</p>';
-  return '<div class="ad-brks">'+list.map(function(x){
-    var side=function(e,label){ return '<div class="ad-side"><figcaption><b>'+label+'</b><span>'+(e?t12(e.at):'—')+'</span></figcaption>'+(e&&e.note?'<p class="ad-q">“'+esc(e.note)+'”</p>':'')+'</div>'; };
-    return '<div class="ad-brk">'+breakHead(r,x)+'<div class="ad-brk-2">'+side(x.b.s,'Started')+side(x.b.e,'Ended')+'</div></div>';
-  }).join('')+'</div>';
+  var h='', last=0;
+  list.forEach(function(x){
+    var b=x.b, len=(b.e?b.e.at:(x.shiftEnd?x.shiftEnd.at:Date.now()))-b.s.at, open=!b.e;
+    if(x.many&&x.shift!==last){ h+=(last?'</ul>':'')+'<p class="ad-bk-grp">Shift '+x.shift+'</p><ul class="ad-bks">'; last=x.shift; }
+    else if(!x.many&&!last){ h+='<ul class="ad-bks">'; last=-1; }
+    var q=function(e,label){ return e&&e.note?'<p class="ad-bk-q"><span>'+label+'</span>“'+esc(e.note)+'”</p>':''; };
+    h+='<li class="ad-bk"><span class="ad-bk-len'+(open?' open':'')+'">'+hm(len)+'</span><div class="ad-bk-main">'+
+      '<div class="ad-bk-h"><b>Break '+b.n+'</b><span>'+t12(b.s.at)+' – '+(b.e?t12(b.e.at):r.today&&!x.shiftEnd?'now':'not ended')+'</span></div>'+
+      q(b.s,'Start')+q(b.e,'End')+'</div></li>';
+  });
+  return h+'</ul>';
 }
 function notesTab(cm){
   if(!cm.length) return '<p class="ad-none">No shift comments this day. Break comments are in the Breaks tab.</p>';

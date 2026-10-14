@@ -7807,7 +7807,7 @@ var I = {
   lock:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
 };
 var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-var STATES=[['done','Completed'],['late','Late'],['notended','Not ended'],['progress','In progress']];
+var STATES=[['done','Completed'],['notended','Not ended'],['progress','In progress']];
 var data=loadShift(), openDate=null;
 var state={f:blank(), page:1, per:10};
 function blank(){ return {q:'',month:'',status:''}; }
@@ -7988,12 +7988,10 @@ function openDay(date,keep,sec){
   if(!keep) document.getElementById('ar-x').focus();
 }
 function isBreakEv(e){ return e.type==='break_start'||e.type==='break_end'; }
-function lateBy(r){ var s=r.events.filter(function(e){ return e.type==='start'; })[0]; return s&&isLate(s.at)?s.at-new Date(s.at).setHours(SHIFT_STARTS[0],SHIFT_STARTS[1],0,0):0; }
 /* the one thing worth flagging about the day, if any */
 function alertBox(r,T){
-  var roster=pad(SHIFT_STARTS[0])+':'+pad(SHIFT_STARTS[1])+' AM', late=lateBy(r), h='';
+  var h='';
   if(!T.end&&!r.today) h+='<div class="ad-alert bad"><b>Worked time missing</b><span>The shift was never ended, so worked time can’t be worked out. Ask your manager to correct it.</span></div>';
-  if(late) h+='<div class="ad-alert warn"><b>Arrived '+(late<36e5?Math.round(late/60000)+' min':hm(late))+' late</b><span>Rostered start is '+roster+'.</span></div>';
   return h;
 }
 function row(k,v){ return '<div><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
@@ -8240,15 +8238,15 @@ function timerOf(s,T){ return s==='on'?T.cur:s==='break'?T.curBreak:0; }
 function lastStart(ev){ for(var i=ev.length-1;i>=0;i--) if(ev[i].type==='start') return ev[i].at; return null; }
 function caption(s,T){
   var today=T.shifts>1||(s!=='on'&&s!=='break')?' · today <b>'+hm(T.worked)+'</b>':'';
-  if(s==='off') return 'Rostered start <b>'+pad(SHIFT_STARTS[0])+':'+pad(SHIFT_STARTS[1])+' AM</b>';
+  if(s==='off') return '';                            // the badge already says Not started
   if(s==='break') return 'Break since <b>'+t12(lastBreak(data.today.events))+'</b>'+(T.shifts>1?today:' · worked <b>'+hm(T.worked)+'</b>');
   if(s==='ended') return 'Worked <b>'+hm(T.worked)+'</b> today'+(T.shifts>1?' over '+T.shifts+' shifts':' · '+t12(T.start)+' to '+t12(T.end));
   var st=lastStart(data.today.events);
-  return 'Started <b>'+t12(st)+'</b>'+(T.shifts===1&&isLate(st)?' · <b style="color:#B4690E">Late</b>':'')+(T.shifts>1?today:'');
+  return 'Started <b>'+t12(st)+'</b>'+(T.shifts>1?today:'');
 }
 function actions(s){
   var dis=busy?' disabled':'';
-  if(s==='off'||s==='ended') return '<button class="at-btn pri" data-act="start"'+dis+'>'+I.play+'Start Shift</button>';
+  if(s==='off') return '<button class="at-btn pri" data-act="start"'+dis+'>'+I.play+'Start Shift</button>';
   if(s==='on') return '<button class="at-btn sec" data-act="break_start"'+dis+'>'+I.coffee+'Break</button><button class="at-btn stop" data-act="end"'+dis+'>'+I.stop+'End Shift</button>';
   if(s==='break') return '<button class="at-btn pri" data-act="break_end"'+dis+'>'+I.back+'End Break</button>';
   return '';
@@ -8294,7 +8292,7 @@ function request(type){
   var s=data.today.status;
   if(!canDo(type,s)){
     toast(s==='break'&&type!=='break_end'?'End your break first.':
-          s==='off'||s==='ended'?'Start your shift first.':'That action isn’t available right now.',true);
+          s==='ended'?'Your shift has ended for today.':s==='off'?'Start your shift first.':'That action isn’t available right now.',true);
     render(); return;
   }
   if(a.note||type==='start') return askNote(type);   // the start note is optional
@@ -8525,7 +8523,6 @@ render();
    Shared by the app shell (header timer), Dashboard (shift actions) and Attendance (records).
    Prototype store: this browser's localStorage; the server is the record once one is connected. */
 var SHIFT_KEY = 'aad-attendance-v2';
-var SHIFT_STARTS = [9,0], LATE_AFTER_MIN = 15;     // rostered 09:00, late after 09:15
 var ME = { name:'John Doe', role:'Admin', id:'KPG1000', branch:'Blacktown Sydney', initials:'JD' };
 
 /* the four actions, the state each one starts from, and whether it needs a comment */
@@ -8650,15 +8647,14 @@ function totals(events,now){
   return {start:first,end:open?null:last,brk:brk,worked:worked,onBreak:bOpen!=null,breaks:breaks,shifts:shifts,cur:cur,curBreak:curBreak};
 }
 /* an action is allowed from its starting state; a new shift can also start after the last one ended */
-function canDo(type,s){ return ACTIONS[type].from===s || (type==='start'&&s==='ended'); }
-function isLate(ts){ var d=new Date(ts), lim=new Date(ts); lim.setHours(SHIFT_STARTS[0],SHIFT_STARTS[1]+LATE_AFTER_MIN,0,0); return d>lim; }
-/* one word for how a day went: progress, notended, late or done */
+function canDo(type,s){ return ACTIONS[type].from===s; }   // one shift a day: once it ends it can't be started again
+/* one word for how a day went: progress, notended or done (no Late: there's no roster to measure it against) */
 function dayState(day,isToday){
   var T=totals(day.events,Date.now());
   if(!T.end) return isToday?'progress':'notended';
-  return isLate(T.start)?'late':'done';
+  return 'done';
 }
-var DAY_STATE = { done:['','Completed'], late:['late','Late'], notended:['no','Not ended'], progress:['open','In progress'] };
+var DAY_STATE = { done:['','Completed'], notended:['no','Not ended'], progress:['open','In progress'] };
 
 /* a day's events as a timeline, each with its comment and any attached documents */
 function shiftTimeline(events,empty,bare){                   // bare: times only, when comments and files are listed elsewhere

@@ -2978,7 +2978,7 @@ tbody tr:hover{background:#FCFCFD}
 .ss-lrow .flabel{margin-bottom:0}
 .ss-ccl{display:flex;gap:14px}
 .ss-ccl .linkbtn{padding:0;font-size:12px}
-.ss-codes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.ss-codes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px}
 .ss-codes>span{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--faint);margin-right:2px}
 .ss-code{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--slate)}
 .ss-code:hover{border-color:var(--orange);color:var(--orange-ink);background:#FFFBF7}
@@ -2987,6 +2987,18 @@ tbody tr:hover{background:#FCFCFD}
 .ss-seg button{padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;color:var(--mute)}
 .ss-seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.08)}
 .ss-area{display:block}
+.ss-rte{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+.ss-rte:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.ss-rte.bad{border-color:#F3A3A3}
+.ss-tools{display:flex;gap:2px;padding:5px 6px;border-bottom:1px solid var(--line);background:#FAFBFC}
+.ss-tb{width:30px;height:28px;border-radius:6px;font-size:14px;color:var(--slate);font-family:Georgia,serif}
+.ss-tb:hover{background:#EEF0F3;color:var(--ink)}
+.ss-tb.on{background:var(--orange-soft);color:var(--orange-ink)}
+.ss-bold{font-weight:800}.ss-italic{font-style:italic}.ss-underline{text-decoration:underline}
+.ss-ed{min-height:220px;max-height:420px;overflow-y:auto;padding:12px 14px;font-size:14px;line-height:1.6;color:var(--ink);outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
+.ss-html{font-size:13.5px;line-height:1.6;color:var(--ink);overflow-wrap:anywhere}
+.ss-rmf{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--mute);padding:2px 6px;border-radius:6px}
+.ss-rmf svg{width:11px;height:11px}.ss-rmf:hover{background:#FEF2F2;color:var(--red)}
 .ss-area.sms{min-height:84px}
 .ss-area.bad{border-color:#F3A3A3;background:#FFF7F7}
 .ss-mail{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#FCFCFD}
@@ -4493,14 +4505,22 @@ function sendScreen(body,foot,cfg){
   var s={email:true,sms:true,eTpl:et[0].id,sTpl:stp[0].id,to:cfg.to.email||'',cc:'',bcc:'',subject:et[0].subject,body:et[0].body,smsTo:cfg.to.phone||'',smsBody:stp[0].body,errs:{},busy:false,fail:'',pv:false,last:'body'};
   var codes=SHORTCODES.filter(function(c){ return !(cfg.kind==='engagement'&&c[0]==='onboarding_link')&&!(cfg.kind==='onboarding'&&c[0]==='signing_link'); });
   s.showCc=false; s.showBcc=false; s.eMode='write'; s.sMode='write';
+  /* the email is written in a small rich-text editor (bold, italic, underline); templates are plain text, so lines become <br> */
+  function toHtml(t){ return esc(t).replace(/\n/g,'<br>'); }
+  function fillHtml(h){ return String(h||'').replace(/\{([a-z_]+)\}/g,function(m){ var v=fillTpl(m,cfg.ctx); return v===m?m:esc(v).replace(/\n/g,'<br>'); }); }
+  s.bodyHtml=toHtml(s.body);
+  var REQ=' <span class="req">*</span>';
   function err(id){ return s.errs[id]?'<span class="cl-err">'+I.info+esc(s.errs[id])+'</span>':''; }
-  function tplSel(id,list,val){ return '<div class="ss-f"><label class="flabel" for="'+id+'">Template</label><span class="selbox"><select id="'+id+'">'+list.map(function(t){ return '<option value="'+t.id+'"'+(t.id===val?' selected':'')+'>'+esc(t.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'; }
-  function field(id,label,ph,extra){
-    return '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-'+id+'">'+label+'</label>'+(extra||'')+'</div>'+
+  function tplSel(id,list,val){ return '<div class="ss-f"><label class="flabel" for="'+id+'">Template'+REQ+'</label><span class="selbox"><select id="'+id+'">'+list.map(function(t){ return '<option value="'+t.id+'"'+(t.id===val?' selected':'')+'>'+esc(t.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'; }
+  function field(id,label,ph,extra,req){
+    return '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-'+id+'">'+label+(req?REQ:'')+'</label>'+(extra||'')+'</div>'+
       '<input class="fin sm'+(s.errs[id]?' bad':'')+'" id="ss-'+id+'" data-ss="'+id+'" value="'+esc(s[id])+'" placeholder="'+esc(ph)+'" autocomplete="off">'+err(id)+'</div>'; }
-  /* shortcodes sit under the message: click one to put it where the cursor is */
-  function chips(target){ return '<div class="ss-codes" aria-label="Insert a shortcode"><span>Insert</span>'+codes.map(function(c){ return '<button type="button" class="ss-code" data-code="'+target+'|'+c[0]+'" title="Inserts {'+c[0]+'}">'+esc(c[1])+'</button>'; }).join('')+'</div>'; }
+  function rmBtn(k,label){ return '<button type="button" class="ss-rmf" data-rmf="'+k+'" aria-label="Remove '+label+'">'+I.close+'Remove</button>'; }
+  /* shortcodes sit above the message: click one to put it where the cursor is */
+  function chips(target){ return '<div class="ss-codes" aria-label="Insert a shortcode"><span>Shortcodes</span>'+codes.map(function(c){ return '<button type="button" class="ss-code" data-code="'+target+'|'+c[0]+'" title="Inserts {'+c[0]+'}">'+esc(c[1])+'</button>'; }).join('')+'</div>'; }
   function modes(key){ return '<div class="ss-seg" role="tablist">'+[['write','Write'],['preview','Preview']].map(function(m){ var on=s[key]===m[0]; return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-mode="'+key+'|'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'; }
+  function toolbar(){ return '<div class="ss-tools" role="toolbar" aria-label="Formatting">'+[['bold','B','Bold (Ctrl+B)'],['italic','I','Italic (Ctrl+I)'],['underline','U','Underline (Ctrl+U)']].map(function(t){
+    return '<button type="button" class="ss-tb ss-'+t[0]+'" data-fmt="'+t[0]+'" title="'+t[2]+'" aria-label="'+t[0]+'" aria-pressed="false">'+t[1]+'</button>'; }).join('')+'</div>'; }
   function chCard(key,icon,label,dest){
     var on=s[key];
     return '<label class="ss-chc'+(on?' on':'')+'"><input type="checkbox" id="ss-'+key+'"'+(on?' checked':'')+'><span class="ss-chi">'+icon+'</span>'+
@@ -4512,16 +4532,17 @@ function sendScreen(body,foot,cfg){
     var h=(cfg.intro||'')+'<div class="ss-lbl">Send by</div><div class="ss-chs">'+chCard('email',IC.mail,'Email',s.to)+chCard('sms',IC.phone,'SMS',s.smsTo)+'</div>'+err('channel');
     if(s.email) h+='<section class="ss-card"><header><b>'+IC.mail+'Email</b></header><div class="ss-in">'+
       tplSel('ss-etpl',et,s.eTpl)+
-      field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>')+
-      (cc?field('cc','Cc','Separate addresses with commas'):'')+(bcc?field('bcc','Bcc','Separate addresses with commas'):'')+
-      field('subject','Subject','Subject')+
-      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-body">Message</label>'+modes('eMode')+'</div>'+
-        (s.eMode==='write'?'<textarea class="ftext ss-area'+(s.errs.body?' bad':'')+'" id="ss-body" data-ss="body" rows="10">'+esc(s.body)+'</textarea>'+chips('body')
-          :'<div class="ss-mail"><b>'+esc(fillTpl(s.subject,cfg.ctx))+'</b><span>To '+esc(s.to||'—')+'</span><pre>'+esc(fillTpl(s.body,cfg.ctx))+'</pre></div>')+err('body')+'</div></div></section>';
+      field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>',true)+
+      (cc?field('cc','Cc','Separate addresses with commas',rmBtn('cc','Cc')):'')+(bcc?field('bcc','Bcc','Separate addresses with commas',rmBtn('bcc','Bcc')):'')+
+      field('subject','Subject','Subject','',true)+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Message'+REQ+'</label>'+modes('eMode')+'</div>'+
+        (s.eMode==='write'?chips('body')+'<div class="ss-rte'+(s.errs.body?' bad':'')+'">'+toolbar()+
+            '<div class="ss-ed" id="ss-body" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ss-body-l" tabindex="0">'+s.bodyHtml+'</div></div>'
+          :'<div class="ss-mail"><b>'+esc(fillTpl(s.subject,cfg.ctx))+'</b><span>To '+esc(s.to||'—')+'</span><div class="ss-html">'+fillHtml(s.bodyHtml)+'</div></div>')+err('body')+'</div></div></section>';
     if(s.sms) h+='<section class="ss-card"><header><b>'+IC.phone+'SMS</b></header><div class="ss-in">'+
-      tplSel('ss-stpl',stp,s.sTpl)+field('smsTo','To','04XX XXX XXX')+
-      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-smsBody">Message</label>'+modes('sMode')+'</div>'+
-        (s.sMode==='write'?'<textarea class="ftext ss-area sms'+(s.errs.smsBody?' bad':'')+'" id="ss-smsBody" data-ss="smsBody" rows="3">'+esc(s.smsBody)+'</textarea>'+chips('smsBody')
+      tplSel('ss-stpl',stp,s.sTpl)+field('smsTo','To','04XX XXX XXX','',true)+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-smsBody">Message'+REQ+'</label>'+modes('sMode')+'</div>'+
+        (s.sMode==='write'?chips('smsBody')+'<textarea class="ftext ss-area sms'+(s.errs.smsBody?' bad':'')+'" id="ss-smsBody" data-ss="smsBody" rows="3">'+esc(s.smsBody)+'</textarea>'
           :'<div class="ss-phone"><span class="ss-bubble">'+esc(smsText)+'</span></div>')+
         '<div class="ss-cnt">'+smsText.length+' characters · '+segs+' SMS'+(segs>1?' messages':'')+'</div>'+err('smsBody')+'</div></div></section>';
     if(s.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent. Check the details and try again.</span></div>';
@@ -4530,28 +4551,45 @@ function sendScreen(body,foot,cfg){
       '<button class="btn-primary" id="ss-send"'+(s.busy?' disabled':'')+'>'+(s.busy?'<span class="spin"></span>Sending…':OI.send+(cfg.sendLabel||'Send'))+'</button>';
     wire();
   }
+  function clearErr(k,el){ if(!s.errs[k]) return; delete s.errs[k]; var box=el.closest('.ss-rte')||el; box.classList.remove('bad'); var nx=el.closest('.ss-f').querySelector('.cl-err'); if(nx) nx.remove(); }
   function wire(){
     body.querySelectorAll('[data-ss]').forEach(function(el){
       el.oninput=function(){
-        var k=el.dataset.ss; s[k]=el.value;
-        if(s.errs[k]){ delete s.errs[k]; el.classList.remove('bad'); var nx=el.parentNode.querySelector('.cl-err'); if(nx) nx.remove(); }
+        var k=el.dataset.ss; s[k]=el.value; clearErr(k,el);
         if(k==='smsBody'){ var t=fillTpl(s.smsBody,cfg.ctx), n=Math.max(1,Math.ceil(t.length/160)); body.querySelector('.ss-cnt').textContent=t.length+' characters · '+n+' SMS'+(n>1?' messages':''); }
         if(k==='to'||k==='smsTo'){ var sm=body.querySelector('#ss-'+(k==='to'?'email':'sms')).parentNode.querySelector('small'); if(sm) sm.textContent=el.value||'Add a recipient below'; }
       };
     });
+    var ed=document.getElementById('ss-body');
+    if(ed){
+      var sync=function(){ s.bodyHtml=ed.innerHTML; s.body=ed.innerText.replace(/ /g,' '); clearErr('body',ed); };
+      var states=function(){ body.querySelectorAll('[data-fmt]').forEach(function(b){ var on=false; try{ on=document.queryCommandState(b.dataset.fmt); }catch(x){} b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }); };
+      ed.oninput=sync; ed.onkeyup=ed.onmouseup=states; ed.onfocus=states;
+      ed.onpaste=function(ev){ ev.preventDefault(); var t=(ev.clipboardData||window.clipboardData).getData('text/plain'); document.execCommand('insertText',false,t); };   // plain text only
+      body.querySelectorAll('[data-fmt]').forEach(function(b){
+        b.onmousedown=function(ev){ ev.preventDefault(); };
+        b.onclick=function(){ if(document.activeElement!==ed) ed.focus(); document.execCommand(b.dataset.fmt,false,null); sync(); states(); };
+      });
+    }
     var ce=document.getElementById('ss-email'), cs=document.getElementById('ss-sms');
     ce.onchange=function(){ s.email=ce.checked; delete s.errs.channel; paint(); };
     cs.onchange=function(){ s.sms=cs.checked; delete s.errs.channel; paint(); };
-    var e1=document.getElementById('ss-etpl'); if(e1) e1.onchange=function(){ var t=et.filter(function(x){return x.id===e1.value;})[0]; s.eTpl=t.id; s.subject=t.subject; s.body=t.body; paint(); };
+    var e1=document.getElementById('ss-etpl'); if(e1) e1.onchange=function(){ var t=et.filter(function(x){return x.id===e1.value;})[0]; s.eTpl=t.id; s.subject=t.subject; s.body=t.body; s.bodyHtml=toHtml(t.body); paint(); };
     var e2=document.getElementById('ss-stpl'); if(e2) e2.onchange=function(){ var t=stp.filter(function(x){return x.id===e2.value;})[0]; s.sTpl=t.id; s.smsBody=t.body; paint(); };
     var c1=document.getElementById('ss-showcc'); if(c1) c1.onclick=function(){ s.showCc=true; paint(); document.getElementById('ss-cc').focus(); };
     var c2=document.getElementById('ss-showbcc'); if(c2) c2.onclick=function(){ s.showBcc=true; paint(); document.getElementById('ss-bcc').focus(); };
+    body.querySelectorAll('[data-rmf]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.rmf; s[k]=''; delete s.errs[k]; if(k==='cc') s.showCc=false; else s.showBcc=false; paint(); }; });
     body.querySelectorAll('[data-mode]').forEach(function(b){ b.onclick=function(){ var p=b.dataset.mode.split('|'); s[p[0]]=p[1]; paint(); }; });
     body.querySelectorAll('[data-code]').forEach(function(b){
-      b.onmousedown=function(e){ e.preventDefault(); };          // keep the cursor in the message
+      b.onmousedown=function(e){ e.preventDefault(); };          // keep the cursor where it is
       b.onclick=function(){
-        var p=b.dataset.code.split('|'), ta=document.getElementById('ss-'+p[0]), code='{'+p[1]+'}', a=ta.selectionStart, z=ta.selectionEnd;
-        ta.value=ta.value.slice(0,a)+code+ta.value.slice(z); ta.focus(); ta.selectionStart=ta.selectionEnd=a+code.length; ta.oninput();
+        var p=b.dataset.code.split('|'), el=document.getElementById('ss-'+p[0]), code='{'+p[1]+'}';
+        if(el.isContentEditable){
+          if(document.activeElement!==el){ el.focus(); var r=document.createRange(); r.selectNodeContents(el); r.collapse(false); var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+          document.execCommand('insertText',false,code); el.oninput();
+        } else {
+          var a=el.selectionStart, z=el.selectionEnd; el.value=el.value.slice(0,a)+code+el.value.slice(z); el.focus(); el.selectionStart=el.selectionEnd=a+code.length; el.oninput();
+        }
       };
     });
     document.getElementById('ss-back').onclick=function(){ if(!s.busy) cfg.back(); };
@@ -4580,7 +4618,7 @@ function sendScreen(body,foot,cfg){
     s.errs=validate(); s.fail='';
     if(Object.keys(s.errs).length){ if(s.errs.body) s.eMode='write'; if(s.errs.smsBody) s.sMode='write'; if(s.errs.cc) s.showCc=true; if(s.errs.bcc) s.showBcc=true; paint(); var b=body.querySelector('.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
     s.busy=true; paint();
-    var msg={email:s.email?{to:s.to.trim(),cc:s.cc,bcc:s.bcc,subject:fillTpl(s.subject,cfg.ctx),body:fillTpl(s.body,cfg.ctx),template:s.eTpl}:null,
+    var msg={email:s.email?{to:s.to.trim(),cc:s.cc,bcc:s.bcc,subject:fillTpl(s.subject,cfg.ctx),body:fillTpl(s.body,cfg.ctx),html:fillHtml(s.bodyHtml),template:s.eTpl}:null,
              sms:s.sms?{to:fmtPhone(s.smsTo),body:fillTpl(s.smsBody,cfg.ctx),template:s.sTpl}:null};
     deliver(msg).then(function(r){
       s.busy=false;

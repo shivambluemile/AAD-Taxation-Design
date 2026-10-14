@@ -2724,7 +2724,16 @@ tbody tr:hover{background:#FCFCFD}
 .dir-head b{font-size:14px;font-weight:600}
 .dir-acts{margin-left:auto;display:flex;align-items:center;gap:14px}
 .dir-body{padding:16px}
-.copyrow{display:flex;justify-content:flex-end;margin-bottom:-8px}
+.copychk{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink)}
+.copychk input{width:17px;height:17px;accent-color:var(--orange);margin:0}
+.copychk small{flex-basis:100%;padding-left:27px;font-size:12px;font-weight:400;color:var(--faint)}
+.fin[readonly]{background:#F6F7F9!important;color:var(--slate);cursor:default}
+.btabs .tab-n.ok,.btabs button.on .tab-n.ok{background:#DCFCE7;color:#15803D;gap:3px}
+.btabs .tab-n.ok svg{width:11px;height:11px}
+.ob-ticks{display:flex;flex-wrap:wrap;gap:6px}
+.ob-tick{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font-size:11.5px;font-weight:600;background:#F1F2F4;color:var(--faint);white-space:nowrap}
+.ob-tick svg{width:11px;height:11px}
+.ob-tick.on{background:#DCFCE7;color:#15803D}
 .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:4px 0}
 .linkbtn:hover:not([disabled]){text-decoration:underline;text-underline-offset:2px}
 .linkbtn.danger{color:var(--red)}
@@ -3511,11 +3520,11 @@ function renderList(){
      selHtml('lf-entity','All Entity Types',[['Individual','Individual']].concat(ENTITY_TYPES.map(function(e){return [e,e];})),state.fEntity)+
      selHtml('lf-status','All Status',[['active','Active'],['inactive','Inactive']],state.fStatus)+
      '<button class="clearf" id="clearf"'+(filtersActive()?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card cl-table"><table><thead><tr><th>Name</th><th>Contact info</th><th>Entity type</th><th>ABN</th><th class="c">Status</th><th class="c">Actions</th></tr></thead><tbody>';
+  h+='<div class="card cl-table"><table><thead><tr><th>Name</th><th>Contact info</th><th>Entity type</th><th>ABN</th><th>KYC &amp; letter</th><th class="c">Status</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!CLIENTS.length){
-    h+='<tr><td colspan="6"><div class="empty"><h3>No clients yet</h3><p>Add your first individual or company client to get started.</p><button class="btn-primary" id="add2">'+I.plus+'Add Client</button></div></td></tr>';
+    h+='<tr><td colspan="7"><div class="empty"><h3>No clients yet</h3><p>Add your first individual or company client to get started.</p><button class="btn-primary" id="add2">'+I.plus+'Add Client</button></div></td></tr>';
   } else if(!page.length){
-    h+='<tr><td colspan="6"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clearf2">Clear filters</button></div></td></tr>';
+    h+='<tr><td colspan="7"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clearf2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(c){
     var co=c.type==='company';
@@ -3528,6 +3537,8 @@ function renderList(){
       '</span></td>'+
       '<td class="nowrap">'+esc(c.entity)+'</td>'+
       '<td class="nowrap mask" style="color:var(--ink)">'+(c.abn?esc(fmtABN(c.abn)):'<span class="cl-muted">--</span>')+'</td>'+
+      '<td><span class="ob-ticks">'+(kycDone(c)?'<span class="ob-tick on" title="KYC documents uploaded">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')+
+        (letterSignedFor(c)?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>')+'</span></td>'+
       '<td class="c"><span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span></td>'+
       '<td class="c"><span class="acts">'+
         '<button class="act" data-view="'+c.id+'" title="View" aria-label="View '+esc(c.name)+'">'+I.eye+'</button>'+
@@ -3583,13 +3594,15 @@ function resetCell(d){
     '<button class="btn-ghost btn-sm" data-reset="'+d.id+'">'+I.key+'Reset password</button>';
 }
 
+function kycDone(c){ return (c.kyc||[]).length>0; }
+function letterSignedFor(c){ var l=letterFor(c.id); return !!(l&&l.status==='signed'); }   // generated or sent isn't enough
 function detailTabs(c){
   var t=[], act=(c.services||[]).filter(function(a){ return a.status==='active'; }).length;
+  t.push(['notes','Notes',(c.notes||[]).length]);            // notes come first
   t.push(['services','Services',act]);
   if(c.type==='company') t.push(['directors','Directors',c.directors.length]);
-  t.push(['documents','KYC documents',(c.kyc||[]).length]);
-  t.push(['notes','Notes',(c.notes||[]).length]);
-  t.push(['engagement','Engagement letter']);
+  t.push(['documents','KYC documents',(c.kyc||[]).length,kycDone(c)]);
+  t.push(['engagement','Engagement letter',null,letterSignedFor(c)]);
   t.push(['activity','Activities']);
   return t;
 }
@@ -3634,7 +3647,8 @@ function openDetail(id,swap,tab){
        (co?'':'<button class="btn-ghost btn-sm" id="cd-pw">Manage Password</button>')+
        '<button class="x" id="cd-x" aria-label="Close">'+I.close+'</button></div>'+'</div>'+
      '<div class="btabs" role="tablist" aria-label="Client details">'+tabs.map(function(t){
-       return '<button role="tab" id="ct-'+t[0]+'" data-tab="'+t[0]+'" aria-controls="cdb">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>';
+       return '<button role="tab" id="ct-'+t[0]+'" data-tab="'+t[0]+'" aria-controls="cdb">'+t[1]+
+         (t[3]?'<span class="tab-n ok" title="'+(t[0]==='engagement'?'Signed':'Documents uploaded')+'">'+I.tick+(t[2]!=null?t[2]:'')+'</span>':t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>';
      }).join('')+'</div>'+
      '<div class="cl-vbody" id="cdb" role="tabpanel" tabindex="0"></div>'+
    '</div>';
@@ -3833,7 +3847,8 @@ function startForm(id){
   };
   ['abn','tfn','acn'].forEach(function(k){ d[k]=d[k]?(k==='abn'?fmtABN(d[k]):k==='tfn'?fmtTFN(d[k]):fmtACN(d[k])):''; });
   d.directors.forEach(function(x){ x.abn=x.abn?fmtABN(x.abn):''; x.tfn=x.tfn?fmtTFN(x.tfn):''; });
-  form={id:id,src:src,d:d,dirty:false,errs:{},search:'',scrollTo:null};
+  form={id:id,src:src,d:d,dirty:false,errs:{},search:'',scrollTo:null,
+    same:!!(src&&d.commEmail&&d.commEmail===d.email&&d.commPhone===d.phone)};   // communication details copied from the primary ones
 }
 function formBody(){ return document.getElementById('cfb'); }
 // fromDetail: opened from the details panel, so Cancel and Save go back to it
@@ -3862,7 +3877,7 @@ function field(key,label,val,o){
   return '<div'+(o.span?' class="span2"':'')+'><label class="flabel" for="'+id+'">'+label+(o.req?' <span class="req">*</span>':'')+'</label>'+
     '<input class="fin sm'+(err?' bad':'')+'" id="'+id+'" data-k="'+key+'" value="'+esc(val)+'"'+
       (o.ph?' placeholder="'+esc(o.ph)+'"':'')+(o.max?' maxlength="'+o.max+'"':'')+(o.mode?' inputmode="'+o.mode+'"':'')+(o.type?' type="'+o.type+'"':'')+
-      (o.auto?' autocomplete="'+o.auto+'"':'')+(err?' aria-invalid="true"':'')+'>'+
+      (o.auto?' autocomplete="'+o.auto+'"':'')+(o.ro?' readonly':'')+(err?' aria-invalid="true"':'')+'>'+
     (err?'<span class="cl-err">'+I.info+esc(err)+'</span>':(o.hint?'<p class="cl-hint">'+o.hint+'</p>':''))+'</div>';
 }
 function getK(key){ var p=key.split('.'), d=form.d; if(p[0]==='dir') return d.directors[+p[1]][p[2]]; if(p[0]==='addr') return d.address[p[1]]; return d[key]; }
@@ -3870,6 +3885,7 @@ function setK(key,v){ var p=key.split('.'), d=form.d; if(p[0]==='dir') d.directo
 function readForm(){
   if(!formBody()) return;
   formBody().querySelectorAll('[data-k]').forEach(function(el){ setK(el.dataset.k, el.value); });
+  if(form.same){ form.d.commEmail=form.d.email; form.d.commPhone=form.d.phone; }
   var s=document.getElementById('addr-search'); if(s) form.search=s.value;
 }
 
@@ -3891,7 +3907,7 @@ function renderForm(){
        var on=d.type===t[0]; return '<button role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-type="'+t[0]+'">'+t[1]+'</button>';
      }).join('')+'</div></div>';
 
-  var copyRow='<div class="copyrow"><button class="linkbtn" id="copy-primary">'+I.copy+'Copy from primary</button></div>';
+  var copyRow='<label class="copychk"><input type="checkbox" id="copy-primary"'+(f.same?' checked':'')+'><span>Copy from primary</span><small>Use the primary email and phone for communication</small></label>';
   var addrBlock=
     '<div><label class="flabel" for="addr-search">Search address</label><div class="addr-search">'+
       '<input class="fin sm" id="addr-search" placeholder="Search address" autocomplete="off" value="'+esc(f.search)+'"><span class="ico">'+I.search+'</span><div id="sugg"></div></div></div>'+
@@ -3903,8 +3919,8 @@ function renderForm(){
       field('addr.postcode','Postcode',d.address.postcode,{req:true,ph:'e.g. 3000',mode:'numeric',max:4,auto:'off'})+
     '</div>';
   var commBlock=copyRow+'<div class="grid2">'+
-      field('commEmail','Communication email',d.commEmail,{ph:'name@example.com',type:'email',auto:'off'})+
-      field('commPhone','Communication phone',d.commPhone,{ph:'04XX XXX XXX',mode:'tel',auto:'off'})+
+      field('commEmail','Communication email',d.commEmail,{ph:'name@example.com',type:'email',auto:'off',ro:f.same})+
+      field('commPhone','Communication phone',d.commPhone,{ph:'04XX XXX XXX',mode:'tel',auto:'off',ro:f.same})+
     '</div>';
 
   if(!co){
@@ -3988,11 +4004,16 @@ function wireForm(){
     };
   });
   var cp=document.getElementById('copy-primary');
-  if(cp) cp.onclick=function(){
+  if(cp) cp.onchange=function(){
     readForm();
-    if(!d.email.trim() && !d.phone.trim()){ toast('Enter the primary email and phone first',true); return; }
-    d.commEmail=d.email; d.commPhone=d.phone; delete f.errs.commEmail; delete f.errs.commPhone; f.dirty=true; repaint();
+    if(cp.checked&&!d.email.trim()&&!d.phone.trim()){ cp.checked=false; toast('Enter the primary email and phone first',true); return; }
+    f.same=cp.checked;
+    if(f.same){ d.commEmail=d.email; d.commPhone=d.phone; delete f.errs.commEmail; delete f.errs.commPhone; }
+    f.dirty=true; repaint();
   };
+  // while the box is ticked, typing in the primary email or phone updates the communication fields too
+  ['email','phone'].forEach(function(k){ var el=document.getElementById('f-'+k); if(el) el.addEventListener('input',function(){
+    if(!f.same) return; var t=document.getElementById('f-comm'+k[0].toUpperCase()+k.slice(1)); if(t) t.value=el.value; }); });
   var ad=document.getElementById('add-dir');
   if(ad) ad.onclick=function(){
     readForm(); if(d.directors.length>=MAX_DIRECTORS) return;
@@ -11575,6 +11596,10 @@ button{background:none;border:0;cursor:pointer}
 .card>p.sub{font-size:13.5px;color:var(--mute);margin-bottom:20px;line-height:1.5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .span2{grid-column:1/-1}
+.same{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;font-size:13.5px;font-weight:600;color:var(--ink);cursor:pointer}
+.same input{width:17px;height:17px;accent-color:var(--orange);margin:0}
+.same small{flex-basis:100%;padding-left:27px;font-size:12px;font-weight:400;color:var(--mute)}
+.in[readonly]{background:#F6F7F9;color:#475569}
 .grid3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-top:16px}
 label.l{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px}
 .req{color:var(--orange)}.opt{font-weight:500;color:var(--faint)}
@@ -11731,7 +11756,7 @@ function paint(){
   app.innerHTML=h; wire(); window.scrollTo(0,0);
 }
 function fld(k,label,val,o){ o=o||{}; var er=errs[k]; return '<div'+(o.span?' class="span2"':'')+'><label class="l" for="p-'+k.replace(/\./g,'-')+'">'+label+(o.opt?' <span class="opt">(optional)</span>':' <span class="req">*</span>')+'</label>'+
-  '<input class="in'+(er?' bad':'')+'" id="p-'+k.replace(/\./g,'-')+'" data-k="'+k+'" value="'+e(val)+'"'+(o.ph?' placeholder="'+e(o.ph)+'"':'')+(o.mode?' inputmode="'+o.mode+'"':'')+(o.type?' type="'+o.type+'"':'')+' autocomplete="'+(o.auto||'off')+'">'+
+  '<input class="in'+(er?' bad':'')+'" id="p-'+k.replace(/\./g,'-')+'" data-k="'+k+'" value="'+e(val)+'"'+(o.ph?' placeholder="'+e(o.ph)+'"':'')+(o.mode?' inputmode="'+o.mode+'"':'')+(o.type?' type="'+o.type+'"':'')+(o.ro?' readonly':'')+' autocomplete="'+(o.auto||'off')+'">'+
   (er?'<span class="err">'+e(er)+'</span>':o.hint?'<p class="hint">'+o.hint+'</p>':'')+'</div>'; }
 function sel(k,label,opts,val){ var er=errs[k]; return '<div><label class="l" for="p-'+k.replace(/\./g,'-')+'">'+label+' <span class="req">*</span></label><select class="in'+(er?' bad':'')+'" id="p-'+k.replace(/\./g,'-')+'" data-k="'+k+'"><option value="">Select</option>'+opts.map(function(o){ return '<option'+(o===val?' selected':'')+'>'+o+'</option>'; }).join('')+'</select>'+(er?'<span class="err">'+e(er)+'</span>':'')+'</div>'; }
 function getK(k){ var p=k.split('.'); if(p[0]==='dir') return f.directors[+p[1]][p[2]]; if(p[0]==='addr') return f.address[p[1]]; return f[k]; }
@@ -11742,7 +11767,8 @@ function detailsStep(co){
   else h+=fld('name','Full name',f.name,{span:true,auto:'name'});
   h+=fld('email','Email address',f.email,{type:'email',auto:'email'})+fld('phone','Phone number',f.phone,{mode:'tel',auto:'tel'})+
      fld('abn','ABN',f.abn,{mode:'numeric',ph:'e.g. 51 824 753 556'})+fld('tfn','TFN',f.tfn,{mode:'numeric',ph:'e.g. 123 456 789',hint:'Your tax file number is stored securely and shown masked to our team.'})+
-     fld('commEmail','Email for correspondence',f.commEmail,{opt:true,type:'email'})+fld('commPhone','Phone for correspondence',f.commPhone,{opt:true,mode:'tel'})+'</div>'+
+     '<label class="same span2"><input type="checkbox" id="p-same"'+(f.same?' checked':'')+'> Copy from primary <small>Use the email and phone above for correspondence</small></label>'+
+     fld('commEmail','Email for correspondence',f.commEmail,{opt:true,type:'email',ro:f.same})+fld('commPhone','Phone for correspondence',f.commPhone,{opt:true,mode:'tel',ro:f.same})+'</div>'+
      '<div class="sec">Address</div><div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+'</div>'+
      '<div class="grid3">'+fld('addr.suburb','Suburb',a.suburb)+sel('addr.state','State',STATES,a.state)+fld('addr.postcode','Postcode',a.postcode,{mode:'numeric'})+'</div>';
   if(co){
@@ -11788,7 +11814,7 @@ function reviewStep(co){
   if(errs.submit) h+='<div class="note bad"><span>'+e(errs.submit)+'</span></div>';
   return h;
 }
-function read(){ app.querySelectorAll('[data-k]').forEach(function(el){ setK(el.dataset.k,el.value); }); }
+function read(){ app.querySelectorAll('[data-k]').forEach(function(el){ setK(el.dataset.k,el.value); }); if(f.same){ f.commEmail=f.email; f.commPhone=f.phone; } }
 function wire(){
   app.querySelectorAll('[data-k]').forEach(function(el){ el.oninput=function(){ setK(el.dataset.k,el.value); }; el.onchange=function(){ setK(el.dataset.k,el.value); if(el.dataset.k==='entity'){ paint(); } }; });
   app.querySelectorAll('[data-go]').forEach(function(b){ b.onclick=function(){ read(); go(+b.dataset.go); }; });
@@ -11796,6 +11822,8 @@ function wire(){
   var nx=document.getElementById('nx'); if(nx) nx.onclick=function(){ read(); if(step===1){ autoFill(); paint(); } if(!checkStep(step)) return; go(step+1); };
   var sv=document.getElementById('sv'); if(sv) sv.onclick=function(){ read(); persist(true); };
   var sb=document.getElementById('sb'); if(sb) sb.onclick=submit;
+  var sm=document.getElementById('p-same'); if(sm) sm.onchange=function(){ read(); f.same=sm.checked; if(f.same){ f.commEmail=f.email; f.commPhone=f.phone; } paint(); };
+  ['email','phone'].forEach(function(k){ var el=document.getElementById('p-'+k); if(el) el.addEventListener('input',function(){ if(!f.same) return; var t=document.getElementById('p-comm'+k[0].toUpperCase()+k.slice(1)); if(t) t.value=el.value; }); });
   var ad=document.getElementById('addd'); if(ad) ad.onclick=function(){ read(); f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''}); paint(); };
   app.querySelectorAll('[data-rmd]').forEach(function(b){ b.onclick=function(){ read(); f.directors.splice(+b.dataset.rmd,1); errs={}; paint(); }; });
   if(step===2) wireDocs();

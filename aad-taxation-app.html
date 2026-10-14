@@ -6935,7 +6935,7 @@ if(!Array.isArray(savedLeaves)) LEAVES.forEach(function(l){
 
 renderList();
 /* Attendance → "Apply for leave": the shell passes {staff, from} */
-window.AADApplyLeave=function(pre){ if(overlay.classList.contains('open')) return; openForm(null,false,pre); };
+window.AADApplyLeave=function(pre){ if(overlay.classList.contains('open')) closeDrawer(); if(pre&&pre.view){ if(leaveById(pre.view)) openDetail(pre.view); else toast('This leave request no longer exists.',true); return; } openForm(null,false,pre); };
 try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('leave'); if(want) window.AADApplyLeave(want); }catch(e){}
 })();
 
@@ -7650,6 +7650,15 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
 .drawer.ad{max-width:580px}
+.state.leave i{background:#8B5CF6}
+.db-lv{color:#6D28D9}.db-lv b{color:#6D28D9}
+.confirm-body .ol-ic{background:#F3EEFF;color:#6D28D9}
+.ad-chip.leave{background:#F3EEFF;color:#6D28D9}
+.ad-date.lv{background:#F3EEFF;color:#6D28D9}
+.ar-lv{font-weight:600;color:#6D28D9}
+.ar-onlv{display:block;margin-top:3px;font-size:11.5px;font-weight:600;color:#B45309}
+.ar-table tr.ar-leave td{background:#FCFAFF}
+.ar-table tr.ar-leave:hover td{background:#F7F2FF}
 .ar-table tr.ar-row{cursor:pointer}
 .ar-table tr.ar-row:hover td{background:#FAFBFC}
 .confirm-body .dt-ic{background:#EEF4FF;color:#2563EB}
@@ -7913,7 +7922,7 @@ var I = {
   lock:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
 };
 var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
-var STATES=[['done','Completed'],['notended','Not ended'],['progress','In progress']];
+var STATES=[['done','Completed'],['notended','Not ended'],['progress','In progress'],['leave','On leave']];
 var data=loadShift(), openDate=null;
 var state={f:blank(), page:1, per:10};
 function blank(){ return {q:'',month:'',status:'',staff:''}; }
@@ -7924,13 +7933,15 @@ var TEAM=[{id:ME.id,n:ME.name,div:'Admin'},{id:'KPG1001',n:'Alexender Doe',div:'
   {id:'KPG1003',n:'Marthew',div:'Accountant'},{id:'KPG1004',n:'Harry Potter',div:'Receptionist'},{id:'KPG1009',n:'Priya Nair',div:'Bookkeeping'},{id:'KPG1010',n:'Daniel Wu',div:'Accountant'}];
 function member(id){ return TEAM.filter(function(m){ return m.id===id; })[0]||{id:id,n:id,div:''}; }
 /* other staff members' days (the signed-in person's own days stay in the shift store the Dashboard writes) */
-var TEAM_KEY='aad-attendance-team-v1';
+window.addEventListener('storage',function(e){ if(e.key==='aad-leave-v1'&&!document.querySelector('.drawer.sf')) render(); });   // approvals in Leave show up here straight away
+var TEAM_KEY='aad-attendance-team-v2';   // v2: sample shifts skip approved leave days
 function dayStart(k){ return fromKey(k).getTime(); }
 function seedTeam(){
   var base=seedShiftHistory().slice(0,12), out=[];
   TEAM.slice(1).forEach(function(m,k){
     base.forEach(function(d,i){
       if((i+k)%6===5) return;                                    // a day off now and then
+      if(leaveOn(m.id,d.date)) return;                          // no sample shift on a day they're on leave
       var tpl=base[(i+k*3)%base.length], shift=(k*6-12)*60000;   // someone else's pattern, a few minutes earlier or later
       out.push({staff:m.id,date:d.date,events:tpl.events.map(function(e){
         var c=JSON.parse(JSON.stringify(e)); c.at=dayStart(d.date)+(e.at-dayStart(tpl.date))+shift; if(c.brk) c.brk='b-'+(dayStart(d.date)+(+c.brk.slice(2)-dayStart(tpl.date))+shift);
@@ -7956,20 +7967,27 @@ function days(){
   all=all.concat(data.history).map(function(r){ return {staff:ME.id,date:r.date,events:r.events,today:!!r.today,meta:r.meta,mine:true}; });
   if(canManage()) team.days.forEach(function(r){ all.push({staff:r.staff,date:r.date,events:r.events,today:r.date===tk,meta:r.meta,mine:false}); });
   all.forEach(function(r){ r.key=r.staff+'|'+r.date; });
+  var byKey={}; all.forEach(function(r){ byKey[r.key]=r; });
+  approvedLeave().forEach(function(l){
+    if(!canManage()&&l.staff!==ME.id) return;
+    leaveDates(l).forEach(function(dt){ if(dt>tk) return; var k=l.staff+'|'+dt;
+      if(byKey[k]) byKey[k].onLeave=l; else { var row={staff:l.staff,date:dt,events:[],today:dt===tk,mine:l.staff===ME.id,isLeave:true,leave:l,key:k}; byKey[k]=row; all.push(row); } });
+  });
   return all.sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:(a.mine?-1:b.mine?1:member(a.staff).n<member(b.staff).n?-1:1); });
 }
 function monthLabel(k){ var p=k.split('-'); return MONTHS[+p[1]-1]+' '+p[0]; }
 function notes(r){ return r.events.filter(function(e){ return e.note; }); }
 function files(r){ var out=[]; r.events.forEach(function(e){ (e.files||[]).forEach(function(f){ out.push(f); }); }); return out; }
+function stateOf(r){ return r.isLeave?'leave':dayState(r,!!r.today); }
 function anyFilter(f){ return !!(f.q.trim()||f.month||f.status||f.staff); }
 function filtered(){
   var f=state.f, q=f.q.trim().toLowerCase();
   return days().filter(function(r){
     if(f.month&&r.date.slice(0,7)!==f.month) return false;
-    if(f.status&&dayState(r,!!r.today)!==f.status) return false;
+    if(f.status&&stateOf(r)!==f.status) return false;
     if(f.staff&&r.staff!==f.staff) return false;
     if(!q) return true;
-    var d=fromKey(r.date), hay=[dmy(d),weekday(d),member(r.staff).n,r.staff].concat(notes(r).map(function(e){return e.note;}),files(r).map(function(x){return x.n;})).join(' ').toLowerCase();
+    var d=fromKey(r.date), hay=[dmy(d),weekday(d),member(r.staff).n,r.staff,r.leave?leaveName(r.leave):'',r.onLeave?'on leave':''].concat(notes(r).map(function(e){return e.note;}),files(r).map(function(x){return x.n;})).join(' ').toLowerCase();
     return hay.indexOf(q)>=0;
   });
 }
@@ -8018,8 +8036,16 @@ function render(){
     h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(r){
-    var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[dayState(r,!!r.today)], n=notes(r), fl=files(r), last=n[n.length-1];
-    var who=member(r.staff);
+    var who=member(r.staff), dash='<span class="ar-dash">—</span>';
+    if(r.isLeave){ var ld=fromKey(r.date);
+      h+='<tr class="ar-row ar-leave" data-row="'+r.key+'">'+
+        (mg?'<td><button class="name-link" data-view="'+r.key+'"><span class="name">'+esc(who.n)+'</span></button><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
+        '<td><button class="name-link" data-view="'+r.key+'" aria-label="View leave for '+esc(who.n)+', '+dmy(ld)+'"><span class="name">'+dmy(ld)+'</span></button><small class="ar-sub">'+weekday(ld)+(r.today?' · Today':'')+'</small></td>'+
+        '<td class="num">'+dash+'</td><td class="num">'+dash+'</td><td class="num">'+dash+'</td><td class="num">'+dash+'</td>'+
+        '<td class="nowrap"><span class="state leave"><i></i>On leave</span></td>'+
+        '<td><span class="ar-lv">'+esc(leaveName(r.leave))+'</span><small class="ar-sub">Approved'+(r.leave.decidedBy?' by '+esc(r.leave.decidedBy):'')+'</small></td><td>'+dash+'</td></tr>';
+      return; }
+    var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[stateOf(r)], n=notes(r), fl=files(r), last=n[n.length-1];
     h+='<tr class="ar-row'+(r.today&&r.mine?' ar-today':'')+'" data-row="'+r.key+'">'+
       (mg?'<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+esc(who.n)+'</span></button><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
       '<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
@@ -8027,7 +8053,7 @@ function render(){
       '<td class="num">'+(T.end?t12(T.end):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="num">'+hm(T.brk)+(T.breaks>1?'<small class="ar-sub">'+T.breaks+' breaks</small>':'')+'</td>'+
       '<td class="num">'+(T.end||r.today?hm(T.worked):'<span class="ar-dash">—</span>')+'</td>'+
-      '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span></td>'+
+      '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span>'+(r.onLeave?'<small class="ar-onlv" title="'+esc(leaveName(r.onLeave))+' was approved for this day">On leave this day</small>':'')+'</td>'+
       '<td>'+(last?'<button class="ar-cmt" data-view="'+r.key+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.key+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '</tr>';   // the date opens the day, so no separate View action
@@ -8066,7 +8092,8 @@ function exportCsv(){
   var mg=canManage(), out=[(mg?['Staff','Staff ID']:[]).concat(['Date','Day','Shift Start','Shift End','Break','Worked','Status','Comments','Documents'])];
   rows.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date);
-    out.push((mg?[member(r.staff).n,r.staff]:[]).concat([dmy(d),weekday(d),T.start?t12(T.start):'',T.end?t12(T.end):'',hm(T.brk),T.end||r.today?hm(T.worked):'',DAY_STATE[dayState(r,!!r.today)][1],
+    if(r.isLeave){ out.push((mg?[member(r.staff).n,r.staff]:[]).concat([dmy(d),weekday(d),'','','','','On leave',leaveName(r.leave)+(r.leave.reason?': '+r.leave.reason:''),''])); return; }
+    out.push((mg?[member(r.staff).n,r.staff]:[]).concat([dmy(d),weekday(d),T.start?t12(T.start):'',T.end?t12(T.end):'',hm(T.brk),T.end||r.today?hm(T.worked):'',DAY_STATE[stateOf(r)][1]+(r.onLeave?' (on leave this day)':''),
       r.events.filter(function(e){return e.note;}).map(function(e){ return ACTIONS[e.type].ev+': '+e.note; }).join(' | '),
       files(r).map(function(x){return x.n;}).join(' | ')]));
   });
@@ -8100,6 +8127,7 @@ function shiftsOf(events){
 var dayTab='details';
 function openDay(key,keep,sec){
   var r=dayOf(key); if(!r){ closeDay(); return; }
+  if(r.isLeave) return openLeaveDay(r);
   if(!keep||openDate!==key) dayTab='details';
   openDate=key;
   var T=totals(r.events,Date.now()), d=fromKey(r.date), who=member(r.staff);
@@ -8140,17 +8168,41 @@ function openDay(key,keep,sec){
   [].forEach.call(ov.querySelectorAll('[data-dtab]'),function(b){ b.onclick=function(){ dayTab=b.getAttribute('data-dtab'); openDay(openDate,true); document.getElementById('adt-'+dayTab).focus(); }; });
   if(!keep) document.getElementById('ar-x').focus();
 }
+/* a day on approved leave: what kind, the whole request, who approved it, and a way to open it in Leave */
+function openLeaveDay(r){
+  var l=r.leave, d=fromKey(r.date), who=member(r.staff), days=leaveDates(l), dash='<span class="ar-dash">—</span>';
+  openDate=r.key;
+  ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="ad-t">'+
+    '<div class="ad-head"><div class="ad-who"><div class="ad-date lv"><b>'+pad(d.getDate())+'</b><span>'+MONTHS[d.getMonth()].slice(0,3)+'</span></div>'+
+      '<div><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><p>'+esc(who.n)+' · '+esc(who.id)+(r.today?' · Today':'')+'</p></div></div>'+
+      '<button class="x" id="ar-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="ad-tools"><button class="btn-ghost sm" id="ad-lvopen">'+I.cal+'View in Leave</button></div>'+
+    '<div class="ad-body" id="ad-body"><span class="ad-chip leave"><i></i>On leave</span>'+
+      '<section class="ad-sec"><h3>Leave details</h3><dl class="ad-rows">'+
+        row('Type','<b>'+esc(leaveName(l))+'</b>')+
+        row('Dates',dmy(fromKey(l.from))+(l.to!==l.from?' to '+dmy(fromKey(l.to)):''))+
+        row('Working days',days.length+' · '+(Math.round(days.length*LEAVE_DAY_HOURS*10)/10)+' h')+
+        row('Approved',(l.decidedBy?esc(l.decidedBy):dash)+(l.decidedAt?' · '+dmy(new Date(l.decidedAt)):''))+
+      '</dl></section>'+
+      (l.reason?'<section class="ad-sec"><h3>Reason</h3><div class="ad-notes"><figure><blockquote>“'+esc(l.reason)+'”</blockquote></figure></div></section>':'')+
+      '<p class="ad-privnote">Leave isn’t counted as worked time. Changes to this request are made in Leave.</p>'+
+    '</div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('ar-x').onclick=closeDay; document.getElementById('ar-x').focus();
+  document.getElementById('ad-lvopen').onclick=function(){ closeDay(); try{ parent.AADApplyLeave({view:l.id}); }catch(x){} };
+}
 function isBreakEv(e){ return e.type==='break_start'||e.type==='break_end'; }
 /* the one thing worth flagging about the day, if any */
 function alertBox(r,T){
   var h='';
+  if(r.onLeave) h+='<div class="ad-alert warn"><b>On approved leave this day</b><span>'+esc(leaveName(r.onLeave))+(r.onLeave.from!==r.onLeave.to?', '+dmy(fromKey(r.onLeave.from))+' to '+dmy(fromKey(r.onLeave.to)):'')+'. A shift was still recorded.</span></div>';
   if(!T.end&&!r.today) h+='<div class="ad-alert bad"><b>Worked time missing</b><span>The shift was never ended, so worked time can’t be worked out. Ask your manager to correct it.</span></div>';
   return h;
 }
 function row(k,v){ return '<div><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
 /* Details tab: status, anything to flag, then the shift times and totals */
 function detailsTab(r,T){
-  var st=DAY_STATE[dayState(r,!!r.today)], dash='<span class="ar-dash">—</span>', sh=shiftsOf(r.events), many=sh.length>1;
+  var st=DAY_STATE[stateOf(r)], dash='<span class="ar-dash">—</span>', sh=shiftsOf(r.events), many=sh.length>1;
   var manual=r.events.some(function(e){ return e.how==='prototype'; });
   var endTxt=T.end?t12(T.end):r.today?'<small>Still on shift</small>':dash;
   var h='<span class="ad-chip '+(st[0]||'ok')+'"><i></i>'+st[1]+'</span>'+alertBox(r,T)+'<section class="ad-sec"><h3>Shift details</h3><dl class="ad-rows">';
@@ -8324,7 +8376,8 @@ function paintShiftForm(){
 function saveShiftForm(){
   var d=sf.d, e={}, today=dayKey();
   if(!d.date) e.date='Choose the date'; else if(d.date>today) e.date='A shift can’t be added for a future date';
-  if(!sf.key&&d.date&&!e.date&&dayOf(d.staff+'|'+d.date)) e.date=member(d.staff).n+' already has a shift on '+dmy(fromKey(d.date))+'. Open it to edit it instead.';
+  var exist=!sf.key&&d.date&&!e.date&&dayOf(d.staff+'|'+d.date);
+  if(exist&&!exist.isLeave) e.date=member(d.staff).n+' already has a shift on '+dmy(fromKey(d.date))+'. Open it to edit it instead.';
   if(!d.start) e.start='Enter the start time';
   if(!d.end&&d.date!==today) e.end='Enter the end time';
   if(d.start&&d.end&&d.end<=d.start) e.end='The end time must be after the start time';
@@ -8506,7 +8559,7 @@ function timerOf(s,T){ return s==='on'?T.cur:s==='break'?T.curBreak:0; }
 function lastStart(ev){ for(var i=ev.length-1;i>=0;i--) if(ev[i].type==='start') return ev[i].at; return null; }
 function caption(s,T){
   var today=T.shifts>1||(s!=='on'&&s!=='break')?' · today <b>'+hm(T.worked)+'</b>':'';
-  if(s==='off') return '';                            // the badge already says Not started
+  if(s==='off'){ var lv=leaveOn(ME.id,dayKey()); return lv?'<span class="db-lv">You’re on leave today · <b>'+esc(leaveName(lv))+'</b></span>':''; }   // the badge already says Not started
   if(s==='break') return 'Break since <b>'+t12(lastBreak(data.today.events))+'</b>'+(T.shifts>1?today:' · worked <b>'+hm(T.worked)+'</b>');
   if(s==='ended') return 'Worked <b>'+hm(T.worked)+'</b> today'+(T.shifts>1?' over '+T.shifts+' shifts':' · '+t12(T.start)+' to '+t12(T.end));
   var st=lastStart(data.today.events);
@@ -8550,9 +8603,18 @@ setInterval(function(){
   }
   if(data.today.date!==dayKey()) render();
 },1000);
-window.addEventListener('storage',function(e){ if(e.key===SHIFT_KEY && !dlg.classList.contains('open')) render(); });
+window.addEventListener('storage',function(e){ if((e.key===SHIFT_KEY||e.key==='aad-leave-v1') && !dlg.classList.contains('open')) render(); });
 
 /* ---------- actions: sequence check → comment (and document) → face check → record ---------- */
+function onLeaveToday(lv){
+  showModal('<div class="modal sm" role="alertdialog" aria-modal="true" aria-labelledby="ol-t" aria-describedby="ol-p"><div class="confirm-body">'+
+    '<div class="warn ol-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></div>'+
+    '<h3 id="ol-t">You’re on leave today</h3><p id="ol-p">Your <strong>'+esc(leaveName(lv))+'</strong> was approved for today. Start a shift anyway? It will be flagged as worked on a leave day.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="ol-no">Cancel</button><button class="btn-primary" id="ol-go">Start shift anyway</button></div></div>');
+  document.getElementById('ol-no').onclick=closeModal;
+  var go=document.getElementById('ol-go'); go.focus();
+  go.onclick=function(){ closeModal(); request.ok=true; request('start'); };
+}
 function doneForToday(){
   var T=totals(data.today.events,Date.now());
   showModal('<div class="modal sm" role="alertdialog" aria-modal="true" aria-labelledby="dt-t" aria-describedby="dt-p"><div class="confirm-body">'+
@@ -8567,6 +8629,8 @@ function request(type){
   data=loadShift();
   var s=data.today.status;
   if(type==='start'&&s==='ended') return doneForToday();
+  if(type==='start'&&s==='off'&&!request.ok){ var lv=leaveOn(ME.id,dayKey()); if(lv) return onLeaveToday(lv); }
+  request.ok=false;
   if(!canDo(type,s)){
     toast(s==='break'&&type!=='break_end'?'End your break first.':
           s==='ended'?'Your shift has ended for today.':s==='off'?'Start your shift first.':'That action isn’t available right now.',true);
@@ -8931,7 +8995,13 @@ function dayState(day,isToday){
   if(!T.end) return isToday?'progress':'notended';
   return 'done';
 }
-var DAY_STATE = { done:['','Completed'], notended:['no','Not ended'], progress:['open','In progress'] };
+var DAY_STATE = { done:['','Completed'], notended:['no','Not ended'], progress:['open','In progress'], leave:['leave','On leave'] };
+/* approved leave from the Leave module (localStorage aad-leave-v1). Only approved requests count; weekends are skipped like Leave's hours */
+var LEAVE_TYPES = { annual:'Annual Leave', sick:'Sick Leave', lsl:'Long Service Leave', unpaid:'Unpaid Leave' }, LEAVE_DAY_HOURS = 7.6;
+function approvedLeave(){ var v=null; try{ v=JSON.parse(localStorage.getItem('aad-leave-v1')||'null'); }catch(e){} return Array.isArray(v)?v.filter(function(l){ return l.status==='approved'; }):[]; }
+function leaveDates(l){ var out=[], d=fromKey(l.from), end=fromKey(l.to); while(d<=end){ if(d.getDay()!==0&&d.getDay()!==6) out.push(dayKey(d)); d.setDate(d.getDate()+1); } return out; }
+function leaveOn(staff,date){ return approvedLeave().filter(function(l){ return l.staff===staff&&l.from<=date&&l.to>=date&&leaveDates(l).indexOf(date)>=0; })[0]||null; }
+function leaveName(l){ return LEAVE_TYPES[l.type]||'Leave'; }
 
 /* a day's events as a timeline, each with its comment and any attached documents */
 function shiftTimeline(events,empty,bare){                   // bare: times only, when comments and files are listed elsewhere

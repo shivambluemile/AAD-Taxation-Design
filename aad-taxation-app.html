@@ -36,6 +36,8 @@ button{background:none;border:none;cursor:pointer;font:inherit;color:inherit}
 .nav-items button:hover{background:#F6F7F9;color:var(--ink)}
 .nav-items button.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:700}
 .nav-items button svg{flex-shrink:0;opacity:.9}
+.nav-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--orange);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.nav-badge:empty{display:none}
 .nav-foot{padding:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
 .nav-foot a{display:flex;align-items:center;gap:12px;padding:9px 14px;border-radius:8px;color:var(--mute);text-decoration:none;font-size:13.5px}
 .nav-foot a:hover{background:#F6F7F9;color:var(--ink)}
@@ -68,7 +70,7 @@ body.portal-mode .shell{display:none}
       <button data-mod="dashboard" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></button>
       <button data-mod="staff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/><path d="M18 20c0-2.4-.9-4.2-2.4-5.3"/></svg><span>Staff</span></button>
       <button data-mod="clients"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 20v-1.5C3 16 5.2 14 8 14h2c2.8 0 5 2 5 4.5V20"/><circle cx="9" cy="8" r="3.4"/><path d="M16.5 20v-1.2c0-1.8-.9-3.3-2.3-4.1"/><path d="M21 9.5 19 11.5 17.5 10"/></svg><span>Clients</span></button>
-      <button data-mod="leave"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9.5 15 2 2 3.5-3.5"/></svg><span>Leave</span></button>
+      <button data-mod="leave"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9.5 15 2 2 3.5-3.5"/></svg><span>Leave</span><b class="nav-badge" id="nb-leave" aria-label="pending leave requests"></b></button>
       <button data-mod="attendance"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2.5h6"/></svg><span>Attendance</span></button>
       <button data-mod="settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1v.3a2 2 0 1 1-4 0v-.2a1.6 1.6 0 0 0-2.8-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7h-.3a2 2 0 1 1 0-4h.2a1.6 1.6 0 0 0 1.1-2.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 2.7-1.1v-.3a2 2 0 1 1 4 0v.2a1.6 1.6 0 0 0 2.8 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0 1.1 2.7h.3a2 2 0 1 1 0 4h-.2a1.6 1.6 0 0 0-1.4.9Z"/></svg><span>Settings</span></button>
     </div>
@@ -5802,6 +5804,7 @@ select.fin{appearance:none;padding-right:40px;cursor:pointer}
 .ld-btn.no{border-color:#FECACA;color:var(--red);background:#FEF2F2}
 .ld-btn.no:hover{background:#FEE2E2;color:#BE123C}
 .ld-btn.sm{height:30px;padding:0 11px;font-size:12.5px}
+.acts .ld-btn.sm{gap:5px;white-space:nowrap}
 .dhead-acts .act{width:36px;height:36px;border-radius:8px}
 .btabs{display:flex;gap:4px;padding:0 28px;border-bottom:1px solid var(--line);flex-shrink:0}
 .btabs button{padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;gap:7px}
@@ -6015,6 +6018,7 @@ var TYPES = [
 var AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 // staff and divisions come from the Staff module; opening balances are hours available before the leave below
 var STAFF = [
+  { id:'KPG1000', n:'John Doe',      div:'Admin',        open:{ annual:76,    sick:38,   lsl:0 } },
   { id:'KPG1001', n:'Alexender Doe', div:'Bookkeeping',  open:{ annual:98.8,  sick:45.6, lsl:0 } },
   { id:'KPG1002', n:'Jonny',         div:'Admin',        open:{ annual:30.4,  sick:22.8, lsl:0 } },
   { id:'KPG1003', n:'Marthew',       div:'Accountant',   open:{ annual:121.6, sick:76,   lsl:304 } },
@@ -6052,6 +6056,13 @@ var LEAVES = [
     comments:[{by:'John Doe',at:at('2026-10-14',12,20),text:'Please resubmit with a certificate or statutory declaration.'}], doc:null }
 ];
 var nextId = 13;
+var LEAVE_KEY = 'aad-leave-v1';
+function persistLeaves(){
+  try{ localStorage.setItem(LEAVE_KEY,JSON.stringify(LEAVES.map(function(l){ var c=JSON.parse(JSON.stringify(l)); if(c.doc) delete c.doc.url; return c; }))); }catch(e){}
+  try{ if(parent.AADBadges) parent.AADBadges(); }catch(e){}     // the Leave menu shows the pending count
+}
+var savedLeaves=null; try{ savedLeaves=JSON.parse(localStorage.getItem(LEAVE_KEY)||'null'); }catch(e){}
+if(Array.isArray(savedLeaves)){ LEAVES=savedLeaves; nextId=LEAVES.reduce(function(m,l){ return Math.max(m,l.id+1); },1); }
 
 /* ---------- helpers ---------- */
 function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
@@ -6248,6 +6259,7 @@ document.addEventListener('mousedown',function(e){
 
 /* ---------- listing ---------- */
 function renderList(){
+  persistLeaves();
   var rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), d=state.f;
   var h='<div class="page-head"><h1>Leave Management</h1><div class="ph-acts">'+
     '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered leave records as CSV">'+I.csv+'CSV</button>'+
@@ -6288,8 +6300,8 @@ function renderList(){
       '<td>'+(l.doc?'<button class="mini-link" data-doc="'+l.id+'" title="'+esc(l.doc.name)+'">'+I.eye+'View</button>':'<span class="dash">—</span>')+'</td>'+
       '<td class="c"><span class="acts">'+
         (l.status==='pending'?
-          '<button class="act ok" data-approve="'+l.id+'" title="Approve" aria-label="Approve leave for '+esc(s.n)+'">'+I.ok+'</button>'+
-          '<button class="act no" data-decline="'+l.id+'" title="Decline" aria-label="Decline leave for '+esc(s.n)+'">'+I.no+'</button>':'')+
+          '<button class="ld-btn ok sm" data-approve="'+l.id+'" aria-label="Approve leave for '+esc(s.n)+'">'+I.ok+'Approve</button>'+
+          '<button class="ld-btn no sm" data-decline="'+l.id+'" aria-label="Decline leave for '+esc(s.n)+'">'+I.no+'Decline</button>':'')+
         '<button class="act" data-view="'+l.id+'" title="View" aria-label="View leave request for '+esc(s.n)+'">'+I.eye+'</button>'+
         '<button class="act" data-edit="'+l.id+'" title="Edit" aria-label="Edit leave for '+esc(s.n)+'">'+I.edit+'</button>'+
         '<button class="act danger" data-del="'+l.id+'" title="Delete" aria-label="Delete leave for '+esc(s.n)+'">'+I.trash+'</button>'+
@@ -6461,10 +6473,10 @@ function viewDoc(id){
 
 /* ---------- add / edit form ---------- */
 var form=null;
-function openForm(id,fromDetail){
-  var l=id?leaveById(id):null;
+function openForm(id,fromDetail,pre){
+  var l=id?leaveById(id):null; pre=pre||{};
   form={ id:id, fromDetail:!!fromDetail, dirty:false, errs:{}, d: l?{ staff:l.staff, type:l.type, from:l.from, to:l.to, reason:l.reason, comment:'', status:l.status, doc:l.doc }
-                                       :{ staff:'', type:'', from:'', to:'', reason:'', comment:'', status:'pending', doc:null } };
+                                       :{ staff:pre.staff||'', type:'', from:pre.from||'', to:pre.to||pre.from||'', reason:'', comment:'', status:'pending', doc:null } };
   renderForm();
 }
 function field(label,req,inner,err,cls){
@@ -6838,7 +6850,7 @@ function bindDetail(l){
 }
 
 /* history for the sample records: submitted, document, comments, decision */
-LEAVES.forEach(function(l){
+if(!Array.isArray(savedLeaves)) LEAVES.forEach(function(l){
   var s=staffById(l.staff), sub=parse(l.from).getTime()-14*86400000+10*3600000;
   if(l.comments.length) sub=Math.min(sub,l.comments[0].at-2*86400000);
   if(l.doc) sub=Math.min(sub,l.doc.at-3600000);
@@ -6855,6 +6867,9 @@ LEAVES.forEach(function(l){
 });
 
 renderList();
+/* Attendance → "Apply for leave": the shell passes {staff, from} */
+window.AADApplyLeave=function(pre){ if(overlay.classList.contains('open')) return; openForm(null,false,pre); };
+try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('leave'); if(want) window.AADApplyLeave(want); }catch(e){}
 })();
 
 <\/script>
@@ -11749,9 +11764,7 @@ function submit(){
     return head + source('dashboard');
   }
 
-  function show(mod){
-    Array.prototype.forEach.call(document.querySelectorAll('.frame'), function(f){ f.classList.remove('on'); });
-    boot.style.display = 'none';
+  function make(mod){
     if(!frames[mod]){
       var f = document.createElement('iframe');
       f.className = 'frame';
@@ -11762,7 +11775,12 @@ function submit(){
       main.appendChild(f);
       frames[mod] = f;
     }
-    frames[mod].classList.add('on');
+    return frames[mod];
+  }
+  function show(mod){
+    Array.prototype.forEach.call(document.querySelectorAll('.frame'), function(f){ f.classList.remove('on'); });
+    boot.style.display = 'none';
+    make(mod).classList.add('on');
     if(window.innerWidth <= 860) document.body.classList.add('collapsed');
   }
   function select(mod){
@@ -11771,6 +11789,22 @@ function submit(){
     show(mod);
   }
   window.AADNav = select;                     // modules call parent.AADNav('attendance') etc.
+  /* one module asking another to open something: kept until that module picks it up */
+  var intents = {};
+  window.AADTakeIntent = function(mod){ var x = intents[mod]; delete intents[mod]; return x; };
+  window.AADApplyLeave = function(pre){
+    var f = frames.leave, w = f && f.contentWindow;
+    select('leave');
+    if(w && w.AADApplyLeave) w.AADApplyLeave(pre); else intents.leave = pre;
+  };
+  /* Leave menu badge: requests still waiting for a decision */
+  window.AADBadges = function(){
+    var n = 0, list = null; try{ list = JSON.parse(localStorage.getItem('aad-leave-v1') || 'null'); }catch(e){}
+    if(!Array.isArray(list)){ make('leave'); return; }          // first visit: the Leave page loads in the background and saves its records
+    list.forEach(function(l){ if(l.status === 'pending') n++; });
+    var bd = document.getElementById('nb-leave'); bd.textContent = n ? n : ''; bd.title = n + ' pending leave request' + (n === 1 ? '' : 's');
+  };
+  window.addEventListener('storage', function(e){ if(e.key === 'aad-leave-v1') window.AADBadges(); });
 
   document.getElementById('navitems').addEventListener('click', function(e){
     var b = e.target.closest('button[data-mod]');
@@ -11839,6 +11873,7 @@ function submit(){
     return;
   }
   select('dashboard');
+  window.AADBadges();
 })();
 </script>
 </body>

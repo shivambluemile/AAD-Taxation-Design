@@ -2889,6 +2889,7 @@ tbody tr:hover{background:#FCFCFD}
 .wz-head{align-items:flex-start}
 .wz-head>div{min-width:0}
 .wz-steps{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;padding:0}
+.wz-steps[hidden]{display:none}
 .wz-steps li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--faint)}
 .wz-steps li span{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;background:#F1F2F4;color:var(--mute)}
 .wz-steps li span svg{width:11px;height:11px}
@@ -4631,7 +4632,7 @@ function openWizard(){
   startForm(null); form.fromDetail=false;
   wiz={step:1,services:[],files:[],note:'',sig:null,svcErr:{},sending:false};
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
-    '<div class="modal-head wz-head"><div><h2 id="cf-t">Add Client</h2><ol class="wz-steps" id="wz-steps"></ol></div><button id="cf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-head wz-head"><div><h2 id="cf-t">Add Client</h2><ol class="wz-steps" id="wz-steps" hidden></ol></div><button id="cf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="cfb"></div><div class="modal-foot" id="wz-foot"></div></div>');
   overlay._guard=leaveWizard;
   document.getElementById('cf-x').onclick=leaveWizard;
@@ -8013,7 +8014,7 @@ function render(){
   var all=days(), months=[], rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), f=state.f, now=Date.now();
   all.forEach(function(r){ var m=r.date.slice(0,7); if(months.indexOf(m)<0) months.push(m); });
 
-  var mg=canManage(), cols=mg?9:8;
+  var mg=canManage(), cols=mg?10:8;
   var h='<div class="page-head"><h1>Attendance</h1><div class="ph-acts">'+
     '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered attendance records as CSV">'+I.csv+'CSV</button>'+
     '<button class="btn-ghost" id="ar-leave">'+I.cal+'Apply for leave</button>'+
@@ -8028,7 +8029,7 @@ function render(){
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
 
   h+='<div class="card ar-table"><table><thead><tr>'+
-    (mg?'<th>Staff</th>':'')+'<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+
+    (mg?'<th>Staff</th>':'')+'<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+(mg?'<th class="c">Action</th>':'')+
     '</tr></thead><tbody>';
   if(!all.length){
     h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
@@ -8039,15 +8040,15 @@ function render(){
     var who=member(r.staff), dash='<span class="ar-dash">—</span>';
     if(r.isLeave){ var ld=fromKey(r.date);
       h+='<tr class="ar-row ar-leave" data-row="'+r.key+'">'+
-        (mg?'<td><button class="name-link" data-view="'+r.key+'"><span class="name">'+esc(who.n)+'</span></button><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
+        (mg?'<td><button class="name-link" data-view="'+r.key+'"><span class="name">'+esc(who.n)+'</span></button></td>':'')+
         '<td><button class="name-link" data-view="'+r.key+'" aria-label="View leave for '+esc(who.n)+', '+dmy(ld)+'"><span class="name">'+dmy(ld)+'</span></button><small class="ar-sub">'+weekday(ld)+(r.today?' · Today':'')+'</small></td>'+
         '<td class="num">'+dash+'</td><td class="num">'+dash+'</td><td class="num">'+dash+'</td><td class="num">'+dash+'</td>'+
         '<td class="nowrap"><span class="state leave"><i></i>On leave</span></td>'+
-        '<td><span class="ar-lv">'+esc(leaveName(r.leave))+'</span><small class="ar-sub">Approved'+(r.leave.decidedBy?' by '+esc(r.leave.decidedBy):'')+'</small></td><td>'+dash+'</td></tr>';
+        '<td><span class="ar-lv">'+esc(leaveName(r.leave))+'</span><small class="ar-sub">Approved'+(r.leave.decidedBy?' by '+esc(r.leave.decidedBy):'')+'</small></td><td>'+dash+'</td>'+(mg?'<td class="c">'+dash+'</td>':'')+'</tr>';
       return; }
     var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[stateOf(r)], n=notes(r), fl=files(r), last=n[n.length-1];
     h+='<tr class="ar-row'+(r.today&&r.mine?' ar-today':'')+'" data-row="'+r.key+'">'+
-      (mg?'<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+esc(who.n)+'</span></button><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
+      (mg?'<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+esc(who.n)+'</span></button></td>':'')+
       '<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
       '<td class="num">'+(T.start?t12(T.start):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="num">'+(T.end?t12(T.end):'<span class="ar-dash">—</span>')+'</td>'+
@@ -8056,7 +8057,8 @@ function render(){
       '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span>'+(r.onLeave?'<small class="ar-onlv" title="'+esc(leaveName(r.onLeave))+' was approved for this day">On leave this day</small>':'')+'</td>'+
       '<td>'+(last?'<button class="ar-cmt" data-view="'+r.key+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.key+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
-      '</tr>';   // the date opens the day, so no separate View action
+      (mg?'<td class="c"><span class="acts"><button class="act danger" data-del="'+r.key+'" title="Delete shift" aria-label="Delete '+esc(who.n)+'’s shift on '+dmy(d)+'">'+I.trash+'</button></span></td>':'')+
+      '</tr>';   // the date opens the day; Delete is the only row action
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;
@@ -8079,6 +8081,7 @@ function render(){
   if(openDate) openDay(openDate,true);
 }
 content.addEventListener('click',function(e){
+  var del=e.target.closest('[data-del]'); if(del){ deleteShift(del.getAttribute('data-del')); return; }
   var b=e.target.closest('[data-view]'), row=e.target.closest('tr[data-row]');
   if(!b&&(!row||e.target.closest('button,a,input,select'))) return;
   try{ openDay(b?b.getAttribute('data-view'):row.getAttribute('data-row'),false,b?b.getAttribute('data-sec'):null); }

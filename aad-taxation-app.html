@@ -3273,33 +3273,11 @@ var I = {
    Google Places Autocomplete. Without a key, the address search uses
    the built-in Australian address list below so the form still works.
 ========================================================= */
-var GOOGLE_MAPS_API_KEY = '';
+// GOOGLE_MAPS_API_KEY and the fallback address list live in src-onboard-core, shared with the client's onboarding link
 
 var AU_STATES=['ACT','NSW','NT','QLD','SA','TAS','VIC','WA'];
 var ENTITY_TYPES=['Partnership','Trust','Company'];
 var MAX_DIRECTORS=5;
-var ADDR_BOOK=[
-  {street:'200 Collins Street',suburb:'Melbourne',state:'VIC',postcode:'3000'},
-  {street:'310 George Street',suburb:'Sydney',state:'NSW',postcode:'2000'},
-  {street:'78 Miller Street',suburb:'North Sydney',state:'NSW',postcode:'2060'},
-  {street:'120 Church Street',suburb:'Parramatta',state:'NSW',postcode:'2150'},
-  {street:'45 Adelaide Street',suburb:'Brisbane City',state:'QLD',postcode:'4000'},
-  {street:'45 Surf Parade',suburb:'Broadbeach',state:'QLD',postcode:'4218'},
-  {street:'123 St Georges Terrace',suburb:'Perth',state:'WA',postcode:'6000'},
-  {street:'60 Bannister Road',suburb:'Canning Vale',state:'WA',postcode:'6155'},
-  {street:'22 King William Street',suburb:'Adelaide',state:'SA',postcode:'5000'},
-  {street:'42 Elizabeth Street',suburb:'Hobart',state:'TAS',postcode:'7000'},
-  {street:'15 London Circuit',suburb:'Canberra',state:'ACT',postcode:'2601'},
-  {street:'9 Hume Highway',suburb:'Craigieburn',state:'VIC',postcode:'3064'},
-  {street:'15 Point Cook Road',suburb:'Point Cook',state:'VIC',postcode:'3030'},
-  {street:'88 Moorabool Street',suburb:'Geelong',state:'VIC',postcode:'3220'},
-  {street:'5 Leakes Road',suburb:'Tarneit',state:'VIC',postcode:'3029'},
-  {street:'32 High Street',suburb:'Epping',state:'VIC',postcode:'3076'},
-  {street:'18 Main Street',suburb:'Blacktown',state:'NSW',postcode:'2148'},
-  {street:'7 Boas Avenue',suburb:'Joondalup',state:'WA',postcode:'6027'},
-  {street:'12 Smith Street',suburb:'Darwin City',state:'NT',postcode:'0800'},
-  {street:'101 Main Street',suburb:'Pakenham',state:'VIC',postcode:'3810'}
-];
 
 /* =========================================================
    Formatting and validation (Australian formats)
@@ -4220,20 +4198,6 @@ function confirmLeave(onDiscard){
 }
 
 /* ---------- Address search ---------- */
-var placesState='idle'; // idle | loading | ready | off
-function loadPlaces(cb){
-  if(window.google && google.maps && google.maps.places){ placesState='ready'; return cb(true); }
-  if(!GOOGLE_MAPS_API_KEY){ placesState='off'; return cb(false); }
-  if(placesState==='loading'){ (loadPlaces.q=loadPlaces.q||[]).push(cb); return; }
-  placesState='loading'; loadPlaces.q=[cb];
-  var done=function(ok){ placesState=ok?'ready':'off'; (loadPlaces.q||[]).forEach(function(f){f(ok);}); loadPlaces.q=[]; };
-  window.__aadPlacesReady=function(){ done(true); };
-  var s=document.createElement('script');
-  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places&region=AU&callback=__aadPlacesReady';
-  s.async=true; s.onerror=function(){ done(false); };
-  document.head.appendChild(s);
-  setTimeout(function(){ if(placesState==='loading') done(false); },8000);
-}
 function applyAddress(a){
   var d=form.d;
   d.address={street:a.street||'',suburb:a.suburb||'',state:a.state||'',postcode:a.postcode||'',country:a.country||'Australia'};
@@ -4242,12 +4206,6 @@ function applyAddress(a){
   form.dirty=true;
   var body=formBody(), y=body.scrollTop; renderForm(); body.scrollTop=y;
   var nx=document.getElementById(d.address.postcode?'f-addr-street':'f-addr-postcode'); if(nx) nx.focus();
-}
-function fromGooglePlace(place){
-  var get=function(type,short){ var c=(place.address_components||[]).filter(function(x){return x.types.indexOf(type)>=0;})[0]; return c?(short?c.short_name:c.long_name):''; };
-  var unit=get('subpremise'), no=get('street_number'), road=get('route');
-  return {street:((unit?unit+'/':'')+no+' '+road).trim(), suburb:get('locality')||get('sublocality')||get('postal_town'),
-    state:get('administrative_area_level_1',true), postcode:get('postal_code'), country:get('country')||'Australia'};
 }
 function wireAddress(){
   var se=document.getElementById('addr-search'), sg=document.getElementById('sugg'); if(!se) return;
@@ -11649,6 +11607,53 @@ function dropKyc(keys){ if(!keys.length) return Promise.resolve(); return kycTx(
 var KYC_TYPES = /^(application\/pdf|image\/(png|jpeg|webp|heic))$/i, KYC_MAX = 10*1048576;
 function fsize(b){ return b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'; }
 function extTag(name){ var e=(String(name).split('.').pop()||'').toLowerCase(); return e==='jpeg'?'jpg':e; }
+
+/* ---------- address search (Add Client and the client's onboarding link) ----------
+   Add a Google Maps API key with the Places API enabled to use live Google Places Autocomplete.
+   Without a key, the search uses the built-in Australian address list below so the forms still work. */
+var GOOGLE_MAPS_API_KEY = '';
+var ADDR_BOOK=[
+  {street:'200 Collins Street',suburb:'Melbourne',state:'VIC',postcode:'3000'},
+  {street:'310 George Street',suburb:'Sydney',state:'NSW',postcode:'2000'},
+  {street:'78 Miller Street',suburb:'North Sydney',state:'NSW',postcode:'2060'},
+  {street:'120 Church Street',suburb:'Parramatta',state:'NSW',postcode:'2150'},
+  {street:'45 Adelaide Street',suburb:'Brisbane City',state:'QLD',postcode:'4000'},
+  {street:'45 Surf Parade',suburb:'Broadbeach',state:'QLD',postcode:'4218'},
+  {street:'123 St Georges Terrace',suburb:'Perth',state:'WA',postcode:'6000'},
+  {street:'60 Bannister Road',suburb:'Canning Vale',state:'WA',postcode:'6155'},
+  {street:'22 King William Street',suburb:'Adelaide',state:'SA',postcode:'5000'},
+  {street:'42 Elizabeth Street',suburb:'Hobart',state:'TAS',postcode:'7000'},
+  {street:'15 London Circuit',suburb:'Canberra',state:'ACT',postcode:'2601'},
+  {street:'9 Hume Highway',suburb:'Craigieburn',state:'VIC',postcode:'3064'},
+  {street:'15 Point Cook Road',suburb:'Point Cook',state:'VIC',postcode:'3030'},
+  {street:'88 Moorabool Street',suburb:'Geelong',state:'VIC',postcode:'3220'},
+  {street:'5 Leakes Road',suburb:'Tarneit',state:'VIC',postcode:'3029'},
+  {street:'32 High Street',suburb:'Epping',state:'VIC',postcode:'3076'},
+  {street:'18 Main Street',suburb:'Blacktown',state:'NSW',postcode:'2148'},
+  {street:'7 Boas Avenue',suburb:'Joondalup',state:'WA',postcode:'6027'},
+  {street:'12 Smith Street',suburb:'Darwin City',state:'NT',postcode:'0800'},
+  {street:'101 Main Street',suburb:'Pakenham',state:'VIC',postcode:'3810'}
+];
+var placesState='idle'; // idle | loading | ready | off
+function loadPlaces(cb){
+  if(window.google && google.maps && google.maps.places){ placesState='ready'; return cb(true); }
+  if(!GOOGLE_MAPS_API_KEY){ placesState='off'; return cb(false); }
+  if(placesState==='loading'){ (loadPlaces.q=loadPlaces.q||[]).push(cb); return; }
+  placesState='loading'; loadPlaces.q=[cb];
+  var done=function(ok){ placesState=ok?'ready':'off'; (loadPlaces.q||[]).forEach(function(f){f(ok);}); loadPlaces.q=[]; };
+  window.__aadPlacesReady=function(){ done(true); };
+  var s=document.createElement('script');
+  s.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(GOOGLE_MAPS_API_KEY)+'&libraries=places&region=AU&callback=__aadPlacesReady';
+  s.async=true; s.onerror=function(){ done(false); };
+  document.head.appendChild(s);
+  setTimeout(function(){ if(placesState==='loading') done(false); },8000);
+}
+function fromGooglePlace(place){
+  var get=function(type,short){ var c=(place.address_components||[]).filter(function(x){return x.types.indexOf(type)>=0;})[0]; return c?(short?c.short_name:c.long_name):''; };
+  var unit=get('subpremise'), no=get('street_number'), road=get('route');
+  return {street:((unit?unit+'/':'')+no+' '+road).trim(), suburb:get('locality')||get('sublocality')||get('postal_town'),
+    state:get('administrative_area_level_1',true), postcode:get('postal_code'), country:get('country')||'Australia'};
+}
 </script>
 <script type="text/plain" id="src-portal"><!DOCTYPE html>
 <html lang="en">
@@ -11677,13 +11682,41 @@ button{background:none;border:0;cursor:pointer}
 .wrap{max-width:780px;margin:0 auto;padding:28px 16px 60px}
 .hello h1{font-family:'Manrope';font-size:24px;font-weight:800;letter-spacing:-.4px}
 .hello p{font-size:14px;color:var(--mute);margin-top:6px;line-height:1.55}
-.steps{list-style:none;display:flex;flex-wrap:wrap;gap:8px 18px;margin:22px 0 16px}
-.steps li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--faint)}
-.steps li button{display:flex;align-items:center;gap:8px;color:inherit;font-weight:inherit}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:24px 0 18px}
+.steps li{display:flex;flex-direction:column;gap:10px;font-size:12.5px;font-weight:600;color:var(--faint);min-width:0}
+.steps li:before{content:'';height:4px;border-radius:999px;background:#E9ECF0}
+.steps li.on:before{background:var(--orange)}.steps li.done:before{background:#34D399}
+.steps li .st,.steps li button{display:flex;align-items:center;gap:8px;color:inherit;font-weight:inherit;min-width:0;text-align:left}
+.steps li .st>span,.steps li button>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps li button:hover>span{color:var(--ink);text-decoration:underline;text-underline-offset:2px}
+.steps li i{flex-shrink:0}
+@media (max-width:640px){.steps li:not(.on) .st>span,.steps li:not(.on) button>span{display:none}}
 .steps li i{font-style:normal;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;background:#E9ECF0;color:var(--mute)}
 .steps li.on{color:var(--ink)}.steps li.on i{background:var(--orange);color:#fff}
 .steps li.done{color:var(--slate)}.steps li.done i{background:#ECFDF5;color:#047857}
-.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:30px 32px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.aq{margin-bottom:16px}.aq-in{position:relative}.aq-in .in{padding-right:42px}.aq-in>svg{position:absolute;right:14px;top:15px;color:var(--mute);pointer-events:none}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);z-index:20;overflow:hidden}
+.sugg button{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:10px 14px;font-size:13.5px;color:var(--ink)}
+.sugg button:hover,.sugg button:focus{background:#F6F7F9;outline:none}.sugg button svg{color:var(--orange);margin-top:1px;flex-shrink:0}
+.sugg small{display:block;color:var(--mute);font-size:12px;margin-top:1px}.sugg-none{padding:12px 14px;font-size:13px;color:var(--mute)}
+.ty{text-align:center;padding:40px 36px 34px}
+.ty-art{width:240px;max-width:80%;height:auto;display:block;margin:0 auto 10px}
+.ty-env{animation:tyFloat 3.2s ease-in-out infinite}.ty-lines{animation:tyLines 3.2s ease-in-out infinite}
+@keyframes tyFloat{50%{transform:translate(4px,-6px)}}@keyframes tyLines{50%{transform:translateX(-6px);opacity:.7}}
+@media (prefers-reduced-motion:reduce){.ty-env,.ty-lines{animation:none}}
+.ty h1{font-family:'Manrope';font-size:26px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
+.ty-lead{font-size:14.5px;color:var(--mute);line-height:1.6;max-width:480px;margin:8px auto 0}
+.ty-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:26px 0 0;text-align:left}
+.ty-meta div{background:#FAFBFC;padding:12px 16px;min-width:0}.ty-meta dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7A8597}
+.ty-meta dd{font-size:14px;font-weight:700;color:var(--ink);margin-top:4px;overflow-wrap:anywhere}
+.ty-next{text-align:left;margin-top:26px}.ty-next h2{font-family:'Manrope';font-size:15px;font-weight:800;margin-bottom:12px}
+.ty-next ol{list-style:none;counter-reset:ty;display:flex;flex-direction:column;gap:12px}
+.ty-next li{counter-increment:ty;position:relative;padding-left:40px;min-height:28px}
+.ty-next li:before{content:counter(ty);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ty-next li b{display:block;font-size:14px;color:var(--ink)}.ty-next li span{display:block;font-size:13px;color:var(--mute);margin-top:2px;line-height:1.5}
+.ty-help{font-size:13px;color:var(--mute);margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}.ty-help a{color:var(--orange-ink);font-weight:600}
+@media (max-width:640px){.card{padding:22px 18px}.ty{padding:30px 18px}.ty-meta{grid-template-columns:1fr}}
 .card h2{font-family:'Manrope';font-size:18px;font-weight:800;margin-bottom:4px}
 .card>p.sub{font-size:13.5px;color:var(--mute);margin-bottom:20px;line-height:1.5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -11723,7 +11756,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .files{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .kslots{display:flex;flex-direction:column;gap:12px;margin-top:4px}
 .kslot{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;transition:border-color .15s,background .15s}
-.kslot.done{border-color:#BBF7D0}.kslot.bad{border-color:#FECDD3;background:#FFF8F8}.kslot.drag{border-color:var(--orange);background:var(--orange-soft)}
+.kslot.got{border-color:#BBF7D0}.kslot.bad{border-color:#FECDD3;background:#FFF8F8}.kslot.drag{border-color:var(--orange);background:var(--orange-soft)}
 .ks-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .ks-h b{display:block;font-size:14px}.ks-h small{display:block;font-size:12.5px;color:var(--mute);margin-top:3px;line-height:1.45}
 .kslot .files{margin-top:10px}
@@ -11755,11 +11788,11 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .btn.pri{background:var(--orange);color:#fff}.btn.pri:hover{background:var(--orange-ink)}
 .btn.sec{background:#fff;border:1px solid var(--line);color:var(--slate);text-transform:none;letter-spacing:normal;margin:0;padding:0 20px}   /* not the .sec section heading */.btn.sec:hover{background:#F6F7F9}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
-.done{text-align:center;padding:40px 20px}
-.done .big{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:#ECFDF5;color:#047857}
-.done .big.bad{background:#FEF2F2;color:var(--red)}
-.done h2{font-family:'Manrope';font-size:21px;font-weight:800}
-.done p{font-size:14px;color:var(--mute);margin-top:8px;line-height:1.55;max-width:460px;margin-left:auto;margin-right:auto}
+.card.done{text-align:center;padding:40px 20px}
+.card.done .big{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;background:#ECFDF5;color:#047857}
+.card.done .big.bad{background:#FEF2F2;color:var(--red)}
+.card.done h2{font-family:'Manrope';font-size:21px;font-weight:800}
+.card.done p{font-size:14px;color:var(--mute);margin-top:8px;line-height:1.55;max-width:460px;margin-left:auto;margin-right:auto}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);background:#101828;color:#fff;border-radius:9px;padding:12px 18px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.bad{background:#BE123C}
@@ -11783,6 +11816,8 @@ var app=document.getElementById('app');
 ensureLetterCss(document);
 var STATES=['ACT','NSW','NT','QLD','SA','TAS','VIC','WA'], ENTITIES=['Partnership','Trust','Company'];
 var IC={
+  search:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
+  pin:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11.5A7 7 0 0 0 5 9.5C5 15.4 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
   tick:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
   x:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   up:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17a4 4 0 0 1-.6-8A5.6 5.6 0 0 1 17.3 9 3.8 3.8 0 0 1 17 17"/><path d="M12 20v-8m0 0-2.6 2.6M12 12l2.6 2.6"/></svg>'
@@ -11793,6 +11828,29 @@ if(PREVIEW) document.getElementById('pvb').innerHTML='<div class="pvb"><b>Previe
 
 var ONB=loadOnb();
 function save(){ if(PREVIEW) return true; return saveOnb(ONB); }
+/* shown after a successful submit, and whenever the link is opened again afterwards */
+var TY_ART='<svg class="ty-art" viewBox="0 0 260 170" aria-hidden="true">'+
+  '<g class="ty-lines" stroke="#DCE6F5" stroke-width="7" stroke-linecap="round"><path d="M18 78h58"/><path d="M6 102h78"/><path d="M34 126h48"/></g>'+
+  '<g class="ty-env"><g transform="rotate(-9 150 92)"><rect x="96" y="50" width="118" height="82" rx="12" fill="#fff" stroke="#F18934" stroke-width="3.5"/>'+
+  '<path d="M101 56l54 42 54-42" fill="#FFF4EA" stroke="#F18934" stroke-width="3.5" stroke-linejoin="round"/>'+
+  '<path d="M102 126l38-31M208 126l-38-31" stroke="#F8C9A0" stroke-width="3" stroke-linecap="round"/></g>'+
+  '<circle cx="212" cy="46" r="21" fill="#10B981"/><path d="m202 46 7 7 13-13" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></g>'+
+  '<path d="M66 30v12M60 36h12" stroke="#F18934" stroke-width="3" stroke-linecap="round"/><circle cx="244" cy="104" r="5" fill="#FCD9B8"/><circle cx="100" cy="24" r="4" fill="#BFD3F2"/><circle cx="234" cy="140" r="3" fill="#BFD3F2"/>'+
+  '</svg>';
+function thankYou(again){
+  var fm=f||R.form||{}, nm=String(fm.name||R.name||'').trim(), who=R.type==='company'?nm:nm.split(/\s+/)[0];
+  var docs=(R.kyc||[]).length, mail=fm.email||R.email;
+  app.innerHTML='<div class="card ty" role="status">'+TY_ART+
+    '<h1>Thank you'+(who?', '+e(who):'')+'!</h1>'+
+    '<p class="ty-lead">'+(again?'Your onboarding is with us. There’s nothing more you need to do right now.':'Your onboarding has been submitted. We’ve received your details, documents and signed engagement letter.')+'</p>'+
+    '<dl class="ty-meta"><div><dt>Reference</dt><dd>AAD-'+e(String(R.token||TOKEN).slice(0,6).toUpperCase())+'</dd></div><div><dt>Submitted</dt><dd>'+whenOf(R.submittedAt||Date.now())+'</dd></div><div><dt>KYC documents</dt><dd>'+docs+' file'+(docs===1?'':'s')+'</dd></div></dl>'+
+    '<div class="ty-next"><h2>What happens next</h2><ol>'+
+      '<li><b>We review your onboarding</b><span>'+FIRM.name+' checks your details and KYC documents, usually within 1–2 business days.</span></li>'+
+      '<li><b>We’ll contact you if anything’s missing</b><span>Any questions go to '+e(mail)+'.</span></li>'+
+      '<li><b>Your services begin</b><span>Once it’s approved, we’ll confirm by email and get started.</span></li></ol></div>'+
+    '<p class="ty-help">Questions? Call <a href="tel:'+FIRM.phone.replace(/\s/g,'')+'">'+FIRM.phone+'</a> or email <a href="mailto:'+FIRM.email+'">'+FIRM.email+'</a>.</p></div>';
+  window.scrollTo(0,0);
+}
 function closed(icon,title,text){ app.innerHTML='<div class="card done"><div class="big'+(icon==='x'?' bad':'')+'">'+IC[icon]+'</div><h2>'+title+'</h2><p>'+text+'</p></div>'; }
 
 /* ================= signing page ================= */
@@ -11837,7 +11895,7 @@ function bootOnboard(){
   if(!R) return closed('x','This link isn’t valid','Check you opened the most recent message from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
   if(!PREVIEW){
     if(R.status==='rejected') return closed('x','This onboarding request is closed','Please contact '+FIRM.name+' on '+FIRM.phone+' if you think this is a mistake.');
-    if(['submitted','review','completed'].indexOf(R.status)>=0) return closed('tick','Thanks, you’re all done','You submitted your onboarding on '+whenOf(R.submittedAt||R.created)+'. We’ll be in touch if we need anything else.');
+    if(['submitted','review','completed'].indexOf(R.status)>=0) return thankYou(true);
     if(Date.now()>R.expires) return closed('x','This link has expired','Ask '+FIRM.name+' to send you a new link. Anything you saved is kept.');
     // opening the link is recorded, but never changes the onboarding status
     audit(R,'Link opened by client',R.name,'','',''); save();
@@ -11857,7 +11915,7 @@ function paint(){
   var h='<div class="hello"><h1>'+(step===1?'Welcome'+(R.form?' back':'')+', '+e(R.type==='company'?R.name:String(R.name).split(' ')[0]):STEPS[step-1])+'</h1><p>'+
     (step===1?FIRM.name+' has asked you to complete your onboarding. Your progress is saved as you go, so you can come back to this link any time before '+dmyOf(R.expires)+'.':'Step '+step+' of 4')+'</p></div>';
   if(R.status==='info'&&R.reason) h+='<div class="note warn"><span><b>'+FIRM.name+' needs more information:</b> '+e(R.reason)+'</span></div>';
-  h+='<ol class="steps">'+STEPS.map(function(s,i){ var n=i+1, st=n===step?'on':n<step?'done':''; return '<li class="'+st+'">'+(n<step?'<button data-go="'+n+'"><i>✓</i>'+s+'</button>':'<i>'+n+'</i>'+s)+'</li>'; }).join('')+'</ol>';
+  h+='<ol class="steps">'+STEPS.map(function(s,i){ var n=i+1, st=n===step?'on':n<step?'done':''; return '<li class="'+st+'"'+(n===step?' aria-current="step"':'')+'>'+(n<step?'<button data-go="'+n+'"><i>✓</i><span>'+s+'</span></button>':'<span class="st"><i>'+n+'</i><span>'+s+'</span></span>')+'</li>'; }).join('')+'</ol>';
   h+='<div class="card">'+[detailsStep,svcDocsStep,letterStep,reviewStep][step-1](co)+
     '<div class="foot">'+(step>1?'<button class="btn sec" id="bk">Back</button>':'')+'<span class="grow"></span>'+
       (step<4?'<button class="btn sec" id="sv">Save and finish later</button><button class="btn pri" id="nx">Continue</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
@@ -11877,7 +11935,10 @@ function detailsStep(co){
      fld('abn','ABN',f.abn,{mode:'numeric',ph:'e.g. 51 824 753 556'})+fld('tfn','TFN',f.tfn,{mode:'numeric',ph:'e.g. 123 456 789',hint:'Your tax file number is stored securely and shown masked to our team.'})+
      '<label class="same span2"><input type="checkbox" id="p-same"'+(f.same?' checked':'')+'> Copy from primary <small>Use the email and phone above for correspondence</small></label>'+
      fld('commEmail','Email for correspondence',f.commEmail,{opt:true,type:'email',ro:f.same})+fld('commPhone','Phone for correspondence',f.commPhone,{opt:true,mode:'tel',ro:f.same})+'</div>'+
-     '<div class="sec">Address</div><div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+'</div>'+
+     '<div class="sec">Address</div>'+
+     '<div class="aq"><label class="l" for="p-aq">Find your address</label><div class="aq-in"><input class="in" id="p-aq" placeholder="Start typing your street address" autocomplete="off" value="'+e(mem.aq||'')+'">'+IC.search+'<div id="p-sugg"></div></div>'+
+       '<p class="hint">Choose your address from the list and we’ll fill in the fields below. You can still change them.</p></div>'+
+     '<div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+'</div>'+
      '<div class="grid3">'+fld('addr.suburb','Suburb',a.suburb)+sel('addr.state','State',STATES,a.state)+fld('addr.postcode','Postcode',a.postcode,{mode:'numeric'})+'</div>';
   if(co){
     h+='<div class="sec">Directors</div>'+f.directors.map(function(d,i){
@@ -11919,7 +11980,7 @@ function docsStep(){
     '<div class="kslots">'+kycReqs().map(function(q){
       var got=slotFiles(q.k), bad=miss.indexOf(q.k)>=0;
       var st=got.length?'<span class="kst ok">'+okI()+'Uploaded</span>':q.opt?'<span class="kst opt">Optional</span>':'<span class="kst need">Required</span>';
-      return '<div class="kslot'+(bad?' bad':'')+(got.length?' done':'')+'" data-slot="'+q.k+'">'+
+      return '<div class="kslot'+(bad?' bad':'')+(got.length?' got':'')+'" data-slot="'+q.k+'">'+
         '<div class="ks-h"><div><b>'+e(q.n)+(q.opt?'':' <span class="req">*</span>')+'</b><small>'+e(q.hint)+'</small></div>'+st+'</div>'+
         (got.length?'<div class="files">'+got.map(function(o){ var x=o.x, t=extTag(x.name);
           return '<div class="file"><span class="x'+(t==='pdf'?' pdf':'')+'">'+e(t.toUpperCase())+'</span><div><b title="'+e(x.name)+'">'+e(x.name)+'</b><small>'+fsize(x.size)+' · '+whenOf(x.at)+'</small></div>'+
@@ -11967,6 +12028,7 @@ function wire(){
   ['email','phone'].forEach(function(k){ var el=document.getElementById('p-'+k); if(el) el.addEventListener('input',function(){ if(!f.same) return; var t=document.getElementById('p-comm'+k[0].toUpperCase()+k.slice(1)); if(t) t.value=el.value; }); });
   var ad=document.getElementById('addd'); if(ad) ad.onclick=function(){ read(); f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''}); paint(); };
   app.querySelectorAll('[data-rmd]').forEach(function(b){ b.onclick=function(){ read(); f.directors.splice(+b.dataset.rmd,1); errs={}; paint(); }; });
+  if(step===1) wireAddr();
   if(step===2) wireDocs();
   if(step===3&&!letterSigned()) wireSign();
 }
@@ -12028,6 +12090,43 @@ function checkStep(n){
   if(n===3&&!letterSigned()){ errs={sig:'Sign the engagement letter to continue'}; paint(); return false; }
   return true;
 }
+/* Google Places when a key is set, otherwise the built-in address list */
+function useAddress(a){
+  read(); f.address={street:a.street||'',suburb:a.suburb||'',state:a.state||'',postcode:a.postcode||''};
+  ['street','suburb','state','postcode'].forEach(function(k){ delete errs['addr.'+k]; });
+  mem.aq=[a.street,a.suburb,a.state,a.postcode].filter(Boolean).join(', ');
+  var y=window.scrollY; paint(); window.scrollTo(0,y);
+  var pc=document.getElementById('p-addr-street'); if(pc) pc.focus();
+}
+function wireAddr(){
+  var q=document.getElementById('p-aq'), sg=document.getElementById('p-sugg'); if(!q) return;
+  loadPlaces(function(ok){
+    if(!ok||!document.body.contains(q)) return;
+    var ac=new google.maps.places.Autocomplete(q,{componentRestrictions:{country:'au'},fields:['address_components'],types:['address']});
+    ac.addListener('place_changed',function(){ var p=ac.getPlace(); if(p&&p.address_components) useAddress(fromGooglePlace(p)); });
+    q.dataset.google='1';
+  });
+  q.oninput=function(){
+    mem.aq=q.value; if(q.dataset.google) return;
+    var t=q.value.trim().toLowerCase();
+    if(t.length<2){ sg.innerHTML=''; return; }
+    var hits=ADDR_BOOK.filter(function(a){ return (a.street+' '+a.suburb+' '+a.state+' '+a.postcode).toLowerCase().indexOf(t)>=0; }).slice(0,5);
+    sg.innerHTML='<div class="sugg" role="listbox">'+(hits.length?hits.map(function(a){ return '<button type="button" role="option" data-a="'+ADDR_BOOK.indexOf(a)+'">'+IC.pin+'<span>'+e(a.street)+'<small>'+e(a.suburb+' '+a.state+' '+a.postcode)+', Australia</small></span></button>'; }).join(''):
+      '<p class="sugg-none">No matching address. Type it in the fields below.</p>')+'</div>';
+    sg.querySelectorAll('[data-a]').forEach(function(x){ x.onclick=function(){ useAddress(ADDR_BOOK[+x.dataset.a]); }; });
+  };
+  q.onkeydown=function(ev){
+    if(ev.key==='Escape') sg.innerHTML='';
+    if(ev.key==='ArrowDown'){ var first=sg.querySelector('[data-a]'); if(first){ ev.preventDefault(); first.focus(); } }
+  };
+  sg.onkeydown=function(ev){
+    var items=[].slice.call(sg.querySelectorAll('[data-a]')), i=items.indexOf(document.activeElement);
+    if(ev.key==='ArrowDown'&&i<items.length-1){ ev.preventDefault(); items[i+1].focus(); }
+    if(ev.key==='ArrowUp'){ ev.preventDefault(); if(i>0) items[i-1].focus(); else q.focus(); }
+    if(ev.key==='Escape'){ sg.innerHTML=''; q.focus(); }
+  };
+  document.addEventListener('click',function(ev){ if(!ev.target.closest('.aq-in')) sg.innerHTML=''; });
+}
 function wireDocs(){
   var add=function(list,slot){
     var q=kycReqs().filter(function(x){ return x.k===slot; })[0]||{n:'Document'};
@@ -12081,7 +12180,7 @@ function submit(){
   var from=r.status; r.form=JSON.parse(JSON.stringify(f)); r.status='submitted'; r.submittedAt=Date.now(); r.step=4; r.steps=4;
   audit(r,'Onboarding submitted',f.name||R.name,from,'submitted','All steps complete');
   if(!saveOnb(ONB)){ r.status=from; btn.disabled=false; btn.textContent='Submit onboarding'; toast('We couldn’t submit your onboarding. Please try again.',true); return; }
-  R=r; closed('tick','Thanks, your onboarding is submitted',FIRM.name+' will review your details and documents and let you know if anything else is needed.');
+  R=r; thankYou(false);
 }
 })();
 <\/script>

@@ -7646,6 +7646,8 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
 .drawer.ad{max-width:580px}
+.ar-table tr.ar-row{cursor:pointer}
+.ar-table tr.ar-row:hover td{background:#FAFBFC}
 .confirm-body .dt-ic{background:#EEF4FF;color:#2563EB}
 .ad-tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 14px;flex-shrink:0}
 .btn-ghost.sm{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12.5px}
@@ -8014,8 +8016,8 @@ function render(){
   page.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[dayState(r,!!r.today)], n=notes(r), fl=files(r), last=n[n.length-1];
     var who=member(r.staff);
-    h+='<tr'+(r.today&&r.mine?' class="ar-today"':'')+'>'+
-      (mg?'<td><span class="name">'+esc(who.n)+'</span><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
+    h+='<tr class="ar-row'+(r.today&&r.mine?' ar-today':'')+'" data-row="'+r.key+'">'+
+      (mg?'<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+esc(who.n)+'</span></button><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
       '<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
       '<td class="num">'+(T.start?t12(T.start):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="num">'+(T.end?t12(T.end):'<span class="ar-dash">—</span>')+'</td>'+
@@ -8046,7 +8048,12 @@ function render(){
   });
   if(openDate) openDay(openDate,true);
 }
-content.addEventListener('click',function(e){ var b=e.target.closest('[data-view]'); if(b) openDay(b.getAttribute('data-view'),false,b.getAttribute('data-sec')); });
+content.addEventListener('click',function(e){
+  var b=e.target.closest('[data-view]'), row=e.target.closest('tr[data-row]');
+  if(!b&&(!row||e.target.closest('button,a,input,select'))) return;
+  try{ openDay(b?b.getAttribute('data-view'):row.getAttribute('data-row'),false,b?b.getAttribute('data-sec'):null); }
+  catch(err){ closeDay(); toast('This day couldn’t be opened: '+err.message,true); }
+});
 
 /* ---------- CSV of the filtered days ---------- */
 function exportCsv(){

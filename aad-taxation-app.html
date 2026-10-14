@@ -7471,7 +7471,7 @@ tbody tr:hover{background:#FCFCFD}
 .db-links{display:inline-flex;align-items:center;gap:12px}
 .db-lnk{font-size:12.5px;font-weight:600;color:var(--orange-ink);display:inline-flex;align-items:center;gap:3px}
 .db-lnk:hover{text-decoration:underline;text-underline-offset:3px}
-.db-stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.db-stack{display:flex;flex-direction:column;gap:16px;min-width:0;grid-column:-2/-1}   /* right-hand column */
 .db-cap{margin-top:-2px}
 .db-drop{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--slate);padding:4px 8px 4px 0;border-radius:6px}
 .db-drop:hover{color:var(--ink)}
@@ -8214,6 +8214,8 @@ var QUOTES = [
 ];
 /* the comment step for each action that needs one */
 var NOTE = {
+  start:      { title:'Start your shift', sub:'Add a note for your team if you like, such as what you’re working on today.', btn:'Start shift', ph:'e.g. Working from the office today', opt:true,
+                quick:['Working from the office','Working from home','Client meetings today'] },
   break_start:{ title:'Start your break', sub:'Add a short comment so your team knows you’re away.', btn:'Start break', ph:'e.g. Lunch break',
                 quick:['Lunch break','Tea break','Short break','Personal errand'] },
   break_end:  { title:'End your break', sub:'Add a short comment before you get back to work.', btn:'End break', ph:'e.g. Back from lunch',
@@ -8262,7 +8264,7 @@ function render(){
   data=loadShift();
   var s=data.today.status, st=STATUS[s], T=totals(data.today.events,Date.now()), d=new Date(), q=QUOTES[d.getDate()%QUOTES.length];
   var h='<div class="page-head db-hello"><div><h1>'+greet()+', '+esc(ME.name.split(' ')[0])+'</h1><p class="sub">'+weekday(d)+', '+dmy(d)+'</p></div></div>';
-  // the shift card and the thought for the day share one column; the rest of the grid is free for more widgets
+  // the shift card and the thought for the day share the right-hand column; the rest of the grid is free for more widgets
   var n=data.today.events.length;
   h+='<div class="db-row"><div class="db-stack"><section class="at-card db-shift" aria-labelledby="db-t">'+
       '<div class="db-sh"><h2 id="db-t">Today’s shift</h2><span class="at-badge '+st[0]+'" role="status"><i></i>'+st[1]+'</span></div>'+
@@ -8302,7 +8304,7 @@ function request(type){
           s==='off'||s==='ended'?'Start your shift first.':'That action isn’t available right now.',true);
     render(); return;
   }
-  if(a.note) return askNote(type);
+  if(a.note||type==='start') return askNote(type);   // the start note is optional
   openCamera({type:type});
 }
 
@@ -8312,7 +8314,7 @@ function askNote(type){
   showModal('<div class="modal note" role="dialog" aria-modal="true" aria-labelledby="nt-t"><button class="dlg-x" id="nt-x" aria-label="Close">'+I.close+'</button>'+
     '<div class="nt-body"><h3 id="nt-t">'+n.title+'</h3><p>'+n.sub+'</p>'+
     (isEnd?'<dl class="nt-sum"><div><dt>Worked today</dt><dd>'+hm(T.worked)+'</dd></div><div><dt>Breaks</dt><dd>'+hm(T.brk)+'</dd></div></dl>':'')+
-    '<div><label class="nt-lbl" for="nt-ta">Comment <span class="req">*</span></label>'+
+    '<div><label class="nt-lbl" for="nt-ta">'+(n.opt?'Note <span class="opt">(optional)</span>':'Comment <span class="req">*</span>')+'</label>'+
       '<div class="nt-quick" aria-label="Quick comments">'+n.quick.map(function(q){ return '<button type="button" data-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join('')+'</div>'+
       '<textarea class="nt-ta" id="nt-ta" maxlength="300" placeholder="'+esc(n.ph)+'" aria-describedby="nt-err"></textarea>'+
       '<div class="nt-row"><span class="nt-err" id="nt-err">Add a comment to continue</span><span id="nt-n">0/300</span></div></div>'+
@@ -8333,7 +8335,7 @@ function askNote(type){
 }
 function submitNote(){
   var ta=document.getElementById('nt-ta'), v=ta.value.trim(), err=document.getElementById('nt-err');
-  if(v.length<3){
+  if(v.length<3&&!(NOTE[pending.type].opt&&!v)){
     err.textContent=v?'Make the comment a little longer':'Add a comment to continue';
     err.classList.add('show'); ta.classList.add('bad'); ta.focus(); return;
   }

@@ -2980,6 +2980,7 @@ tbody tr:hover{background:#FCFCFD}
 .ss-ccl{display:flex;gap:14px}
 .ss-ccl .linkbtn{padding:0;font-size:12px}
 .ss-codes{border:1px solid var(--line);border-radius:10px;background:#FAFBFC;padding:10px 12px 12px;margin-bottom:12px}
+.ss-in>.ss-codes{margin-bottom:0}
 .ss-codes-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .ss-codes-h b{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B}
 .ss-codes-h span{font-size:12px;color:var(--faint)}
@@ -4510,8 +4511,8 @@ function sendScreen(body,foot,cfg){
       tplSel('ss-etpl',et,s.eTpl)+
       field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>',true)+
       (cc?field('cc','Cc','Separate addresses with commas',rmBtn('cc','Cc')):'')+(bcc?field('bcc','Bcc','Separate addresses with commas',rmBtn('bcc','Bcc')):'')+
-      (s.eMode==='write'?chips('email','Click to insert into the Subject or the Message, where your cursor is'):'')+
       field('subject','Subject','Subject','',true)+
+      (s.eMode==='write'?chips('email','Click to insert into the Subject or the Message, where your cursor is'):'')+   // between the two fields it serves
       '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Message'+REQ+'</label>'+modes('eMode')+'</div>'+
         (s.eMode==='write'?'<div class="ss-rte'+(s.errs.body?' bad':'')+'">'+toolbar()+
             '<div class="ss-ed" id="ss-body" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ss-body-l" tabindex="0">'+s.bodyHtml+'</div></div>'

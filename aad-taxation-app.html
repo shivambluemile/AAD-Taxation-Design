@@ -7582,6 +7582,22 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
 .drawer.ad{max-width:580px}
+.ad-tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 14px;flex-shrink:0}
+.btn-ghost.sm{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12.5px}
+.btn-ghost.danger{color:var(--red)}.btn-ghost.danger:hover{background:#FEF2F2;border-color:#FECACA}
+.drawer.sf{max-width:520px}
+.fin.sm{height:44px;font-size:13.5px}
+.fin:disabled{opacity:.6}
+.sf-who{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC}
+.sf-who b{font-size:14px;color:var(--ink)}.sf-who span{font-size:12.5px;color:var(--mute)}
+.sf-sel{position:relative}.sf-sel select{appearance:none;-webkit-appearance:none;padding-right:34px}.sf-sel svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--mute)}
+.sf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sf-bh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.sf-bh .flabel{margin:0}
+.sf-brow{display:grid;grid-template-columns:1fr auto 1fr 40px;gap:10px;align-items:center;margin-bottom:8px}
+.sf-brow span{font-size:12.5px;color:var(--mute)}
+.sf-rm{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}.sf-rm:hover{background:#FEF2F2;color:var(--red)}
+.sf-none{font-size:13px;color:var(--faint)}
+.drawer.sf .ferr{margin-top:6px}
 .ad-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 24px 6px}
 .ad-who{display:flex;align-items:center;gap:12px;min-width:0}
 .ad-who h2{font-family:'Manrope';font-size:18px;font-weight:800;letter-spacing:-.2px;color:var(--ink);line-height:1.25}
@@ -7819,13 +7835,42 @@ var I = {
   clip:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m20 11.5-8.3 8.3a5 5 0 0 1-7.1-7.1l8.6-8.6a3.4 3.4 0 0 1 4.8 4.8l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"/></svg>',
   tick:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
   warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+  plus:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
   lock:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
 };
 var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 var STATES=[['done','Completed'],['notended','Not ended'],['progress','In progress']];
 var data=loadShift(), openDate=null;
 var state={f:blank(), page:1, per:10};
-function blank(){ return {q:'',month:'',status:''}; }
+function blank(){ return {q:'',month:'',status:'',staff:''}; }
+/* who sees what: everyone sees their own days; admins and managers see every staff member's and can add, edit and delete shifts */
+var MANAGE_ROLES=['Admin','Manager'];
+function canManage(){ return MANAGE_ROLES.indexOf(VIEWER.role)>=0; }
+var TEAM=[{id:ME.id,n:ME.name,div:'Admin'},{id:'KPG1001',n:'Alexender Doe',div:'Bookkeeping'},{id:'KPG1002',n:'Jonny',div:'Admin'},
+  {id:'KPG1003',n:'Marthew',div:'Accountant'},{id:'KPG1004',n:'Harry Potter',div:'Receptionist'},{id:'KPG1009',n:'Priya Nair',div:'Bookkeeping'},{id:'KPG1010',n:'Daniel Wu',div:'Accountant'}];
+function member(id){ return TEAM.filter(function(m){ return m.id===id; })[0]||{id:id,n:id,div:''}; }
+/* other staff members' days (the signed-in person's own days stay in the shift store the Dashboard writes) */
+var TEAM_KEY='aad-attendance-team-v1';
+function dayStart(k){ return fromKey(k).getTime(); }
+function seedTeam(){
+  var base=seedShiftHistory().slice(0,12), out=[];
+  TEAM.slice(1).forEach(function(m,k){
+    base.forEach(function(d,i){
+      if((i+k)%6===5) return;                                    // a day off now and then
+      var tpl=base[(i+k*3)%base.length], shift=(k*6-12)*60000;   // someone else's pattern, a few minutes earlier or later
+      out.push({staff:m.id,date:d.date,events:tpl.events.map(function(e){
+        var c=JSON.parse(JSON.stringify(e)); c.at=dayStart(d.date)+(e.at-dayStart(tpl.date))+shift; if(c.brk) c.brk='b-'+(dayStart(d.date)+(+c.brk.slice(2)-dayStart(tpl.date))+shift);
+        if(c.files) c.files=[]; delete c.photo; return c; })});
+    });
+  });
+  return out;
+}
+function loadTeam(){ var v=null; try{ v=JSON.parse(localStorage.getItem(TEAM_KEY)||'null'); }catch(e){} if(!v||!Array.isArray(v.days)){ v={days:seedTeam()}; saveTeam(v); } return v; }
+function saveTeam(v){ try{ localStorage.setItem(TEAM_KEY,JSON.stringify(v)); }catch(e){} }
+var team=loadTeam();
 var content=document.getElementById('content'), ov=document.getElementById('overlay');
 function toast(msg,err){
   var t=document.getElementById('toast'); t.innerHTML=(err?I.warn:I.tick)+esc(msg);
@@ -7835,21 +7880,25 @@ function toast(msg,err){
 
 /* today (once it has activity) plus history, newest first */
 function days(){
-  var all=[];
-  if(data.today.events.length) all.push({date:data.today.date,events:data.today.events,today:true});
-  return all.concat(data.history);
+  var all=[], tk=dayKey();
+  if(data.today.events.length) all.push({date:data.today.date,events:data.today.events,today:true,meta:data.today.meta});
+  all=all.concat(data.history).map(function(r){ return {staff:ME.id,date:r.date,events:r.events,today:!!r.today,meta:r.meta,mine:true}; });
+  if(canManage()) team.days.forEach(function(r){ all.push({staff:r.staff,date:r.date,events:r.events,today:r.date===tk,meta:r.meta,mine:false}); });
+  all.forEach(function(r){ r.key=r.staff+'|'+r.date; });
+  return all.sort(function(a,b){ return a.date<b.date?1:a.date>b.date?-1:(a.mine?-1:b.mine?1:member(a.staff).n<member(b.staff).n?-1:1); });
 }
 function monthLabel(k){ var p=k.split('-'); return MONTHS[+p[1]-1]+' '+p[0]; }
 function notes(r){ return r.events.filter(function(e){ return e.note; }); }
 function files(r){ var out=[]; r.events.forEach(function(e){ (e.files||[]).forEach(function(f){ out.push(f); }); }); return out; }
-function anyFilter(f){ return !!(f.q.trim()||f.month||f.status); }
+function anyFilter(f){ return !!(f.q.trim()||f.month||f.status||f.staff); }
 function filtered(){
   var f=state.f, q=f.q.trim().toLowerCase();
   return days().filter(function(r){
     if(f.month&&r.date.slice(0,7)!==f.month) return false;
     if(f.status&&dayState(r,!!r.today)!==f.status) return false;
+    if(f.staff&&r.staff!==f.staff) return false;
     if(!q) return true;
-    var d=fromKey(r.date), hay=[dmy(d),weekday(d)].concat(notes(r).map(function(e){return e.note;}),files(r).map(function(x){return x.n;})).join(' ').toLowerCase();
+    var d=fromKey(r.date), hay=[dmy(d),weekday(d),member(r.staff).n,r.staff].concat(notes(r).map(function(e){return e.note;}),files(r).map(function(x){return x.n;})).join(' ').toLowerCase();
     return hay.indexOf(q)>=0;
   });
 }
@@ -7875,35 +7924,41 @@ function render(){
   var all=days(), months=[], rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), f=state.f, now=Date.now();
   all.forEach(function(r){ var m=r.date.slice(0,7); if(months.indexOf(m)<0) months.push(m); });
 
+  var mg=canManage(), cols=mg?9:8;
   var h='<div class="page-head"><h1>Attendance</h1><div class="ph-acts">'+
-    '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered attendance records as CSV">'+I.csv+'CSV</button></div></div>';
+    '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered attendance records as CSV">'+I.csv+'CSV</button>'+
+    '<button class="btn-ghost" id="ar-leave">'+I.cal+'Apply for leave</button>'+
+    (mg?'<button class="btn-primary" id="ar-add">'+I.plus+'Add Shift</button>':'')+'</div></div>';
   // same filter bar as the other modules: search on the left, "Filter By:" dropdowns, Clear filters when any is set
   h+='<div class="filterbar"><div class="search">'+I.search+
-    '<input type="search" id="q" placeholder="Search by date or comment" aria-label="Search attendance" value="'+esc(f.q)+'"></div><div class="filters">'+
+    '<input type="search" id="q" placeholder="'+(mg?'Search by staff, date or comment':'Search by date or comment')+'" aria-label="Search attendance" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     selHtml('f-month','All Months',months.map(function(m){ return [m,monthLabel(m)]; }),f.month)+
+    (mg?selHtml('f-staff','All Staff',TEAM.map(function(m){ return [m.id,m.n]; }),f.staff):'')+
     selHtml('f-status','All Status',STATES,f.status)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
 
   h+='<div class="card ar-table"><table><thead><tr>'+
-    '<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+
+    (mg?'<th>Staff</th>':'')+'<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+
     '</tr></thead><tbody>';
   if(!all.length){
-    h+='<tr><td colspan="8"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
+    h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
   } else if(!page.length){
-    h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+    h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[dayState(r,!!r.today)], n=notes(r), fl=files(r), last=n[n.length-1];
-    h+='<tr'+(r.today?' class="ar-today"':'')+'>'+
-      '<td><button class="name-link" data-view="'+r.date+'" aria-label="View attendance for '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
+    var who=member(r.staff);
+    h+='<tr'+(r.today&&r.mine?' class="ar-today"':'')+'>'+
+      (mg?'<td><span class="name">'+esc(who.n)+'</span><small class="ar-sub">'+esc(who.id)+'</small></td>':'')+
+      '<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
       '<td class="num">'+(T.start?t12(T.start):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="num">'+(T.end?t12(T.end):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="num">'+hm(T.brk)+(T.breaks>1?'<small class="ar-sub">'+T.breaks+' breaks</small>':'')+'</td>'+
       '<td class="num">'+(T.end||r.today?hm(T.worked):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span></td>'+
-      '<td>'+(last?'<button class="ar-cmt" data-view="'+r.date+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
-      '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.date+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(last?'<button class="ar-cmt" data-view="'+r.key+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.key+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
       '</tr>';   // the date opens the day, so no separate View action
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
@@ -7912,13 +7967,15 @@ function render(){
   // filters apply as soon as they change, like the other modules
   var q=document.getElementById('q');
   q.oninput=function(){ state.f.q=q.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-month','month'],['f-status','status']].forEach(function(p){
-    document.getElementById(p[0]).onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
+  [['f-month','month'],['f-status','status'],['f-staff','staff']].forEach(function(p){
+    var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
   var clear=function(){ state.f=blank(); state.page=1; render(); };
   document.getElementById('clearf').onclick=clear;
   var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
   document.getElementById('csv').onclick=exportCsv;
+  document.getElementById('ar-leave').onclick=function(){ applyLeave({staff:ME.id}); };
+  var ad=document.getElementById('ar-add'); if(ad) ad.onclick=function(){ shiftForm(null); };
   Array.prototype.forEach.call(content.querySelectorAll('.pager button'),function(b){
     b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); content.scrollTop=0; };
   });
@@ -7930,12 +7987,12 @@ content.addEventListener('click',function(e){ var b=e.target.closest('[data-view
 function exportCsv(){
   var rows=filtered(); if(!rows.length){ toast('There are no attendance records to export.',true); return; }
   var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }, now=Date.now();
-  var out=[['Date','Day','Shift Start','Shift End','Break','Worked','Status','Comments','Documents']];
+  var mg=canManage(), out=[(mg?['Staff','Staff ID']:[]).concat(['Date','Day','Shift Start','Shift End','Break','Worked','Status','Comments','Documents'])];
   rows.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date);
-    out.push([dmy(d),weekday(d),T.start?t12(T.start):'',T.end?t12(T.end):'',hm(T.brk),T.end||r.today?hm(T.worked):'',DAY_STATE[dayState(r,!!r.today)][1],
+    out.push((mg?[member(r.staff).n,r.staff]:[]).concat([dmy(d),weekday(d),T.start?t12(T.start):'',T.end?t12(T.end):'',hm(T.brk),T.end||r.today?hm(T.worked):'',DAY_STATE[dayState(r,!!r.today)][1],
       r.events.filter(function(e){return e.note;}).map(function(e){ return ACTIONS[e.type].ev+': '+e.note; }).join(' | '),
-      files(r).map(function(x){return x.n;}).join(' | ')]);
+      files(r).map(function(x){return x.n;}).join(' | ')]));
   });
   var csv='﻿'+out.map(function(r){ return r.map(q).join(','); }).join('\r\n');
   var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
@@ -7948,7 +8005,7 @@ function exportCsv(){
 var FT={pdf:['PDF','#FDECEC','#C2410C'],jpg:['JPG','#E8F1FD','#2563EB'],jpeg:['JPG','#E8F1FD','#2563EB'],png:['PNG','#E8F1FD','#2563EB'],doc:['DOC','#EEF2FF','#4F46E5'],docx:['DOC','#EEF2FF','#4F46E5']};
 function ftag(n,big){ var e=(String(n).split('.').pop()||'').toLowerCase(), t=FT[e]||[(e||'file').toUpperCase(),'#F1F2F4','#475569'];
   return '<span class="ar-ft'+(big?' big':'')+'" style="background:'+t[1]+';color:'+t[2]+'">'+t[0]+'</span>'; }
-function dayOf(date){ return days().filter(function(x){ return x.date===date; })[0]; }
+function dayOf(key){ return days().filter(function(x){ return x.key===key; })[0]; }
 /* the day split into shifts, each with its breaks */
 /* the day split into shifts, each with its breaks. A break's start and end share a break id (brk);
    older records without one are paired in order, which is safe because a break must end before the next starts */
@@ -7965,11 +8022,11 @@ function shiftsOf(events){
 }
 /* two tabs: Details holds the whole day (times, breaks with their photos, comments, documents); Shift photos holds the start / end photos */
 var dayTab='details';
-function openDay(date,keep,sec){
-  var r=dayOf(date); if(!r){ closeDay(); return; }
-  if(!keep||openDate!==date) dayTab='details';
-  openDate=date;
-  var T=totals(r.events,Date.now()), d=fromKey(date);
+function openDay(key,keep,sec){
+  var r=dayOf(key); if(!r){ closeDay(); return; }
+  if(!keep||openDate!==key) dayTab='details';
+  openDate=key;
+  var T=totals(r.events,Date.now()), d=fromKey(r.date), who=member(r.staff);
   // break comments live with their break, so the Comments section holds the rest; every photo is in the Photos tab
   var cm=r.events.filter(function(e){ return e.note&&!isBreakEv(e); }), docs=[];
   r.events.forEach(function(e,ei){ (e.files||[]).forEach(function(f,fi){ docs.push({f:f,e:e,ei:ei,fi:fi}); }); });
@@ -7984,8 +8041,10 @@ function openDay(date,keep,sec){
   ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="ad-t">'+
     '<div class="ad-head"><div class="ad-who">'+
       '<div class="ad-date"><b>'+pad(d.getDate())+'</b><span>'+MONTHS[d.getMonth()].slice(0,3)+'</span></div>'+
-      '<div><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><p>'+esc(ME.name)+' · '+esc(ME.id)+(r.today?' · Today':'')+'</p></div></div>'+
+      '<div><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><p>'+esc(who.n)+' · '+esc(who.id)+(r.today?' · Today':'')+'</p></div></div>'+
       '<button class="x" id="ar-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="ad-tools">'+(canManage()?'<button class="btn-ghost sm" id="ad-edit">'+I.edit+'Edit shift</button><button class="btn-ghost sm danger" id="ad-del">'+I.trash+'Delete</button>':'')+
+      (r.mine||canManage()?'<button class="btn-ghost sm" id="ad-leave">'+I.cal+'Apply for leave</button>':'')+'</div>'+
     '<div class="btabs" role="tablist" aria-label="Attendance day">'+tabs.map(function(x){
       return '<button role="tab" data-dtab="'+x[0]+'" id="adt-'+x[0]+'" aria-controls="ad-body" aria-selected="'+(dayTab===x[0])+'" class="'+(dayTab===x[0]?'on':'')+'">'+x[1]+
         (x[2]?'<span class="tab-n">'+x[2]+'</span>':'')+'</button>';
@@ -7999,6 +8058,9 @@ function openDay(date,keep,sec){
     if(el){ bd.scrollTop=el.offsetTop-bd.offsetTop-12; el.classList.add('hl'); setTimeout(function(){ el.classList.remove('hl'); },1600); }
   }
   document.getElementById('ar-x').onclick=closeDay;
+  var be=document.getElementById('ad-edit'); if(be) be.onclick=function(){ shiftForm(r.key); };
+  var bdl=document.getElementById('ad-del'); if(bdl) bdl.onclick=function(){ deleteShift(r.key); };
+  var bl=document.getElementById('ad-leave'); if(bl) bl.onclick=function(){ applyLeave({staff:r.staff,from:r.date}); };
   [].forEach.call(ov.querySelectorAll('[data-dtab]'),function(b){ b.onclick=function(){ dayTab=b.getAttribute('data-dtab'); openDay(openDate,true); document.getElementById('adt-'+dayTab).focus(); }; });
   if(!keep) document.getElementById('ar-x').focus();
 }
@@ -8025,7 +8087,9 @@ function detailsTab(r,T){
   // each break is listed in the Breaks section below, so only the total belongs here
   h+=row(T.breaks?'Total break':'Breaks',T.breaks?hm(T.brk):'None');
   if(T.end||r.today) h+=row('Worked','<b>'+hm(T.worked)+'</b>');
-  h+=row('Photos',manual?'Some actions without camera':'<span class="ad-ok">Photo taken at every action</span>');
+  var hand=r.events.some(function(e){ return e.how==='manual'; });
+  h+=row('Photos',hand?'Entered by hand, no photos':manual?'Some actions without camera':'<span class="ad-ok">Photo taken at every action</span>');
+  if(r.meta) h+=row(r.meta.added?'Added by':'Edited by',esc(r.meta.by)+' · '+dmy(new Date(r.meta.at)));
   return h+'</dl></section>';
 }
 function privNote(){ return '<p class="ad-privnote">'+I.lock+'Private · visible only to the employee and admins</p>'; }
@@ -8129,6 +8193,119 @@ ov.addEventListener('click',function(e){
   var p=e.target.closest('[data-pv]'); if(p) return viewFile(p.getAttribute('data-pv'));
   var dl=e.target.closest('[data-dlf]'); if(dl) return toast('Downloads aren’t connected in this prototype yet.');
 });
+
+/* ---------- Add Shift / Edit shift (admins and managers) ---------- */
+var sf=null;
+function hhmm(ts){ var x=new Date(ts); return pad(x.getHours())+':'+pad(x.getMinutes()); }
+function atOf(date,t){ var p=t.split(':'), d=fromKey(date); d.setHours(+p[0],+p[1],0,0); return d.getTime(); }
+function shiftForm(key){
+  if(!canManage()){ toast('Only admins and managers can add or change shifts.',true); return; }
+  var r=key?dayOf(key):null;
+  if(key&&!r){ toast('This shift no longer exists.',true); return closeDay(); }
+  if(r&&r.mine&&r.today&&(data.today.status==='on'||data.today.status==='break')){ toast('This shift is still running. End it on the Dashboard before editing it.',true); return; }
+  var d={staff:ME.id,date:dayKey(),start:'09:00',end:'17:00',breaks:[],note:''};
+  if(r){
+    var sh=shiftsOf(r.events)[0]||{start:null,end:null,breaks:[]};
+    d={staff:r.staff,date:r.date,start:sh.start?hhmm(sh.start.at):'',end:sh.end?hhmm(sh.end.at):'',
+       breaks:sh.breaks.map(function(x){ return {from:hhmm(x.s.at),to:x.e?hhmm(x.e.at):'',s:x.s,e:x.e}; }),
+       note:sh.end?(sh.end.note||''):(sh.start&&sh.start.note||'')};   // the comment is the end-of-shift note, or the start note while the shift has no end
+  }
+  sf={key:key,r:r,d:d,errs:{}};
+  paintShiftForm();
+}
+function paintShiftForm(){
+  var d=sf.d, e=sf.errs, ed=!!sf.key, who=member(d.staff);
+  var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
+  var inp=function(k,label,type,val,o){ o=o||{}; return '<div><label class="flabel" for="sf-'+k+'">'+label+(o.req?' <span class="req-star">*</span>':'')+'</label>'+
+    '<input class="fin plain sm'+(e[k]?' bad':'')+'" id="sf-'+k+'" data-sf="'+k+'" type="'+type+'" value="'+esc(val)+'"'+(o.max?' max="'+o.max+'"':'')+(o.dis?' disabled':'')+'>'+err(k)+'</div>'; };
+  ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
+    '<div class="modal-head"><h2 id="sf-t">'+(ed?'Edit shift':'Add Shift')+'</h2><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body">'+
+      (ed?'<div class="sf-who"><b>'+esc(who.n)+'</b><span>'+esc(who.id)+' · '+weekday(fromKey(d.date))+', '+dmy(fromKey(d.date))+'</span></div>':
+        '<div><label class="flabel" for="sf-staff">Staff member <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain sm" id="sf-staff" data-sf="staff">'+
+          TEAM.map(function(m){ return '<option value="'+m.id+'"'+(m.id===d.staff?' selected':'')+'>'+esc(m.n)+' · '+m.id+'</option>'; }).join('')+'</select>'+I.chev+'</div>'+err('staff')+'</div>'+
+        inp('date','Date','date',d.date,{req:true,max:dayKey()}))+
+      '<div class="sf-grid">'+inp('start','Start time','time',d.start,{req:true})+inp('end','End time','time',d.end,{req:d.date!==dayKey()})+'</div>'+
+      '<div><div class="sf-bh"><span class="flabel">Breaks</span><button type="button" class="pill-btn quiet" id="sf-addb">'+I.plus+'Add break</button></div>'+
+        (d.breaks.length?d.breaks.map(function(x,i){
+          return '<div class="sf-brow"><input class="fin plain sm'+(e['b'+i]?' bad':'')+'" type="time" data-bf="'+i+'" value="'+esc(x.from)+'" aria-label="Break '+(i+1)+' from"><span>to</span>'+
+            '<input class="fin plain sm'+(e['b'+i]?' bad':'')+'" type="time" data-bt="'+i+'" value="'+esc(x.to)+'" aria-label="Break '+(i+1)+' to">'+
+            '<button type="button" class="sf-rm" data-brm="'+i+'" aria-label="Remove break '+(i+1)+'">'+I.trash+'</button></div>'+err('b'+i);
+        }).join(''):'<p class="sf-none">No breaks.</p>')+'</div>'+
+      '<div><label class="flabel" for="sf-note">Comment</label><textarea class="ftext" id="sf-note" data-sf="note" rows="3" maxlength="300" placeholder="e.g. Forgot to clock in, times confirmed with the team">'+esc(d.note)+'</textarea></div>'+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-save">'+(ed?'Save changes':'Add Shift')+'</button></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  [].forEach.call(ov.querySelectorAll('[data-sf]'),function(el){ el.oninput=el.onchange=function(){ sf.d[el.getAttribute('data-sf')]=el.value; }; });
+  [].forEach.call(ov.querySelectorAll('[data-bf]'),function(el){ el.oninput=function(){ sf.d.breaks[+el.getAttribute('data-bf')].from=el.value; }; });
+  [].forEach.call(ov.querySelectorAll('[data-bt]'),function(el){ el.oninput=function(){ sf.d.breaks[+el.getAttribute('data-bt')].to=el.value; }; });
+  [].forEach.call(ov.querySelectorAll('[data-brm]'),function(el){ el.onclick=function(){ sf.d.breaks.splice(+el.getAttribute('data-brm'),1); sf.errs={}; paintShiftForm(); }; });
+  document.getElementById('sf-addb').onclick=function(){ sf.d.breaks.push({from:'',to:''}); paintShiftForm(); var x=ov.querySelector('[data-bf="'+(sf.d.breaks.length-1)+'"]'); if(x) x.focus(); };
+  var back=function(){ var k=sf.key; sf=null; if(k) openDay(k); else closeDay(); };
+  document.getElementById('sf-x').onclick=back; document.getElementById('sf-cancel').onclick=back;
+  document.getElementById('sf-save').onclick=saveShiftForm;
+}
+function saveShiftForm(){
+  var d=sf.d, e={}, today=dayKey();
+  if(!d.date) e.date='Choose the date'; else if(d.date>today) e.date='A shift can’t be added for a future date';
+  if(!sf.key&&d.date&&!e.date&&dayOf(d.staff+'|'+d.date)) e.date=member(d.staff).n+' already has a shift on '+dmy(fromKey(d.date))+'. Open it to edit it instead.';
+  if(!d.start) e.start='Enter the start time';
+  if(!d.end&&d.date!==today) e.end='Enter the end time';
+  if(d.start&&d.end&&d.end<=d.start) e.end='The end time must be after the start time';
+  if(d.date===today&&d.end&&atOf(d.date,d.end)>Date.now()) e.end='The end time can’t be in the future';
+  var bs=d.breaks.slice().map(function(x,i){ return {x:x,i:i}; }).sort(function(a,b){ return a.x.from<b.x.from?-1:1; }), prev=null;
+  bs.forEach(function(o){ var x=o.x, k='b'+o.i;
+    if(!x.from||!x.to) e[k]='Enter both times for this break, or remove it';
+    else if(x.to<=x.from) e[k]='The break must end after it starts';
+    else if(d.start&&x.from<d.start||d.end&&x.to>d.end) e[k]='The break must be inside the shift';
+    else if(prev&&x.from<prev.to) e[k]='Breaks can’t overlap';
+    prev=x; });
+  sf.errs=e;
+  if(Object.keys(e).length){ paintShiftForm(); var b=ov.querySelector('.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
+  var old=sf.r, ev=[], keepS=old&&shiftsOf(old.events)[0], note=d.note.trim(), S=atOf(d.date,d.start), Ex=d.end?atOf(d.date,d.end):null;
+  var same=function(o,at){ return o&&o.at===at; };               // an unchanged time keeps its photo and how it was recorded
+  var mk=function(type,at,o,extra){ var x=same(o,at)?JSON.parse(JSON.stringify(o)):{type:type,at:at,how:'manual'}; x.type=type; x.at=at; for(var k in extra) x[k]=extra[k]; return x; };
+  ev.push(mk('start',S,keepS&&keepS.start,{}));
+  bs.map(function(o){ return o.x; }).forEach(function(x){
+    var a=atOf(d.date,x.from), z=atOf(d.date,x.to), id='b-'+a;
+    ev.push(mk('break_start',a,x.s,{brk:id})); ev.push(mk('break_end',z,x.e,{brk:id}));
+  });
+  if(Ex){ var oe=keepS&&keepS.end; var en=mk('end',Ex,oe,{}); if(oe&&oe.files) en.files=oe.files; if(note) en.note=note; else delete en.note; ev.push(en); }
+  else if(note) ev[0].note=note;
+  var meta={by:ME.name,at:Date.now(),added:!sf.key};
+  // photos of actions that no longer exist go with them
+  if(old){ var kept=ev.map(function(x){ return x.photo; }); deletePhotos(old.events.filter(function(x){ return x.photo&&kept.indexOf(x.photo)<0; }).map(function(x){ return x.photo; })); }
+  if(d.staff===ME.id){
+    data=loadShift();
+    if(d.date===today){ data.today.events=ev; data.today.status=Ex?'ended':'on'; data.today.meta=meta; }
+    else { data.history=data.history.filter(function(h){ return h.date!==d.date; }); data.history.push({date:d.date,events:ev,meta:meta}); data.history.sort(function(a,b){ return a.date<b.date?1:-1; }); }
+    saveShift(data); try{ parent.AADShiftTick(); }catch(x){}
+  } else {
+    team=loadTeam(); team.days=team.days.filter(function(h){ return !(h.staff===d.staff&&h.date===d.date); });
+    team.days.push({staff:d.staff,date:d.date,events:ev,meta:meta}); saveTeam(team);
+  }
+  var k=d.staff+'|'+d.date; sf=null;
+  toast(meta.added?'Shift added for '+member(d.staff).n+'.':'Shift updated.');
+  render(); openDay(k);
+}
+function deleteShift(key){
+  var r=dayOf(key); if(!r||!canManage()) return;
+  if(r.mine&&r.today&&(data.today.status==='on'||data.today.status==='break')){ toast('This shift is still running. End it on the Dashboard before deleting it.',true); return; }
+  var who=member(r.staff);
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="dd-t"><div class="confirm-body"><div class="warn">'+I.trash+'</div><h3 id="dd-t">Delete this shift?</h3>'+
+    '<p><strong>'+esc(who.n)+'</strong>’s shift on '+dmy(fromKey(r.date))+' and its breaks, comments, documents and photos will be removed. This can’t be undone.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="dd-no">Cancel</button><button class="btn-danger" id="dd-go">Delete shift</button></div></div>';
+  dlg.classList.add('open');
+  document.getElementById('dd-no').onclick=closeFile;
+  document.getElementById('dd-go').onclick=function(){
+    deletePhotos(r.events.filter(function(x){ return x.photo; }).map(function(x){ return x.photo; }));
+    if(r.mine){ data=loadShift(); if(r.today) data.today={date:r.date,status:'off',events:[]}; else data.history=data.history.filter(function(h){ return h.date!==r.date; }); saveShift(data); try{ parent.AADShiftTick(); }catch(x){} }
+    else { team=loadTeam(); team.days=team.days.filter(function(h){ return !(h.staff===r.staff&&h.date===r.date); }); saveTeam(team); }
+    closeFile(); closeDay(); render(); toast('Shift deleted.');
+  };
+}
+/* leave from the timesheet: the Leave page opens Add Leave with the person (and day) filled in */
+function applyLeave(pre){ try{ parent.AADApplyLeave(pre); }catch(x){ toast('Open Leave to apply for leave.',true); } }
 
 /* a document opened from the day panel. Only the name and size are stored in this prototype, so it shows a placeholder sheet */
 var dlg=document.getElementById('dlg');

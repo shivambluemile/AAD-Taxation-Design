@@ -2798,6 +2798,11 @@ tbody tr:hover{background:#FCFCFD}
 .el-opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
 .el-sub{margin-top:16px}
 .el-sub .grid2{margin-bottom:14px}
+.el-sigfoot{display:flex;justify-content:flex-end;margin-top:10px}
+.el-signed{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
+.el-sigimg{flex:0 0 auto;min-width:160px;max-width:260px;height:64px;display:flex;align-items:center;border-bottom:1px solid #CBD5E1}
+.el-sigimg img{max-height:60px;max-width:100%;object-fit:contain}.el-sigimg .el-typed{font-size:32px;line-height:60px;border:0;height:auto}
+.el-sigmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.el-sigmeta b{font-size:14px;color:var(--ink)}.el-sigmeta span{font-size:12.5px;color:var(--mute)}
 @media (max-width:600px){.el-opts.two{grid-template-columns:1fr}}
 .el-prev{display:flex;flex-direction:column;gap:8px}.el-prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
 .el-prow>div{flex:1;min-width:0}.el-prow b{display:block;font-size:13.5px;color:var(--ink)}.el-prow small{font-size:12px;color:var(--mute)}
@@ -4787,7 +4792,7 @@ function openWizard(draftId){
   var dr=draftId?loadWzDrafts().filter(function(x){ return x.id===draftId; })[0]:null;
   if(dr){
     form.d=JSON.parse(JSON.stringify(dr.d));
-    ['step','services','note','kycDate','reviewed','signerIdx','method','channels','sigDate'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
+    ['step','services','note','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
     wiz.files=(dr.files||[]).slice(); wiz.draftId=dr.id; wiz.token=dr.token;
   }
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
@@ -4853,7 +4858,7 @@ function storeDraft(){
   return Promise.all(puts).then(function(){
     var list=loadWzDrafts(), old=list.filter(function(x){ return x.id===id; })[0];
     var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,kycDate:wiz.kycDate,
-      files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,token:wiz.token||null};
+      files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,sig:wiz.sig||null,sigAt:wiz.sigAt||null,token:wiz.token||null};
     list=list.filter(function(x){ return x.id!==id; }); list.unshift(rec);
     form.dirty=false;
     return saveWzDrafts(list);
@@ -4897,7 +4902,7 @@ function wzClient(){ var d=form.d; return {name:d.name.trim(),type:d.type,entity
 function wzLetterHtml(){
   var c=wzClient(), sg=wzSigner();
   return letterHtml({name:c.name,type:c.type,entity:c.entity,email:c.email,address:c.address,abn:form.d.abn,services:wiz.services.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),
-    date:Date.now(),staff:ME,signature:null,signedAt:null,fy:fyStart(Date.now()),signerName:sg.name||(c.type==='company'?'':c.name)});
+    date:Date.now(),staff:ME,signature:wiz.method==='manual'&&wiz.sig||null,signedAt:wiz.method==='manual'&&wiz.sig?wiz.sigAt:null,fy:fyStart(Date.now()),signerName:sg.name||(c.type==='company'?'':c.name)});
 }
 /* step 3: everything inline: preview, review, director, how it's signed, then Save as Draft or Send */
 function paintLetterStep(){
@@ -4921,8 +4926,14 @@ function paintLetterStep(){
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div>'+err('method');
   if(wiz.method==='request') h+=err('channel');
   if(wiz.method==='manual'){
-    h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm" type="date" id="el-date" value="'+esc(wiz.sigDate)+'" max="'+isoOf(Date.now())+'">'+err('date')+'</div><div></div></div>'+
-      '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+'</div>';
+    var sv=wiz.sig;
+    if(sv) h+='<div class="el-sub"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div class="el-signed">'+
+        '<div class="el-sigimg">'+(sv.method==='type'?'<em class="el-typed"'+(sv.font?' style="font-family:'+esc(sv.font)+'"':'')+'>'+esc(sv.text)+'</em>':'<img src="'+sv.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
+        '<div class="el-sigmeta"><b>'+esc(sv.name)+'</b><span>Signed '+whenOf(wiz.sigAt)+'</span></div>'+
+        '<button type="button" class="linkbtn" id="el-resign">Sign again</button></div></div>';
+    else h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm'+(e.date?' bad':'')+'" type="text" id="el-date" inputmode="numeric" maxlength="10" placeholder="dd-mm-yyyy" autocomplete="off" value="'+esc(wiz.sigDateTxt!=null?wiz.sigDateTxt:(wiz.sigDate?dmyOf(fromIso(wiz.sigDate)):''))+'">'+err('date')+'</div><div></div></div>'+
+      '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+
+      '<div class="el-sigfoot"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit</button></div></div>';
   }
   h+='</section>';
   if(wiz.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(wiz.fail)+' Nothing was sent and the client wasn’t created. Check the details and try again.</span></div>';
@@ -4930,22 +4941,35 @@ function paintLetterStep(){
   foot.innerHTML='<button class="btn-ghost" id="wz-back"'+(wiz.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
     '<button class="btn-ghost" id="wz-draft"'+(wiz.busy?' disabled':'')+'>Save as Draft</button>'+
     '<button class="btn-primary" id="wz-send"'+(wiz.busy?' disabled':'')+'>'+(wiz.busy?'<span class="spin"></span>Sending…':OI.send+'Send')+'</button>';
-  var pad=wiz.method==='manual'?sigPad(document.getElementById('el-pad'),sg.name||c.name,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}):null;
+  var pad=wiz.method==='manual'&&!wiz.sig?sigPad(document.getElementById('el-pad'),sg.name||c.name,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}):null;
   wiz.pad=pad;
   var clear=function(k){ if(e[k]){ delete e[k]; } };
   document.getElementById('wz-back').onclick=function(){ wiz.step=2; wiz.errs={}; wiz.fail=''; wzPaint(); };
   document.getElementById('el-full').onclick=function(){ printLetter(wzLetterHtml(),true); };
   document.getElementById('el-pdf').onclick=function(){ printLetter(wzLetterHtml()); };
   document.getElementById('wz-rev').onchange=function(){ wiz.reviewed=this.checked; form.dirty=true; if(this.checked&&e.review){ clear('review'); paintLetterStep(); } };
-  body.querySelectorAll('input[name=el-dir]').forEach(function(r){ r.onchange=function(){ wiz.signerIdx=+r.value; form.dirty=true; clear('signer'); clear('channel'); paintLetterStep(); }; });
+  body.querySelectorAll('input[name=el-dir]').forEach(function(r){ r.onchange=function(){ wiz.signerIdx=+r.value; wiz.sig=null; wiz.sigAt=null; form.dirty=true; clear('signer'); clear('channel'); paintLetterStep(); }; });   // a new signer signs again
   body.querySelectorAll('input[name=el-how]').forEach(function(r){ r.onchange=function(){ wiz.method=r.value; form.dirty=true; clear('method'); clear('channel'); clear('sig'); paintLetterStep(); }; });
-  var dt=document.getElementById('el-date'); if(dt) dt.oninput=function(){ wiz.sigDate=dt.value; form.dirty=true; };
+  var dt=document.getElementById('el-date'); if(dt) dt.oninput=function(){   // types as dd-mm-yyyy; the ISO date is kept once it's a real date
+    var d=dt.value.replace(/\D/g,'').slice(0,8), v=d.slice(0,2)+(d.length>2?'-'+d.slice(2,4):'')+(d.length>4?'-'+d.slice(4):'');
+    if(v!==dt.value) dt.value=v; wiz.sigDateTxt=v; wiz.sigDate=isoFromDmy(v); form.dirty=true; };
+  var ok=document.getElementById('el-sigok'); if(ok) ok.onclick=function(){
+    var today=isoOf(Date.now()), er={};
+    if(!wiz.sigDate) er.date=wiz.sigDateTxt?'Enter a real date as dd-mm-yyyy':'Enter the signing date'; else if(wiz.sigDate>today) er.date='The signing date can’t be in the future';
+    var v=pad&&pad.value(sg.name||c.name); if(!v) er.sig='Draw the signature, select a style, or upload a signature image';
+    delete e.date; delete e.sig; for(var k in er) e[k]=er[k];
+    if(Object.keys(er).length){ paintLetterStep(); var b=formBody().querySelector('#el-date.bad')||formBody().querySelector('.el-sub .cl-err'); if(b) b.scrollIntoView({block:'center'}); return; }
+    var now=new Date(), at=new Date(fromIso(wiz.sigDate)); at.setHours(now.getHours(),now.getMinutes(),now.getSeconds(),0);   // the chosen day, at the time it was submitted
+    wiz.sig=v; wiz.sigAt=at.getTime(); wiz.sigDateTxt=null; form.dirty=true; paintLetterStep();
+  };
+  var rs=document.getElementById('el-resign'); if(rs) rs.onclick=function(){ wiz.sig=null; wiz.sigAt=null; form.dirty=true; paintLetterStep(); };
   document.getElementById('wz-draft').onclick=function(){
     storeDraft().then(function(ok){ if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
       var n=c.name; form=null; wiz=null; closeDrawer(); refreshList(); toast(n+' saved as a draft'); });
   };
   document.getElementById('wz-send').onclick=wzSend;
 }
+function isoFromDmy(v){ var m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(v||''); if(!m) return ''; var d=new Date(+m[3],+m[2]-1,+m[1]); return d.getDate()===+m[1]&&d.getMonth()===+m[2]-1?isoOf(d.getTime()):''; }
 function wzSend(){
   if(wiz.busy) return;
   var c=wzClient(), co=c.type==='company', sg=wzSigner(), e={};
@@ -4955,11 +4979,8 @@ function wzSend(){
   var sig=null, at=null;
   if(wiz.method==='request'&&(!co||wiz.signerIdx!=null)&&!sg.email&&!sg.phone) e.channel=(co?'This director has':'The client has')+' no email address or mobile number. Add one in step 1';
   if(wiz.method==='manual'){
-    var today=isoOf(Date.now());
-    if(!wiz.sigDate) e.date='Enter the signing date'; else if(wiz.sigDate>today) e.date='The signing date can’t be in the future';
-    sig=wiz.pad&&wiz.pad.value(sg.name||c.name);
-    if(!sig) e.sig='Draw the signature, select a style, or upload a signature image';
-    at=wiz.sigDate===today?Date.now():fromIso(wiz.sigDate);
+    sig=wiz.sig; at=wiz.sigAt;
+    if(!sig) e.sig='Add the signature and click Submit';
   }
   wiz.errs=e; wiz.fail='';
   if(Object.keys(e).length){

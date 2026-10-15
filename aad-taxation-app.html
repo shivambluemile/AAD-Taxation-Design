@@ -2760,6 +2760,39 @@ tbody tr:hover{background:#FCFCFD}
 .el-review{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:0 0 14px;cursor:pointer}
 .el-review input{margin-top:1px}.el-review b{display:block;font-size:13.5px;color:var(--ink)}.el-review small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px;line-height:1.45}
 .el-review.bad{border-color:#F3A3A3;background:#FFF7F7}
+/* ===== Add Client: clean sections, inline letter step ===== */
+.drawer.wz>.modal-head{border-bottom:0}
+.drawer.wz #cfb .wz-sec,.drawer.wz #rqb .wz-sec{border:0;border-radius:0;padding:0;background:none}
+.drawer.wz #cfb .wz-sec+.wz-sec,.drawer.wz #rqb .wz-sec+.wz-sec{border-top:0;padding-top:0;margin-top:8px}
+.wz-h{display:block;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}
+#cfb .flabel{margin-bottom:7px}
+#cfb .fin::placeholder,#cfb .ftext::placeholder,#rqb .fin::placeholder,#rqb .ftext::placeholder{color:#9BA6B7;opacity:1;font-weight:400}
+#cfb .wz-kycd{margin-bottom:14px}
+.sp-rm{border:1px solid var(--line);background:#fff}
+.sp-rm:hover:not([disabled]){border-color:#FECACA}
+.el-acts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.el-acts .pill-btn{display:inline-flex;align-items:center;gap:7px}
+.el-acts .pill-btn.on{background:var(--orange-soft)}
+.el-step .el-wrap{margin-bottom:14px}
+.el-step .el-review{align-items:center}
+.el-step .el-review span{font-size:13.5px;color:var(--ink);line-height:1.45}
+.el-opts{display:grid;gap:8px}
+.el-opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.el-opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;transition:border-color .15s,background .15s}
+.el-opt:hover{border-color:#F8C9A2}
+.el-opt.on{border-color:var(--orange);background:var(--orange-soft)}
+.el-opt input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:18px;height:18px;margin-top:1px;border:1.5px solid #CBD5E1;border-radius:50%;background:#fff;display:inline-grid;place-content:center;cursor:pointer}
+.el-opt input:checked{border-color:var(--orange)}
+.el-opt input:checked::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.el-opt.chk input{border-radius:5px}
+.el-opt.chk input:checked{background:var(--orange)}
+.el-opt.chk input:checked::after{width:9px;height:5px;border-radius:0;background:none;border:2px solid #fff;border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg)}
+.el-opt input:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.2)}
+.el-opt b{display:block;font-size:13.5px;font-weight:700;color:var(--ink)}
+.el-opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px;overflow-wrap:anywhere}
+.el-sub{margin-top:16px}
+.el-sub .grid2{margin-bottom:14px}
+@media (max-width:600px){.el-opts.two{grid-template-columns:1fr}}
 .el-prev{display:flex;flex-direction:column;gap:8px}.el-prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
 .el-prow>div{flex:1;min-width:0}.el-prow b{display:block;font-size:13.5px;color:var(--ink)}.el-prow small{font-size:12px;color:var(--mute)}
 .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:4px 0}
@@ -3533,17 +3566,26 @@ function closeDetail(){
 /* =========================================================
    Listing
 ========================================================= */
-/* onboarding requests that haven't become clients yet show in the list as Draft */
+/* onboarding requests that haven't become clients yet, and Add Client forms saved part-way, show in the list as Draft */
 function draftRows(){
   ONB=loadOnb();
   return ONB.requests.filter(function(r){ return ['completed','rejected'].indexOf(r.status)<0; }).map(function(r){
     var f=r.form||{}, co=r.type==='company';
     return {draft:true,r:r,id:r.id,name:f.name||r.name,email:f.email||r.email,phone:f.phone||r.phone,type:r.type,entity:co?(f.entity||'Company'):'Individual',abn:f.abn||'',created:r.created};
-  });
+  }).concat(loadWzDrafts().map(function(w){
+    var d=w.d||{}, co=d.type==='company';
+    var r={id:w.id,wiz:true,services:chosen(w.services||[]).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),kyc:w.files||[],letter:{status:'pending'},status:'wiz'+(w.step||1),by:w.by};
+    return {draft:true,r:r,id:w.id,name:String(d.name||'').trim()||'Unnamed client',email:d.email||'',phone:d.phone||'',type:d.type,entity:co?(d.entity||'Company'):'Individual',abn:d.abn||'',created:w.updated||w.created};
+  }));
 }
+/* Add Client forms saved with Save & Close / Save as Draft (this browser; the server keeps them once connected) */
+var WZD_KEY='aad-add-client-drafts';
+function loadWzDrafts(){ try{ var v=JSON.parse(localStorage.getItem(WZD_KEY)||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function saveWzDrafts(v){ try{ localStorage.setItem(WZD_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function openDraftRow(id){ if(String(id).indexOf('wd')===0) openWizard(id); else openRequestDetail(id); }
 var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 function clIni(n){ var p=String(n||'?').trim().split(' ').filter(Boolean); return ((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(); }
-var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review'};
+var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review',wiz1:'Add Client · step 1 of 3',wiz2:'Add Client · step 2 of 3',wiz3:'Add Client · step 3 of 3'};
 function filtered(){
   var q=state.q.trim().toLowerCase(), qd=digits(q);
   var drafts=draftRows().filter(function(d){
@@ -3635,7 +3677,7 @@ function renderList(){
   var a2=document.getElementById('add2'); if(a2) a2.onclick=function(){ openForm(null); };
   content.querySelectorAll('.pager button[data-p]').forEach(function(b){ b.onclick=function(){ state.page=+b.dataset.p; renderList(); window.scrollTo(0,0); }; });
   content.querySelectorAll('[data-view]').forEach(function(b){ b.onclick=function(){ go('/clients/'+b.dataset.view); }; });
-  content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openRequestDetail(b.dataset.rq); }; });
+  content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openDraftRow(b.dataset.rq); }; });
   content.querySelectorAll('[data-edit]').forEach(function(b){ b.onclick=function(){ openForm(+b.dataset.edit); }; });
   wireCopy(content);
   wireViews();
@@ -3677,13 +3719,17 @@ function kycDone(c){ var k=kycCurrent(c); return !!(k&&kycState(k)!=='expired');
 function currentLetter(c){ var F=fyStart(Date.now()); return ONB.letters.filter(function(l){ return l.clientId===c.id&&letterFy(l)===F; }).sort(function(a,b){ return b.created-a.created; })[0]||null; }
 function letterSignedFor(c){ var l=currentLetter(c); return !!(l&&l.status==='signed'); }
 /* who signs: the first director for a company, otherwise the client */
+function letterSigner(c,L){
+  if(c.type==='company'&&L&&L.signer&&L.signer.name){ var d=(c.directors||[]).filter(function(x){ return x.name===L.signer.name; })[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'director'}; }
+  return firstSigner(c);
+}
 function firstSigner(c){ if(c.type==='company'){ var d=(c.directors||[])[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'first director'}; } return {name:c.name,email:c.email,phone:c.phone,role:'client'}; }   // generated or sent isn't enough
 function detailTabs(c){
   var t=[], act=(c.services||[]).filter(function(a){ return a.status==='active'; }).length;
   t.push(['notes','Notes',(c.notes||[]).length]);            // notes come first
   t.push(['services','Services',act]);
   if(c.type==='company') t.push(['directors','Directors',c.directors.length]);
-  t.push(['documents','KYC documents',kycRecs(c).length,kycDone(c)]);
+  t.push(['documents','KYC',kycRecs(c).length,kycDone(c)]);
   t.push(['engagement','Engagement letter',null,letterSignedFor(c)]);
   t.push(['activity','Activities']);
   return t;
@@ -4376,7 +4422,9 @@ var OI={
   pen:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
   note:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
   shield:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.4 3.1 8.4 7.5 9.5 4.4-1.1 7.5-5.1 7.5-9.5V6Z"/><path d="m9 12 2 2 4-4"/></svg>',
-  print:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>'
+  print:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>',
+  del:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
+  ext:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
 };
 ensureLetterCss(document);
 
@@ -4408,16 +4456,15 @@ function svcPickerHtml(list,errs){
     var opts=act.filter(function(s){ return taken.indexOf(s.id)<0||s.id===x.svcId; });
     var es=errs['s'+i], ep=errs['p'+i], first=i===0;
     return '<div class="sp-row">'+
-      '<div class="sp-svc"><label class="sr" for="sp-s'+i+'">Service '+(i+1)+'</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
+      '<div class="sp-svc"><label class="'+(first?'flabel':'sr')+'" for="sp-s'+i+'">'+(first?'Service':'Service '+(i+1))+'</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
         '<option value="">Choose a service</option>'+opts.map(function(s){ return '<option value="'+s.id+'"'+(s.id===x.svcId?' selected':'')+'>'+esc(s.name)+' · min '+money(s.price)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'+
-      '<div class="sp-pr"><label class="sr" for="sp-p'+i+'">Price for service '+(i+1)+', including GST</label><span class="sp-cur" aria-hidden="true">$</span><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
+      '<div class="sp-pr"><label class="'+(first?'flabel':'sr')+'" for="sp-p'+i+'">'+(first?'Price (incl. GST)':'Price for service '+(i+1)+', including GST')+'</label><span class="sp-cur" aria-hidden="true">$</span><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
         (x.svcId?' min="'+minOf(x)+'" placeholder="'+minOf(x)+'"':' placeholder="0.00" disabled')+' value="'+esc(x.price)+'"'+(edit||!x.svcId?'':' readonly title="Only admins and managers can change prices"')+'></div>'+
-      '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove service '+(i+1)+'"'+(list.length===1&&!x.svcId?' disabled':'')+'>'+I.trash+'</button>'+
+      '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove service '+(i+1)+'"'+(list.length===1&&!x.svcId?' disabled':'')+'>'+OI.del+'</button>'+
       (es||ep?'<span class="cl-err sp-err">'+I.info+esc(es||ep)+'</span>':'')+'</div>';
   }).join('');
   var more=act.length>chosen(list).length, last=list[list.length-1];
-  h+='<div class="sp-foot"><button type="button" class="pill-btn quiet" id="sp-add"'+(more?'':' disabled')+(more?'':' title="Every active service is already added"')+'>'+I.plus+'Add another service</button>'+
-    (chosen(list).length?'<span class="sp-sum"><b class="sp-total">Total '+money(totalOf(chosen(list)))+'</b><small>Prices include GST</small></span>':'')+'</div>';
+  h+='<div class="sp-foot"><button type="button" class="pill-btn quiet" id="sp-add"'+(more?'':' disabled')+(more?'':' title="Every active service is already added"')+'>'+I.plus+'Add another service</button></div>';
   if(errs.list) h+='<span class="cl-err">'+I.info+esc(errs.list)+'</span>';
   if(!edit) h+='<p class="cl-hint">Prices come from Settings → Services. Only admins and managers can raise them for a client.</p>';
   return h+'</div>';
@@ -4522,12 +4569,12 @@ function letterCtx(c,services,letter){
     signature:letter&&letter.status==='signed'?letter.signature:null,signedAt:letter&&letter.signedAt};
 }
 /* opens the letter on its own page and the browser's print dialog, where it can be saved as a PDF */
-function printLetter(html){
-  var w=window.open('','_blank'); if(!w){ toast('Allow pop-ups to open the PDF',true); return; }
+function printLetter(html,view){
+  var w=window.open('','_blank'); if(!w){ toast(view?'Allow pop-ups to open the letter':'Allow pop-ups to download the PDF',true); return; }
   w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Engagement letter · '+esc(FIRM.name)+'</title>'+
     '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"><link href="'+SIG_FONT_URL+'" rel="stylesheet">'+
     '<style>'+LETTER_CSS+'body{margin:0;background:#F3F4F6;padding:24px}@media print{body{background:#fff;padding:0}.el-page{box-shadow:none;max-width:none}}</style></head><body>'+html+
-    '<scr'+'ipt>setTimeout(function(){window.print()},600)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
+    (view?'':'<scr'+'ipt>setTimeout(function(){window.print()},600)</scr'+'ipt>')+'</body></html>');   // view: full page only; otherwise the print dialog, where it saves as PDF   // split so the page loader doesn't read it as the end of this script
   w.document.close();
 }
 
@@ -4715,9 +4762,15 @@ function sendScreen(body,foot,cfg){
 ========================================================= */
 var wiz=null;
 var WZ=[['Client details'],['Services & KYC'],['Engagement letter']];
-function openWizard(){
+function openWizard(draftId){
   startForm(null); form.fromDetail=false;
-  wiz={step:1,services:[],files:[],note:'',sig:null,sigDate:'',kycDate:isoOf(Date.now()),reviewed:false,svcErr:{},sending:false};
+  wiz={step:1,services:[],files:[],note:'',kycDate:isoOf(Date.now()),reviewed:false,svcErr:{},signerIdx:null,method:null,channels:{email:true,sms:false},sigDate:isoOf(Date.now()),preview:false,errs:{},busy:false};
+  var dr=draftId?loadWzDrafts().filter(function(x){ return x.id===draftId; })[0]:null;
+  if(dr){
+    form.d=JSON.parse(JSON.stringify(dr.d));
+    ['step','services','note','kycDate','reviewed','signerIdx','method','channels','sigDate'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
+    wiz.files=(dr.files||[]).slice(); wiz.draftId=dr.id; wiz.token=dr.token;
+  }
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
     '<div class="modal-head wz-head"><div><h2 id="cf-t">Add Client</h2><ol class="wz-steps" id="wz-steps" hidden></ol></div><button id="cf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="cfb"></div><div class="modal-foot" id="wz-foot"></div></div>');
@@ -4728,7 +4781,8 @@ function openWizard(){
 }
 function leaveWizard(){
   if(wiz&&wiz.step===1) readForm();
-  var dirty=form&&(form.dirty||chosen(wiz.services).length||wiz.files.length||wiz.note.trim());
+  if(wiz&&wiz.step===2) saveKycNote();
+  var dirty=form&&(form.dirty||(!wiz.draftId&&(chosen(wiz.services).length||wiz.files.length||wiz.note.trim())));
   var done=function(){ form=null; wiz=null; closeDrawer(); };
   if(!dirty){ done(); return; }
   confirmLeave(done);
@@ -4737,81 +4791,188 @@ function wzPaint(){
   var st=document.getElementById('wz-steps'), body=formBody(), foot=document.getElementById('wz-foot'); if(!st) return;
   st.innerHTML=WZ.map(function(x,i){ var n=i+1; return '<li class="'+(n===wiz.step?'on':n<wiz.step?'done':'')+'"><span>'+(n<wiz.step?I.tick:n)+'</span>'+x[0]+'</li>'; }).join('');
   body.scrollTop=0;
-  var back='<button class="btn-ghost" id="wz-back">'+(wiz.step===1?'Cancel':'Back')+'</button><span class="sp-grow"></span>';
-  if(wiz.step===1){ renderForm(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next</button>'; }
-  if(wiz.step===2){ paintSvcStep(); foot.innerHTML=back+'<button class="btn-primary" id="wz-next">Next</button>'; }
   if(wiz.step===3){ paintLetterStep(); return; }
+  foot.innerHTML='<button class="btn-ghost" id="wz-back">'+(wiz.step===1?'Cancel':'Back')+'</button><span class="sp-grow"></span>'+
+    '<button class="btn-ghost" id="wz-close">Save &amp; Close</button><button class="btn-primary" id="wz-next">Save &amp; Next</button>';
+  if(wiz.step===1) renderForm();
+  if(wiz.step===2) paintSvcStep();
   document.getElementById('wz-back').onclick=function(){ if(wiz.step===1){ readForm(); leaveWizard(); return; } saveKycNote(); wiz.step--; wzPaint(); };
-  document.getElementById('wz-next').onclick=wzNext;
+  document.getElementById('wz-next').onclick=function(){ wzSave(false); };
+  document.getElementById('wz-close').onclick=function(){ wzSave(true); };
 }
-function wzNext(){
+/* checks the current step. Save & Next needs the step complete; Save & Close only needs a name and whatever was typed to be valid */
+function wzCheck(partial){
   if(wiz.step===1){
-    readForm(); autoFill(); form.errs=validate();
-    if(Object.keys(form.errs).length){ renderForm(); var b=formBody().querySelector('.bad, .alert-err'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast('Please fix the highlighted fields',true); return; }
+    readForm(); autoFill(); var e=validate();
+    if(partial) Object.keys(e).forEach(function(k){ if(k!=='name'&&!String(getK(k)||'').trim()) delete e[k]; });
+    form.errs=e;
+    if(Object.keys(e).length){ renderForm(); var b=formBody().querySelector('.bad, .alert-err'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast('Please fix the highlighted fields',true); return false; }
   }
   if(wiz.step===2){
     saveKycNote();
-    if(!wiz.picker.check()){ var b2=formBody().querySelector('#wz-sp .bad'); if(b2){ b2.scrollIntoView({block:'center'}); b2.focus(); } toast('Check the services and prices',true); return; }
-    wiz.kycErr=wiz.files.length&&!wiz.kycDate?'Enter the KYC date':wiz.kycDate>isoOf(Date.now())?'The KYC date can’t be in the future':'';
-    if(wiz.kycErr){ paintKyc(); var kd=document.getElementById('wz-kycdate'); kd.scrollIntoView({block:'center'}); kd.focus(); toast('Enter the KYC date',true); return; }
+    if(!partial&&!wiz.picker.check()){ var b2=formBody().querySelector('#wz-sp .bad'); if(b2){ b2.scrollIntoView({block:'center'}); b2.focus(); } toast('Check the services and prices',true); return false; }
+    wiz.kycErr=wiz.files.length&&!wiz.kycDate?'Enter the date the KYC was verified':wiz.kycDate>isoOf(Date.now())?'The verified date can’t be in the future':'';
+    if(wiz.kycErr){ paintKyc(); var kd=document.getElementById('wz-kycdate'); kd.scrollIntoView({block:'center'}); kd.focus(); toast(wiz.kycErr,true); return false; }
   }
-  wiz.step++; wzPaint();
+  return true;
 }
-/* step 2: services, KYC documents and a note on one page */
+function wzSave(close){
+  if(!wzCheck(close)) return;
+  if(!String(form.d.name||'').trim()){ toast('Enter the client’s name before saving',true); return; }
+  storeDraft().then(function(ok){
+    if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
+    if(close){ var n=String(form.d.name||'').trim(); form=null; wiz=null; closeDrawer(); refreshList(); toast(n+' saved as a draft'); return; }
+    wiz.step++; wzPaint();
+  });
+}
+/* saves the wizard as a Draft row; KYC files go to private file storage, the draft keeps references */
+function storeDraft(){
+  if(!wiz.draftId) wiz.draftId='wd'+Date.now().toString(36);
+  var id=wiz.draftId, now=Date.now();
+  var puts=wiz.files.map(function(x,i){ if(x.key) return Promise.resolve();
+    var key='kyc-'+id+'-'+now+'-'+i; return putKyc(key,x.file,{owner:'draft-'+id,name:x.name,type:x.type,size:x.size,at:x.at||now,by:x.by||ME}).then(function(){ x.key=key; }); });
+  return Promise.all(puts).then(function(){
+    var list=loadWzDrafts(), old=list.filter(function(x){ return x.id===id; })[0];
+    var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,kycDate:wiz.kycDate,
+      files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,token:wiz.token||null};
+    list=list.filter(function(x){ return x.id!==id; }); list.unshift(rec);
+    form.dirty=false;
+    return saveWzDrafts(list);
+  },function(){ return false; });
+}
+function dropDraft(id){ if(id) saveWzDrafts(loadWzDrafts().filter(function(x){ return x.id!==id; })); }
+
+/* step 2: services, KYC and a note on one page */
 function paintSvcStep(){
   var body=formBody();
-  body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">Services</div></div>'+
-      '<div id="wz-sp"></div></section>'+
+  body.innerHTML='<section class="wz-sec"><h3 class="wz-h">Services</h3><div id="wz-sp"></div></section>'+
     '<section class="wz-sec" id="wz-kyc-sec"></section>'+
-    '<section class="wz-sec"><div class="cl-sec"><label class="bsec" for="wz-note">Notes</label></div>'+
-      '<textarea class="ftext wz-note" id="wz-note" rows="4" maxlength="2000" placeholder="Anything the team should know about this client, their services or their ID check">'+esc(wiz.note)+'</textarea></section>';
+    '<section class="wz-sec"><label class="wz-h" for="wz-note">Notes</label>'+
+      '<textarea class="ftext wz-note" id="wz-note" rows="4" maxlength="2000" placeholder="Enter notes">'+esc(wiz.note)+'</textarea></section>';
   wiz.picker=mountSvcPicker(document.getElementById('wz-sp'),wiz.services,wiz.svcErr,function(){ form.dirty=true; });
   paintKyc();
+  document.getElementById('wz-note').oninput=function(){ form.dirty=true; };
 }
 function paintKyc(){
   var sec=document.getElementById('wz-kyc-sec'); if(!sec) return;
   var today=isoOf(Date.now());
-  sec.innerHTML='<div class="cl-sec"><div class="bsec">KYC documents</div>'+(wiz.files.length?'<span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span>':'')+'</div>'+
-    '<div class="grid2 wz-kycd"><div><label class="flabel" for="wz-kycdate">Date checked'+(wiz.files.length?' <span class="req">*</span>':'')+'</label><input class="fin sm'+(wiz.kycErr?' bad':'')+'" type="date" id="wz-kycdate" value="'+esc(wiz.kycDate)+'" max="'+today+'">'+
-      (wiz.kycErr?'<span class="cl-err">'+I.info+esc(wiz.kycErr)+'</span>':'<p class="cl-hint" id="wz-kycexp">'+(wiz.kycDate?'Valid until '+dmyOf(fromIso(kycExpiry(wiz.kycDate))):'')+'</p>')+'</div><div></div></div>'+
-    dropZone('wz-kyc')+kycRows(wiz.files,{remove:true,empty:'No documents yet. You can also add them later from the client’s record.'});
-  var kd=document.getElementById('wz-kycdate'); kd.oninput=function(){ wiz.kycDate=kd.value; wiz.kycErr=''; var x=document.getElementById('wz-kycexp'); if(x) x.textContent=kd.value?'Valid until '+dmyOf(fromIso(kycExpiry(kd.value))):''; };
+  sec.innerHTML='<h3 class="wz-h">KYC</h3>'+
+    '<div class="grid2 wz-kycd"><div><label class="flabel" for="wz-kycdate">Verified on'+(wiz.files.length?' <span class="req">*</span>':'')+'</label><input class="fin sm'+(wiz.kycErr?' bad':'')+'" type="date" id="wz-kycdate" value="'+esc(wiz.kycDate)+'" max="'+today+'">'+
+      (wiz.kycErr?'<span class="cl-err">'+I.info+esc(wiz.kycErr)+'</span>':'')+'</div><div></div></div>'+
+    '<span class="flabel">Documents</span>'+dropZone('wz-kyc')+(wiz.files.length?kycRows(wiz.files,{remove:true}):'');
+  var kd=document.getElementById('wz-kycdate'); kd.oninput=function(){ wiz.kycDate=kd.value; wiz.kycErr=''; form.dirty=true; };
   wireDrop('wz-kyc',function(list){ acceptFiles(list).forEach(function(f){ wiz.files.push({file:f,name:f.name,type:f.type,size:f.size,at:Date.now(),by:ME}); }); form.dirty=true; paintKyc(); });
-  sec.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ wiz.files.splice(+b.dataset.krm,1); paintKyc(); }; });
+  sec.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ wiz.files.splice(+b.dataset.krm,1); form.dirty=true; paintKyc(); }; });
   sec.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kpv]); }; });
   sec.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kdl],true); }; });
 }
 function saveKycNote(){ var n=document.getElementById('wz-note'); if(n) wiz.note=n.value; }
-function wzSigner(){ var d=form.d; if(d.type==='company'){ var x=(d.directors||[])[0]||{}; return {name:String(x.name||'').trim(),email:String(x.email||'').trim().toLowerCase(),phone:x.phone}; } return {name:d.name.trim(),email:d.email.trim().toLowerCase(),phone:d.phone}; }
-function wzClient(){ var d=form.d; return {name:d.name.trim(),type:d.type,entity:d.type==='company'?d.entity:'Individual',email:d.email.trim().toLowerCase(),address:d.address}; }
-function paintLetterStep(){
-  var body=formBody(), foot=document.getElementById('wz-foot'), c=wzClient();
-  var sg=wzSigner(), html=letterHtml({name:c.name,type:c.type,entity:c.entity,email:c.email,address:c.address,services:wiz.services.map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),date:Date.now(),staff:ME,signature:wiz.sig,signedAt:wiz.sig?wiz.sigAt:null,fy:fyStart(Date.now()),signerName:sg.name});
-  body.innerHTML='<div class="el-top"><div class="wz-intro"><b>'+(wiz.sig?'Check the signature on the letter':'Engagement letter')+'</b><span>'+(wiz.sig?'This is how the signed letter will be saved. Confirm to create the client, or change the signature.':'Generated from the client’s details and the services you chose. Sign it now, or send it to the client to sign.')+'</span></div>'+
-    '</div><div class="el-wrap">'+html+'</div>'+
-    (wiz.sig?'':'<label class="el-review"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span><b>I’ve reviewed this letter</b><small>Check the services, fees and client details. '+(c.type==='company'?'It goes to the first director, '+esc(sg.name||'Director 1')+', who is the only one who signs.':'')+'</small></span></label>');
-  foot.innerHTML='<button class="btn-ghost" id="wz-back">Back</button><button class="linkbtn" id="wz-pdf">'+OI.print+'Open as PDF</button><span class="sp-grow"></span>'+
-    (wiz.sig?'<button class="btn-ghost" id="wz-resign">Change signature</button><button class="btn-primary" id="wz-confirm">'+I.tick+'Confirm &amp; create client</button>'
-            :'<button class="btn-ghost" id="wz-sign">'+OI.pen+'Sign manually</button><button class="btn-primary" id="wz-send">'+OI.send+'Send for signature</button>');
-  document.getElementById('wz-back').onclick=function(){ if(wiz.sig){ wiz.sig=null; paintLetterStep(); return; } wiz.step=2; wzPaint(); };
-  document.getElementById('wz-pdf').onclick=function(){ printLetter(html); };
-  var rv=document.getElementById('wz-rev'); if(rv) rv.onchange=function(){ wiz.reviewed=rv.checked; };
-  var needReview=function(){ if(wiz.reviewed) return false; toast('Review the letter and tick the box first',true); var x=document.getElementById('wz-rev'); if(x){ x.focus(); x.closest('.el-review').classList.add('bad'); } return true; };
-  var sign=function(){ if(!wiz.sig&&needReview()) return; signDialog(sg.name||c.name,function(sig,at){ wiz.sig=sig; wiz.sigAt=at; paintLetterStep(); }); };
-  if(wiz.sig){ document.getElementById('wz-resign').onclick=sign; document.getElementById('wz-confirm').onclick=function(){ finalizeClient({mode:'signed',sig:wiz.sig,signedAt:wiz.sigAt}); }; }
-  else { document.getElementById('wz-sign').onclick=sign; document.getElementById('wz-send').onclick=function(){ if(!needReview()) paintSendStep(); }; }
+/* who signs: the director chosen on the letter step (companies), otherwise the client */
+function wzDirectors(){ return (form.d.directors||[]).map(function(x,i){ return {i:i,name:String(x.name||'').trim(),email:String(x.email||'').trim().toLowerCase(),phone:x.phone||''}; }).filter(function(x){ return x.name; }); }
+function wzSigner(){
+  var d=form.d;
+  if(d.type==='company'){ var x=wzDirectors().filter(function(y){ return y.i===wiz.signerIdx; })[0]; return x?{name:x.name,email:x.email,phone:x.phone,role:'director'}:{name:'',email:'',phone:'',role:'director'}; }
+  return {name:d.name.trim(),email:d.email.trim().toLowerCase(),phone:d.phone,role:'client'};
 }
-function paintSendStep(){
-  var c=wzClient(), token=wiz.token||(wiz.token=newToken()), expires=Date.now()+LINK_DAYS*864e5;
-  var services=wiz.services.map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; });
-  document.getElementById('cf-t').textContent='Add Client · Send for signature';
-  sendScreen(formBody(),document.getElementById('wz-foot'),{
-    kind:'engagement', sendLabel:'Send letter',
-    intro:'<div class="wz-intro"><b>Send the engagement letter</b><span>'+(c.type==='company'?esc(wzSigner().name)+', the first director, gets a secure link to review and sign. No other director needs to sign.':'The client gets a secure link to review and sign.')+' The letter stays “Sent” until it’s signed.</span></div>',
-    to:{email:wzSigner().email,phone:wzSigner().phone},
-    ctx:tplCtx({name:c.name,type:c.type,entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires}),
-    back:function(){ document.getElementById('cf-t').textContent='Add Client'; paintLetterStep(); },
-    done:function(rec){ if(rec.ok) finalizeClient({mode:'sent',send:rec,token:token,expires:expires}); }
+function wzClient(){ var d=form.d; return {name:d.name.trim(),type:d.type,entity:d.type==='company'?d.entity:'Individual',email:d.email.trim().toLowerCase(),address:d.address}; }
+function wzLetterHtml(){
+  var c=wzClient(), sg=wzSigner();
+  return letterHtml({name:c.name,type:c.type,entity:c.entity,email:c.email,address:c.address,services:wiz.services.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),
+    date:Date.now(),staff:ME,signature:null,signedAt:null,fy:fyStart(Date.now()),signerName:sg.name||(c.type==='company'?'':c.name)});
+}
+/* step 3: everything inline: preview, review, director, how it's signed, then Save as Draft or Send */
+function paintLetterStep(){
+  var body=formBody(), foot=document.getElementById('wz-foot'), c=wzClient(), co=c.type==='company', e=wiz.errs;
+  var dirs=co?wzDirectors():[];
+  if(co&&dirs.length===1&&wiz.signerIdx==null) wiz.signerIdx=dirs[0].i;
+  var sg=wzSigner();
+  var err=function(k){ return e[k]?'<span class="cl-err">'+I.info+esc(e[k])+'</span>':''; };
+  var h='<section class="wz-sec el-step"><h3 class="wz-h">Engagement letter</h3>'+
+    '<div class="el-acts"><button type="button" class="pill-btn'+(wiz.preview?' on':'')+'" id="el-pv" aria-expanded="'+wiz.preview+'">'+OI.note+(wiz.preview?'Hide preview':'Preview')+'</button>'+
+      '<button type="button" class="pill-btn quiet" id="el-full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" id="el-pdf">'+OI.dl+'Download PDF</button></div>'+
+    (wiz.preview?'<div class="el-wrap" id="el-letter">'+wzLetterHtml()+'</div>':'')+
+    '<label class="el-review'+(e.review?' bad':'')+'"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+err('review')+'</section>';
+  if(co){
+    h+='<section class="wz-sec"><h3 class="wz-h">Which director will sign the engagement letter?</h3>'+
+      (dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x,n){ var on=wiz.signerIdx===x.i;
+        return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+x.i+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>Director '+(x.i+1)+(x.email?' · '+esc(x.email):'')+(x.phone?' · '+esc(x.phone):'')+'</small></span></label>'; }).join('')+'</div>'
+        :'<p class="cl-hint">Add a director in step 1 first.</p>')+err('signer')+'</section>';
+  }
+  h+='<section class="wz-sec"><h3 class="wz-h">How should this be signed?</h3><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
+    [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=wiz.method===m[0];
+      return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div>'+err('method');
+  if(wiz.method==='request'){
+    h+='<div class="el-sub"><span class="flabel">Send the link by</span><div class="el-opts two">'+
+      [['email','Email',sg.email],['sms','SMS',sg.phone]].map(function(ch){ var on=!!wiz.channels[ch[0]];
+        return '<label class="el-opt chk'+(on?' on':'')+'"><input type="checkbox" data-ch="'+ch[0]+'"'+(on?' checked':'')+'><span><b>'+ch[1]+'</b><small>'+(ch[2]?esc(ch[2]):'No '+(ch[0]==='email'?'email address':'mobile number')+' for '+(co?'this director':'the client'))+'</small></span></label>'; }).join('')+'</div>'+err('channel')+'</div>';
+  }
+  if(wiz.method==='manual'){
+    h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm" type="date" id="el-date" value="'+esc(wiz.sigDate)+'" max="'+isoOf(Date.now())+'">'+err('date')+'</div><div></div></div>'+
+      '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+'</div>';
+  }
+  h+='</section>';
+  if(wiz.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(wiz.fail)+' Nothing was sent and the client wasn’t created. Check the details and try again.</span></div>';
+  body.innerHTML=h;
+  foot.innerHTML='<button class="btn-ghost" id="wz-back"'+(wiz.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
+    '<button class="btn-ghost" id="wz-draft"'+(wiz.busy?' disabled':'')+'>Save as Draft</button>'+
+    '<button class="btn-primary" id="wz-send"'+(wiz.busy?' disabled':'')+'>'+(wiz.busy?'<span class="spin"></span>Sending…':OI.send+'Send')+'</button>';
+  var pad=wiz.method==='manual'?sigPad(document.getElementById('el-pad'),sg.name||c.name,{modes:[['draw','Draw'],['upload','Select & upload']]}):null;
+  wiz.pad=pad;
+  var clear=function(k){ if(e[k]){ delete e[k]; } };
+  document.getElementById('wz-back').onclick=function(){ wiz.step=2; wiz.errs={}; wiz.fail=''; wzPaint(); };
+  document.getElementById('el-pv').onclick=function(){ wiz.preview=!wiz.preview; paintLetterStep(); if(wiz.preview){ var l=document.getElementById('el-letter'); if(l) l.scrollIntoView({block:'nearest'}); } };
+  document.getElementById('el-full').onclick=function(){ printLetter(wzLetterHtml(),true); };
+  document.getElementById('el-pdf').onclick=function(){ printLetter(wzLetterHtml()); };
+  document.getElementById('wz-rev').onchange=function(){ wiz.reviewed=this.checked; form.dirty=true; if(this.checked&&e.review){ clear('review'); paintLetterStep(); } };
+  body.querySelectorAll('input[name=el-dir]').forEach(function(r){ r.onchange=function(){ wiz.signerIdx=+r.value; form.dirty=true; clear('signer'); clear('channel'); paintLetterStep(); }; });
+  body.querySelectorAll('input[name=el-how]').forEach(function(r){ r.onchange=function(){ wiz.method=r.value; form.dirty=true; clear('method'); clear('channel'); clear('sig'); paintLetterStep(); }; });
+  body.querySelectorAll('[data-ch]').forEach(function(x){ x.onchange=function(){ wiz.channels[x.dataset.ch]=x.checked; form.dirty=true; clear('channel'); paintLetterStep(); }; });
+  var dt=document.getElementById('el-date'); if(dt) dt.oninput=function(){ wiz.sigDate=dt.value; form.dirty=true; };
+  document.getElementById('wz-draft').onclick=function(){
+    storeDraft().then(function(ok){ if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
+      var n=c.name; form=null; wiz=null; closeDrawer(); refreshList(); toast(n+' saved as a draft'); });
+  };
+  document.getElementById('wz-send').onclick=wzSend;
+}
+function wzSend(){
+  if(wiz.busy) return;
+  var c=wzClient(), co=c.type==='company', sg=wzSigner(), e={};
+  if(!wiz.reviewed) e.review='Confirm you’ve reviewed the letter';
+  if(co&&wiz.signerIdx==null) e.signer='Choose the director who will sign';
+  if(!wiz.method) e.method='Choose how the letter will be signed';
+  var sig=null, at=null;
+  if(wiz.method==='request'){
+    if(!wiz.channels.email&&!wiz.channels.sms) e.channel='Choose Email, SMS or both';
+    else if(wiz.channels.email&&!validEmail(sg.email)) e.channel=(co?'This director has':'The client has')+' no valid email address. Add it in step 1, or send by SMS';
+    else if(wiz.channels.sms&&!validPhone(sg.phone)) e.channel=(co?'This director has':'The client has')+' no valid mobile number. Add it in step 1, or send by email';
+  }
+  if(wiz.method==='manual'){
+    var today=isoOf(Date.now());
+    if(!wiz.sigDate) e.date='Enter the signing date'; else if(wiz.sigDate>today) e.date='The signing date can’t be in the future';
+    sig=wiz.pad&&wiz.pad.value(sg.name||c.name);
+    if(!sig) e.sig='Draw the signature, or select and upload a signature image';
+    at=wiz.sigDate===today?Date.now():fromIso(wiz.sigDate);
+  }
+  wiz.errs=e; wiz.fail='';
+  if(Object.keys(e).length){
+    var keep=sig;   // a drawn signature survives the repaint only if valid; ask again otherwise
+    paintLetterStep(); var b=formBody().querySelector('.el-review.bad, .cl-err'); if(b) b.scrollIntoView({block:'center'});
+    toast('Please complete the highlighted items',true); return;
+  }
+  if(wiz.method==='manual'){ finalizeClient({mode:'signed',sig:sig,signedAt:at}); return; }
+  var token=wiz.token||(wiz.token=newToken()), expires=Date.now()+LINK_DAYS*864e5;
+  var services=wiz.services.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; });
+  var ctx=tplCtx({name:co?sg.name:c.name,type:'individual',entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires});
+  var et=EMAIL_TEMPLATES.filter(function(x){ return x.kind==='engagement'; })[0], st=SMS_TEMPLATES.filter(function(x){ return x.kind==='engagement'; })[0];
+  var msg={email:wiz.channels.email?{to:sg.email,cc:'',bcc:'',subject:fillTpl(et.subject,ctx),body:fillTpl(et.body,ctx),html:esc(fillTpl(et.body,ctx)).replace(/\n/g,'<br>'),template:et.id}:null,
+           sms:wiz.channels.sms?{to:fmtPhone(sg.phone),body:fillTpl(st.body,ctx),template:st.id}:null};
+  wiz.busy=true; paintLetterStep();
+  deliver(msg).then(function(r){
+    if(!wiz) return;
+    wiz.busy=false;
+    var rec={at:Date.now(),by:ME,channels:[msg.email?'Email':'',msg.sms?'SMS':''].filter(Boolean),emailTo:msg.email&&msg.email.to,smsTo:msg.sms&&msg.sms.to,ok:r.ok,error:r.error||''};
+    if(!r.ok){ wiz.fail=r.error; paintLetterStep(); return; }
+    finalizeClient({mode:'sent',send:rec,token:token,expires:expires});
   });
 }
 /* the client is only created here, once the letter is signed or has been sent successfully */
@@ -4828,20 +4989,24 @@ function finalizeClient(o){
   rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price),by:ME}); });
   if(rec.notes.length) rec.history.push({t:now,kind:'note',title:'Note added',detail:'',by:ME});
   // KYC files go to private storage first; the client only references what was stored
-  var saves=wiz.files.map(function(x,i){ var key='kyc-c'+rec.id+'-'+now+'-'+i;
+  var signer=wzSigner(), draftId=wiz.draftId;
+  var saves=wiz.files.map(function(x,i){ if(x.key&&!x.file){ rec.kyc.push({key:x.key,name:x.name,type:x.type,size:x.size,at:x.at||now,by:x.by||ME}); return Promise.resolve(); }
+    var key='kyc-c'+rec.id+'-'+now+'-'+i;
     return putKyc(key,x.file,{owner:'client-'+rec.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.kyc.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); });   // rec.kyc is gathered into the first KYC record below
   Promise.all(saves).then(function(){ finish(); },function(){ toast('Some KYC files couldn’t be stored. Upload them again from the client’s record.',true); finish(); });
   function finish(){
     if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,source:'Add Client'}]; rec.kyc=[];
       rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+rec.kycRecords[0].files.length+' file'+(rec.kycRecords[0].files.length===1?'':'s'),by:ME}); }
-    var sg=firstSigner(rec), letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
+    var sg=signer, letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
       status:o.mode==='signed'?'signed':'sent',sends:o.send?[o.send]:[],expires:o.expires||null,audit:[]};
     audit(letter,'Generated',ME,'','pending','Financial year '+fyLabel(letter.fy)+' · expires '+dmyOf(fromIso(fyEnd(letter.fy))));
-    audit(letter,'Reviewed by staff',ME,'','','Checked before '+(o.mode==='signed'?'signing':'sending'));
-    if(o.mode==='signed'){ letter.signature=o.sig; letter.signedAt=o.signedAt||now; letter.method='manual'; audit(letter,'Signed manually',ME,'pending','signed','Signer: '+o.sig.name+' ('+o.sig.method+') · signing date '+dmyOf(letter.signedAt));
+    audit(letter,'Reviewed by staff',ME,'','','Confirmed: I have reviewed this letter and verified the client details, services, and fees');
+    if(co) audit(letter,'Signing director chosen',ME,'','',sg.name);
+    if(o.mode==='signed'){ letter.signature=o.sig; letter.signedAt=o.signedAt||now; letter.method='manual'; audit(letter,'Signed manually',ME,'pending','signed','Signer: '+o.sig.name+' ('+(o.sig.method==='upload'?'uploaded signature':o.sig.method)+') · signing date '+dmyOf(letter.signedAt)); dropDraft(draftId);
       rec.history.push({t:now,kind:'letter',title:'Engagement letter signed',detail:'FY '+fyLabel(letter.fy)+' · signed by '+o.sig.name+' on '+dmyOf(letter.signedAt),by:ME}); }
-    else { audit(letter,'Sent for signature',ME,'pending','sent',o.send.channels.join(' + '));
-      rec.history.push({t:now,kind:'letter',title:'Engagement letter sent for signature',detail:o.send.channels.join(' + '),by:ME}); }
+    else { audit(letter,'Sent for signature',ME,'pending','sent',o.send.channels.join(' + ')+' · to '+sg.name);
+      rec.history.push({t:now,kind:'letter',title:'Engagement letter sent for signature',detail:o.send.channels.join(' + ')+' · to '+sg.name,by:ME}); }
+    dropDraft(draftId);
     ONB.letters.push(letter); persistOnb();
     CLIENTS.unshift(rec); saveClients();
     form=null; wiz=null; refreshList();
@@ -4990,7 +5155,7 @@ function wireRequests(){
   var q=document.getElementById('rq-q'); if(!q) return;
   q.oninput=function(){ RQS.q=q.value; renderList(); var n=document.getElementById('rq-q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
   document.getElementById('rq-st').onchange=function(){ RQS.status=this.value; renderList(); };
-  content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openRequestDetail(b.dataset.rq); }; });
+  content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openDraftRow(b.dataset.rq); }; });
   content.querySelectorAll('[data-rqlink]').forEach(function(b){ b.onclick=function(){ showLink(b.dataset.rqlink); }; });
   var n2=document.getElementById('rq-new2'); if(n2) n2.onclick=openRequest;
 }
@@ -5203,13 +5368,12 @@ function kycTab(c){
 function kycDialog(c,done){
   var files=[], today=isoOf(Date.now());
   showModal('<div class="modal" role="dialog" aria-modal="true" aria-labelledby="kd-t"><div class="modal-head"><h2 id="kd-t">Record new KYC</h2><button data-close aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body"><div class="grid2"><div><label class="flabel" for="kd-date">KYC date <span class="req">*</span></label><input class="fin sm" type="date" id="kd-date" value="'+today+'" max="'+today+'"><p class="cl-hint" id="kd-exp"></p></div><div></div></div>'+
+    '<div class="modal-body"><div class="grid2"><div><label class="flabel" for="kd-date">Verified on <span class="req">*</span></label><input class="fin sm" type="date" id="kd-date" value="'+today+'" max="'+today+'"></div><div></div></div>'+
     '<div><span class="flabel">Documents <span class="req">*</span></span>'+dropZone('kd-up')+'<div id="kd-files"></div></div>'+
     '<div><label class="flabel" for="kd-note">Note</label><textarea class="ftext" id="kd-note" rows="2" maxlength="500" placeholder="e.g. Passport and driver licence sighted"></textarea></div>'+
     '<span class="cl-err" id="kd-err" hidden></span></div>'+
     '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-primary" id="kd-go">Save KYC</button></div></div>');
-  var dt=document.getElementById('kd-date'), ex=document.getElementById('kd-exp');
-  var showExp=function(){ ex.textContent=dt.value?'Valid until '+dmyOf(fromIso(kycExpiry(dt.value))):''; }; dt.oninput=showExp; showExp();
+  var dt=document.getElementById('kd-date');
   var paintF=function(){ document.getElementById('kd-files').innerHTML=kycRows(files,{remove:true,empty:''});
     document.querySelectorAll('#kd-files [data-krm]').forEach(function(b){ b.onclick=function(){ files.splice(+b.dataset.krm,1); paintF(); }; });
     document.querySelectorAll('#kd-files [data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(files[+b.dataset.kpv]); }; }); };
@@ -5233,14 +5397,14 @@ function notesTabC(c){
       '<div class="ntl-b"><div class="ntl-h"><b>'+esc(n.by)+'</b><span>'+whenOf(n.t)+'</span></div><p>'+esc(n.text)+'</p></div></div>'; }).join('')+'</div>':'<p class="cl-muted">No notes yet.</p>')+'</section>';
 }
 function engagementTab(c){
-  ONB=loadOnb(); var F=fyStart(Date.now()), L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=firstSigner(c);
+  ONB=loadOnb(); var F=fyStart(Date.now()), L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var fyBar='<div class="el-fybar"><b>Financial year '+fyLabel(F)+'</b><span>Letters expire on '+dmyOf(fromIso(fyEnd(F)))+'. Next year’s letter is generated and emailed on 01-07-'+(F+1)+'.</span></div>';
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var prev=older.length?'<section class="vsec"><div class="vsec-h"><h3>Earlier letters</h3><span class="cl-muted">Kept for audit</span></div><div class="el-prev">'+older.map(function(l){
     return '<div class="el-prow"><div><b>FY '+fyLabel(letterFy(l))+'</b><small>'+(l.status==='signed'?'Signed '+dmyOf(l.signedAt)+' by '+esc(l.signature.name):'Never signed')+' · expired '+dmyOf(fromIso(fyEnd(letterFy(l))))+'</small></div>'+pill(LETTER_STATUS,letterState(l))+
       '<button class="linkbtn" data-elpdf="'+l.id+'">'+OI.print+'Open</button></div>'; }).join('')+'</div></section>':'';
-  var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span><b>I’ve reviewed this letter</b><small>Check the services, fees and client details before it goes out.'+(c.type==='company'?' It goes to '+esc(sg.name||'the first director')+', the first director, who is the only one who signs.':'')+'</small></span></label>'; };
-  if(!L) return fyBar+'<div class="vbar"><p>No engagement letter for '+fyLabel(F)+' yet'+(act.length?'':'. Assign a service first')+'.</p>'+(act.length?'<span class="vsec-acts"><button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?'first director':'client')+'</button></span>':'')+'</div>'+
+  var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'; };
+  if(!L) return fyBar+'<div class="vbar"><p>No engagement letter for '+fyLabel(F)+' yet'+(act.length?'':'. Assign a service first')+'.</p>'+(act.length?'<span class="vsec-acts"><button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?esc(sg.name||'the director'):'client')+'</button></span>':'')+'</div>'+
     (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>'+review():'')+prev;
   var h=fyBar+'<div class="vbar"><p>'+pill(LETTER_STATUS,L.status)+' '+(L.status==='signed'?'On '+dmyOf(L.signedAt)+' by <b>'+esc(L.signature.name)+'</b>'+(L.method==='manual'?' (recorded by staff)':' (signed through the link)'):
       L.status==='sent'?'Emailed '+whenOf(L.sends[L.sends.length-1].at)+' to <b>'+esc((L.signer&&L.signer.name)||sg.name)+'</b>. Waiting for them to sign.':'')+'</p><span class="vsec-acts"><button class="linkbtn" data-el="pdf">'+OI.print+'Open as PDF</button>'+
@@ -5253,7 +5417,7 @@ function engagementTab(c){
 }
 /* sign or (re)send the letter from the client's record */
 function letterAction(c,what,refresh){
-  ONB=loadOnb(); var L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=firstSigner(c);
+  ONB=loadOnb(); var L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var services=L?L.services:act.map(function(a){ return {name:a.name,price:a.price}; });
   if(what==='pdf') return printLetter(letterHtml(letterCtx(c,services,L)));
   if(what.indexOf('pdf:')===0){ var old=ONB.letters.filter(function(l){ return l.id===what.slice(4); })[0]; if(old) printLetter(letterHtml(letterCtx(c,old.services,old))); return; }
@@ -5274,12 +5438,12 @@ function letterAction(c,what,refresh){
   });
   if(what==='send'){
     var x0=L, token=x0?x0.token:newToken(), expires=Date.now()+LINK_DAYS*864e5;
-    if(!sg.email&&!sg.phone){ toast((c.type==='company'?'Add an email or phone for the first director':'Add an email or phone for the client')+' first',true); return; }
+    if(!sg.email&&!sg.phone){ toast((c.type==='company'?'Add an email or phone for '+(sg.name||'the signing director'):'Add an email or phone for the client')+' first',true); return; }
     showDrawer('<div class="drawer wz swap" role="dialog" aria-modal="true" aria-labelledby="ls-t"><div class="modal-head"><h2 id="ls-t">Send engagement letter · '+esc(c.name)+'</h2><button id="ls-x" aria-label="Close">'+I.close+'</button></div><div class="modal-body" id="lsb"></div><div class="modal-foot" id="ls-foot"></div></div>');
     var back=function(){ openDetail(c.id,true,'engagement'); };
     document.getElementById('ls-x').onclick=back;
     sendScreen(document.getElementById('lsb'),document.getElementById('ls-foot'),{kind:'engagement',sendLabel:x0&&x0.sends.length?'Resend letter':'Send letter',
-      intro:c.type==='company'?'<div class="wz-intro"><b>Send to the first director</b><span>'+esc(sg.name)+' gets a secure link to review and sign. No other director needs to sign.</span></div>':'',
+      intro:c.type==='company'?'<div class="wz-intro"><b>Send to '+esc(sg.name)+'</b><span>They get a secure link to review and sign. No other director needs to sign.</span></div>':'',
       to:{email:sg.email,phone:sg.phone},ctx:tplCtx({name:c.name,type:c.type,entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires}),
       back:back,
       done:function(send){
@@ -5358,8 +5522,8 @@ function annualUpkeep(){
     var mine=ONB.letters.filter(function(l){ return l.clientId===c.id; });
     mine.forEach(function(l){ if(letterFy(l)<F&&!l.expiryLogged){ l.expiryLogged=true; audit(l,'Expired','System',l.status,'expired','Financial year '+fyLabel(letterFy(l))+' ended '+dmyOf(fromIso(fyEnd(letterFy(l)))));
       c.history.push({t:fromIso(fyEnd(letterFy(l))),kind:'letter',title:'Engagement letter expired',detail:'FY '+fyLabel(letterFy(l)),by:'System'}); changed=true; onbChanged=true; } });
-    /* 1 July: a new letter for the new financial year, emailed to the first director (or the client) */
-    var act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=firstSigner(c);
+    /* 1 July: a new letter for the new financial year, emailed to the signing director (or the client) */
+    var act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,letterFor(c.id));
     if(c.active&&mine.length&&act.length&&sg.email&&!mine.some(function(l){ return letterFy(l)===F; })){
       var L={id:'L'+now.toString(36)+c.id,clientId:c.id,client:snap(c),token:newToken(),created:now,by:ME,fy:F,signer:{name:sg.name,email:sg.email,role:sg.role},
         services:act.map(function(a){ return {name:a.name,price:a.price}; }),status:'sent',expires:now+LINK_DAYS*day,
@@ -11814,7 +11978,7 @@ function letterHtml(c){                               // c: {name,type,entity,em
     '<h4>Your responsibilities</h4><p>You agree to provide complete and accurate information, keep records for five years and tell us about anything that may affect your tax position.</p>'+
     '<h4>Fees and payment</h4><p>Fees are payable within 14 days of invoice. Work outside the scope above is quoted separately before we start.</p>'+
     '<h4>Privacy</h4><p>We handle your personal information under the Privacy Act 1988 and only use it to provide these services.</p>'+
-    '<div class="el-sign"><div><span>'+(c.type==='company'?'Signed by the first director':'Signed for the client')+'</span>'+
+    '<div class="el-sign"><div><span>'+(c.type==='company'?'Signed by the director':'Signed for the client')+'</span>'+
       (sig?(sig.method==='type'?'<em class="el-typed"'+(sig.font?' style="font-family:'+escH(sig.font)+'"':'')+'>'+escH(sig.text)+'</em>':'<img src="'+sig.data+'" alt="Signature">'):'<i class="el-line"></i>')+
       '<b>'+escH(sig?sig.name:(c.signerName||c.name||''))+'</b><small>'+(c.signedAt?'Signed '+dmyOf(c.signedAt):'Not signed yet')+'</small></div>'+
       '<div><span>For '+FIRM.name+'</span><em class="el-typed firm">'+escH(c.staff||'')+'</em><b>'+escH(c.staff||'')+'</b><small>Registered tax agent</small></div></div>'+
@@ -11856,10 +12020,11 @@ function ensureLetterCss(doc){ doc=doc||document; if(doc.getElementById('ob-css'
 
 /* ---------- signature pad: draw, type or upload ---------- */
 var SIG_FONTS=[['Classic',"'Dancing Script',cursive"],['Elegant',"'Great Vibes',cursive"],['Relaxed',"'Caveat',cursive"],['Formal',"'Satisfy',cursive"]];
-function sigPad(el,defaultName){
-  var mode='draw', drawn=false, typed=defaultName||'', font=0, upload=null, cv, ctx;
+function sigPad(el,defaultName,opts){
+  var MODES=(opts&&opts.modes)||[['draw','Draw'],['type','Select'],['upload','Upload']];
+  var mode=MODES[0][0], drawn=false, typed=defaultName||'', font=0, upload=null, cv, ctx;
   function paint(){
-    el.innerHTML='<div class="sg"><div class="sg-tabs" role="tablist">'+[['draw','Draw'],['type','Select'],['upload','Upload']].map(function(t){
+    el.innerHTML='<div class="sg"><div class="sg-tabs" role="tablist">'+MODES.map(function(t){
       return '<button type="button" role="tab" aria-selected="'+(mode===t[0])+'" class="'+(mode===t[0]?'on':'')+'" data-sgm="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div><div class="sg-body">'+
       (mode==='draw'?'<canvas aria-label="Signature drawing area"></canvas><div class="sg-row"><span>Sign with your mouse, finger or stylus</span><button type="button" data-sgclear>Clear</button></div>':
        mode==='type'?'<p class="sg-hint">Choose a style for the signer’s name</p><div class="sg-styles" role="radiogroup" aria-label="Signature style">'+SIG_FONTS.map(function(f,i){
@@ -12182,7 +12347,7 @@ function paintSign(){
   if(L.status==='signed'&&!PREVIEW){ app.innerHTML='<div class="signed">'+IC.tick+'<span>You signed this letter on '+whenOf(L.signedAt)+'. A copy is kept on your file.</span></div><div class="lw">'+letterHtml(c)+'</div>'; return; }
   if(L.expires&&Date.now()>L.expires&&!PREVIEW) return closed('x','This link has expired','Ask '+FIRM.name+' to send you a new signing link.');
   var signer=c.signerName||c.name;
-  app.innerHTML='<div class="hello"><h1>Your engagement letter</h1><p>Please read the letter, then sign below. It takes less than a minute.'+(c.type==='company'?' Only the first director, '+e(signer)+', needs to sign.':'')+'</p></div>'+
+  app.innerHTML='<div class="hello"><h1>Your engagement letter</h1><p>Please read the letter, then sign below. It takes less than a minute.'+(c.type==='company'?' Only '+e(signer)+' needs to sign.':'')+'</p></div>'+
     '<div class="card" style="margin-top:20px"><div class="lw">'+letterHtml(c)+'</div><label class="l" for="sn">Your full name <span class="req">*</span></label><input class="in" id="sn" value="'+e(signer)+'" maxlength="80">'+
     '<div id="pad" style="margin-top:16px"></div><label class="agree"><input type="checkbox" id="ag"> I have read the engagement letter and agree to its terms</label><span class="err" id="se" hidden></span>'+
     '<div class="foot"><span class="grow"></span><button class="btn pri" id="sg">Sign letter</button></div></div>';

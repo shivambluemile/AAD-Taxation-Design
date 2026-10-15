@@ -3394,10 +3394,11 @@ var MAX_DIRECTORS=5;
    Formatting and validation (Australian formats)
 ========================================================= */
 function digits(s){ return String(s||'').replace(/\D/g,''); }
+function numText(s){ var v=String(s||'').trim(); return /^[\d\s-]*$/.test(v)?digits(v):v; }   // numbers are stored as digits; anything else is kept as typed
 function group(s,sizes){ var out=[],i=0; sizes.forEach(function(n){ if(i<s.length){ out.push(s.slice(i,i+n)); i+=n; } }); return out.join(' '); }
-function fmtABN(s){ s=digits(s); return s.length===11?group(s,[2,3,3,3]):s; }
-function fmtTFN(s){ s=digits(s); return s.length===9?group(s,[3,3,3]):s.length===8?group(s,[3,3,2]):s; }
-function fmtACN(s){ s=digits(s); return s.length===9?group(s,[3,3,3]):s; }
+function fmtABN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===11?group(s,[2,3,3,3]):s; }
+function fmtTFN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===9?group(s,[3,3,3]):s.length===8?group(s,[3,3,2]):s; }
+function fmtACN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===9?group(s,[3,3,3]):s; }
 function normPhone(s){ var d=digits(s); if(d.indexOf('61')===0 && d.length===11) d='0'+d.slice(2); return d; }
 function fmtPhone(s){ var d=normPhone(s); if(d.length!==10) return String(s||'').trim(); return d.slice(0,2)==='04'?group(d,[4,3,3]):group(d,[2,4,4]); }
 function validPhone(s){ return /^0[23478]\d{8}$/.test(normPhone(s)); }
@@ -3415,7 +3416,7 @@ function validACN(s){
   var d=digits(s).split('').map(Number); if(d.length!==9) return false;
   var t=0; for(var i=0;i<8;i++) t+=d[i]*(8-i); return (10-t%10)%10===d[8];
 }
-function maskTFN(s){ var d=digits(s); return d ? '••• ••• '+d.slice(-3) : ''; }
+function maskTFN(s){ var d=numText(s); return d ? '••• ••• '+d.slice(-3) : ''; }
 /* shared across modules: one icon per activity kind */
 var ACT={
   item:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>',
@@ -3533,9 +3534,9 @@ function wizDraftToClient(w){
   var d=w.d||{}, co=d.type==='company', t=function(v){ return String(v||'').trim(); }, now=w.updated||w.created||Date.now(), ad=d.address||{};
   var c={_draft:true,_step:w.step||1,id:w.id,type:d.type,entity:co?(d.entity||'Company'):'Individual',
     name:t(d.name)||'Unnamed client',email:t(d.email).toLowerCase(),phone:d.phone?fmtPhone(d.phone):'',
-    abn:digits(d.abn),tfn:digits(d.tfn),acn:co?digits(d.acn):'',commEmail:t(d.commEmail).toLowerCase(),commPhone:d.commPhone?fmtPhone(d.commPhone):'',
+    abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',commEmail:t(d.commEmail).toLowerCase(),commPhone:d.commPhone?fmtPhone(d.commPhone):'',
     address:{street:t(ad.street),suburb:t(ad.suburb),state:ad.state||'',postcode:t(ad.postcode),country:'Australia'},active:false,
-    directors:co?((d.directors||[]).map(function(x,i){ return {id:i+1,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:x.phone?fmtPhone(x.phone):'',abn:digits(x.abn),tfn:digits(x.tfn)}; })):[],
+    directors:co?((d.directors||[]).map(function(x,i){ return {id:i+1,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:x.phone?fmtPhone(x.phone):'',abn:numText(x.abn),tfn:numText(x.tfn)}; })):[],
     services:chosen(w.services||[]).map(function(x){ return assignment(x,'Add Client (draft)',w.by||ME,now); }),
     notes:(w.note&&w.note.trim())?[{t:now,by:w.by||ME,text:w.note.trim()}]:[],kyc:[],kycRecords:[],history:[],created:w.created||now};
   var files=(w.files||[]).map(function(f){ return {key:f.key,name:f.name,type:f.type,size:f.size,at:f.at||now,by:f.by||w.by||ME}; });
@@ -4247,14 +4248,10 @@ function autoFill(){
 function validate(){
   var d=form.d, e={}, co=d.type==='company';
   var req=function(k,label){ if(!String(getK(k)||'').trim()) e[k]=label+' is required'; };
-  var email=function(k){ var v=String(getK(k)||'').trim(); if(v && !validEmail(v)) e[k]='Enter a valid email address'; };
-  var phone=function(k){ var v=String(getK(k)||'').trim(); if(v && !validPhone(v)) e[k]='Enter a valid Australian phone number, e.g. 0412 345 678'; };
-  var abn=function(k){ var v=getK(k); if(String(v||'').trim() && !validABN(v)) e[k]='Enter a valid 11-digit ABN'; };
-  var tfn=function(k){ var v=getK(k); if(String(v||'').trim() && !validTFN(v)) e[k]='Enter a valid 9-digit TFN'; };
+  // no format checks on email, phone, ABN, TFN, ACN or postcode: whatever is typed is kept
 
   req('name',co?'Company name':'Full name'); req('email','Email address'); req('phone','Phone number');
   req('abn','ABN'); req('tfn','TFN');
-  email('email'); phone('phone'); abn('abn'); tfn('tfn');
   if(!e.email){
     var dup=CLIENTS.filter(function(c){ return c.id!==form.id && c.email.toLowerCase()===d.email.trim().toLowerCase(); })[0];
     if(dup) e.email='This email is already used by '+dup.name;
@@ -4263,13 +4260,10 @@ function validate(){
     var dupA=CLIENTS.filter(function(c){ return c.id!==form.id && digits(c.abn)===digits(d.abn); })[0];
     if(dupA) e.abn='This ABN is already recorded for '+dupA.name;
   }
-  email('commEmail'); phone('commPhone');
   req('addr.street','Address'); req('addr.suburb','Suburb'); req('addr.state','State'); req('addr.postcode','Postcode');
-  var pc=String(d.address.postcode||'').trim(); if(pc && !/^\d{4}$/.test(pc)) e['addr.postcode']='Postcode must be 4 digits';
   if(co){
     if(!d.entity) e.entity='Choose an entity type';
     if(d.entity==='Company') req('acn','ACN');
-    var acn=String(d.acn||'').trim(); if(acn && !validACN(acn)) e.acn='Enter a valid 9-digit ACN';
     if(!e.acn && digits(d.acn)){
       var dupC=CLIENTS.filter(function(c){ return c.id!==form.id && digits(c.acn)===digits(d.acn); })[0];
       if(dupC) e.acn='This ACN is already recorded for '+dupC.name;
@@ -4280,7 +4274,6 @@ function validate(){
       var p='dir.'+i+'.';
       req(p+'name','Full name'); req(p+'email','Email address'); req(p+'phone','Phone number');
       req(p+'abn','ABN'); req(p+'tfn','TFN');
-      email(p+'email'); phone(p+'phone'); abn(p+'abn'); tfn(p+'tfn');
       var em=x.email.trim().toLowerCase();
       if(em && !e[p+'email']){ if(seen[em]!=null) e[p+'email']='Director '+(seen[em]+1)+' already uses this email'; else seen[em]=i; }
     });
@@ -4302,7 +4295,7 @@ function saveForm(){
   var t=function(v){ return String(v||'').trim(); };
   var rec={
     type:d.type, entity:co?d.entity:'Individual', name:t(d.name), email:t(d.email).toLowerCase(), phone:fmtPhone(d.phone),
-    abn:digits(d.abn), tfn:digits(d.tfn), acn:co?digits(d.acn):'',
+    abn:numText(d.abn), tfn:numText(d.tfn), acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(), commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},
     active:d.active
@@ -4312,7 +4305,7 @@ function saveForm(){
   rec.directors=co?d.directors.map(function(x){
     var base=x.id!=null&&prev[x.id]?prev[x.id]:{id:dirSeq++,login:false,lastReset:null};
     var out={}; for(var k in base) out[k]=base[k];
-    out.name=t(x.name); out.email=t(x.email).toLowerCase(); out.phone=fmtPhone(x.phone); out.abn=digits(x.abn); out.tfn=digits(x.tfn);
+    out.name=t(x.name); out.email=t(x.email).toLowerCase(); out.phone=fmtPhone(x.phone); out.abn=numText(x.abn); out.tfn=numText(x.tfn);
     return out;
   }):[];
   var id;
@@ -4771,15 +4764,13 @@ function sendScreen(body,foot,cfg){
     var e={}, list=function(v){ return String(v||'').split(',').map(function(x){return x.trim();}).filter(Boolean); };
     if(!s.email&&!s.sms) e.channel='Choose Email, SMS or both';
     if(s.email){
-      if(!s.to.trim()) e.to='Enter the client’s email address'; else if(!validEmail(s.to)) e.to='Enter a valid email address';
-      if(list(s.cc).some(function(x){return !validEmail(x);})) e.cc='One of these addresses isn’t valid';
-      if(list(s.bcc).some(function(x){return !validEmail(x);})) e.bcc='One of these addresses isn’t valid';
+      if(!s.to.trim()) e.to='Enter the client’s email address';
       if(!s.subject.trim()) e.subject='Add a subject';
       if(!s.body.trim()) e.body='Add a message'; else if(s.body.length>MSG_MAX) e.body='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.body+s.subject).length) e.body='Unknown shortcode '+badCodes(s.body+s.subject)[0];
       else if(s.body.indexOf(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')<0) e.body='Include '+(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')+' so the client can open it';
     }
     if(s.sms){
-      if(!validPhone(s.smsTo)) e.smsTo='Enter a valid Australian mobile number';
+      if(!String(s.smsTo||'').trim()) e.smsTo='Enter the client’s mobile number';
       if(!s.smsBody.trim()) e.smsBody='Add a message'; else if(s.smsBody.length>MSG_MAX) e.smsBody='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.smsBody).length) e.smsBody='Unknown shortcode '+badCodes(s.smsBody)[0];
       else if(s.smsBody.indexOf(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')<0) e.smsBody='Include '+(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}');
     }
@@ -5025,10 +5016,10 @@ function wzSendScreen(){
 /* the client is only created here, once the letter is signed or has been sent successfully */
 function finalizeClient(o){
   var f=form, d=f.d, co=d.type==='company', t=function(v){ return String(v||'').trim(); }, now=Date.now();
-  var rec={type:d.type,entity:co?d.entity:'Individual',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:digits(d.abn),tfn:digits(d.tfn),acn:co?digits(d.acn):'',
+  var rec={type:d.type,entity:co?d.entity:'Individual',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(),commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},active:true,
-    directors:co?d.directors.map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:digits(x.abn),tfn:digits(x.tfn)}; }):[]};
+    directors:co?d.directors.map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn)}; }):[]};
   rec.id=clientSeq++; rec.created=now;
   rec.services=wiz.services.map(function(x){ return assignment(x,'Add Client',ME,now); });
   rec.kyc=[]; rec.kycRecords=[]; rec.notes=wiz.note.trim()?[{t:now,by:ME,text:wiz.note.trim()}]:[];
@@ -5110,8 +5101,8 @@ function rqPaint(){
     document.getElementById('rq-next').onclick=function(){
       rqRead(); rqAutoFill(); var er={};
       if(!rq.name.trim()) er.name=(co?'Company':'Client')+' name is required';
-      if(!rq.email.trim()) er.email='Email address is required'; else if(!validEmail(rq.email)) er.email='Enter a valid email address';
-      if(!rq.phone.trim()) er.phone='Mobile number is required'; else if(!validPhone(rq.phone)) er.phone='Enter a valid Australian phone number';
+      if(!rq.email.trim()) er.email='Email address is required';
+      if(!rq.phone.trim()) er.phone='Mobile number is required';
       var em=rq.email.trim().toLowerCase();
       if(!er.email){
         var cl=CLIENTS.filter(function(c){ return c.email.toLowerCase()===em; })[0]; if(cl) er.email='Already a client: '+cl.name;
@@ -5336,9 +5327,9 @@ function reqAction(id,what){
 function completeRequest(r,kycDate,auto){
   if(r.clientId){ if(!auto) go('/clients/'+r.clientId); return null; }
   var f=r.form, co=r.type==='company', now=Date.now(), t=function(v){ return String(v||'').trim(); }, BY=auto?'System':ME;
-  var rec={id:clientSeq++,type:r.type,entity:co?(f.entity||'Company'):'Individual',name:t(f.name),email:t(f.email).toLowerCase(),phone:fmtPhone(f.phone),abn:digits(f.abn),tfn:digits(f.tfn),acn:co?digits(f.acn):'',
+  var rec={id:clientSeq++,type:r.type,entity:co?(f.entity||'Company'):'Individual',name:t(f.name),email:t(f.email).toLowerCase(),phone:fmtPhone(f.phone),abn:numText(f.abn),tfn:numText(f.tfn),acn:co?numText(f.acn):'',
     commEmail:t(f.commEmail).toLowerCase(),commPhone:t(f.commPhone)?fmtPhone(f.commPhone):'',address:{street:t(f.address.street),suburb:t(f.address.suburb),state:f.address.state,postcode:t(f.address.postcode),country:'Australia'},
-    directors:co?(f.directors||[]).map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:digits(x.abn),tfn:digits(x.tfn)}; }):[],
+    directors:co?(f.directors||[]).map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn)}; }):[],
     active:true,created:now,login:false,lastReset:null,onboardingId:r.id};
   rec.services=r.services.map(function(x){ return assignment(x,'Onboarding request',r.by,now); });
   rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,source:'Client onboarding link'}]:[];
@@ -12024,10 +12015,11 @@ function audit(rec,action,by,from,to,note){ (rec.audit=rec.audit||[]).push({t:Da
 
 /* ---------- formatting + validation (same rules as the staff client form) ---------- */
 function digits(s){ return String(s||'').replace(/\D/g,''); }
+function numText(s){ var v=String(s||'').trim(); return /^[\d\s-]*$/.test(v)?digits(v):v; }   // numbers are stored as digits; anything else is kept as typed
 function group(s,sizes){ var out=[],i=0; sizes.forEach(function(n){ if(i<s.length){ out.push(s.slice(i,i+n)); i+=n; } }); return out.join(' '); }
-function fmtABN(s){ s=digits(s); return s.length===11?group(s,[2,3,3,3]):s; }
-function fmtTFN(s){ s=digits(s); return s.length===9?group(s,[3,3,3]):s.length===8?group(s,[3,3,2]):s; }
-function fmtACN(s){ s=digits(s); return s.length===9?group(s,[3,3,3]):s; }
+function fmtABN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===11?group(s,[2,3,3,3]):s; }
+function fmtTFN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===9?group(s,[3,3,3]):s.length===8?group(s,[3,3,2]):s; }
+function fmtACN(s){ if(!/^[\d\s-]*$/.test(String(s||'').trim())) return String(s).trim(); s=digits(s); return s.length===9?group(s,[3,3,3]):s; }
 function normPhone(s){ var d=digits(s); if(d.indexOf('61')===0 && d.length===11) d='0'+d.slice(2); return d; }
 function fmtPhone(s){ var d=normPhone(s); if(d.length!==10) return String(s||'').trim(); return d.slice(0,2)==='04'?group(d,[4,3,3]):group(d,[2,4,4]); }
 function validPhone(s){ return /^0[23478]\d{8}$/.test(normPhone(s)); }
@@ -12896,21 +12888,12 @@ function validateDetails(){
   var er={}, co=R.type==='company', req=function(k,l){ if(!String(getK(k)||'').trim()) er[k]=l+' is required'; };
   if(co) req('name','Business name'); else { req('first','First name'); req('last','Last name'); }
   req('email','Email address'); req('phone','Phone number'); req('abn','ABN'); req('tfn','TFN');
-  if(f.email&&!validEmail(f.email)) er.email='Enter a valid email address';
-  if(f.phone&&!validPhone(f.phone)) er.phone='Enter a valid Australian phone number, e.g. 0412 345 678';
-  if(f.abn&&!validABN(f.abn)) er.abn='Enter a valid 11-digit ABN';
-  if(f.tfn&&!validTFN(f.tfn)) er.tfn='Enter a valid 9-digit TFN';
-  if(f.commEmail&&!validEmail(f.commEmail)) er.commEmail='Enter a valid email address';
-  if(f.commPhone&&!validPhone(f.commPhone)) er.commPhone='Enter a valid Australian phone number';
+  // no format checks: the client can type their details however they like
   req('addr.street','Street address'); req('addr.suburb','Suburb'); req('addr.state','State'); req('addr.postcode','Postcode');
-  if(f.address.postcode&&!/^\d{4}$/.test(String(f.address.postcode).trim())) er['addr.postcode']='Postcode must be 4 digits';
   if(co){
     if(!f.entity) er.entity='Choose an entity type';
     if(f.entity==='Company') req('acn','ACN');
-    if(f.acn&&!validACN(f.acn)) er.acn='Enter a valid 9-digit ACN';
-    f.directors.forEach(function(d,i){ var p='dir.'+i+'.'; req(p+'name','Full name'); req(p+'email','Email address'); req(p+'phone','Phone number'); req(p+'tfn','TFN');
-      if(d.email&&!validEmail(d.email)) er[p+'email']='Enter a valid email address'; if(d.phone&&!validPhone(d.phone)) er[p+'phone']='Enter a valid phone number';
-      if(d.abn&&!validABN(d.abn)) er[p+'abn']='Enter a valid ABN'; if(d.tfn&&!validTFN(d.tfn)) er[p+'tfn']='Enter a valid TFN'; });
+    f.directors.forEach(function(d,i){ var p='dir.'+i+'.'; req(p+'name','Full name'); req(p+'email','Email address'); req(p+'phone','Phone number'); req(p+'tfn','TFN'); });
   }
   return er;
 }

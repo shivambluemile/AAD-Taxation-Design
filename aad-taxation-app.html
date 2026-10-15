@@ -12223,7 +12223,7 @@ function docsStep(){
     (errs.kyc?'<div class="note bad" role="alert"><span>'+e(errs.kyc)+'</span></div>':'')+
     '<div class="kslots">'+kycReqs().map(function(q){
       var got=slotFiles(q.k), bad=miss.indexOf(q.k)>=0;
-      var st=got.length?'<span class="kst ok">'+okI()+'Uploaded</span>':q.opt?'<span class="kst opt">Optional</span>':'<span class="kst need">Required</span>';
+      var st=got.length?'':q.opt?'<span class="kst opt">Optional</span>':'<span class="kst need">Required</span>';
       return '<div class="kslot'+(bad?' bad':'')+(got.length?' got':'')+'" data-slot="'+q.k+'">'+
         '<div class="ks-h"><div><b>'+e(q.n)+(q.opt?'':' <span class="req">*</span>')+'</b><small>'+e(q.hint)+'</small></div>'+st+'</div>'+
         (got.length?'<div class="files">'+got.map(function(o){ var x=o.x, t=extTag(x.name);

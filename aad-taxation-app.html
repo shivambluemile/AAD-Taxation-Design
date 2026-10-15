@@ -2890,6 +2890,8 @@ tbody tr:hover{background:#FCFCFD}
 .page-head .ph-acts{display:flex;align-items:center;gap:10px}
 .page-head .btn-ghost{display:inline-flex;align-items:center;gap:8px}
 .cl-views{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 16px}
+.state.draft i{background:#94A3B8}
+.cl-stage{display:block;font-size:11.5px;color:var(--faint);margin-top:3px;white-space:nowrap}
 .cl-views button{display:inline-flex;align-items:center;gap:7px;padding:10px 12px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px}
 .cl-views button:hover{color:var(--ink)}
 .cl-views button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}
@@ -3521,8 +3523,24 @@ function closeDetail(){
 /* =========================================================
    Listing
 ========================================================= */
+/* onboarding requests that haven't become clients yet show in the list as Draft */
+function draftRows(){
+  ONB=loadOnb();
+  return ONB.requests.filter(function(r){ return ['completed','rejected'].indexOf(r.status)<0; }).map(function(r){
+    var f=r.form||{}, co=r.type==='company';
+    return {draft:true,r:r,id:r.id,name:f.name||r.name,email:f.email||r.email,phone:f.phone||r.phone,type:r.type,entity:co?(f.entity||'Company'):'Individual',abn:f.abn||'',created:r.created};
+  });
+}
+var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review'};
 function filtered(){
   var q=state.q.trim().toLowerCase(), qd=digits(q);
+  var drafts=draftRows().filter(function(d){
+    if(q){ var hit=(d.name+' '+d.email).toLowerCase().indexOf(q)>=0||(qd.length>=3&&(digits(d.phone).indexOf(qd)>=0||digits(d.abn).indexOf(qd)>=0)); if(!hit) return false; }
+    if(state.fType&&d.type!==state.fType) return false;
+    if(state.fEntity&&d.entity!==state.fEntity) return false;
+    return !state.fStatus||state.fStatus==='draft';
+  });
+  if(state.fStatus==='draft') return drafts.sort(function(a,b){ return b.created-a.created; });
   return CLIENTS.filter(function(c){
     if(q){
       var hay=(c.name+' '+c.email+' '+c.commEmail+' '+c.directors.map(function(d){return d.name;}).join(' ')).toLowerCase();
@@ -3534,7 +3552,7 @@ function filtered(){
     if(state.fStatus==='active' && !c.active) return false;
     if(state.fStatus==='inactive' && c.active) return false;
     return true;
-  }).sort(function(a,b){ return b.created-a.created; });
+  }).concat(drafts).sort(function(a,b){ return b.created-a.created; });
 }
 function filtersActive(){ return !!(state.q||state.fType||state.fEntity||state.fStatus); }
 function selHtml(id,first,pairs,val){
@@ -3555,24 +3573,31 @@ function renderList(){
   document.title='Clients · AAD Taxation';
   var rows=filtered(), page=rows.slice((state.page-1)*state.per, state.page*state.per);
   ONB=loadOnb();
-  var openReqs=ONB.requests.filter(function(r){ return ['completed','rejected'].indexOf(r.status)<0; }).length;
-  var h='<div class="page-head"><h1>Clients</h1><div class="ph-acts"><button class="btn-ghost" id="rq-new">'+OI.send+'Request Client</button><button class="btn-primary" id="add">'+I.plus+'Add Client</button></div></div>'+
-    '<div class="cl-views" role="tablist" aria-label="Client lists"><button role="tab" data-view-tab="clients" aria-selected="'+(state.view!=='requests')+'" class="'+(state.view!=='requests'?'on':'')+'">Clients<span class="tab-n">'+CLIENTS.length+'</span></button>'+
-    '<button role="tab" data-view-tab="requests" aria-selected="'+(state.view==='requests')+'" class="'+(state.view==='requests'?'on':'')+'">Onboarding requests'+(openReqs?'<span class="tab-n">'+openReqs+'</span>':'')+'</button></div>';
-  if(state.view==='requests'){ content.innerHTML=h+requestsHtml(); wireViews(); wireRequests(); return; }
+  var h='<div class="page-head"><h1>Clients</h1><div class="ph-acts"><button class="btn-ghost" id="rq-new">'+OI.send+'Request Client</button><button class="btn-primary" id="add">'+I.plus+'Add Client</button></div></div>';
   h+='<div class="filterbar"><div class="search">'+I.search+
      '<input type="search" id="q" placeholder="Search by name, email, phone or ABN" aria-label="Search clients" value="'+esc(state.q)+'"></div><div class="filters">'+
      '<span class="lbl">'+I.filter+'Filter By:</span>'+
      selHtml('lf-entity','All Entity Types',[['Individual','Individual']].concat(ENTITY_TYPES.map(function(e){return [e,e];})),state.fEntity)+
-     selHtml('lf-status','All Status',[['active','Active'],['inactive','Inactive']],state.fStatus)+
+     selHtml('lf-status','All Status',[['active','Active'],['inactive','Inactive'],['draft','Draft']],state.fStatus)+
      '<button class="clearf" id="clearf"'+(filtersActive()?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
   h+='<div class="card cl-table"><table><thead><tr><th>Name</th><th>Contact info</th><th>Entity type</th><th>ABN</th><th>KYC &amp; letter</th><th class="c">Status</th><th class="c">Actions</th></tr></thead><tbody>';
-  if(!CLIENTS.length){
+  if(!CLIENTS.length&&!rows.length){
     h+='<tr><td colspan="7"><div class="empty"><h3>No clients yet</h3><p>Add your first individual or company client to get started.</p><button class="btn-primary" id="add2">'+I.plus+'Add Client</button></div></td></tr>';
   } else if(!page.length){
     h+='<tr><td colspan="7"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clearf2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(c){
+    if(c.draft){ var r=c.r;
+      h+='<tr class="cl-draft">'+
+        '<td><button class="blink" data-rq="'+r.id+'">'+esc(c.name)+'</button></td>'+
+        '<td><span class="contact"><span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span></span><span class="nowrap">'+esc(c.phone)+'</span></span></td>'+
+        '<td class="nowrap">'+esc(c.entity)+'</td>'+
+        '<td class="nowrap mask" style="color:var(--ink)">'+(c.abn?esc(fmtABN(c.abn)):'<span class="cl-muted">--</span>')+'</td>'+
+        '<td><span class="ob-ticks">'+(r.kyc.length?'<span class="ob-tick on" title="KYC documents uploaded by the client">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')+
+          (r.letter.status==='signed'?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>')+'</span></td>'+
+        '<td class="c"><span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small></td>'+
+        '<td class="c"></td></tr>';
+      return; }
     var co=c.type==='company';
     h+='<tr>'+
       '<td><button class="blink" data-view="'+c.id+'">'+esc(c.name)+'</button>'+
@@ -3605,6 +3630,7 @@ function renderList(){
   var a2=document.getElementById('add2'); if(a2) a2.onclick=function(){ openForm(null); };
   content.querySelectorAll('.pager button[data-p]').forEach(function(b){ b.onclick=function(){ state.page=+b.dataset.p; renderList(); window.scrollTo(0,0); }; });
   content.querySelectorAll('[data-view]').forEach(function(b){ b.onclick=function(){ go('/clients/'+b.dataset.view); }; });
+  content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openRequestDetail(b.dataset.rq); }; });
   content.querySelectorAll('[data-edit]').forEach(function(b){ b.onclick=function(){ openForm(+b.dataset.edit); }; });
   wireCopy(content);
   wireViews();
@@ -4935,7 +4961,7 @@ function wireViews(){
   var rn=document.getElementById('rq-new'); if(rn) rn.onclick=openRequest;
   var ad=document.getElementById('add'); if(ad) ad.onclick=function(){ openForm(null); };
 }
-function renderListKeep(){ if(state.view==='requests'||!content.querySelector('.cl-table')){ var y=window.scrollY; renderList(); window.scrollTo(0,y); } else refreshList(); }
+function renderListKeep(){ refreshList(); }
 function requestsHtml(){
   ONB=loadOnb();
   var q=RQS.q.trim().toLowerCase();
@@ -5287,7 +5313,7 @@ function onbChanged(){
   ONB.letters.forEach(function(L){
     if(L.status==='signed'&&L.method==='client-link'&&!L.logged){ var c=findClient(L.clientId); if(c){ (c.history=c.history||[]).push({t:L.signedAt||Date.now(),kind:'letter',title:'Engagement letter signed by client',detail:'Through the signing link',by:L.signature.name}); saveClients(); } L.logged=true; persistOnb(); }
   });
-  if(state.view==='requests') renderListKeep();
+  if(content.querySelector('.cl-table')) renderListKeep();
   if(openReqId&&overlay.classList.contains('open')&&document.getElementById('rd-t')) openRequestDetail(openReqId,true);
   else if(detailState.id&&detailState.tab==='engagement'&&document.getElementById('cdb')) openDetail(detailState.id,true,'engagement');
 }

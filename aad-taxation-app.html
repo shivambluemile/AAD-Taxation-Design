@@ -4646,7 +4646,7 @@ function sendScreen(body,foot,cfg){
   function paint(){
     var smsText=fillTpl(s.smsBody,cfg.ctx), segs=Math.max(1,Math.ceil(smsText.length/160));
     var cc=s.showCc||!!s.cc, bcc=s.showBcc||!!s.bcc;
-    var h=(cfg.intro||'')+'<div class="ss-lbl">Send by</div><div class="ss-chs">'+chCard('email',IC.mail,'Email',s.to)+chCard('sms',IC.phone,'SMS',s.smsTo)+'</div>'+err('channel');
+    var h=(cfg.intro||'')+'<div class="ss-lbl">'+(cfg.kind==='onboarding'?'Send the onboarding link by':'Send by')+'</div><div class="ss-chs">'+chCard('email',IC.mail,'Email',s.to)+chCard('sms',IC.phone,'SMS',s.smsTo)+'</div>'+err('channel');
     if(s.email) h+='<section class="ss-card"><header><b>Email</b></header><div class="ss-in">'+
       tplSel('ss-etpl',et,s.eTpl)+
       field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>',true)+
@@ -5066,7 +5066,6 @@ function rqPaint(){
   if(rq.step===2){
     var token=rq.token||(rq.token=newToken()), expires=Date.now()+LINK_DAYS*864e5, services=rq.services.map(function(x){ return {svcId:x.svcId,name:x.name,price:cleanPrice(x.price),adminPrice:x.adminPrice}; });
     sendScreen(body,foot,{kind:'onboarding',sendLabel:'Send request',
-      intro:'<div class="wz-intro"><b>Send the onboarding link</b><span>The request is saved as <b>Draft</b> and stays Draft until '+esc(rq.name.trim())+' submits the complete form. Sending or opening the link doesn’t change that.</span></div>',
       to:{email:rq.email,phone:rq.phone},
       ctx:tplCtx({name:rq.name.trim(),type:rq.type,services:services,staff:ME,kind:'onboarding',link:portalLink('onboard',token),expires:expires}),
       back:function(){ rq.step=1; rqPaint(); },

@@ -2757,9 +2757,9 @@ tbody tr:hover{background:#FCFCFD}
 .wz-kycd{margin-bottom:12px}
 .el-fybar{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:12px 16px;border:1px solid #FDE3CC;background:#FFF8F1;border-radius:10px;margin-bottom:14px}
 .el-fybar b{font-size:13.5px;color:var(--orange-ink)}.el-fybar span{font-size:12.5px;color:var(--slate)}
-.el-review{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:0 0 14px;cursor:pointer}
+.el-review{display:flex;gap:12px;align-items:flex-start;padding:2px 0;margin:0 0 14px;cursor:pointer}
 .el-review input{margin-top:1px}.el-review b{display:block;font-size:13.5px;color:var(--ink)}.el-review small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px;line-height:1.45}
-.el-review.bad{border-color:#F3A3A3;background:#FFF7F7}
+.el-review.bad span,.el-review.bad b{color:#C2415B}.el-review.bad input{border-color:#F3A3A3}
 /* ===== Add Client: clean sections, inline letter step ===== */
 .drawer.wz>.modal-head{border-bottom:0}
 .rq-done>p:first-child{font-size:14px;color:var(--ink);line-height:1.55;text-align:left}
@@ -2768,18 +2768,21 @@ tbody tr:hover{background:#FCFCFD}
 .sp-row{align-items:end}.sp-rm{align-self:end;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
 .drawer.wz #cfb .wz-sec,.drawer.wz #rqb .wz-sec{border:0;border-radius:0;padding:0;background:none}
 .drawer.wz #cfb .wz-sec+.wz-sec,.drawer.wz #rqb .wz-sec+.wz-sec{border-top:0;padding-top:0;margin-top:8px}
+#rqb>.wz-sec:first-child,#rqb>.ss:first-child{margin-top:-20px}
 .wz-h{display:block;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}
 #cfb .flabel{margin-bottom:7px}
 #cfb .fin::placeholder,#cfb .ftext::placeholder,#rqb .fin::placeholder,#rqb .ftext::placeholder{color:#9BA6B7;opacity:1;font-weight:400}
 #cfb .wz-kycd{margin-bottom:14px}
 .sp-rm{border:1px solid var(--line);background:#fff}
 .sp-rm:hover:not([disabled]){border-color:#FECACA}
-.el-acts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.el-step{margin-top:-20px}
+.el-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:14px}
 .el-acts .pill-btn{display:inline-flex;align-items:center;gap:7px}
+.vbar.el-sbar{flex-wrap:nowrap}.el-sbar p{flex:1;min-width:0}.el-sbar .vsec-acts{flex:none;gap:8px}.el-sbar .pill-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .el-acts .pill-btn.on{background:var(--orange-soft)}
 .el-step .el-wrap{margin-bottom:14px}
-.el-pvw{position:relative}.el-pvw .el-pvb{position:sticky;top:0;float:right;margin:-8px -6px 0 0}
-.el-pvb{position:absolute;top:10px;right:12px;z-index:1;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.el-pvw{position:relative}.el-pvw .el-pvb{position:sticky;top:0;float:left;margin:-8px 0 0 -6px}
+.el-pvb{position:absolute;top:10px;left:12px;z-index:1;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 9px}
 .el-step .el-review{align-items:center}
 .el-step .el-review span{font-size:13.5px;color:var(--ink);line-height:1.45}
 .el-opts{display:grid;gap:8px}
@@ -2802,6 +2805,7 @@ tbody tr:hover{background:#FCFCFD}
 .el-signed{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
 .el-sigimg{flex:0 0 auto;min-width:160px;max-width:260px;height:64px;display:flex;align-items:center;border-bottom:1px solid #CBD5E1}
 .el-sigimg img{max-height:60px;max-width:100%;object-fit:contain}.el-sigimg .el-typed{font-size:32px;line-height:60px;border:0;height:auto}
+.el-sigcol{flex:0 0 auto;display:flex;flex-direction:column;gap:6px}.el-sigline{font-size:12px;color:var(--mute)}
 .el-sigmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.el-sigmeta b{font-size:14px;color:var(--ink)}.el-sigmeta span{font-size:12.5px;color:var(--mute)}
 @media (max-width:600px){.el-opts.two{grid-template-columns:1fr}}
 .el-prev{display:flex;flex-direction:column;gap:8px}.el-prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
@@ -3010,8 +3014,7 @@ tbody tr:hover{background:#FCFCFD}
 .kyc-drop small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 .kyc-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .kyc-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
-.kyc-ext{flex-shrink:0;width:40px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:#E8F1FD;color:#2563EB}
-.kyc-ext.e-pdf{background:#FDECEC;color:#C2410C}
+.kyc-ext{flex-shrink:0;width:40px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:#EEF0F2;color:#6B7280}
 .kyc-info{flex:1;min-width:0}
 .kyc-name{display:block;max-width:100%;font-size:13px;font-weight:600;color:var(--ink);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kyc-name:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
 .kyc-info b{display:block;font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -3525,7 +3528,28 @@ var CL_KEY='aad-clients-v1';
 })();
 function saveClients(){ try{ localStorage.setItem(CL_KEY,JSON.stringify(CLIENTS)); }catch(e){} }
 function logEvent(c,kind,title,detail){ (c.history=c.history||[]).push({t:Date.now(),kind:kind,title:title,detail:detail||'',by:ME}); saveClients(); }
-function findClient(id){ return CLIENTS.filter(function(c){return c.id===id;})[0]; }
+var DRAFT_VIEWS={};   // transient read-only client objects built from Add Client drafts, so their name opens the same tabbed detail
+function findClient(id){ return CLIENTS.filter(function(c){return c.id===id;})[0] || DRAFT_VIEWS[id]; }
+/* build a read-only client-shaped object from a saved Add Client wizard draft */
+function wizDraftToClient(w){
+  var d=w.d||{}, co=d.type==='company', t=function(v){ return String(v||'').trim(); }, now=w.updated||w.created||Date.now(), ad=d.address||{};
+  var c={_draft:true,_step:w.step||1,id:w.id,type:d.type,entity:co?(d.entity||'Company'):'Individual',
+    name:t(d.name)||'Unnamed client',email:t(d.email).toLowerCase(),phone:d.phone?fmtPhone(d.phone):'',
+    abn:digits(d.abn),tfn:digits(d.tfn),acn:co?digits(d.acn):'',commEmail:t(d.commEmail).toLowerCase(),commPhone:d.commPhone?fmtPhone(d.commPhone):'',
+    address:{street:t(ad.street),suburb:t(ad.suburb),state:ad.state||'',postcode:t(ad.postcode),country:'Australia'},active:false,
+    directors:co?((d.directors||[]).map(function(x,i){ return {id:i+1,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:x.phone?fmtPhone(x.phone):'',abn:digits(x.abn),tfn:digits(x.tfn)}; })):[],
+    services:chosen(w.services||[]).map(function(x){ return assignment(x,'Add Client (draft)',w.by||ME,now); }),
+    notes:(w.note&&w.note.trim())?[{t:now,by:w.by||ME,text:w.note.trim()}]:[],kyc:[],kycRecords:[],history:[],created:w.created||now};
+  var files=(w.files||[]).map(function(f){ return {key:f.key,name:f.name,type:f.type,size:f.size,at:f.at||now,by:f.by||w.by||ME}; });
+  if(files.length) c.kycRecords=[{id:'k'+String(w.id),date:w.kycDate||isoOf(now),files:files,by:w.by||ME,at:now,source:'Add Client (draft)'}];
+  return c;
+}
+function openWizDraftDetail(id){
+  var w=loadWzDrafts().filter(function(x){ return x.id===id; })[0];
+  if(!w){ renderList(); return; }
+  DRAFT_VIEWS[id]=wizDraftToClient(w);
+  openDetail(id,false);
+}
 
 /* =========================================================
    State and routing
@@ -3597,7 +3621,7 @@ function draftRows(){
 var WZD_KEY='aad-add-client-drafts';
 function loadWzDrafts(){ try{ var v=JSON.parse(localStorage.getItem(WZD_KEY)||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 function saveWzDrafts(v){ try{ localStorage.setItem(WZD_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
-function openDraftRow(id){ if(String(id).indexOf('wd')===0) openWizard(id); else openRequestDetail(id); }
+function openDraftRow(id){ if(String(id).indexOf('wd')===0) openWizDraftDetail(id); else openRequestDetail(id); }
 var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 function clIni(n){ var p=String(n||'?').trim().split(' ').filter(Boolean); return ((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(); }
 var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review',wiz1:'Add Client · step 1 of 3',wiz2:'Add Client · step 2 of 3',wiz3:'Add Client · step 3 of 3'};
@@ -3781,17 +3805,16 @@ function openDetail(id,swap,tab){
      '<div class="dhead cl-dhead">'+
        '<div class="dprofile">'+
          '<div class="dpmain">'+
-           '<h2 id="cd-t">'+esc(c.name)+' <span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span></h2>'+
+           '<h2 id="cd-t">'+esc(c.name)+' '+(c._draft?'<span class="state draft"><i></i>Draft</span>':'<span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span>')+'</h2>'+
            headerInfo()+
          '</div>'+
        '</div>'+
      '<div class="dhead-acts">'+
-       '<button class="btn-ghost btn-sm" id="edit">Edit</button>'+
-       (co?'':'<button class="btn-ghost btn-sm" id="cd-pw">Manage Password</button>')+
+       '<button class="btn-ghost btn-sm" id="edit">'+(c._draft?'Continue setup':'Edit')+'</button>'+
+       (co||c._draft?'':'<button class="btn-ghost btn-sm" id="cd-pw">Manage Password</button>')+
        '<button class="x" id="cd-x" aria-label="Close">'+I.close+'</button></div>'+'</div>'+
      '<div class="btabs" role="tablist" aria-label="Client details">'+tabs.map(function(t){
-       return '<button role="tab" id="ct-'+t[0]+'" data-tab="'+t[0]+'" aria-controls="cdb">'+t[1]+
-         (t[3]?'<span class="tab-n ok" title="'+(t[0]==='engagement'?'Signed':'Documents uploaded')+'">'+I.tick+(t[2]!=null?t[2]:'')+'</span>':t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>';
+       return '<button role="tab" id="ct-'+t[0]+'" data-tab="'+t[0]+'" aria-controls="cdb">'+t[1]+'</button>';
      }).join('')+'</div>'+
      '<div class="cl-vbody" id="cdb" role="tabpanel" tabindex="0"></div>'+
    '</div>';
@@ -3799,7 +3822,7 @@ function openDetail(id,swap,tab){
   overlay._guard=closeDetail;
   wireCopy(overlay.querySelector('.cl-dhead')); wireReveal(overlay.querySelector('.cl-dhead'));
   document.getElementById('cd-x').onclick=closeDetail;
-  document.getElementById('edit').onclick=function(){ openForm(id,null,true); };
+  document.getElementById('edit').onclick=function(){ if(c._draft){ closeDrawer(); openWizard(id); } else openForm(id,null,true); };
   var pw=document.getElementById('cd-pw'); if(pw) pw.onclick=function(){ resetPassword(c,c,function(){ openDetail(id,true); }); };
 
   var tabBtns=[].slice.call(overlay.querySelectorAll('[data-tab]'));
@@ -3842,9 +3865,9 @@ function openDetail(id,swap,tab){
     var body=document.getElementById('cdb'); body.setAttribute('aria-labelledby','ct-'+t);
     body.innerHTML = t==='directors' ? directorsTab() : t==='services' ? servicesTab(c) : t==='documents' ? kycTab(c) : t==='notes' ? notesTabC(c) : t==='engagement' ? engagementTab(c) : historyTab();
     body.scrollTop=scroll||0;
-    // keep the tab in the address so a refresh or shared link opens the same tab
-    var want='#/clients/'+id+(t===tabs[0][0]?'':'/'+t);
-    if(location.hash!==want){ setHash(want); currentHash=location.hash; }
+    // keep the tab in the address so a refresh or shared link opens the same tab (drafts are transient, so they stay out of the address)
+    if(!c._draft){ var want='#/clients/'+id+(t===tabs[0][0]?'':'/'+t);
+      if(location.hash!==want){ setHash(want); currentHash=location.hash; } }
     wireCopy(body); wireReveal(body);
     wireClientTab(c,t,body,function(){ openDetail(id,true,t); });
     body.querySelectorAll('[data-manage]').forEach(function(b){ b.onclick=function(){ openForm(id,'directors',true); }; });
@@ -3857,7 +3880,7 @@ function openDetail(id,swap,tab){
   /* ----- Directors: one section per director ----- */
   function directorsTab(){
     var h='<div class="vbar"><p><b>'+c.directors.length+' of '+MAX_DIRECTORS+'</b> directors. Each director has their own details and login.</p>'+
-      '<button class="btn-edit" data-manage>'+I.edit+'Manage directors</button></div>';
+      (c._draft?'':'<button class="btn-edit" data-manage>'+I.edit+'Manage directors</button>')+'</div>';
     if(!c.directors.length) return h+'<p class="cl-muted vempty">No directors added</p>';
     c.directors.forEach(function(d,i){
       h+='<section class="vsec vdir"><div class="vsec-h"><div class="who2"><span class="av">'+esc(initials(d.name))+'</span><span><b>'+esc(d.name)+'</b><small>Director '+(i+1)+'</small></span></div>'+
@@ -4534,8 +4557,7 @@ function kycRows(files,o){
   o=o||{};
   if(!files.length) return '<p class="cl-muted kyc-none">'+(o.empty||'No documents uploaded yet.')+'</p>';
   return '<div class="kyc-list">'+files.map(function(f,i){
-    var e=extTag(f.name);
-    return '<div class="kyc-row"><span class="kyc-ext e-'+e+'">'+esc(e.toUpperCase())+'</span>'+
+    return '<div class="kyc-row"><span class="kyc-ext">'+OI.note+'</span>'+
       '<div class="kyc-info">'+(canViewKyc()?'<button class="kyc-name" data-kpv="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+(f.doc?esc(f.doc)+' · ':'')+fsize(f.size)+(f.at?' · '+whenOf(f.at):'')+(f.by?' · '+esc(f.by):'')+'</small></div>'+
       '<span class="acts">'+(canViewKyc()?'<button class="act" data-kdl="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+
       (o.remove?'<button class="act danger" data-krm="'+i+'" title="Remove" aria-label="Remove '+esc(f.name)+'">'+I.trash+'</button>':'')+'</span></div>';
@@ -4543,7 +4565,7 @@ function kycRows(files,o){
 }
 function dropZone(id){
   return '<label class="kyc-drop" id="'+id+'-drop"><input type="file" id="'+id+'" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*" hidden>'+
-    '<span class="kyc-ic">'+OI.up+'</span><span><b>Click to upload or drag files here</b><small>PDF or images · up to 10 MB each · as many as you need</small></span></label>';
+    '<span class="kyc-ic">'+OI.up+'</span><span><b>Click to upload or drag files here</b><small>PDF or images · up to 10 MB each</small></span></label>';
 }
 function wireDrop(id,onFiles){
   var inp=document.getElementById(id), z=document.getElementById(id+'-drop'); if(!inp) return;
@@ -4869,7 +4891,7 @@ function dropDraft(id){ if(id) saveWzDrafts(loadWzDrafts().filter(function(x){ r
 /* step 2: services, KYC and a note on one page */
 function paintSvcStep(){
   var body=formBody();
-  body.innerHTML='<section class="wz-sec"><h3 class="wz-h">Services</h3><div id="wz-sp"></div></section>'+
+  body.innerHTML='<section class="wz-sec"><div id="wz-sp"></div></section>'+
     '<section class="wz-sec" id="wz-kyc-sec"></section>'+
     '<section class="wz-sec"><label class="wz-h" for="wz-note">Notes</label>'+
       '<textarea class="ftext wz-note" id="wz-note" rows="4" maxlength="2000" placeholder="Enter notes">'+esc(wiz.note)+'</textarea></section>';
@@ -4918,7 +4940,7 @@ function paintLetterStep(){
   if(co){
     h+='<section class="wz-sec"><h3 class="wz-h">Which director will sign the engagement letter?</h3>'+
       (dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x,n){ var on=wiz.signerIdx===x.i;
-        return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+x.i+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>Director '+(x.i+1)+(x.email?' · '+esc(x.email):'')+(x.phone?' · '+esc(x.phone):'')+'</small></span></label>'; }).join('')+'</div>'
+        return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+x.i+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'
         :'<p class="cl-hint">Add a director in step 1 first.</p>')+err('signer')+'</section>';
   }
   h+='<section class="wz-sec"><h3 class="wz-h">How should this be signed?</h3><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
@@ -4928,12 +4950,12 @@ function paintLetterStep(){
   if(wiz.method==='manual'){
     var sv=wiz.sig;
     if(sv) h+='<div class="el-sub"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div class="el-signed">'+
-        '<div class="el-sigimg">'+(sv.method==='type'?'<em class="el-typed"'+(sv.font?' style="font-family:'+esc(sv.font)+'"':'')+'>'+esc(sv.text)+'</em>':'<img src="'+sv.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
-        '<div class="el-sigmeta"><b>'+esc(sv.name)+'</b><span>Signed '+whenOf(wiz.sigAt)+'</span></div>'+
-        '<button type="button" class="linkbtn" id="el-resign">Sign again</button></div></div>';
+        '<div class="el-sigcol"><div class="el-sigimg">'+(sv.method==='type'?'<em class="el-typed"'+(sv.font?' style="font-family:'+esc(sv.font)+'"':'')+'>'+esc(sv.text)+'</em>':'<img src="'+sv.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
+        '<span class="el-sigline">Signed on '+whenOf(wiz.sigAt).replace(' · ',' at ')+' by '+esc(ME)+'</span></div>'+
+        '<div class="el-sigmeta"><b>'+esc(sv.name)+'</b></div></div></div>';
     else h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm'+(e.date?' bad':'')+'" type="text" id="el-date" inputmode="numeric" maxlength="10" placeholder="dd-mm-yyyy" autocomplete="off" value="'+esc(wiz.sigDateTxt!=null?wiz.sigDateTxt:(wiz.sigDate?dmyOf(fromIso(wiz.sigDate)):''))+'">'+err('date')+'</div><div></div></div>'+
       '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+
-      '<div class="el-sigfoot"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit</button></div></div>';
+      '<div class="el-sigfoot"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
   }
   h+='</section>';
   if(wiz.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(wiz.fail)+' Nothing was sent and the client wasn’t created. Check the details and try again.</span></div>';
@@ -4962,7 +4984,6 @@ function paintLetterStep(){
     var now=new Date(), at=new Date(fromIso(wiz.sigDate)); at.setHours(now.getHours(),now.getMinutes(),now.getSeconds(),0);   // the chosen day, at the time it was submitted
     wiz.sig=v; wiz.sigAt=at.getTime(); wiz.sigDateTxt=null; form.dirty=true; paintLetterStep();
   };
-  var rs=document.getElementById('el-resign'); if(rs) rs.onclick=function(){ wiz.sig=null; wiz.sigAt=null; form.dirty=true; paintLetterStep(); };
   document.getElementById('wz-draft').onclick=function(){
     storeDraft().then(function(ok){ if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
       var n=c.name; form=null; wiz=null; closeDrawer(); refreshList(); toast(n+' saved as a draft'); });
@@ -5231,8 +5252,7 @@ function openRequestDetail(id,swap,tab){
     '</div></div>'+
     '<div class="dhead-acts">'+acts+'<button class="x" id="rd-x" aria-label="Close">'+I.close+'</button></div></div>'+
     '<div class="btabs" role="tablist" aria-label="Onboarding request">'+tabs.map(function(t){
-      return '<button role="tab" id="rt-'+t[0]+'" data-rtab="'+t[0]+'" aria-controls="rdb" aria-selected="'+(t[0]===rqTab)+'" class="'+(t[0]===rqTab?'on':'')+'">'+t[1]+
-        (t[3]?'<span class="tab-n ok">'+I.tick+(t[2]!=null?t[2]:'')+'</span>':t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>'+
+      return '<button role="tab" id="rt-'+t[0]+'" data-rtab="'+t[0]+'" aria-controls="rdb" aria-selected="'+(t[0]===rqTab)+'" class="'+(t[0]===rqTab?'on':'')+'">'+t[1]+'</button>'; }).join('')+'</div>'+
     '<div class="cl-vbody" id="rdb" role="tabpanel" aria-labelledby="rt-'+rqTab+'" tabindex="0">'+
       (r.reason?'<div class="cl-note rq-reason">'+I.infoLg+'<span><b>'+(r.status==='rejected'?'Reason for rejecting':'Information requested')+':</b> '+esc(r.reason)+'</span></div>':'')+
       rqTabHtml(r,rqTab,dirs,first)+'</div></div>';
@@ -5338,10 +5358,10 @@ function completeRequest(r,kycDate,auto){
 function servicesTab(c){
   var list=c.services||[], act=list.filter(function(a){ return a.status==='active'; });
   var h='<div class="vbar"><p><b>'+act.length+' active</b> service'+(act.length===1?'':'s')+(act.length?' · '+money(totalOf(act))+' total':'')+'. Revoked services stay in the history below.</p>'+
-    '<button class="btn-edit" data-assign>'+I.plus+'Assign service</button></div>';
+    (c._draft?'':'<button class="btn-edit" data-assign>'+I.plus+'Assign service</button>')+'</div>';
   h+='<section class="vsec"><div class="vsec-h"><h3>'+I.tag+'Current services</h3></div>'+
-    (act.length?'<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th><th>Assigned</th><th class="c">Action</th></tr></thead><tbody>'+act.map(function(a){
-      return '<tr><td>'+esc(a.name)+'</td><td class="r">'+money(a.price)+'</td><td>'+whenOf(a.at)+'<small class="cl-muted"> by '+esc(a.by)+'</small></td><td class="c"><button class="linkbtn danger" data-revoke="'+a.aid+'">Revoke</button></td></tr>'; }).join('')+'</tbody></table>'
+    (act.length?'<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th><th>Assigned</th>'+(c._draft?'':'<th class="c">Action</th>')+'</tr></thead><tbody>'+act.map(function(a){
+      return '<tr><td>'+esc(a.name)+'</td><td class="r">'+money(a.price)+'</td><td>'+whenOf(a.at)+'<small class="cl-muted"> by '+esc(a.by)+'</small></td>'+(c._draft?'':'<td class="c"><button class="linkbtn danger" data-revoke="'+a.aid+'">Revoke</button></td>')+'</tr>'; }).join('')+'</tbody></table>'
       :'<p class="cl-muted">No active services. Assign one to start working with this client.</p>')+'</section>';
   h+='<section class="vsec"><div class="vsec-h"><h3>'+I.clock+'Service history</h3><span class="cl-muted">Every assignment is its own record</span></div>'+
     (list.length?'<div class="svh">'+list.slice().sort(function(a,b){ return b.at-a.at; }).map(function(a){
@@ -5392,7 +5412,7 @@ function kycTab(c){
       pill({valid:['Valid','green'],expiring:['Expiring soon','amber'],expired:['Expired','red'],replaced:['Replaced','grey']},st==='replaced'&&isoOf(Date.now())>exp?'expired':st)+'</div>'+
       (r.note?'<p class="ky-note">“'+esc(r.note)+'”</p>':''); };
   var h='<div class="vbar"><p>'+(cur?(kycState(cur)==='expired'?'<b>KYC expired.</b> Record a new check to keep this client compliant.':'Each KYC check is valid for one year. A new check never replaces an earlier one.'):'No KYC recorded yet.')+'</p>'+
-    '<button class="btn-edit" data-kyc-add>'+I.plus+'Record new KYC</button></div>';
+    (c._draft?'':'<button class="btn-edit" data-kyc-add>'+I.plus+'Record new KYC</button>')+'</div>';
   if(cur) h+='<section class="vsec"><div class="vsec-h"><h3>Current KYC</h3></div><div class="ky-rec cur">'+head(cur,0)+kycRows(cur.files||[],{pfx:0,empty:'No files in this check.'})+'</div></section>';
   if(recs.length>1) h+='<section class="vsec"><div class="vsec-h"><h3>KYC history</h3><span class="cl-muted">Kept for audit</span></div><div class="ky-hist">'+
     recs.slice(1).map(function(r,i){ return '<div class="ky-rec">'+head(r,i+1)+kycRows(r.files||[],{pfx:i+1,empty:'No files in this check.'})+'</div>'; }).join('')+'</div></section>';
@@ -5425,8 +5445,8 @@ function kycDialog(c,done){
 }
 function notesTabC(c){
   var list=(c.notes||[]).slice().sort(function(a,b){ return b.t-a.t; });
-  return '<section class="vsec nt-add"><label class="flabel" for="cn-text">Add a note</label><textarea class="ftext" id="cn-text" rows="3" maxlength="2000" placeholder="Add a note for the team"></textarea>'+
-    '<div class="nt-row"><span class="cl-err" id="cn-e" hidden>'+I.info+'Write a note first</span><span class="sp-grow"></span><button class="btn-primary btn-sm" id="cn-add">Add note</button></div></section>'+
+  return (c._draft?'':'<section class="vsec nt-add"><label class="flabel" for="cn-text">Add a note</label><textarea class="ftext" id="cn-text" rows="3" maxlength="2000" placeholder="Add a note for the team"></textarea>'+
+    '<div class="nt-row"><span class="cl-err" id="cn-e" hidden>'+I.info+'Write a note first</span><span class="sp-grow"></span><button class="btn-primary btn-sm" id="cn-add">Add note</button></div></section>')+
     '<section class="vsec">'+(list.length?'<div class="ntl">'+list.map(function(n){ return '<div class="ntl-i"><span class="ntl-av" aria-hidden="true">'+esc(String(n.by||'?').trim().split(' ').map(function(p){ return p[0]; }).join('').slice(0,2).toUpperCase())+'</span>'+
       '<div class="ntl-b"><div class="ntl-h"><b>'+esc(n.by)+'</b><span>'+whenOf(n.t)+'</span></div><p>'+esc(n.text)+'</p></div></div>'; }).join('')+'</div>':'<p class="cl-muted">No notes yet.</p>')+'</section>';
 }
@@ -5438,11 +5458,14 @@ function engagementTab(c){
     return '<div class="el-prow"><div><b>FY '+fyLabel(letterFy(l))+'</b><small>'+(l.status==='signed'?'Signed '+dmyOf(l.signedAt)+' by '+esc(l.signature.name):'Never signed')+' · expired '+dmyOf(fromIso(fyEnd(letterFy(l))))+'</small></div>'+pill(LETTER_STATUS,letterState(l))+
       '<button class="linkbtn" data-elpdf="'+l.id+'">'+OI.print+'Open</button></div>'; }).join('')+'</div></section>':'';
   var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'; };
+  if(c._draft) return fyBar+'<div class="vbar"><p>'+(act.length?'This is a preview of the engagement letter. Finish setup to sign or send it.':'No services assigned yet, so there’s nothing to put in the letter.')+'</p></div>'+
+    (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>':'');
   if(!L) return fyBar+'<div class="vbar"><p>No engagement letter for '+fyLabel(F)+' yet'+(act.length?'':'. Assign a service first')+'.</p>'+(act.length?'<span class="vsec-acts"><button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?esc(sg.name||'the director'):'client')+'</button></span>':'')+'</div>'+
     (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>'+review():'')+prev;
-  var h=fyBar+'<div class="vbar"><p>'+pill(LETTER_STATUS,L.status)+' '+(L.status==='signed'?'On '+dmyOf(L.signedAt)+' by <b>'+esc(L.signature.name)+'</b>'+(L.method==='manual'?' (recorded by staff)':' (signed through the link)'):
+  var h=fyBar+'<div class="vbar'+(L.status==='signed'?' el-sbar':'')+'"><p>'+pill(LETTER_STATUS,L.status)+' '+(L.status==='signed'?'On '+dmyOf(L.signedAt)+' by <b>'+esc(L.signature.name)+'</b>'+(L.method==='manual'?' (recorded by staff)':' (signed through the link)'):
       L.status==='sent'?'Emailed '+whenOf(L.sends[L.sends.length-1].at)+' to <b>'+esc((L.signer&&L.signer.name)||sg.name)+'</b>. Waiting for them to sign.':'')+'</p><span class="vsec-acts">'+
-    (L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':'')+'</span></div>';
+    (L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':
+      '<button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button>')+'</span></div>';
   h+='<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,L.services,L))+'</div></section>';
   return h+prev;
 }
@@ -5451,6 +5474,7 @@ function letterAction(c,what,refresh){
   ONB=loadOnb(); var L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var services=L?L.services:act.map(function(a){ return {name:a.name,price:a.price}; });
   if(what==='pdf') return printLetter(letterHtml(letterCtx(c,services,L)));
+  if(what==='full') return printLetter(letterHtml(letterCtx(c,services,L)),true);
   if(what.indexOf('pdf:')===0){ var old=ONB.letters.filter(function(l){ return l.id===what.slice(4); })[0]; if(old) printLetter(letterHtml(letterCtx(c,old.services,old))); return; }
   var rv=document.getElementById('el-rev');
   if(rv&&!rv.checked){ toast('Review the letter and tick the box first',true); rv.focus(); rv.closest('.el-review').classList.add('bad'); return; }
@@ -5498,7 +5522,8 @@ function wireClientTab(c,t,body,repaintTab){
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });
   }
   if(t==='notes'){
-    document.getElementById('cn-add').onclick=function(){
+    var add=document.getElementById('cn-add');
+    if(add) add.onclick=function(){
       var tx=document.getElementById('cn-text').value.trim(); if(!tx){ document.getElementById('cn-e').hidden=false; return; }
       (c.notes=c.notes||[]).push({t:Date.now(),by:ME,text:tx});
       logEvent(c,'note','Note added',''); toast('Note added'); repaintTab();
@@ -12258,8 +12283,18 @@ function letterHtml(c){                               // c: {name,type,entity,em
         '<div><dt>Name of signatory:</dt><dd>'+e(sig?sig.name:signer)+'</dd></div>'+
         '<div><dt>Date:</dt><dd>'+(c.signedAt?dmyOf(c.signedAt):'')+'</dd></div></dl></div>'
   ];
+  var fyY=c.fy!=null?c.fy:fyStart(c.date||Date.now());
+  var mastName=signer||c.name;
+  var mast=function(full){
+    return '<header class="lt-mast'+(full?'':' compact')+'"><div class="lt-mast-top">'+
+      '<div class="lt-brand"><b>'+T+'</b>'+(full?'<small>'+e(F.trading)+' · ABN '+e(fmtABN(F.abn))+' · Tax agent '+e(F.tan)+'</small><small>Dandenong (Head Office) · '+e(F.phone)+' · www.aadtaxation.com.au</small>':'')+'</div>'+
+      '<span class="lt-tag">Engagement<br>letter</span></div>'+
+      (full?'<div class="lt-mast-meta"><span>Issued <b>'+e(date)+'</b></span><span>Financial year <b>'+e(fyLabel(fyY))+'</b></span><span>Expires <b>'+e(dmyOf(fromIso(fyEnd(fyY))))+'</b></span></div>'+
+        (mastName?'<div class="lt-mast-name">'+e(mastName)+'</div>':''):'')+
+      '</header>';
+  };
   return '<div class="el-doc">'+pages.map(function(p,i){
-    return '<section class="el-sheet" aria-label="Page '+(i+1)+' of '+pages.length+'"><img class="lt-head" src="'+LH_HEAD+'" alt="AAD Taxation · 03 9115 1581 · hello@aadtaxation.com.au · www.aadtaxation.com.au · Tax agent 26337798">'+
+    return '<section class="el-sheet" aria-label="Page '+(i+1)+' of '+pages.length+'">'+mast(i===0)+
       '<div class="lt-body">'+p+'</div><img class="lt-foot" src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd · ABN 91 692 752 702 · Dandenong (Head Office)"></section>';
   }).join('')+'</div>';
 }
@@ -12267,7 +12302,15 @@ function escH(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){re
 var LETTER_CSS =
   '.el-doc{container-type:inline-size;display:flex;flex-direction:column;gap:14px;width:100%;max-width:794px;margin:0 auto}'+
   '.el-sheet{background:#fff;aspect-ratio:210/297;display:flex;flex-direction:column;box-shadow:0 6px 20px rgba(15,23,42,.10),0 0 0 1px #E5E7EB;font-family:Calibri,Carlito,"Segoe UI",Arial,sans-serif;font-size:1.86cqw;line-height:1.5;color:#111;text-align:left}'+
-  '.lt-head,.lt-foot{display:block;width:100%;height:auto;flex-shrink:0;max-width:none}'+
+  '.lt-foot{display:block;width:100%;height:auto;flex-shrink:0;max-width:none}'+
+  '.lt-mast{flex-shrink:0;padding:5cqw 6.2cqw 0}'+
+  '.lt-mast-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1.4em;padding-bottom:.9em;border-bottom:2px solid #E46A11}'+
+  '.lt-brand b{display:block;font-size:2.1em;font-weight:700;line-height:1.05;color:#111;letter-spacing:-.01em}'+
+  '.lt-brand small{display:block;font-size:.78em;color:#555;margin-top:.32em;line-height:1.45}'+
+  '.lt-tag{flex-shrink:0;text-align:right;font-size:.82em;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#E46A11;line-height:1.3}'+
+  '.lt-mast-meta{display:flex;flex-wrap:wrap;gap:.35em 2.4em;margin-top:1em;font-size:.9em;color:#555}.lt-mast-meta b{color:#111;font-weight:600}'+
+  '.lt-mast-name{margin-top:.6em;font-size:1.1em;font-weight:700;color:#111}'+
+  '.lt-mast.compact .lt-mast-top{border-bottom-width:1px}'+
   '.lt-body{flex:1;padding:3.4cqw 6.2cqw 4cqw}.lt-body p{margin:0 0 1.05em}.lt-body>:last-child{margin-bottom:0}'+
   '.lt-n>span,.lt-h>span,.lt-sh>span{display:inline-block;min-width:3.6em}'+
   '.lt-h,.lt-sh{font:inherit;font-weight:400;margin:1.5em 0 .3em}.lt-sh{margin:1.1em 0 .8em}.lt-body>.lt-h:first-child,.lt-body>.lt-sh:first-child{margin-top:0}'+
@@ -12441,14 +12484,14 @@ button,input,select,textarea{font:inherit;color:inherit}
 button{background:none;border:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.top{background:#fff;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:14px}
+.top{position:relative;background:#fff;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:14px}
 .top img{height:38px;width:auto}
-.top span{font-size:13px;color:var(--mute);margin-left:auto;display:flex;align-items:center;gap:6px}
+.top span{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
 .top span svg{color:var(--green)}
 .pvb{background:#181C1E;color:#fff;font-size:12.5px;padding:9px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .pvb b{background:var(--orange);padding:3px 9px;border-radius:999px;font-size:11.5px}
 .wrap{max-width:780px;margin:0 auto;padding:28px 16px 60px}
-.hello{margin-bottom:18px}.hello h1{font-family:'Manrope';font-size:24px;font-weight:800;letter-spacing:-.4px}
+.hello{margin-bottom:18px;text-align:center}.hello h1{font-family:'Manrope';font-size:24px;font-weight:800;letter-spacing:-.4px}
 .hello p{font-size:14px;color:var(--mute);margin-top:6px;line-height:1.55}
 .steps{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:24px 0 18px}
 .steps li{display:flex;flex-direction:column;gap:10px;font-size:12.5px;font-weight:600;color:var(--faint);min-width:0}
@@ -12575,7 +12618,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 </style>
 </head>
 <body>
-<header class="top"><img src="logo.png" alt="AAD Taxation"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Secure link</span></header>
+<header class="top"><img src="logo.png" alt="AAD Taxation"></header>
 <div id="pvb"></div>
 <main class="wrap" id="app"></main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

@@ -4922,7 +4922,7 @@ function paintLetterStep(){
   foot.innerHTML='<button class="btn-ghost" id="wz-back"'+(wiz.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
     '<button class="btn-ghost" id="wz-draft"'+(wiz.busy?' disabled':'')+'>Save as Draft</button>'+
     '<button class="btn-primary" id="wz-send"'+(wiz.busy?' disabled':'')+'>'+(wiz.busy?'<span class="spin"></span>Sending…':OI.send+'Send')+'</button>';
-  var pad=wiz.method==='manual'?sigPad(document.getElementById('el-pad'),sg.name||c.name,{modes:[['draw','Draw'],['upload','Select & upload']]}):null;
+  var pad=wiz.method==='manual'?sigPad(document.getElementById('el-pad'),sg.name||c.name,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}):null;
   wiz.pad=pad;
   var clear=function(k){ if(e[k]){ delete e[k]; } };
   document.getElementById('wz-back').onclick=function(){ wiz.step=2; wiz.errs={}; wiz.fail=''; wzPaint(); };
@@ -4950,7 +4950,7 @@ function wzSend(){
     var today=isoOf(Date.now());
     if(!wiz.sigDate) e.date='Enter the signing date'; else if(wiz.sigDate>today) e.date='The signing date can’t be in the future';
     sig=wiz.pad&&wiz.pad.value(sg.name||c.name);
-    if(!sig) e.sig='Draw the signature, or select and upload a signature image';
+    if(!sig) e.sig='Draw the signature, select a style, or upload a signature image';
     at=wiz.sigDate===today?Date.now():fromIso(wiz.sigDate);
   }
   wiz.errs=e; wiz.fail='';

@@ -918,7 +918,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-file{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 4px 0 6px;border:1px solid var(--line-soft);border-radius:8px;background:#FAFBFC;font-size:12px;color:var(--slate);max-width:100%}
 .ds-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}
 .ds-file .x.e-pdf{background:#FDECEC;color:#C2410C}
-.ds-file b{font-weight:600;color:var(--ink)}
+.ds-file b,.ds-fname{font-weight:600;color:var(--ink);font-size:inherit}.ds-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
 .ds-file .sdt-ib{width:24px;height:24px}
 .ds-fmore{height:30px;padding:0 11px;border:1px dashed var(--line);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--orange-ink)}
 .ds-fmore:hover{border-color:var(--orange);background:var(--orange-soft)}
@@ -1432,8 +1432,7 @@ function sideName(d,t,f){ return t.slots.length>1?slotLabel(d.k,f.slot):'Documen
 /* a file chip: type, side, size, view + download */
 function fileChip(d,t,vi,fi,f){
   var e=extOf(f.n);
-  return '<span class="ds-file" title="'+esc(f.n)+'"><span class="x e-'+e+'">'+e.toUpperCase()+'</span><b>'+esc(sideName(d,t,f))+'</b>'+f.s+
-    '<button class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="View" aria-label="View '+esc(f.n)+'">'+I.eye+'</button>'+
+  return '<span class="ds-file" title="'+esc(f.n)+'"><span class="x e-'+e+'">'+e.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" aria-label="Open '+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button>'+f.s+
     '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>';
 }
 /* a version's files: the first 3 show, the rest sit behind "+N more" so the card stays one row tall */
@@ -2958,6 +2957,7 @@ tbody tr:hover{background:#FCFCFD}
 .kyc-ext{flex-shrink:0;width:40px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:#E8F1FD;color:#2563EB}
 .kyc-ext.e-pdf{background:#FDECEC;color:#C2410C}
 .kyc-info{flex:1;min-width:0}
+.kyc-name{display:block;max-width:100%;font-size:13px;font-weight:600;color:var(--ink);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kyc-name:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
 .kyc-info b{display:block;font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kyc-info small{font-size:12px;color:var(--faint)}
 .kyc-none{margin-top:12px;font-size:13px}
@@ -3569,7 +3569,6 @@ function renderList(){
         (letterSignedFor(c)?'<span class="ob-tick on" title="Engagement letter for '+fyLabel(fyStart(Date.now()))+' signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>')+'</span></td>'+
       '<td class="c"><span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span></td>'+
       '<td class="c"><span class="acts">'+
-        '<button class="act" data-view="'+c.id+'" title="View" aria-label="View '+esc(c.name)+'">'+I.eye+'</button>'+
         '<button class="act" data-edit="'+c.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>'+
       '</span></td></tr>';
   });
@@ -4426,9 +4425,8 @@ function kycRows(files,o){
   return '<div class="kyc-list">'+files.map(function(f,i){
     var e=extTag(f.name);
     return '<div class="kyc-row"><span class="kyc-ext e-'+e+'">'+esc(e.toUpperCase())+'</span>'+
-      '<div class="kyc-info"><b title="'+esc(f.name)+'">'+esc(f.name)+'</b><small>'+(f.doc?esc(f.doc)+' · ':'')+fsize(f.size)+(f.at?' · '+whenOf(f.at):'')+(f.by?' · '+esc(f.by):'')+'</small></div>'+
-      '<span class="acts">'+(canViewKyc()?'<button class="act" data-kpv="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Preview" aria-label="Preview '+esc(f.name)+'">'+I.eye+'</button>'+
-        '<button class="act" data-kdl="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+
+      '<div class="kyc-info">'+(canViewKyc()?'<button class="kyc-name" data-kpv="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+(f.doc?esc(f.doc)+' · ':'')+fsize(f.size)+(f.at?' · '+whenOf(f.at):'')+(f.by?' · '+esc(f.by):'')+'</small></div>'+
+      '<span class="acts">'+(canViewKyc()?'<button class="act" data-kdl="'+(o.pfx!=null?o.pfx+'|':'')+i+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+
       (o.remove?'<button class="act danger" data-krm="'+i+'" title="Remove" aria-label="Remove '+esc(f.name)+'">'+I.trash+'</button>':'')+'</span></div>';
   }).join('')+'</div>';
 }
@@ -4936,7 +4934,7 @@ function requestsHtml(){
       '<td class="nowrap">'+r.services.length+' · '+money(totalOf(r.services))+'</td>'+
       '<td>'+pill(ONB_STATUS,r.status)+'</td><td>'+pill(INVITE_STATUS,r.invite.status)+'</td><td>'+pill(LETTER_STATUS,r.letter.status)+'</td>'+
       '<td class="nowrap"><span class="rq-last">'+esc(last?last.action:'')+'<small>'+(last?whenOf(last.t):'')+'</small></span></td>'+
-      '<td class="c"><span class="acts"><button class="act" data-rq="'+r.id+'" title="View" aria-label="View request for '+esc(r.name)+'">'+I.eye+'</button>'+
+      '<td class="c"><span class="acts">'+
         '<button class="act" data-rqlink="'+r.token+'" title="Show Link" aria-label="Show the client’s view for '+esc(r.name)+'">'+OI.link+'</button></span></td></tr>';
   });
   return h+'</tbody></table></div>';
@@ -8402,7 +8400,7 @@ function docsTab(docs){
   return '<div class="ar-files">'+docs.map(function(x){
     var k=x.ei+'|'+x.fi;
     return '<div class="ar-file">'+ftag(x.f.n)+'<button class="ar-fi" data-pv="'+k+'" title="Open '+esc(x.f.n)+'"><b>'+esc(x.f.n)+'</b><small>'+x.f.s+' · '+ACTIONS[x.e.type].ev+', '+t12(x.e.at)+'</small></button>'+
-      '<span class="acts"><button class="act" data-pv="'+k+'" title="View" aria-label="View '+esc(x.f.n)+'">'+I.eye+'</button>'+
+      '<span class="acts">'+
       '<button class="act" data-dlf="'+k+'" title="Download" aria-label="Download '+esc(x.f.n)+'">'+I.csv+'</button></span></div>';
   }).join('')+'</div>';
 }

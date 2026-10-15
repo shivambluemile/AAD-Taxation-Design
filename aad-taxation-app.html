@@ -1138,7 +1138,7 @@ var I={
   key:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/></svg>',
   up:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#E8873A" stroke-width="1.7" stroke-linecap="round"><path d="M7 17a4 4 0 0 1-.6-8A5.6 5.6 0 0 1 17.3 9 3.8 3.8 0 0 1 17 17"/><path d="M12 20v-8m0 0-2.6 2.6M12 12l2.6 2.6"/></svg>',
   img:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="16" rx="2.4"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 18 5-5 4 4 2.5-2.5L20 18"/></svg>',
-  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   cv:'<svg class="cv" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
   dl:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14"/></svg>',
   upsm:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V8m0 0-4 4m4-4 4 4M5 5h14"/></svg>',
@@ -1326,7 +1326,7 @@ I.eye='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="curre
 I.info='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/></svg>';
 I.lock='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>';
 ACT.replaced='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13l-3.5-3.5M20 15H7l3.5 3.5"/></svg>';
-ACT.deleted='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>';
+ACT.deleted='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>';
 
 /* document types enabled for the Staff module (Settings → Document Types) */
 var DOC_TYPES=[
@@ -2774,6 +2774,8 @@ tbody tr:hover{background:#FCFCFD}
 .el-acts .pill-btn{display:inline-flex;align-items:center;gap:7px}
 .el-acts .pill-btn.on{background:var(--orange-soft)}
 .el-step .el-wrap{margin-bottom:14px}
+.el-pvw{position:relative}
+.el-pvb{position:absolute;top:10px;right:12px;z-index:1;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 9px}
 .el-step .el-review{align-items:center}
 .el-step .el-review span{font-size:13.5px;color:var(--ink);line-height:1.45}
 .el-opts{display:grid;gap:8px}
@@ -2971,7 +2973,7 @@ tbody tr:hover{background:#FCFCFD}
 #cfb .wz-sec .cl-sec,#rqb .wz-sec .cl-sec{margin-bottom:14px}
 #cfb .wz-sec .bsec,#rqb .wz-sec .bsec{font-family:'Manrope';font-size:15px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--ink)}
 #cfb .wz-sec .bsec svg,#rqb .wz-sec .bsec svg{display:none}
-.sp-pr{position:relative}.sp-cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13.5px;color:var(--mute);pointer-events:none}.sp-pr .fin{padding-left:28px}
+.sp-in{position:relative;display:block}.sp-cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13.5px;line-height:1;color:var(--mute);pointer-events:none}.sp-in .fin{padding-left:28px}
 .sp-sum{display:flex;flex-direction:column;align-items:flex-end;gap:1px}.sp-sum small{font-size:11.5px;color:var(--faint)}
 .el-wrap+.el-review{margin-top:0}   /* the drawer body's 24px gap already sits above the line */
 
@@ -3314,7 +3316,7 @@ var I = {
   plus:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   minus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>',
   edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/></svg>',
-  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   close:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   info:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="8" r=".8" fill="currentColor" stroke="none"/></svg>',
   tick:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
@@ -4458,8 +4460,8 @@ function svcPickerHtml(list,errs){
     return '<div class="sp-row">'+
       '<div class="sp-svc"><label class="'+(first?'flabel':'sr')+'" for="sp-s'+i+'">'+(first?'Service':'Service '+(i+1))+'</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
         '<option value="">Choose a service</option>'+opts.map(function(s){ return '<option value="'+s.id+'"'+(s.id===x.svcId?' selected':'')+'>'+esc(s.name)+' · min '+money(s.price)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'+
-      '<div class="sp-pr"><label class="'+(first?'flabel':'sr')+'" for="sp-p'+i+'">'+(first?'Price (incl. GST)':'Price for service '+(i+1)+', including GST')+'</label><span class="sp-cur" aria-hidden="true">$</span><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
-        (x.svcId?' min="'+minOf(x)+'" placeholder="'+minOf(x)+'"':' placeholder="0.00" disabled')+' value="'+esc(x.price)+'"'+(edit||!x.svcId?'':' readonly title="Only admins and managers can change prices"')+'></div>'+
+      '<div class="sp-pr"><label class="'+(first?'flabel':'sr')+'" for="sp-p'+i+'">'+(first?'Price (incl. GST)':'Price for service '+(i+1)+', including GST')+'</label><span class="sp-in"><span class="sp-cur" aria-hidden="true">$</span><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
+        (x.svcId?' min="'+minOf(x)+'" placeholder="'+minOf(x)+'"':' placeholder="0.00" disabled')+' value="'+esc(x.price)+'"'+(edit||!x.svcId?'':' readonly title="Only admins and managers can change prices"')+'></span></div>'+
       '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove service '+(i+1)+'"'+(list.length===1&&!x.svcId?' disabled':'')+'>'+OI.del+'</button>'+
       (es||ep?'<span class="cl-err sp-err">'+I.info+esc(es||ep)+'</span>':'')+'</div>';
   }).join('');
@@ -4888,9 +4890,8 @@ function paintLetterStep(){
   var sg=wzSigner();
   var err=function(k){ return e[k]?'<span class="cl-err">'+I.info+esc(e[k])+'</span>':''; };
   var h='<section class="wz-sec el-step"><h3 class="wz-h">Engagement letter</h3>'+
-    '<div class="el-acts"><button type="button" class="pill-btn'+(wiz.preview?' on':'')+'" id="el-pv" aria-expanded="'+wiz.preview+'">'+OI.note+(wiz.preview?'Hide preview':'Preview')+'</button>'+
-      '<button type="button" class="pill-btn quiet" id="el-full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" id="el-pdf">'+OI.dl+'Download PDF</button></div>'+
-    (wiz.preview?'<div class="el-wrap" id="el-letter">'+wzLetterHtml()+'</div>':'')+
+    '<div class="el-acts"><button type="button" class="pill-btn quiet" id="el-full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" id="el-pdf">'+OI.dl+'Download PDF</button></div>'+
+    '<div class="el-wrap el-pvw" id="el-letter"><span class="el-pvb">Preview</span>'+wzLetterHtml()+'</div>'+
     '<label class="el-review'+(e.review?' bad':'')+'"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+err('review')+'</section>';
   if(co){
     h+='<section class="wz-sec"><h3 class="wz-h">Which director will sign the engagement letter?</h3>'+
@@ -4901,11 +4902,7 @@ function paintLetterStep(){
   h+='<section class="wz-sec"><h3 class="wz-h">How should this be signed?</h3><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
     [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=wiz.method===m[0];
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div>'+err('method');
-  if(wiz.method==='request'){
-    h+='<div class="el-sub"><span class="flabel">Send the link by</span><div class="el-opts two">'+
-      [['email','Email',sg.email],['sms','SMS',sg.phone]].map(function(ch){ var on=!!wiz.channels[ch[0]];
-        return '<label class="el-opt chk'+(on?' on':'')+'"><input type="checkbox" data-ch="'+ch[0]+'"'+(on?' checked':'')+'><span><b>'+ch[1]+'</b><small>'+(ch[2]?esc(ch[2]):'No '+(ch[0]==='email'?'email address':'mobile number')+' for '+(co?'this director':'the client'))+'</small></span></label>'; }).join('')+'</div>'+err('channel')+'</div>';
-  }
+  if(wiz.method==='request') h+=err('channel');
   if(wiz.method==='manual'){
     h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm" type="date" id="el-date" value="'+esc(wiz.sigDate)+'" max="'+isoOf(Date.now())+'">'+err('date')+'</div><div></div></div>'+
       '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+'</div>';
@@ -4920,13 +4917,11 @@ function paintLetterStep(){
   wiz.pad=pad;
   var clear=function(k){ if(e[k]){ delete e[k]; } };
   document.getElementById('wz-back').onclick=function(){ wiz.step=2; wiz.errs={}; wiz.fail=''; wzPaint(); };
-  document.getElementById('el-pv').onclick=function(){ wiz.preview=!wiz.preview; paintLetterStep(); if(wiz.preview){ var l=document.getElementById('el-letter'); if(l) l.scrollIntoView({block:'nearest'}); } };
   document.getElementById('el-full').onclick=function(){ printLetter(wzLetterHtml(),true); };
   document.getElementById('el-pdf').onclick=function(){ printLetter(wzLetterHtml()); };
   document.getElementById('wz-rev').onchange=function(){ wiz.reviewed=this.checked; form.dirty=true; if(this.checked&&e.review){ clear('review'); paintLetterStep(); } };
   body.querySelectorAll('input[name=el-dir]').forEach(function(r){ r.onchange=function(){ wiz.signerIdx=+r.value; form.dirty=true; clear('signer'); clear('channel'); paintLetterStep(); }; });
   body.querySelectorAll('input[name=el-how]').forEach(function(r){ r.onchange=function(){ wiz.method=r.value; form.dirty=true; clear('method'); clear('channel'); clear('sig'); paintLetterStep(); }; });
-  body.querySelectorAll('[data-ch]').forEach(function(x){ x.onchange=function(){ wiz.channels[x.dataset.ch]=x.checked; form.dirty=true; clear('channel'); paintLetterStep(); }; });
   var dt=document.getElementById('el-date'); if(dt) dt.oninput=function(){ wiz.sigDate=dt.value; form.dirty=true; };
   document.getElementById('wz-draft').onclick=function(){
     storeDraft().then(function(ok){ if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
@@ -4941,11 +4936,7 @@ function wzSend(){
   if(co&&wiz.signerIdx==null) e.signer='Choose the director who will sign';
   if(!wiz.method) e.method='Choose how the letter will be signed';
   var sig=null, at=null;
-  if(wiz.method==='request'){
-    if(!wiz.channels.email&&!wiz.channels.sms) e.channel='Choose Email, SMS or both';
-    else if(wiz.channels.email&&!validEmail(sg.email)) e.channel=(co?'This director has':'The client has')+' no valid email address. Add it in step 1, or send by SMS';
-    else if(wiz.channels.sms&&!validPhone(sg.phone)) e.channel=(co?'This director has':'The client has')+' no valid mobile number. Add it in step 1, or send by email';
-  }
+  if(wiz.method==='request'&&(!co||wiz.signerIdx!=null)&&!sg.email&&!sg.phone) e.channel=(co?'This director has':'The client has')+' no email address or mobile number. Add one in step 1';
   if(wiz.method==='manual'){
     var today=isoOf(Date.now());
     if(!wiz.sigDate) e.date='Enter the signing date'; else if(wiz.sigDate>today) e.date='The signing date can’t be in the future';
@@ -4960,20 +4951,20 @@ function wzSend(){
     toast('Please complete the highlighted items',true); return;
   }
   if(wiz.method==='manual'){ finalizeClient({mode:'signed',sig:sig,signedAt:at}); return; }
+  wzSendScreen();
+}
+/* Request Signature: the send screen, in the same panel. Email and SMS start ticked; untick one to send by the other only */
+function wzSendScreen(){
+  var c=wzClient(), co=c.type==='company', sg=wzSigner();
   var token=wiz.token||(wiz.token=newToken()), expires=Date.now()+LINK_DAYS*864e5;
   var services=wiz.services.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; });
-  var ctx=tplCtx({name:co?sg.name:c.name,type:'individual',entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires});
-  var et=EMAIL_TEMPLATES.filter(function(x){ return x.kind==='engagement'; })[0], st=SMS_TEMPLATES.filter(function(x){ return x.kind==='engagement'; })[0];
-  var msg={email:wiz.channels.email?{to:sg.email,cc:'',bcc:'',subject:fillTpl(et.subject,ctx),body:fillTpl(et.body,ctx),html:esc(fillTpl(et.body,ctx)).replace(/\n/g,'<br>'),template:et.id}:null,
-           sms:wiz.channels.sms?{to:fmtPhone(sg.phone),body:fillTpl(st.body,ctx),template:st.id}:null};
-  wiz.busy=true; paintLetterStep();
-  deliver(msg).then(function(r){
-    if(!wiz) return;
-    wiz.busy=false;
-    var rec={at:Date.now(),by:ME,channels:[msg.email?'Email':'',msg.sms?'SMS':''].filter(Boolean),emailTo:msg.email&&msg.email.to,smsTo:msg.sms&&msg.sms.to,ok:r.ok,error:r.error||''};
-    if(!r.ok){ wiz.fail=r.error; paintLetterStep(); return; }
-    finalizeClient({mode:'sent',send:rec,token:token,expires:expires});
-  });
+  formBody().scrollTop=0;
+  sendScreen(formBody(),document.getElementById('wz-foot'),{kind:'engagement',sendLabel:'Send',
+    intro:'<div class="wz-intro"><b>Send to '+esc(sg.name||c.name)+'</b><span>They get a secure link to review and sign the engagement letter.</span></div>',
+    to:{email:sg.email,phone:sg.phone},
+    ctx:tplCtx({name:co?sg.name:c.name,type:'individual',entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires}),
+    back:function(){ wiz.fail=''; paintLetterStep(); },
+    done:function(rec){ if(!wiz||!rec.ok) return; wiz.channels={email:rec.channels.indexOf('Email')>=0,sms:rec.channels.indexOf('SMS')>=0}; finalizeClient({mode:'sent',send:rec,token:token,expires:expires}); }});
 }
 /* the client is only created here, once the letter is signed or has been sent successfully */
 function finalizeClient(o){
@@ -6431,7 +6422,7 @@ var I = {
   filter:'<svg width="15" height="11" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h20M5 9h14M9 15h6"/></svg>',
   plus:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/></svg>',
-  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   close:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   tick:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
   ok:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
@@ -8152,7 +8143,45 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .ad-q{font-size:12.5px;line-height:1.45;color:var(--slate);margin-top:4px;overflow-wrap:anywhere}
 .ad-emptybox b{display:block;font-size:13.5px;color:var(--ink)}
 .ad-emptybox span{display:block;font-size:12.5px;color:var(--mute);margin-top:4px}
-@media (max-width:600px){.ad-head,.ad-body{padding-left:18px;padding-right:18px}}
+/* day panel v2: title + status, actions top right, summary strip, quiet sections */
+.ad-tt{min-width:0}
+.ad-who{flex:1 1 auto}
+.ad-who h2{overflow-wrap:anywhere}
+.ad-tl{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
+.ad-tl .ad-chip{padding:3px 10px;font-size:12px}
+.ad-hacts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ad-ib{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--slate);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.ad-ib:hover{background:#F6F7F9;color:var(--ink)}
+.ad-ib.danger:hover{background:#FEF2F2;border-color:#FECACA;color:var(--red)}
+.ad-ib:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.2)}
+.ad-hacts .btn-ghost.sm{height:34px}
+.ad-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ad-stat{background:#F8F9FB;border-radius:10px;padding:11px 12px;min-width:0}
+.ad-stat dt{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--faint)}
+.ad-stat dd{margin-top:4px;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-stat.main{background:var(--orange-soft)}
+.ad-stat.main dd{color:var(--orange-ink)}
+.ad-live{font-family:'Inter';font-size:13px;font-weight:600;color:#2563EB}
+.ad-sec{border-top:0;padding-top:0}
+.ad-sec h3{font-size:13.5px;margin-bottom:10px}
+.ad-shifts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ad-shifts li{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-top:1px solid #F1F2F4;font-size:13px}
+.ad-shifts li:first-child{border-top:0;padding-top:0}
+.ad-shifts b{font-weight:700;color:var(--ink);width:56px;flex-shrink:0}
+.ad-shifts span{color:var(--mute);font-variant-numeric:tabular-nums;flex:1}
+.ad-shifts em{font-style:normal;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.ad-notes{gap:10px}
+.ad-notes figure{background:#F8F9FB;border-radius:10px;padding:10px 12px;margin:0}
+.ad-meta{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:12px;color:var(--faint);padding-top:4px}
+/* documents in the list */
+.ar-docs{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:200px}
+.ar-dfile{display:flex;align-items:center;gap:7px;max-width:100%;min-width:0;font-size:12.5px;color:var(--ink);text-align:left}
+.ar-dfile .ar-ft{width:28px;height:18px;border-radius:4px;font-size:8.5px}
+.ar-dfile span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.ar-dfile:hover span{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
+.ar-dmore{font-size:12px;font-weight:600;color:var(--orange-ink);padding-left:35px}
+.ar-dmore:hover{text-decoration:underline;text-underline-offset:3px}
+@media (max-width:600px){.ad-head,.ad-body{padding-left:18px;padding-right:18px}.ad-head{flex-wrap:wrap}.ad-who{flex:1 1 100%}.ad-hacts{margin-left:auto}.ad-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* document viewer */
 #dlg .modal.ar-pv{max-width:620px}
 .ar-pv-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
@@ -8297,7 +8326,7 @@ var I = {
   warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
   plus:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   cal:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
   lock:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
 };
@@ -8305,7 +8334,9 @@ var MONTHS=['January','February','March','April','May','June','July','August','S
 var STATES=[['done','Completed'],['notended','Not ended'],['progress','In progress'],['leave','On leave']];
 var data=loadShift(), openDate=null;
 var state={f:blank(), page:1, per:10};
-function blank(){ return {q:'',month:'',status:'',staff:''}; }
+function thisMonth(){ return dayKey().slice(0,7); }
+function lastMonth(){ var d=fromKey(thisMonth()+'-01'); d.setMonth(d.getMonth()-1); return d.getFullYear()+'-'+pad(d.getMonth()+1); }
+function blank(){ return {q:'',month:thisMonth(),status:'',staff:''}; }   // the list opens on This Month
 /* who sees what: everyone sees their own days; admins and managers see every staff member's and can add, edit and delete shifts */
 var MANAGE_ROLES=['Admin','Manager'];
 function canManage(){ return MANAGE_ROLES.indexOf(VIEWER.role)>=0; }
@@ -8358,8 +8389,16 @@ function days(){
 function monthLabel(k){ var p=k.split('-'); return MONTHS[+p[1]-1]+' '+p[0]; }
 function notes(r){ return r.events.filter(function(e){ return e.note; }); }
 function files(r){ var out=[]; r.events.forEach(function(e){ (e.files||[]).forEach(function(f){ out.push(f); }); }); return out; }
+function fileRefs(r){ var out=[]; r.events.forEach(function(e,ei){ (e.files||[]).forEach(function(f,fi){ out.push({f:f,k:ei+'|'+fi}); }); }); return out; }
+function docCells(r,fl){
+  var show=fl.length>3?fl.slice(0,2):fl;
+  return '<div class="ar-docs">'+show.map(function(x){
+    return '<button class="ar-dfile" data-view="'+r.key+'" data-file="'+x.k+'" title="Open '+esc(x.f.n)+'">'+ftag(x.f.n)+'<span>'+esc(x.f.n)+'</span></button>'; }).join('')+
+    (fl.length>show.length?'<button class="ar-dmore" data-view="'+r.key+'" data-sec="docs">+'+(fl.length-show.length)+' more</button>':'')+'</div>';
+}
 function stateOf(r){ return r.isLeave?'leave':dayState(r,!!r.today); }
-function anyFilter(f){ return !!(f.q.trim()||f.month||f.status||f.staff); }
+function anyFilter(f){ return !!(f.q.trim()||f.month!==thisMonth()||f.status||f.staff); }
+function monthName(m){ return !m?'All Months':m===thisMonth()?'This Month':m===lastMonth()?'Last Month':monthLabel(m); }
 function filtered(){
   var f=state.f, q=f.q.trim().toLowerCase();
   return days().filter(function(r){
@@ -8392,28 +8431,33 @@ function render(){
   data=loadShift();
   var all=days(), months=[], rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per), f=state.f, now=Date.now();
   all.forEach(function(r){ var m=r.date.slice(0,7); if(months.indexOf(m)<0) months.push(m); });
+  [lastMonth(),thisMonth()].forEach(function(m){ if(months.indexOf(m)<0) months.push(m); });
+  if(f.month&&months.indexOf(f.month)<0) months.push(f.month);
+  months.sort().reverse();
 
   var mg=canManage(), cols=mg?10:8;
   var h='<div class="page-head"><h1>Attendance</h1><div class="ph-acts">'+
-    '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the filtered attendance records as CSV">'+I.csv+'CSV</button>'+
+    '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the records shown ('+esc(monthName(f.month))+') as a CSV file">'+I.csv+'Export</button>'+
     '<button class="btn-ghost" id="ar-leave">'+I.cal+'Apply for leave</button>'+
     (mg?'<button class="btn-primary" id="ar-add">'+I.plus+'Add Shift</button>':'')+'</div></div>';
   // same filter bar as the other modules: search on the left, "Filter By:" dropdowns, Clear filters when any is set
   h+='<div class="filterbar"><div class="search">'+I.search+
-    '<input type="search" id="q" placeholder="'+(mg?'Search by staff, date or comment':'Search by date or comment')+'" aria-label="Search attendance" value="'+esc(f.q)+'"></div><div class="filters">'+
+    '<input type="search" id="q" placeholder="'+(mg?'Search by staff, date or notes':'Search by date or notes')+'" aria-label="Search attendance" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
-    selHtml('f-month','All Months',months.map(function(m){ return [m,monthLabel(m)]; }),f.month)+
+    selHtml('f-month','All Months',months.map(function(m){ return [m,monthName(m)]; }),f.month)+
     (mg?selHtml('f-staff','All Staff',TEAM.map(function(m){ return [m.id,m.n]; }),f.staff):'')+
     selHtml('f-status','All Status',STATES,f.status)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
 
   h+='<div class="card ar-table"><table><thead><tr>'+
-    (mg?'<th>Staff</th>':'')+'<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Comments</th><th>Documents</th>'+(mg?'<th class="c">Action</th>':'')+
+    (mg?'<th>Staff</th>':'')+'<th>Date</th><th>Shift Start</th><th>Shift End</th><th>Break</th><th>Worked</th><th>Status</th><th>Notes</th><th>Documents</th>'+(mg?'<th class="c">Action</th>':'')+
     '</tr></thead><tbody>';
   if(!all.length){
     h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No attendance yet</h3><p>Your shifts appear here once you start one on the Dashboard.</p></div></td></tr>';
   } else if(!page.length){
-    h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+    var onlyMonth=f.month&&!f.q.trim()&&!f.status&&!f.staff;
+    h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No records found.</h3><p>'+(onlyMonth?'There’s no attendance for '+esc(monthName(f.month).replace('This','this').replace('Last','last'))+'.':'Try a different search term, or clear the filters.')+'</p>'+
+      '<button class="btn-ghost" id="'+(onlyMonth?'allm':'clear2')+'">'+(onlyMonth?'Show all months':'Clear filters')+'</button></div></td></tr>';
   }
   page.forEach(function(r){
     var who=member(r.staff), dash='<span class="ar-dash">—</span>';
@@ -8425,7 +8469,7 @@ function render(){
         '<td class="nowrap"><span class="state leave"><i></i>On leave</span></td>'+
         '<td><span class="ar-lv">'+esc(leaveName(r.leave))+'</span><small class="ar-sub">Approved'+(r.leave.decidedBy?' by '+esc(r.leave.decidedBy):'')+'</small></td><td>'+dash+'</td>'+(mg?'<td class="c">'+dash+'</td>':'')+'</tr>';
       return; }
-    var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[stateOf(r)], n=notes(r), fl=files(r), last=n[n.length-1];
+    var T=totals(r.events,now), d=fromKey(r.date), st=DAY_STATE[stateOf(r)], n=notes(r), fl=fileRefs(r), last=n[n.length-1];
     h+='<tr class="ar-row'+(r.today&&r.mine?' ar-today':'')+'" data-row="'+r.key+'">'+
       (mg?'<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+esc(who.n)+'</span></button></td>':'')+
       '<td><button class="name-link" data-view="'+r.key+'" aria-label="View attendance for '+esc(who.n)+', '+dmy(d)+'"><span class="name">'+dmy(d)+'</span></button><small class="ar-sub">'+weekday(d)+(r.today?' · Today':'')+'</small></td>'+
@@ -8434,8 +8478,8 @@ function render(){
       '<td class="num">'+hm(T.brk)+(T.breaks>1?'<small class="ar-sub">'+T.breaks+' breaks</small>':'')+'</td>'+
       '<td class="num">'+(T.end||r.today?hm(T.worked):'<span class="ar-dash">—</span>')+'</td>'+
       '<td class="nowrap"><span class="state '+st[0]+'"><i></i>'+st[1]+'</span>'+(r.onLeave?'<small class="ar-onlv" title="'+esc(leaveName(r.onLeave))+' was approved for this day">On leave this day</small>':'')+'</td>'+
-      '<td>'+(last?'<button class="ar-cmt" data-view="'+r.key+'" data-sec="notes" title="Read the comments for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' comments</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
-      '<td>'+(fl.length?'<button class="ar-doc" data-view="'+r.key+'" data-sec="docs" title="'+esc(fl.map(function(x){return x.n;}).join(', '))+'">'+I.clip+fl.length+' file'+(fl.length===1?'':'s')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(last?'<button class="ar-cmt" data-view="'+r.key+'" data-sec="notes" title="Read the notes for '+dmy(d)+'"><span class="ar-clip">'+esc(last.note)+'</span>'+(n.length>1?'<small class="ar-sub">'+n.length+' notes</small>':'')+'</button>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td>'+(fl.length?docCells(r,fl):'<span class="ar-dash">—</span>')+'</td>'+
       (mg?'<td class="c"><span class="acts"><button class="act danger" data-del="'+r.key+'" title="Delete shift" aria-label="Delete '+esc(who.n)+'’s shift on '+dmy(d)+'">'+I.trash+'</button></span></td>':'')+
       '</tr>';   // the date opens the day; Delete is the only row action
   });
@@ -8452,6 +8496,7 @@ function render(){
   document.getElementById('clearf').onclick=clear;
   var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
   document.getElementById('csv').onclick=exportCsv;
+  var am=document.getElementById('allm'); if(am) am.onclick=function(){ state.f.month=''; state.page=1; render(); };
   document.getElementById('ar-leave').onclick=function(){ applyLeave({staff:ME.id}); };
   var ad=document.getElementById('ar-add'); if(ad) ad.onclick=function(){ shiftForm(null); };
   Array.prototype.forEach.call(content.querySelectorAll('.pager button'),function(b){
@@ -8463,7 +8508,7 @@ content.addEventListener('click',function(e){
   var del=e.target.closest('[data-del]'); if(del){ deleteShift(del.getAttribute('data-del')); return; }
   var b=e.target.closest('[data-view]'), row=e.target.closest('tr[data-row]');
   if(!b&&(!row||e.target.closest('button,a,input,select'))) return;
-  try{ openDay(b?b.getAttribute('data-view'):row.getAttribute('data-row'),false,b?b.getAttribute('data-sec'):null); }
+  try{ openDay(b?b.getAttribute('data-view'):row.getAttribute('data-row'),false,b?b.getAttribute('data-sec'):null); if(b&&b.getAttribute('data-file')) viewFile(b.getAttribute('data-file')); }
   catch(err){ closeDay(); toast('This day couldn’t be opened: '+err.message,true); }
 });
 
@@ -8471,7 +8516,7 @@ content.addEventListener('click',function(e){
 function exportCsv(){
   var rows=filtered(); if(!rows.length){ toast('There are no attendance records to export.',true); return; }
   var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }, now=Date.now();
-  var mg=canManage(), out=[(mg?['Staff','Staff ID']:[]).concat(['Date','Day','Shift Start','Shift End','Break','Worked','Status','Comments','Documents'])];
+  var mg=canManage(), out=[(mg?['Staff','Staff ID']:[]).concat(['Date','Day','Shift Start','Shift End','Break','Worked','Status','Notes','Documents'])];
   rows.forEach(function(r){
     var T=totals(r.events,now), d=fromKey(r.date);
     if(r.isLeave){ out.push((mg?[member(r.staff).n,r.staff]:[]).concat([dmy(d),weekday(d),'','','','','On leave',leaveName(r.leave)+(r.leave.reason?': '+r.leave.reason:''),''])); return; }
@@ -8481,9 +8526,10 @@ function exportCsv(){
   });
   var csv='﻿'+out.map(function(r){ return r.map(q).join(','); }).join('\r\n');
   var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
-  a.download='attendance-'+dmy(new Date())+'.csv'; document.body.appendChild(a); a.click(); a.remove();
+  var m=state.f.month, tag=m?MONTHS[+m.slice(5)-1]+'-'+m.slice(0,4):'all-months';
+  a.download='attendance-'+tag.toLowerCase()+'.csv'; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(function(){ URL.revokeObjectURL(a.href); },1000);
-  toast('Exported '+rows.length+' day'+(rows.length===1?'':'s')+' to CSV.');
+  toast('Exported '+rows.length+' record'+(rows.length===1?'':'s')+' · '+(m?monthLabel(m):'all months')+'.');
 }
 
 /* ---------- one day in a side panel: summary, comments, documents, then the timeline ---------- */
@@ -8517,23 +8563,24 @@ function openDay(key,keep,sec){
   var cm=r.events.filter(function(e){ return e.note&&!isBreakEv(e); }), docs=[];
   r.events.forEach(function(e,ei){ (e.files||[]).forEach(function(f,fi){ docs.push({f:f,e:e,ei:ei,fi:fi}); }); });
   var shots=r.events.filter(function(e){ return e.photo||e.how==='prototype'; });
-  var tabs=[['details','Details'],['photos','Photos',shots.length]];
+  var tabs=[['details','Details'],['photos','Photos']];
   var keepY=keep&&document.getElementById('ad-body')?document.getElementById('ad-body').scrollTop:0;
   var body=dayTab==='photos'?photosSec(r,shots):
     detailsTab(r,T)+
-    (T.breaks?'<section class="ad-sec" id="ad-breaks"><h3>Breaks<span>'+T.breaks+'</span></h3>'+breaksSec(r)+'</section>':'')+
-    (cm.length?'<section class="ad-sec" id="ad-notes"><h3>Comments<span>'+cm.length+'</span></h3>'+notesTab(cm)+'</section>':'')+
-    '<section class="ad-sec" id="ad-docs"><h3>Documents'+(docs.length?'<span>'+docs.length+'</span>':'')+'</h3>'+docsTab(docs)+'</section>';
+    (T.breaks?'<section class="ad-sec" id="ad-breaks"><h3>Breaks</h3>'+breaksSec(r)+'</section>':'')+
+    (cm.length?'<section class="ad-sec" id="ad-notes"><h3>Notes</h3>'+notesTab(cm)+'</section>':'')+
+    (docs.length?'<section class="ad-sec" id="ad-docs"><h3>Documents</h3>'+docsTab(docs)+'</section>':'')+
+    metaLine(r);
   ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="ad-t">'+
     '<div class="ad-head"><div class="ad-who">'+
       '<div class="ad-date"><b>'+pad(d.getDate())+'</b><span>'+MONTHS[d.getMonth()].slice(0,3)+'</span></div>'+
-      '<div><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><p>'+esc(who.n)+' · '+esc(who.id)+(r.today?' · Today':'')+'</p></div></div>'+
-      '<button class="x" id="ar-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="ad-tools">'+(canManage()?'<button class="btn-ghost sm" id="ad-edit">'+I.edit+'Edit shift</button><button class="btn-ghost sm danger" id="ad-del">'+I.trash+'Delete</button>':'')+
-      (r.mine||canManage()?'<button class="btn-ghost sm" id="ad-leave">'+I.cal+'Apply for leave</button>':'')+'</div>'+
+      '<div class="ad-tt"><div class="ad-tl"><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2>'+statusChip(r)+'</div><p>'+esc(who.n)+(r.today?' · Today':'')+'</p></div></div>'+
+      '<div class="ad-hacts">'+(canManage()?'<button class="btn-ghost sm" id="ad-edit">'+I.edit+'Edit</button>':'')+
+        (r.mine||canManage()?'<button class="ad-ib" id="ad-leave" title="Apply for leave" aria-label="Apply for leave">'+I.cal+'</button>':'')+
+        (canManage()?'<button class="ad-ib danger" id="ad-del" title="Delete shift" aria-label="Delete shift">'+I.trash+'</button>':'')+
+        '<button class="ad-ib" id="ar-x" aria-label="Close">'+I.close+'</button></div></div>'+
     '<div class="btabs" role="tablist" aria-label="Attendance day">'+tabs.map(function(x){
-      return '<button role="tab" data-dtab="'+x[0]+'" id="adt-'+x[0]+'" aria-controls="ad-body" aria-selected="'+(dayTab===x[0])+'" class="'+(dayTab===x[0]?'on':'')+'">'+x[1]+
-        (x[2]?'<span class="tab-n">'+x[2]+'</span>':'')+'</button>';
+      return '<button role="tab" data-dtab="'+x[0]+'" id="adt-'+x[0]+'" aria-controls="ad-body" aria-selected="'+(dayTab===x[0])+'" class="'+(dayTab===x[0]?'on':'')+'">'+x[1]+'</button>';
     }).join('')+'</div>'+
     '<div class="ad-body" id="ad-body" role="tabpanel" aria-labelledby="adt-'+dayTab+'" tabindex="0">'+body+'</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
@@ -8556,10 +8603,9 @@ function openLeaveDay(r){
   openDate=r.key;
   ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="ad-t">'+
     '<div class="ad-head"><div class="ad-who"><div class="ad-date lv"><b>'+pad(d.getDate())+'</b><span>'+MONTHS[d.getMonth()].slice(0,3)+'</span></div>'+
-      '<div><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><p>'+esc(who.n)+' · '+esc(who.id)+(r.today?' · Today':'')+'</p></div></div>'+
-      '<button class="x" id="ar-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="ad-tools"><button class="btn-ghost sm" id="ad-lvopen">'+I.cal+'View in Leave</button></div>'+
-    '<div class="ad-body" id="ad-body"><span class="ad-chip leave"><i></i>On leave</span>'+
+      '<div class="ad-tt"><div class="ad-tl"><h2 id="ad-t">'+weekday(d)+', '+dmy(d)+'</h2><span class="ad-chip leave"><i></i>On leave</span></div><p>'+esc(who.n)+(r.today?' · Today':'')+'</p></div></div>'+
+      '<div class="ad-hacts"><button class="btn-ghost sm" id="ad-lvopen">'+I.cal+'View in Leave</button><button class="ad-ib" id="ar-x" aria-label="Close">'+I.close+'</button></div></div>'+
+    '<div class="ad-body" id="ad-body">'+
       '<section class="ad-sec"><h3>Leave details</h3><dl class="ad-rows">'+
         row('Type','<b>'+esc(leaveName(l))+'</b>')+
         row('Dates',dmy(fromKey(l.from))+(l.to!==l.from?' to '+dmy(fromKey(l.to)):''))+
@@ -8582,25 +8628,30 @@ function alertBox(r,T){
   return h;
 }
 function row(k,v){ return '<div><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
+function statusChip(r){ var st=DAY_STATE[stateOf(r)]; return '<span class="ad-chip '+(st[0]||'ok')+'"><i></i>'+st[1]+'</span>'; }
+function stat(k,v,cls){ return '<div class="ad-stat'+(cls?' '+cls:'')+'"><dt>'+k+'</dt><dd>'+v+'</dd></div>'; }
+/* how the day was recorded and who last changed it, as one quiet line at the end */
+function metaLine(r){
+  var hand=r.events.some(function(e){ return e.how==='manual'; }), proto=r.events.some(function(e){ return e.how==='prototype'; });
+  var bits=[hand?'Entered by hand, no photos':proto?'Some actions recorded without camera':'Photo taken at every action'];
+  if(r.meta) bits.push((r.meta.added?'Added by ':'Edited by ')+esc(r.meta.by)+' · '+dmy(new Date(r.meta.at)));
+  return '<p class="ad-meta">'+bits.join('<span aria-hidden="true">·</span>')+'</p>';
+}
 /* Details tab: status, anything to flag, then the shift times and totals */
 function detailsTab(r,T){
-  var st=DAY_STATE[stateOf(r)], dash='<span class="ar-dash">—</span>', sh=shiftsOf(r.events), many=sh.length>1;
-  var manual=r.events.some(function(e){ return e.how==='prototype'; });
-  var endTxt=T.end?t12(T.end):r.today?'<small>Still on shift</small>':dash;
-  var h='<span class="ad-chip '+(st[0]||'ok')+'"><i></i>'+st[1]+'</span>'+alertBox(r,T)+'<section class="ad-sec"><h3>Shift details</h3><dl class="ad-rows">';
-  if(many) sh.forEach(function(s,i){
-    var w=totals(r.events.filter(function(e){ return e.at>=s.start.at&&(!s.end||e.at<=s.end.at); }),Date.now());
-    h+='<div class="ad-sub"><dt>Shift '+(i+1)+'</dt><dd>'+(s.end||r.today?hm(w.worked):'')+'</dd></div>'+
-      row('Start',t12(s.start.at))+row('End',s.end?t12(s.end.at):r.today?'<small>Still on shift</small>':dash);
-  });
-  else h+=row('Start',sh[0]?t12(sh[0].start.at):dash)+row('End',endTxt);
-  // each break is listed in the Breaks section below, so only the total belongs here
-  h+=row(T.breaks?'Total break':'Breaks',T.breaks?hm(T.brk):'None');
-  if(T.end||r.today) h+=row('Worked','<b>'+hm(T.worked)+'</b>');
-  var hand=r.events.some(function(e){ return e.how==='manual'; });
-  h+=row('Photos',hand?'Entered by hand, no photos':manual?'Some actions without camera':'<span class="ad-ok">Photo taken at every action</span>');
-  if(r.meta) h+=row(r.meta.added?'Added by':'Edited by',esc(r.meta.by)+' · '+dmy(new Date(r.meta.at)));
-  return h+'</dl></section>';
+  var dash='<span class="ar-dash">—</span>', sh=shiftsOf(r.events), many=sh.length>1;
+  var endTxt=T.end?t12(T.end):r.today?'<span class="ad-live">On shift</span>':dash;
+  var h=alertBox(r,T)+'<dl class="ad-stats">'+
+    stat('Start',sh[0]?t12(sh[0].start.at):dash)+stat('End',endTxt)+
+    stat('Break',T.breaks?hm(T.brk):dash)+   // each break is listed in Breaks below
+    stat('Worked',T.end||r.today?hm(T.worked):dash,'main')+'</dl>';
+  if(many){
+    h+='<section class="ad-sec"><h3>Shifts</h3><ul class="ad-shifts">'+sh.map(function(s,i){
+      var w=totals(r.events.filter(function(e){ return e.at>=s.start.at&&(!s.end||e.at<=s.end.at); }),Date.now());
+      return '<li><b>Shift '+(i+1)+'</b><span>'+t12(s.start.at)+' – '+(s.end?t12(s.end.at):r.today?'now':'not ended')+'</span><em>'+(s.end||r.today?hm(w.worked):'')+'</em></li>';
+    }).join('')+'</ul></section>';
+  }
+  return h;
 }
 function privNote(){ return '<p class="ad-privnote">'+I.lock+'Private · visible only to the employee and admins</p>'; }
 /* every break in the day, with the shift it belongs to */
@@ -8631,7 +8682,7 @@ function breaksSec(r){
   return h+'</ul>';
 }
 function notesTab(cm){
-  if(!cm.length) return '<p class="ad-none">No shift comments this day. Break comments are in the Breaks tab.</p>';
+  if(!cm.length) return '<p class="ad-none">No notes this day.</p>';
   return '<div class="ad-notes">'+cm.map(function(e){
     return '<figure><figcaption>'+ACTIONS[e.type].ev+' · '+t12(e.at)+'</figcaption><blockquote>“'+esc(e.note)+'”</blockquote></figure>';
   }).join('')+'</div>';
@@ -8718,7 +8769,7 @@ function shiftForm(key){
     var sh=shiftsOf(r.events)[0]||{start:null,end:null,breaks:[]};
     d={staff:r.staff,date:r.date,start:sh.start?hhmm(sh.start.at):'',end:sh.end?hhmm(sh.end.at):'',
        breaks:sh.breaks.map(function(x){ return {from:hhmm(x.s.at),to:x.e?hhmm(x.e.at):'',s:x.s,e:x.e}; }),
-       note:sh.end?(sh.end.note||''):(sh.start&&sh.start.note||'')};   // the comment is the end-of-shift note, or the start note while the shift has no end
+       note:sh.end?(sh.end.note||''):(sh.start&&sh.start.note||'')};   // the notes are the end-of-shift note, or the start note while the shift has no end
   }
   sf={key:key,r:r,d:d,errs:{}};
   paintShiftForm();
@@ -8731,9 +8782,9 @@ function paintShiftForm(){
   ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><h2 id="sf-t">'+(ed?'Edit shift':'Add Shift')+'</h2><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body">'+
-      (ed?'<div class="sf-who"><b>'+esc(who.n)+'</b><span>'+esc(who.id)+' · '+weekday(fromKey(d.date))+', '+dmy(fromKey(d.date))+'</span></div>':
+      (ed?'<div class="sf-who"><b>'+esc(who.n)+'</b><span>'+weekday(fromKey(d.date))+', '+dmy(fromKey(d.date))+'</span></div>':
         '<div><label class="flabel" for="sf-staff">Staff <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain sm" id="sf-staff" data-sf="staff">'+
-          TEAM.map(function(m){ return '<option value="'+m.id+'"'+(m.id===d.staff?' selected':'')+'>'+esc(m.n)+' · '+m.id+'</option>'; }).join('')+'</select>'+I.chev+'</div>'+err('staff')+'</div>'+
+          TEAM.map(function(m){ return '<option value="'+m.id+'"'+(m.id===d.staff?' selected':'')+'>'+esc(m.n)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'+err('staff')+'</div>'+
         inp('date','Date','date',d.date,{req:true,max:dayKey()}))+
       '<div class="sf-grid">'+inp('start','Start time','time',d.start,{req:true})+inp('end','End time','time',d.end,{req:d.date!==dayKey()})+'</div>'+
       '<div><div class="sf-bh"><span class="flabel">Breaks</span><button type="button" class="pill-btn quiet" id="sf-addb">'+I.plus+'Add break</button></div>'+
@@ -8742,7 +8793,7 @@ function paintShiftForm(){
             '<input class="fin plain sm'+(e['b'+i]?' bad':'')+'" type="time" data-bt="'+i+'" value="'+esc(x.to)+'" aria-label="Break '+(i+1)+' to">'+
             '<button type="button" class="sf-rm" data-brm="'+i+'" aria-label="Remove break '+(i+1)+'">'+I.trash+'</button></div>'+err('b'+i);
         }).join(''):'<p class="sf-none">No break added</p>')+'</div>'+
-      '<div><label class="flabel" for="sf-note">Comment</label><textarea class="ftext" id="sf-note" data-sf="note" rows="3" maxlength="300" placeholder="e.g. Forgot to clock in, times confirmed with the team">'+esc(d.note)+'</textarea></div>'+
+      '<div><label class="flabel" for="sf-note">Notes</label><textarea class="ftext" id="sf-note" data-sf="note" rows="3" maxlength="300" placeholder="Enter notes">'+esc(d.note)+'</textarea></div>'+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-save">'+(ed?'Save changes':'Add Shift')+'</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
@@ -8804,7 +8855,7 @@ function deleteShift(key){
   if(r.mine&&r.today&&(data.today.status==='on'||data.today.status==='break')){ toast('This shift is still running. End it on the Dashboard before deleting it.',true); return; }
   var who=member(r.staff);
   dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="dd-t"><div class="confirm-body"><div class="warn">'+I.trash+'</div><h3 id="dd-t">Delete this shift?</h3>'+
-    '<p><strong>'+esc(who.n)+'</strong>’s shift on '+dmy(fromKey(r.date))+' and its breaks, comments, documents and photos will be removed. This can’t be undone.</p></div>'+
+    '<p><strong>'+esc(who.n)+'</strong>’s shift on '+dmy(fromKey(r.date))+' and its breaks, notes, documents and photos will be removed. This can’t be undone.</p></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="dd-no">Cancel</button><button class="btn-danger" id="dd-go">Delete shift</button></div></div>';
   dlg.classList.add('open');
   document.getElementById('dd-no').onclick=closeFile;
@@ -8908,13 +8959,13 @@ var MATCH_THRESHOLD = 0.6, MAX_TRIES = 3;
 var MAX_FILES = 3, MAX_BYTES = 5*1048576, OK_EXT = ['pdf','jpg','jpeg','png','doc','docx'];
 /* the comment step for each action that needs one */
 var NOTE = {
-  start:      { title:'Start your shift', sub:'Add a note for your team if you like, such as what you’re working on today.', btn:'Start shift', ph:'e.g. Working from the office today', opt:true,
+  start:      { title:'Start your shift', sub:'Add a note for your team if you like, such as what you’re working on today.', btn:'Start shift', ph:'Enter notes', opt:true,
                 quick:['Working from the office','Working from home','Client meetings today'] },
-  break_start:{ title:'Start your break', sub:'Add a short comment so your team knows you’re away.', btn:'Start break', ph:'e.g. Lunch break',
+  break_start:{ title:'Start your break', sub:'Add a short note so your team knows you’re away.', btn:'Start break', ph:'Enter notes',
                 quick:['Lunch break','Tea break','Short break','Personal errand'] },
-  break_end:  { title:'End your break', sub:'Add a short comment before you get back to work.', btn:'End break', ph:'e.g. Back from lunch',
+  break_end:  { title:'End your break', sub:'Add a short note before you get back to work.', btn:'End break', ph:'Enter notes',
                 quick:['Back from lunch','Back at my desk','Back from break'] },
-  end:        { title:'End your shift', sub:'Add a summary of your day. You can also attach a document, like a timesheet.', btn:'End shift', ph:'What did you work on today? Anything to hand over?',
+  end:        { title:'End your shift', sub:'Add a summary of your day. You can also attach a document, like a timesheet.', btn:'End shift', ph:'Enter notes',
                 quick:['All tasks completed for today','Handed over open items','Client work done, details in the file'] }
 };
 
@@ -9028,10 +9079,10 @@ function askNote(type){
   showModal('<div class="modal note" role="dialog" aria-modal="true" aria-labelledby="nt-t"><button class="dlg-x" id="nt-x" aria-label="Close">'+I.close+'</button>'+
     '<div class="nt-body"><h3 id="nt-t">'+n.title+'</h3><p>'+n.sub+'</p>'+
     (isEnd?'<dl class="nt-sum"><div><dt>Worked today</dt><dd>'+hm(T.worked)+'</dd></div><div><dt>Breaks</dt><dd>'+hm(T.brk)+'</dd></div></dl>':'')+
-    '<div><label class="nt-lbl" for="nt-ta">'+(n.opt?'Note <span class="opt">(optional)</span>':'Comment <span class="req">*</span>')+'</label>'+
-      '<div class="nt-quick" aria-label="Quick comments">'+n.quick.map(function(q){ return '<button type="button" data-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join('')+'</div>'+
+    '<div><label class="nt-lbl" for="nt-ta">'+'Notes '+(n.opt?'<span class="opt">(optional)</span>':'<span class="req">*</span>')+'</label>'+
+      '<div class="nt-quick" aria-label="Quick notes">'+n.quick.map(function(q){ return '<button type="button" data-q="'+esc(q)+'">'+esc(q)+'</button>'; }).join('')+'</div>'+
       '<textarea class="nt-ta" id="nt-ta" maxlength="300" placeholder="'+esc(n.ph)+'" aria-describedby="nt-err"></textarea>'+
-      '<div class="nt-row"><span class="nt-err" id="nt-err">Add a comment to continue</span><span id="nt-n">0/300</span></div></div>'+
+      '<div class="nt-row"><span class="nt-err" id="nt-err">Add notes to continue</span><span id="nt-n">0/300</span></div></div>'+
     (isEnd?'<div><span class="nt-lbl">Attach a document <span class="opt">(optional)</span></span>'+
       '<label class="nt-drop" id="nt-drop"><input type="file" id="nt-file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
         '<span class="ic">'+I.upload+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB · max '+MAX_FILES+' files</small></span></label>'+
@@ -9050,7 +9101,7 @@ function askNote(type){
 function submitNote(){
   var ta=document.getElementById('nt-ta'), v=ta.value.trim(), err=document.getElementById('nt-err');
   if(v.length<3&&!(NOTE[pending.type].opt&&!v)){
-    err.textContent=v?'Make the comment a little longer':'Add a comment to continue';
+    err.textContent=v?'Make the notes a little longer':'Add notes to continue';
     err.classList.add('show'); ta.classList.add('bad'); ta.focus(); return;
   }
   var p=pending;
@@ -10218,7 +10269,7 @@ var I = {
   plus:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   minus:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>',
   edit:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/></svg>',
-  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   close:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   info:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M12 11v5" stroke-linecap="round"/><circle cx="12" cy="8" r=".8" fill="currentColor" stroke="none"/></svg>',
   tick:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',

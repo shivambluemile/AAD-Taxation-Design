@@ -2558,6 +2558,16 @@ tbody tr:hover{background:#FCFCFD}
 .cl-table th:last-child,.cl-table td:last-child{padding-right:20px}
 .cl-table td:first-child{min-width:180px;max-width:240px}
 .cl-table .blink{white-space:normal;line-height:1.35}
+.cl-list .cl-person{display:flex;align-items:center;gap:11px;min-width:0}
+.cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.cl-pn{min-width:0}.cl-pn .blink{display:block;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1.3}.cl-pn small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
+.cl-contact{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--slate);line-height:1.5}.cl-contact>span{display:inline-flex;align-items:center;gap:5px}
+.cl-ent{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
+.cl-chips{display:flex;flex-wrap:wrap;gap:5px;max-width:230px}
+.cl-chip{background:var(--field);color:var(--slate);font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
+.cl-chip.more{background:var(--orange-soft);color:var(--orange-ink)}
+.cl-meta{font-size:12.5px;color:var(--slate);line-height:1.5;white-space:nowrap}.cl-meta span{display:block;font-size:11.5px;color:var(--faint)}
+.cl-list .cl-stage{text-align:left}
 .cl-em{display:inline-block;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
 
 /* details side panel (wide, Basic Info layout) */
@@ -3531,6 +3541,8 @@ function draftRows(){
     return {draft:true,r:r,id:r.id,name:f.name||r.name,email:f.email||r.email,phone:f.phone||r.phone,type:r.type,entity:co?(f.entity||'Company'):'Individual',abn:f.abn||'',created:r.created};
   });
 }
+var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
+function clIni(n){ var p=String(n||'?').trim().split(' ').filter(Boolean); return ((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(); }
 var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review'};
 function filtered(){
   var q=state.q.trim().toLowerCase(), qd=digits(q);
@@ -3580,40 +3592,33 @@ function renderList(){
      selHtml('lf-entity','All Entity Types',[['Individual','Individual']].concat(ENTITY_TYPES.map(function(e){return [e,e];})),state.fEntity)+
      selHtml('lf-status','All Status',[['active','Active'],['inactive','Inactive'],['draft','Draft']],state.fStatus)+
      '<button class="clearf" id="clearf"'+(filtersActive()?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card cl-table"><table><thead><tr><th>Name</th><th>Contact info</th><th>Entity type</th><th>ABN</th><th>KYC &amp; letter</th><th class="c">Status</th><th class="c">Actions</th></tr></thead><tbody>';
+  h+='<div class="card cl-table cl-list"><table><thead><tr><th>Name</th><th>Contact Info</th><th>Entity Type</th><th>Services</th><th>KYC &amp; Letter</th><th>Status</th><th>Created By</th><th>Actions</th></tr></thead><tbody>';
   if(!CLIENTS.length&&!rows.length){
-    h+='<tr><td colspan="7"><div class="empty"><h3>No clients yet</h3><p>Add your first individual or company client to get started.</p><button class="btn-primary" id="add2">'+I.plus+'Add Client</button></div></td></tr>';
+    h+='<tr><td colspan="8"><div class="empty"><h3>No clients yet</h3><p>Add your first individual or company client to get started.</p><button class="btn-primary" id="add2">'+I.plus+'Add Client</button></div></td></tr>';
   } else if(!page.length){
-    h+='<tr><td colspan="7"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clearf2">Clear filters</button></div></td></tr>';
+    h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clearf2">Clear filters</button></div></td></tr>';
   }
   page.forEach(function(c){
-    if(c.draft){ var r=c.r;
-      h+='<tr class="cl-draft">'+
-        '<td><button class="blink" data-rq="'+r.id+'">'+esc(c.name)+'</button></td>'+
-        '<td><span class="contact"><span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span></span><span class="nowrap">'+esc(c.phone)+'</span></span></td>'+
-        '<td class="nowrap">'+esc(c.entity)+'</td>'+
-        '<td class="nowrap mask" style="color:var(--ink)">'+(c.abn?esc(fmtABN(c.abn)):'<span class="cl-muted">--</span>')+'</td>'+
-        '<td><span class="ob-ticks">'+(r.kyc.length?'<span class="ob-tick on" title="KYC documents uploaded by the client">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')+
-          (r.letter.status==='signed'?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>')+'</span></td>'+
-        '<td class="c"><span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small></td>'+
-        '<td class="c"></td></tr>';
-      return; }
-    var co=c.type==='company';
-    h+='<tr>'+
-      '<td><button class="blink" data-view="'+c.id+'">'+esc(c.name)+'</button>'+
-        (co?'<span class="cl-sub">'+c.directors.length+(c.directors.length===1?' director':' directors')+'</span>':'')+'</td>'+
-      '<td><span class="contact">'+
-        '<span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span><button class="copy" data-copy="'+esc(c.email)+'" title="Copy email" aria-label="Copy email">'+I.copy+'</button></span>'+
-        '<span class="nowrap">'+esc(c.phone)+'<button class="copy" data-copy="'+esc(c.phone)+'" title="Copy phone" aria-label="Copy phone">'+I.copy+'</button></span>'+
-      '</span></td>'+
-      '<td class="nowrap">'+esc(c.entity)+'</td>'+
-      '<td class="nowrap mask" style="color:var(--ink)">'+(c.abn?esc(fmtABN(c.abn)):'<span class="cl-muted">--</span>')+'</td>'+
-      '<td><span class="ob-ticks">'+(kycDone(c)?'<span class="ob-tick on" title="KYC valid until '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">'+I.tick+'KYC</span>':kycCurrent(c)?'<span class="ob-tick bad" title="KYC expired '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">KYC expired</span>':'<span class="ob-tick" title="No KYC yet">KYC</span>')+
-        (letterSignedFor(c)?'<span class="ob-tick on" title="Engagement letter for '+fyLabel(fyStart(Date.now()))+' signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>')+'</span></td>'+
-      '<td class="c"><span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span></td>'+
-      '<td class="c"><span class="acts">'+
-        '<button class="act" data-edit="'+c.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>'+
-      '</span></td></tr>';
+    var r=c.draft?c.r:null, co=c.type==='company', av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
+    var svc=r?r.services:(c.services||[]).filter(function(a){ return a.status==='active'; });
+    var chips=svc.slice(0,2).map(function(a){ return '<span class="cl-chip" title="'+esc(a.name)+' · '+money(a.price)+'">'+esc(a.name)+'</span>'; }).join('')+
+      (svc.length>2?'<span class="cl-chip more" title="'+esc(svc.slice(2).map(function(a){ return a.name; }).join(', '))+'">+'+(svc.length-2)+'</span>':'');
+    var kyc=r?(r.kyc.length?'<span class="ob-tick on" title="KYC documents uploaded by the client">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')
+      :kycDone(c)?'<span class="ob-tick on" title="KYC valid until '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">'+I.tick+'KYC</span>':kycCurrent(c)?'<span class="ob-tick bad" title="KYC expired '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">KYC expired</span>':'<span class="ob-tick" title="No KYC yet">KYC</span>';
+    var letter=(r?r.letter.status==='signed':letterSignedFor(c))?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>';
+    var by=r?r.by:((c.history||[])[0]&&c.history[0].by)||'Admin';
+    var copy=function(v,what){ return v?'<button class="copy" data-copy="'+esc(v)+'" title="Copy '+what+'" aria-label="Copy '+what+'">'+I.copy+'</button>':''; };
+    h+='<tr'+(r?' class="cl-draft"':'')+'>'+
+      '<td><div class="cl-person"><span class="cl-av" style="background:'+av[0]+';color:'+av[1]+'">'+esc(clIni(c.name))+'</span><span class="cl-pn">'+
+        (r?'<button class="blink" data-rq="'+r.id+'">':'<button class="blink" data-view="'+c.id+'">')+esc(c.name)+'</button>'+
+        (co&&!r&&c.directors.length?'<small>'+c.directors.length+(c.directors.length===1?' director':' directors')+'</small>':'')+'</span></div></td>'+
+      '<td><div class="cl-contact"><span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span>'+copy(c.email,'email')+'</span><span>'+esc(c.phone)+copy(c.phone,'phone')+'</span></div></td>'+
+      '<td class="cl-ent">'+esc(c.entity)+'</td>'+
+      '<td><div class="cl-chips">'+(chips||'<span class="cl-muted">--</span>')+'</div></td>'+
+      '<td><span class="ob-ticks">'+kyc+letter+'</span></td>'+
+      '<td>'+(r?'<span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small>':'<span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span>')+'</td>'+
+      '<td><div class="cl-meta">'+whenOf(c.created||Date.now()).replace(' · ',', ')+'<span>by '+esc(by)+'</span></div></td>'+
+      '<td><span class="acts">'+(r?'':'<button class="act" data-edit="'+c.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>')+'</span></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;

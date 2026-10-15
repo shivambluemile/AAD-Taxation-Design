@@ -4993,6 +4993,7 @@ function reqById(id){ return ONB.requests.filter(function(r){ return r.id===id; 
 var openReqId=null;
 function openRequestDetail(id,swap){
   ONB=loadOnb(); var r=reqById(id); if(!r){ closeDrawer(); return; }
+  if(r.clientId&&findClient(r.clientId)){ openReqId=null; go('/clients/'+r.clientId); return; }
   openReqId=id;
   var f=r.form||{}, link=portalLink('onboard',r.token), expired=Date.now()>r.expires;
   var row=function(k,v){ return '<div class="fv"><dt>'+k+'</dt><dd>'+(v||'<span class="cl-muted">--</span>')+'</dd></div>'; };
@@ -5020,7 +5021,7 @@ function openRequestDetail(id,swap){
     step(det,'Client details',r.submittedAt?'Submitted '+whenOf(r.submittedAt):r.form?'Started, not submitted':'Not started')+
     step(kyc,'KYC documents',r.kyc.length?r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' uploaded':'None yet')+
     step(let_,'Engagement letter',r.letter.status==='signed'?'Signed by '+esc(r.letter.signature.name)+' · '+dmyOf(r.letter.signedAt):'Not signed yet')+
-    step(rev,'Staff review',r.status==='completed'?'Approved':r.status==='rejected'?'Rejected':r.status==='review'?'In progress':'After the client submits')+'</ol>';
+    step(r.status==='completed'?'done':r.status==='rejected'?'bad':'todo','Active client',r.status==='completed'?'Created':r.status==='rejected'?'Request closed':'Created automatically once they sign and submit')+'</ol>';
   var h='<div class="drawer wide cl-view'+(swap?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="rd-t">'+
     '<div class="dhead cl-dhead"><div class="dprofile"><div class="dpmain"><p class="eyebrow">Onboarding request · '+esc(r.type==='company'?'Company':'Individual')+'</p>'+
       '<h2 id="rd-t">'+who+' '+pill(ONB_STATUS,r.status)+'</h2>'+
@@ -5105,23 +5106,25 @@ function reqAction(id,what){
   }
 }
 /* completing turns the request into exactly one client; the request keeps a link to it so it can't be created twice */
-function completeRequest(r,kycDate){
-  if(r.clientId){ go('/clients/'+r.clientId); return; }
-  var f=r.form, co=r.type==='company', now=Date.now(), t=function(v){ return String(v||'').trim(); };
+function completeRequest(r,kycDate,auto){
+  if(r.clientId){ if(!auto) go('/clients/'+r.clientId); return null; }
+  var f=r.form, co=r.type==='company', now=Date.now(), t=function(v){ return String(v||'').trim(); }, BY=auto?'System':ME;
   var rec={id:clientSeq++,type:r.type,entity:co?(f.entity||'Company'):'Individual',name:t(f.name),email:t(f.email).toLowerCase(),phone:fmtPhone(f.phone),abn:digits(f.abn),tfn:digits(f.tfn),acn:co?digits(f.acn):'',
     commEmail:t(f.commEmail).toLowerCase(),commPhone:t(f.commPhone)?fmtPhone(f.commPhone):'',address:{street:t(f.address.street),suburb:t(f.address.suburb),state:f.address.state,postcode:t(f.address.postcode),country:'Australia'},
     directors:co?(f.directors||[]).map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:digits(x.abn),tfn:digits(x.tfn)}; }):[],
     active:true,created:now,login:false,lastReset:null,onboardingId:r.id};
   rec.services=r.services.map(function(x){ return assignment(x,'Onboarding request',r.by,now); });
-  rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36),date:kycDate||isoOf(now),files:r.kyc.slice(),by:ME,at:now,source:'Client onboarding link'}]:[];
-  rec.notes=[{t:now,by:ME,text:'Created from onboarding request '+r.id+' after review.'}];
-  rec.history=[{t:now,kind:'created',title:'Client created',detail:'From onboarding request '+r.id,by:ME}];
-  rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price)+' (requested by '+r.by+')',by:ME}); });
-  if(rec.kycRecords.length) rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' from the client',by:ME});
+  rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,source:'Client onboarding link'}]:[];
+  rec.notes=[{t:now,by:BY,text:auto?'Created automatically when the client signed the engagement letter and submitted the onboarding form.':'Created from onboarding request '+r.id+'.'}];
+  rec.history=[{t:now,kind:'created',title:'Client created',detail:auto?'Signed and submitted through the onboarding link':'From onboarding request '+r.id,by:BY}];
+  rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price)+' (requested by '+r.by+')',by:BY}); });
+  if(rec.kycRecords.length) rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' from the client',by:BY});
   ONB=loadOnb(); var x=reqById(r.id);
   ONB.letters.push({id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:x.token,created:x.created,by:x.by,services:x.services.map(function(s){ return {name:s.name,price:s.price}; }),fy:fyStart(x.letter.signedAt||now),signer:{name:x.letter.signature.name,role:firstSigner(rec).role},status:'signed',signature:x.letter.signature,signedAt:x.letter.signedAt,method:'client',sends:[],audit:[{t:x.letter.signedAt,action:'Signed by client',by:x.letter.signature.name,from:'pending',to:'signed',note:'Through the onboarding link'}]});
-  x.clientId=rec.id; var from=x.status; x.status='completed'; audit(x,'Approved · client created',ME,from,'completed','Client #'+rec.id);
-  persistOnb(); CLIENTS.unshift(rec); saveClients(); renderListKeep();
+  x.clientId=rec.id; var from=x.status; x.status='completed'; audit(x,auto?'Client created automatically':'Approved · client created',BY,from,'completed','Client #'+rec.id);
+  persistOnb(); CLIENTS.unshift(rec); saveClients();
+  if(auto) return rec;
+  renderListKeep();
   toast(rec.name+' added as a client'); closeDrawer(); go('/clients/'+rec.id);
 }
 
@@ -5307,7 +5310,17 @@ function wireClientTab(c,t,body,repaintTab){
 }
 
 /* ---------- client-side changes (another tab, or the client's link) show up here straight away ---------- */
+/* a client who has signed and submitted becomes an Active client straight away; nobody needs to review it */
+function autoCompleteRequests(){
+  ONB=loadOnb(); var made=[];
+  ONB.requests.slice().forEach(function(r){
+    if(!r.clientId&&['submitted','review'].indexOf(r.status)>=0&&r.letter&&r.letter.status==='signed'&&r.form){ var c=completeRequest(r,isoOf(r.submittedAt||Date.now()),true); if(c) made.push(c); }
+  });
+  return made;
+}
 function onbChanged(){
+  var made=autoCompleteRequests();
+  if(made.length){ refreshList(); toast(made.map(function(c){ return c.name; }).join(', ')+(made.length===1?' is':' are')+' now an active client'); }
   ONB=loadOnb();
   // a letter the client signed through their link is added to the client's activity once
   ONB.letters.forEach(function(L){
@@ -5410,6 +5423,7 @@ document.addEventListener('click',function(e){
   if(document.body.classList.contains('nav-open') && !e.target.closest('.nav') && !e.target.closest('#burger')) document.body.classList.remove('nav-open');
 });
 seedOnboarding();
+autoCompleteRequests();
 annualUpkeep();
 route();
 })();
@@ -12141,12 +12155,11 @@ function thankYou(again){
   var docs=(R.kyc||[]).length, mail=fm.email||R.email;
   app.innerHTML='<div class="card ty" role="status">'+TY_ART+
     '<h1>Thank you'+(who?', '+e(who):'')+'!</h1>'+
-    '<p class="ty-lead">'+(again?'Your onboarding is with us. There’s nothing more you need to do right now.':'Your onboarding has been submitted. We’ve received your details, documents and signed engagement letter.')+'</p>'+
+    '<p class="ty-lead">'+(again?'Your onboarding is complete. There’s nothing more you need to do.':'Your onboarding is complete. We’ve received your details, documents and signed engagement letter.')+'</p>'+
     '<dl class="ty-meta"><div><dt>Reference</dt><dd>AAD-'+e(String(R.token||TOKEN).slice(0,6).toUpperCase())+'</dd></div><div><dt>Submitted</dt><dd>'+whenOf(R.submittedAt||Date.now())+'</dd></div><div><dt>KYC documents</dt><dd>'+docs+' file'+(docs===1?'':'s')+'</dd></div></dl>'+
     '<div class="ty-next"><h2>What happens next</h2><ol>'+
-      '<li><b>We review your onboarding</b><span>'+FIRM.name+' checks your details and KYC documents, usually within 1–2 business days.</span></li>'+
-      '<li><b>We’ll contact you if anything’s missing</b><span>Any questions go to '+e(mail)+'.</span></li>'+
-      '<li><b>Your services begin</b><span>Once it’s approved, we’ll confirm by email and get started.</span></li></ol></div>'+
+      '<li><b>You’re set up as a client</b><span>'+FIRM.name+' now has everything needed to start your services.</span></li>'+
+      '<li><b>We’ll be in touch to get started</b><span>Updates go to '+e(mail)+'.</span></li></ol></div>'+
     '<p class="ty-help">Questions? Call <a href="tel:'+FIRM.phone.replace(/\s/g,'')+'">'+FIRM.phone+'</a> or email <a href="mailto:'+FIRM.email+'">'+FIRM.email+'</a>.</p></div>';
   window.scrollTo(0,0);
 }

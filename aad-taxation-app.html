@@ -5407,9 +5407,6 @@ function engagementTab(c){
       L.status==='sent'?'Emailed '+whenOf(L.sends[L.sends.length-1].at)+' to <b>'+esc((L.signer&&L.signer.name)||sg.name)+'</b>. Waiting for them to sign.':'')+'</p><span class="vsec-acts">'+
     (L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':'')+'</span></div>';
   h+='<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,L.services,L))+'</div></section>';
-  if(L.status!=='signed') h+=review();
-  var log=(L.audit||[]).slice().reverse();
-  if(log.length) h+='<section class="vsec"><div class="vsec-h"><h3>'+I.clock+'Letter history</h3></div><div class="timeline">'+log.map(function(a){ return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(a.action)+'</div><div class="tlmeta">'+(a.note?esc(a.note)+' · ':'')+whenOf(a.t)+' · by <b>'+esc(a.by)+'</b></div></div>'; }).join('')+'</div></section>';
   return h+prev;
 }
 /* sign or (re)send the letter from the client's record */

@@ -2768,14 +2768,12 @@ tbody tr:hover{background:#FCFCFD}
 .sp-row{align-items:end}.sp-rm{align-self:end;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
 .drawer.wz #cfb .wz-sec,.drawer.wz #rqb .wz-sec{border:0;border-radius:0;padding:0;background:none}
 .drawer.wz #cfb .wz-sec+.wz-sec,.drawer.wz #rqb .wz-sec+.wz-sec{border-top:0;padding-top:0;margin-top:8px}
-#rqb>.wz-sec:first-child,#rqb>.ss:first-child{margin-top:-20px}
 .wz-h{display:block;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}
 #cfb .flabel{margin-bottom:7px}
 #cfb .fin::placeholder,#cfb .ftext::placeholder,#rqb .fin::placeholder,#rqb .ftext::placeholder{color:#9BA6B7;opacity:1;font-weight:400}
 #cfb .wz-kycd{margin-bottom:14px}
 .sp-rm{border:1px solid var(--line);background:#fff}
 .sp-rm:hover:not([disabled]){border-color:#FECACA}
-.el-step{margin-top:-20px}
 .el-acts{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-bottom:14px}
 .el-acts .pill-btn{display:inline-flex;align-items:center;gap:7px}
 .vbar.el-sbar{flex-wrap:nowrap}.el-sbar p{flex:1;min-width:0}.el-sbar .vsec-acts{flex:none;gap:8px}.el-sbar .pill-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -3164,7 +3162,7 @@ table.mini .c{text-align:center}
 table.mini .tot td{font-weight:700;color:var(--ink)}
 
 /* client detail: services history, notes */
-.cl-vbody .vsec{padding-left:32px;padding-right:32px}
+.cl-vbody .vsec{padding-left:32px;padding-right:32px}.cl-vbody>.vempty{padding:22px 32px}
 .svh{display:flex;flex-direction:column;gap:10px}
 .svh-row{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
 .svh-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -3185,7 +3183,7 @@ table.mini .tot td{font-weight:700;color:var(--ink)}
 .ntl-i p{font-size:13.5px;line-height:1.55;color:var(--slate);margin-top:4px;white-space:pre-wrap;overflow-wrap:anywhere}
 @media (max-width:640px){
   .sp-row{grid-template-columns:minmax(0,1fr) 44px}.sp-svc{grid-column:1/-1}.sp-pr{grid-column:1/2}
-  .cl-vbody .vsec{padding-left:18px;padding-right:18px}.svh-why{padding-left:0}
+  .cl-vbody .vsec{padding-left:18px;padding-right:18px}.cl-vbody>.vempty{padding:18px}.svh-why{padding-left:0}
 }
 </style>
 
@@ -3884,7 +3882,7 @@ function openDetail(id,swap,tab){
     if(!c.directors.length) return h+'<p class="cl-muted vempty">No directors added</p>';
     c.directors.forEach(function(d,i){
       h+='<section class="vsec vdir"><div class="vsec-h"><div class="who2"><span class="av">'+esc(initials(d.name))+'</span><span><b>'+esc(d.name)+'</b><small>Director '+(i+1)+'</small></span></div>'+
-        '<div class="ddir-acts">'+(d.login?'<span class="gpill">Access granted</span>':'<span class="gpill off">No login account</span>')+resetCell(d)+'</div></div>'+
+        (c._draft?'':'<div class="ddir-acts"><button class="linkbtn" data-reset="'+d.id+'">'+I.key+'Manage password</button></div>')+'</div>'+
         '<dl class="fgrid">'+
           fv('Email address',mailto(d.email),{html:true,copy:d.email})+fv('Phone number',d.phone,{copy:d.phone})+
           fv('ABN',d.abn?fmtABN(d.abn):'')+fvTFN('TFN',d.tfn,'d'+d.id)+
@@ -3929,7 +3927,7 @@ function openDetail(id,swap,tab){
    Password reset (one director at a time)
 ========================================================= */
 function resetPassword(c,d,done){
-  if(!d.login){
+  if(!d.login&&d===c){   // every director has a login account once they've signed
     showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="rp-t">'+
       '<button class="dlg-x" data-cancel aria-label="Close">'+I.close+'</button>'+
       '<div class="confirm-body"><div class="soft">'+I.infoLg+'</div>'+
@@ -4951,8 +4949,7 @@ function paintLetterStep(){
     var sv=wiz.sig;
     if(sv) h+='<div class="el-sub"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div class="el-signed">'+
         '<div class="el-sigcol"><div class="el-sigimg">'+(sv.method==='type'?'<em class="el-typed"'+(sv.font?' style="font-family:'+esc(sv.font)+'"':'')+'>'+esc(sv.text)+'</em>':'<img src="'+sv.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
-        '<span class="el-sigline">Signed on '+whenOf(wiz.sigAt).replace(' · ',' at ')+' by '+esc(ME)+'</span></div>'+
-        '<div class="el-sigmeta"><b>'+esc(sv.name)+'</b></div></div></div>';
+        '<span class="el-sigline">Signed on '+whenOf(wiz.sigAt).replace(' · ',' at ')+' by '+esc(ME)+'</span></div></div></div>';
     else h+='<div class="el-sub"><div class="grid2"><div><label class="flabel" for="el-date">Signing date</label><input class="fin sm'+(e.date?' bad':'')+'" type="text" id="el-date" inputmode="numeric" maxlength="10" placeholder="dd-mm-yyyy" autocomplete="off" value="'+esc(wiz.sigDateTxt!=null?wiz.sigDateTxt:(wiz.sigDate?dmyOf(fromIso(wiz.sigDate)):''))+'">'+err('date')+'</div><div></div></div>'+
       '<span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+err('sig')+
       '<div class="el-sigfoot"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
@@ -5226,15 +5223,15 @@ var rqTab='services';
 function openRequestDetail(id,swap,tab){
   ONB=loadOnb(); var r=reqById(id); if(!r){ closeDrawer(); return; }
   if(r.clientId&&findClient(r.clientId)){ openReqId=null; go('/clients/'+r.clientId); return; }
-  if(openReqId!==id) rqTab='services';
+  if(openReqId!==id) rqTab='notes';
   openReqId=id;
   var f=r.form||{}, co=r.type==='company', link=portalLink('onboard',r.token), expired=Date.now()>r.expires, open=['draft','info'].indexOf(r.status)>=0;
   var who=esc(f.name||r.name), first=co?who:esc(String(f.name||r.name).split(' ')[0]);
   var dirs=co&&f.directors?f.directors.filter(function(d){ return String(d.name||'').trim(); }):[];
-  var tabs=[['services','Services',r.services.length]];
+  var tabs=[['notes','Notes'],['services','Services',r.services.length]];
   if(dirs.length) tabs.push(['directors','Directors',dirs.length]);
   tabs.push(['documents','KYC',r.kyc.length||null,!!r.kyc.length],['engagement','Engagement letter',null,r.letter.status==='signed'],['activity','Activities']);
-  if(tab) rqTab=tab; if(!tabs.some(function(t){ return t[0]===rqTab; })) rqTab='services';
+  if(tab) rqTab=tab; if(!tabs.some(function(t){ return t[0]===rqTab; })) rqTab='notes';
   var dc=function(icon,val,copy){ return val?'<span class="dc"><i class="dci">'+icon+'</i>'+val+(copy?'<button class="copy" data-copy="'+esc(copy)+'" title="Copy" aria-label="Copy">'+I.copy+'</button>':'')+'</span>':''; };
   var a0=f.address||{}, addr=[a0.street,[a0.suburb,a0.state,a0.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   var acts={
@@ -5264,9 +5261,15 @@ function openRequestDetail(id,swap,tab){
   overlay.querySelectorAll('[data-kpv]').forEach(function(x){ x.onclick=function(){ openKyc(r.kyc[+x.dataset.kpv]); }; });
   overlay.querySelectorAll('[data-kdl]').forEach(function(x){ x.onclick=function(){ openKyc(r.kyc[+x.dataset.kdl],true); }; });
   overlay.querySelectorAll('[data-do]').forEach(function(x){ x.onclick=function(){ reqAction(r.id,x.dataset.do); }; });
+  var na=document.getElementById('cn-add'); if(na) na.onclick=function(){
+    var tx=document.getElementById('cn-text').value.trim(); if(!tx){ document.getElementById('cn-e').hidden=false; return; }
+    ONB=loadOnb(); var x=reqById(id); (x.notes=x.notes||[]).push({t:Date.now(),by:ME,text:tx});
+    audit(x,'Note added',ME); persistOnb(); toast('Note added'); openRequestDetail(id,true,'notes');
+  };
 }
 function rqTabHtml(r,t,dirs,first){
   var f=r.form||{};
+  if(t==='notes') return notesTabC(r);
   if(t==='services') return '<div class="vbar"><p><b>'+r.services.length+'</b> service'+(r.services.length===1?'':'s')+' · '+money(totalOf(r.services))+' total. Set by staff; the client can’t change them.</p></div>'+
     '<section class="vsec"><table class="mini"><thead><tr><th>Service</th><th class="r">Price</th></tr></thead><tbody>'+
       r.services.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="r">'+money(x.price)+'</td></tr>'; }).join('')+'</tbody></table></section>';
@@ -5339,7 +5342,7 @@ function completeRequest(r,kycDate,auto){
     active:true,created:now,login:false,lastReset:null,onboardingId:r.id};
   rec.services=r.services.map(function(x){ return assignment(x,'Onboarding request',r.by,now); });
   rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,source:'Client onboarding link'}]:[];
-  rec.notes=[{t:now,by:BY,text:auto?'Created automatically when the client signed the engagement letter and submitted the onboarding form.':'Created from onboarding request '+r.id+'.'}];
+  rec.notes=(r.notes||[]).concat([{t:now,by:BY,text:auto?'Created automatically when the client signed the engagement letter and submitted the onboarding form.':'Created from onboarding request '+r.id+'.'}]);
   rec.history=[{t:now,kind:'created',title:'Client created',detail:auto?'Signed and submitted through the onboarding link':'From onboarding request '+r.id,by:BY}];
   rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price)+' (requested by '+r.by+')',by:BY}); });
   if(rec.kycRecords.length) rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' from the client',by:BY});
@@ -12484,7 +12487,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 button{background:none;border:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.top{position:relative;background:#fff;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:14px}
+.top{position:relative;padding:24px 20px 0;display:flex;align-items:center;justify-content:center;gap:14px}
 .top img{height:38px;width:auto}
 .top span{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mute);display:flex;align-items:center;gap:6px}
 .top span svg{color:var(--green)}
@@ -12548,7 +12551,7 @@ label.l{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bot
 select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.4'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 .err{display:block;font-size:12px;color:var(--red);font-weight:600;margin-top:6px}
 .hint{font-size:12px;color:var(--faint);margin-top:6px}
-.sec{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#3F3F46;margin:26px 0 14px;padding-top:20px;border-top:1px solid var(--line)}
+.sec{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#3F3F46;margin:26px 0 14px;padding-top:20px;border-top:1px solid var(--line)}.sec.flat{border-top:0;padding-top:0}
 .dir{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
 .dir-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;font-weight:700;font-size:13.5px}
 .lnk{font-size:13px;font-weight:600;color:var(--orange-ink)}
@@ -12708,7 +12711,7 @@ function clientNameFor(L){ try{ var cl=JSON.parse(localStorage.getItem('aad-clie
 
 /* ================= onboarding form ================= */
 var R=null, step=1, errs={}, f=null, mem={kyc:[],sig:null};
-var STEPS=['Your details','Services & KYC documents','Engagement letter'], LAST=3;
+var STEPS=['Your details','Please find below the services','Engagement letter'], LAST=3;
 if(KIND==='onboard') bootOnboard();
 function bootOnboard(){
   R=ONB.requests.filter(function(x){ return x.token===TOKEN; })[0];
@@ -12733,12 +12736,11 @@ function kycList(){ return PREVIEW?R.kyc.concat(mem.kyc):R.kyc; }
 function letterSigned(){ return PREVIEW?!!mem.sig||R.letter.status==='signed':R.letter.status==='signed'; }
 function paint(){
   var co=R.type==='company';
-  var h='<div class="hello"><h1>'+(step===1?'Welcome'+(R.form?' back':'')+', '+e(R.type==='company'?R.name:String(R.name).split(' ')[0]):STEPS[step-1])+'</h1><p>'+
-    (step===1?'Please fill in your details below.':'Step '+step+' of '+LAST)+'</p></div>';
+  var h='<div class="hello"><h1>'+(step===1?'Please fill in your details below.':STEPS[step-1])+'</h1>'+(step>1?'<p>Step '+step+' of '+LAST+'</p>':'')+'</div>';
   if(R.status==='info'&&R.reason) h+='<div class="note warn"><span><b>'+FIRM.name+' needs more information:</b> '+e(R.reason)+'</span></div>';
   h+='<div class="card">'+(errs.submit?'<div class="note bad" role="alert"><span>'+e(errs.submit)+'</span></div>':'')+[detailsStep,svcDocsStep,letterStep][step-1](co)+
     '<div class="foot">'+(step>1?'<button class="btn sec" id="bk">Back</button>':'')+'<span class="grow"></span>'+
-      '<button class="btn sec" id="sv">Save &amp; Close</button>'+(step<LAST?'<button class="btn pri" id="nx">Save &amp; Next</button>':'<button class="btn pri" id="sb">Submit onboarding</button>')+'</div></div>';
+      (step<LAST?'<button class="btn sec" id="sv">Save &amp; Close</button><button class="btn pri" id="nx">Save &amp; Next</button>':'<button class="btn pri" id="sb">Submit</button>')+'</div></div>';
   app.innerHTML=h; wire(); window.scrollTo(0,0);
 }
 function fld(k,label,val,o){ o=o||{}; var er=errs[k]; return '<div'+(o.span?' class="span2"':'')+'><label class="l" for="p-'+k.replace(/\./g,'-')+'">'+label+(o.opt?' <span class="opt">(optional)</span>':' <span class="req">*</span>')+'</label>'+
@@ -12756,8 +12758,8 @@ function detailsStep(co){
      fld('abn','ABN',f.abn,{mode:'numeric',ph:'e.g. 51 824 753 556'})+fld('tfn','TFN',f.tfn,{mode:'numeric',ph:'e.g. 123 456 789'})+
      '<label class="same span2"><input type="checkbox" id="p-same"'+(f.same?' checked':'')+'> Copy from primary <small>Use the email and phone above for correspondence</small></label>'+
      fld('commEmail','Email for correspondence',f.commEmail,{opt:true,type:'email',ro:f.same})+fld('commPhone','Phone for correspondence',f.commPhone,{opt:true,mode:'tel',ro:f.same})+'</div>'+
-     '<div class="sec">Address</div>'+
-     '<div class="aq"><label class="l" for="p-aq">Find your address</label><div class="aq-in"><input class="in" id="p-aq" placeholder="Search address" autocomplete="off" value="'+e(mem.aq||'')+'">'+IC.search+'<div id="p-sugg"></div></div></div>'+
+     '<div class="sec flat">Address</div>'+
+     '<div class="aq"><div class="aq-in"><input class="in" id="p-aq" placeholder="Search address" aria-label="Search address" autocomplete="off" value="'+e(mem.aq||'')+'">'+IC.search+'<div id="p-sugg"></div></div></div>'+
      '<div class="grid2">'+fld('addr.street','Street address',a.street,{span:true,auto:'street-address'})+'</div>'+
      '<div class="grid3">'+fld('addr.suburb','Suburb',a.suburb)+sel('addr.state','State',STATES,a.state)+fld('addr.postcode','Postcode',a.postcode,{mode:'numeric'})+'</div>';
   if(co){
@@ -12770,7 +12772,7 @@ function detailsStep(co){
   return h;
 }
 function servicesStep(){
-  return '<h2>Please find below the services</h2>'+
+  return ''+
     '<table class="svc"><thead><tr><th>Service</th><th>Fee (inc. GST)</th></tr></thead><tbody>'+R.services.map(function(s){ return '<tr><td>'+e(s.name)+'</td><td>'+money(s.price)+'</td></tr>'; }).join('')+
     '<tr class="tot"><td>Total</td><td>'+money(totalOf(R.services))+'</td></tr></tbody></table>';
 }
@@ -12991,7 +12993,7 @@ function submit(){
   if(['draft','info'].indexOf(r.status)<0){ R=r; return bootOnboard(); }     // already submitted (double click or another tab)
   var from=r.status; r.form=JSON.parse(JSON.stringify(f)); r.status='submitted'; r.submittedAt=Date.now(); r.step=LAST; r.steps=4;
   audit(r,'Onboarding submitted',f.name||R.name,from,'submitted','All steps complete');
-  if(!saveOnb(ONB)){ r.status=from; btn.disabled=false; btn.textContent='Submit onboarding'; toast('We couldn’t submit your onboarding. Please try again.',true); return; }
+  if(!saveOnb(ONB)){ r.status=from; btn.disabled=false; btn.textContent='Submit'; toast('We couldn’t submit your onboarding. Please try again.',true); return; }
   R=r; thankYou(false);
 }
 })();

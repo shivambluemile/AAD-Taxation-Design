@@ -2921,7 +2921,15 @@ tbody tr:hover{background:#FCFCFD}
 .wz-intro{display:flex;flex-direction:column;gap:3px;margin-bottom:18px}
 .wz-intro b{font-family:'Manrope';font-size:15.5px;font-weight:800;color:var(--ink)}
 .wz-intro span{font-size:13px;color:var(--mute);line-height:1.5}
-.wz-sec+.wz-sec{padding-top:20px;border-top:1px solid var(--line)}   /* the drawer body's 24px gap already sits above the line */
+.wz-sec+.wz-sec{padding-top:20px;border-top:1px solid var(--line)}
+#cfb .wz-sec,#rqb .wz-sec{border:1px solid var(--line);border-radius:12px;padding:18px 20px 20px;background:#fff}
+#cfb .wz-sec+.wz-sec,#rqb .wz-sec+.wz-sec{padding-top:18px}
+#cfb .wz-sec .cl-sec,#rqb .wz-sec .cl-sec{margin-bottom:14px}
+#cfb .wz-sec .bsec,#rqb .wz-sec .bsec{font-family:'Manrope';font-size:15px;font-weight:800;letter-spacing:0;text-transform:none;color:var(--ink)}
+#cfb .wz-sec .bsec svg,#rqb .wz-sec .bsec svg{display:none}
+.sp-pr{position:relative}.sp-cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13.5px;color:var(--mute);pointer-events:none}.sp-pr .fin{padding-left:28px}
+.sp-sum{display:flex;flex-direction:column;align-items:flex-end;gap:1px}.sp-sum small{font-size:11.5px;color:var(--faint)}
+.el-wrap+.el-review{margin-top:0}   /* the drawer body's 24px gap already sits above the line */
 
 /* service picker */
 .sp{display:flex;flex-direction:column;gap:12px}
@@ -4348,16 +4356,16 @@ function svcPickerHtml(list,errs){
     var opts=act.filter(function(s){ return taken.indexOf(s.id)<0||s.id===x.svcId; });
     var es=errs['s'+i], ep=errs['p'+i], first=i===0;
     return '<div class="sp-row">'+
-      '<div class="sp-svc"><label class="flabel'+(first?'':' sr')+'" for="sp-s'+i+'">Service</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
+      '<div class="sp-svc"><label class="sr" for="sp-s'+i+'">Service '+(i+1)+'</label><span class="selbox"><select id="sp-s'+i+'" data-sp-svc="'+i+'"'+(es?' class="bad"':'')+'>'+
         '<option value="">Choose a service</option>'+opts.map(function(s){ return '<option value="'+s.id+'"'+(s.id===x.svcId?' selected':'')+'>'+esc(s.name)+' · min '+money(s.price)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'+
-      '<div class="sp-pr"><label class="flabel'+(first?'':' sr')+'" for="sp-p'+i+'">Price (inc. GST)</label><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
+      '<div class="sp-pr"><label class="sr" for="sp-p'+i+'">Price for service '+(i+1)+', including GST</label><span class="sp-cur" aria-hidden="true">$</span><input class="fin sm'+(ep?' bad':'')+'" id="sp-p'+i+'" data-sp-price="'+i+'" type="number" step="0.01" inputmode="decimal"'+
         (x.svcId?' min="'+minOf(x)+'" placeholder="'+minOf(x)+'"':' placeholder="0.00" disabled')+' value="'+esc(x.price)+'"'+(edit||!x.svcId?'':' readonly title="Only admins and managers can change prices"')+'></div>'+
       '<button type="button" class="sp-rm" data-sp-rm="'+i+'" title="Remove" aria-label="Remove service '+(i+1)+'"'+(list.length===1&&!x.svcId?' disabled':'')+'>'+I.trash+'</button>'+
       (es||ep?'<span class="cl-err sp-err">'+I.info+esc(es||ep)+'</span>':'')+'</div>';
   }).join('');
   var more=act.length>chosen(list).length, last=list[list.length-1];
   h+='<div class="sp-foot"><button type="button" class="pill-btn quiet" id="sp-add"'+(more?'':' disabled')+(more?'':' title="Every active service is already added"')+'>'+I.plus+'Add another service</button>'+
-    (chosen(list).length?'<b class="sp-total">Total '+money(totalOf(chosen(list)))+'</b>':'')+'</div>';
+    (chosen(list).length?'<span class="sp-sum"><b class="sp-total">Total '+money(totalOf(chosen(list)))+'</b><small>Prices include GST</small></span>':'')+'</div>';
   if(errs.list) h+='<span class="cl-err">'+I.info+esc(errs.list)+'</span>';
   if(!edit) h+='<p class="cl-hint">Prices come from Settings → Services. Only admins and managers can raise them for a client.</p>';
   return h+'</div>';
@@ -4712,7 +4720,7 @@ function paintKyc(){
   var sec=document.getElementById('wz-kyc-sec'); if(!sec) return;
   var today=isoOf(Date.now());
   sec.innerHTML='<div class="cl-sec"><div class="bsec">KYC documents</div>'+(wiz.files.length?'<span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span>':'')+'</div>'+
-    '<div class="grid2 wz-kycd"><div><label class="flabel" for="wz-kycdate">KYC date'+(wiz.files.length?' <span class="req">*</span>':'')+'</label><input class="fin sm'+(wiz.kycErr?' bad':'')+'" type="date" id="wz-kycdate" value="'+esc(wiz.kycDate)+'" max="'+today+'">'+
+    '<div class="grid2 wz-kycd"><div><label class="flabel" for="wz-kycdate">Date checked'+(wiz.files.length?' <span class="req">*</span>':'')+'</label><input class="fin sm'+(wiz.kycErr?' bad':'')+'" type="date" id="wz-kycdate" value="'+esc(wiz.kycDate)+'" max="'+today+'">'+
       (wiz.kycErr?'<span class="cl-err">'+I.info+esc(wiz.kycErr)+'</span>':'<p class="cl-hint" id="wz-kycexp">'+(wiz.kycDate?'Valid until '+dmyOf(fromIso(kycExpiry(wiz.kycDate))):'')+'</p>')+'</div><div></div></div>'+
     dropZone('wz-kyc')+kycRows(wiz.files,{remove:true,empty:'No documents yet. You can also add them later from the client’s record.'});
   var kd=document.getElementById('wz-kycdate'); kd.oninput=function(){ wiz.kycDate=kd.value; wiz.kycErr=''; var x=document.getElementById('wz-kycexp'); if(x) x.textContent=kd.value?'Valid until '+dmyOf(fromIso(kycExpiry(kd.value))):''; };
@@ -4728,8 +4736,8 @@ function paintLetterStep(){
   var body=formBody(), foot=document.getElementById('wz-foot'), c=wzClient();
   var sg=wzSigner(), html=letterHtml({name:c.name,type:c.type,entity:c.entity,email:c.email,address:c.address,services:wiz.services.map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),date:Date.now(),staff:ME,signature:wiz.sig,signedAt:wiz.sig?wiz.sigAt:null,fy:fyStart(Date.now()),signerName:sg.name});
   body.innerHTML='<div class="el-top"><div class="wz-intro"><b>'+(wiz.sig?'Check the signature on the letter':'Engagement letter')+'</b><span>'+(wiz.sig?'This is how the signed letter will be saved. Confirm to create the client, or change the signature.':'Generated from the client’s details and the services you chose. Sign it now, or send it to the client to sign.')+'</span></div>'+
-    (wiz.sig?'':'<label class="el-review"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span><b>I’ve reviewed this letter</b><small>Check the services, fees and client details. '+(c.type==='company'?'It goes to the first director, '+esc(sg.name||'Director 1')+', who is the only one who signs.':'')+'</small></span></label>')+'</div>'+
-    '<div class="el-wrap">'+html+'</div>';
+    '</div><div class="el-wrap">'+html+'</div>'+
+    (wiz.sig?'':'<label class="el-review"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span><b>I’ve reviewed this letter</b><small>Check the services, fees and client details. '+(c.type==='company'?'It goes to the first director, '+esc(sg.name||'Director 1')+', who is the only one who signs.':'')+'</small></span></label>');
   foot.innerHTML='<button class="btn-ghost" id="wz-back">Back</button><button class="linkbtn" id="wz-pdf">'+OI.print+'Open as PDF</button><span class="sp-grow"></span>'+
     (wiz.sig?'<button class="btn-ghost" id="wz-resign">Change signature</button><button class="btn-primary" id="wz-confirm">'+I.tick+'Confirm &amp; create client</button>'
             :'<button class="btn-ghost" id="wz-sign">'+OI.pen+'Sign manually</button><button class="btn-primary" id="wz-send">'+OI.send+'Send for signature</button>');
@@ -5163,12 +5171,12 @@ function engagementTab(c){
       '<button class="linkbtn" data-elpdf="'+l.id+'">'+OI.print+'Open</button></div>'; }).join('')+'</div></section>':'';
   var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span><b>I’ve reviewed this letter</b><small>Check the services, fees and client details before it goes out.'+(c.type==='company'?' It goes to '+esc(sg.name||'the first director')+', the first director, who is the only one who signs.':'')+'</small></span></label>'; };
   if(!L) return fyBar+'<div class="vbar"><p>No engagement letter for '+fyLabel(F)+' yet'+(act.length?'':'. Assign a service first')+'.</p>'+(act.length?'<span class="vsec-acts"><button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?'first director':'client')+'</button></span>':'')+'</div>'+
-    (act.length?review()+'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>':'')+prev;
+    (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>'+review():'')+prev;
   var h=fyBar+'<div class="vbar"><p>'+pill(LETTER_STATUS,L.status)+' '+(L.status==='signed'?'On '+dmyOf(L.signedAt)+' by <b>'+esc(L.signature.name)+'</b>'+(L.method==='manual'?' (recorded by staff)':' (signed through the link)'):
       L.status==='sent'?'Emailed '+whenOf(L.sends[L.sends.length-1].at)+' to <b>'+esc((L.signer&&L.signer.name)||sg.name)+'</b>. Waiting for them to sign.':'')+'</p><span class="vsec-acts"><button class="linkbtn" data-el="pdf">'+OI.print+'Open as PDF</button>'+
     (L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':'')+'</span></div>';
-  if(L.status!=='signed') h+=review();
   h+='<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,L.services,L))+'</div></section>';
+  if(L.status!=='signed') h+=review();
   var log=(L.audit||[]).slice().reverse();
   if(log.length) h+='<section class="vsec"><div class="vsec-h"><h3>'+I.clock+'Letter history</h3></div><div class="timeline">'+log.map(function(a){ return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(a.action)+'</div><div class="tlmeta">'+(a.note?esc(a.note)+' · ':'')+whenOf(a.t)+' · by <b>'+esc(a.by)+'</b></div></div>'; }).join('')+'</div></section>';
   return h+prev;

@@ -12736,7 +12736,7 @@ function kycList(){ return PREVIEW?R.kyc.concat(mem.kyc):R.kyc; }
 function letterSigned(){ return PREVIEW?!!mem.sig||R.letter.status==='signed':R.letter.status==='signed'; }
 function paint(){
   var co=R.type==='company';
-  var h='<div class="hello"><h1>'+(step===1?'Please fill in your details below.':STEPS[step-1])+'</h1>'+(step>1?'<p>Step '+step+' of '+LAST+'</p>':'')+'</div>';
+  var h='<div class="hello"><h1>'+(step===1?'Please fill in your details below.':STEPS[step-1])+'</h1></div>';
   if(R.status==='info'&&R.reason) h+='<div class="note warn"><span><b>'+FIRM.name+' needs more information:</b> '+e(R.reason)+'</span></div>';
   h+='<div class="card">'+(errs.submit?'<div class="note bad" role="alert"><span>'+e(errs.submit)+'</span></div>':'')+[detailsStep,svcDocsStep,letterStep][step-1](co)+
     '<div class="foot">'+(step>1?'<button class="btn sec" id="bk">Back</button>':'')+'<span class="grow"></span>'+
@@ -12824,7 +12824,9 @@ function wire(){
   app.querySelectorAll('[data-k]').forEach(function(el){ el.oninput=function(){ setK(el.dataset.k,el.value); }; el.onchange=function(){ setK(el.dataset.k,el.value); if(el.dataset.k==='entity'){ paint(); } }; });
   app.querySelectorAll('[data-go]').forEach(function(b){ b.onclick=function(){ read(); go(+b.dataset.go); }; });
   var bk=document.getElementById('bk'); if(bk) bk.onclick=function(){ read(); go(step-1); };
-  var nx=document.getElementById('nx'); if(nx) nx.onclick=function(){ read(); if(step===1){ autoFill(); paint(); } if(!checkStep(step)) return; go(step+1); };
+  var nx=document.getElementById('nx'); if(nx) nx.onclick=function(){ read(); if(step===1){ autoFill(); paint(); }
+    if(step===2&&missingDocs().length){ nx.disabled=true; autoDocs().then(function(){ if(checkStep(2)) go(3); },function(){ nx.disabled=false; toast('The upload didn’t work. Please try again.',true); }); return; }
+    if(!checkStep(step)) return; go(step+1); };
   var sv=document.getElementById('sv'); if(sv) sv.onclick=function(){ read(); if(persist(true,true)) savedClosed(); };
   var sb=document.getElementById('sb'); if(sb) sb.onclick=submit;
   var sm=document.getElementById('p-same'); if(sm) sm.onchange=function(){ read(); f.same=sm.checked; if(f.same){ f.commEmail=f.email; f.commPhone=f.phone; } paint(); };
@@ -12873,6 +12875,22 @@ function autoFill(){
     if(!f.directors.length) f.directors.push({name:'',email:'',phone:'',abn:'',tfn:''});
     f.directors.forEach(function(d,i){ var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(d.name)); fill(p+'phone',mob()); fill(p+'tfn',gen(9,validTFN,fmtTFN)); });
   }
+}
+/* Save & Next on the documents step uploads a sample PDF for every required document that's still missing (prototype), so it never stops on a "still needed" error */
+function autoDocs(){
+  var now=Date.now(), by=f.name||R.name, miss=missingDocs();
+  var pdf=function(t){ var line='BT /F1 18 Tf 60 760 Td ('+t.split('(').join('').split(')').join('')+') Tj ET';
+    return new Blob([['%PDF-1.4','1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj','2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj',
+      '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Contents 4 0 R/Resources<</Font<</F1<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>>>>>>>endobj',
+      '4 0 obj<</Length '+line.length+'>>stream',line,'endstream endobj','trailer<</Root 1 0 R>>','%%EOF'].join('\n')],{type:'application/pdf'}); };
+  var files=miss.map(function(q,i){ var b=pdf(q.n+' - sample'); return {q:q,blob:b,key:'kyc-'+TOKEN.slice(0,10)+'-'+now+'-s'+i,name:q.n.split(' · ').join(' - ')+'.pdf'}; });
+  if(PREVIEW){ files.forEach(function(x){ mem.kyc.push({name:x.name,type:'application/pdf',size:x.blob.size,at:now,slot:x.q.k,doc:x.q.n}); }); return Promise.resolve(); }
+  return Promise.all(files.map(function(x){ return putKyc(x.key,x.blob,{owner:TOKEN,name:x.name,type:'application/pdf',size:x.blob.size,at:now,by:by}); })).then(function(){
+    ONB=loadOnb(); var r=ONB.requests.filter(function(y){ return y.token===TOKEN; })[0];
+    files.forEach(function(x){ r.kyc.push({key:x.key,name:x.name,type:'application/pdf',size:x.blob.size,at:now,by:by,slot:x.q.k,doc:x.q.n}); });
+    audit(r,'Documents uploaded by client',by,'','',files.map(function(x){ return x.q.n; }).join(', ')+' · '+files.length+' file'+(files.length===1?'':'s'));
+    r.form=JSON.parse(JSON.stringify(f)); saveOnb(ONB); R=r;
+  });
 }
 function validateDetails(){
   var er={}, co=R.type==='company', req=function(k,l){ if(!String(getK(k)||'').trim()) er[k]=l+' is required'; };

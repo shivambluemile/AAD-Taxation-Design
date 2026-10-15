@@ -5177,76 +5177,71 @@ function wireRequests(){
 }
 function reqById(id){ return ONB.requests.filter(function(r){ return r.id===id; })[0]; }
 var openReqId=null;
-function openRequestDetail(id,swap){
+/* an onboarding request (Draft row) opens in the same layout as a client: details in the header, actions top right, then tabs */
+var rqTab='services';
+function openRequestDetail(id,swap,tab){
   ONB=loadOnb(); var r=reqById(id); if(!r){ closeDrawer(); return; }
   if(r.clientId&&findClient(r.clientId)){ openReqId=null; go('/clients/'+r.clientId); return; }
+  if(openReqId!==id) rqTab='services';
   openReqId=id;
-  var f=r.form||{}, link=portalLink('onboard',r.token), expired=Date.now()>r.expires;
-  var row=function(k,v){ return '<div class="fv"><dt>'+k+'</dt><dd>'+(v||'<span class="cl-muted">--</span>')+'</dd></div>'; };
-  var who=esc(f.name||r.name), first=r.type==='company'?who:esc(String(f.name||r.name).split(' ')[0]);
-  var lastSend=r.invite.sends[r.invite.sends.length-1], open=['draft','info'].indexOf(r.status)>=0;
-  /* what happens next, and the buttons for it */
-  var next={
-    draft:[r.form?first+' has started the form but hasn’t submitted it yet.':'Waiting for '+first+' to open the link and fill in the form.','<button class="btn-ghost btn-sm" data-do="resend">'+OI.send+'Resend invitation</button>'],
-    info:['Waiting for '+first+' to update the form.','<button class="btn-ghost btn-sm" data-do="resend">'+OI.send+'Resend invitation</button>'],
-    submitted:[first+' submitted the form. Review the details and documents.','<button class="btn-primary btn-sm" data-do="review">Start review</button>'],
-    review:['Check the details, KYC documents and signed letter, then decide.','<button class="btn-ghost btn-sm danger-t" data-do="reject">Reject</button><button class="btn-ghost btn-sm" data-do="info">Request information</button><button class="btn-primary btn-sm" data-do="approve">'+I.tick+'Approve &amp; complete</button>'],
-    completed:['Approved. '+who+' is now a client.',r.clientId?'<button class="btn-primary btn-sm" data-do="client">Open client record</button>':''],
-    rejected:['This request was rejected and the link no longer works.','']
-  }[r.status]||['',''];
-  var linkLine=open?'<div class="rq-lk"><span>'+(expired?'<b class="rq-exp">Link expired '+dmyOf(r.expires)+'</b>':'Link expires '+dmyOf(r.expires))+'</span><button class="linkbtn" id="rd-copy">'+I.copy+'Copy link</button></div>':'';
-  /* progress: one line per part of the onboarding */
-  var step=function(state,title,detail){ return '<li class="rq-st '+state+'"><i aria-hidden="true">'+(state==='done'?I.tick:state==='bad'?'!':'')+'</i><div><b>'+title+'</b><small>'+detail+'</small></div></li>'; };
-  var inv=r.invite.status==='failed'?'bad':r.invite.sends.length?'done':'todo';
-  var det=r.submittedAt?'done':r.form?'part':'todo';
-  var kyc=r.kyc.length?'done':'todo';
-  var let_=r.letter.status==='signed'?'done':'todo';
-  var rev=r.status==='completed'?'done':r.status==='rejected'?'bad':r.status==='review'?'part':'todo';
-  var steps='<ol class="rq-steps">'+
-    step(inv,'Invitation',inv==='bad'?'Delivery failed. Resend it.':lastSend?lastSend.channels.join(' + ')+' · '+whenOf(lastSend.at)+(r.invite.sends.length>1?' · '+r.invite.sends.length+' sends':''):'Not sent yet')+
-    step(det,'Client details',r.submittedAt?'Submitted '+whenOf(r.submittedAt):r.form?'Started, not submitted':'Not started')+
-    step(kyc,'KYC documents',r.kyc.length?r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' uploaded':'None yet')+
-    step(let_,'Engagement letter',r.letter.status==='signed'?'Signed by '+esc(r.letter.signature.name)+' · '+dmyOf(r.letter.signedAt):'Not signed yet')+
-    step(r.status==='completed'?'done':r.status==='rejected'?'bad':'todo','Active client',r.status==='completed'?'Created':r.status==='rejected'?'Request closed':'Created automatically once they sign and submit')+'</ol>';
+  var f=r.form||{}, co=r.type==='company', link=portalLink('onboard',r.token), expired=Date.now()>r.expires, open=['draft','info'].indexOf(r.status)>=0;
+  var who=esc(f.name||r.name), first=co?who:esc(String(f.name||r.name).split(' ')[0]);
+  var dirs=co&&f.directors?f.directors.filter(function(d){ return String(d.name||'').trim(); }):[];
+  var tabs=[['services','Services',r.services.length]];
+  if(dirs.length) tabs.push(['directors','Directors',dirs.length]);
+  tabs.push(['documents','KYC',r.kyc.length||null,!!r.kyc.length],['engagement','Engagement letter',null,r.letter.status==='signed'],['activity','Activities']);
+  if(tab) rqTab=tab; if(!tabs.some(function(t){ return t[0]===rqTab; })) rqTab='services';
+  var dc=function(icon,val,copy){ return val?'<span class="dc"><i class="dci">'+icon+'</i>'+val+(copy?'<button class="copy" data-copy="'+esc(copy)+'" title="Copy" aria-label="Copy">'+I.copy+'</button>':'')+'</span>':''; };
+  var a0=f.address||{}, addr=[a0.street,[a0.suburb,a0.state,a0.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  var acts={
+    draft:'<button class="btn-ghost btn-sm" data-do="resend">Resend invitation</button><button class="btn-ghost btn-sm" id="rd-copy">Copy link</button>',
+    info:'<button class="btn-ghost btn-sm" data-do="resend">Resend invitation</button><button class="btn-ghost btn-sm" id="rd-copy">Copy link</button>',
+    submitted:'<button class="btn-primary btn-sm" data-do="review">Start review</button>',
+    review:'<button class="btn-ghost btn-sm danger-t" data-do="reject">Reject</button><button class="btn-ghost btn-sm" data-do="info">Request information</button><button class="btn-primary btn-sm" data-do="approve">Approve &amp; complete</button>'
+  }[r.status]||'';
   var h='<div class="drawer wide cl-view'+(swap?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="rd-t">'+
-    '<div class="dhead cl-dhead"><div class="dprofile"><div class="dpmain"><p class="eyebrow">Onboarding request · '+esc(r.type==='company'?'Company':'Individual')+'</p>'+
+    '<div class="dhead cl-dhead"><div class="dprofile"><div class="dpmain">'+
       '<h2 id="rd-t">'+who+' '+pill(ONB_STATUS,r.status)+'</h2>'+
-      '<div class="dmetaline"><span class="dc"><i class="dci">'+IC.mail+'</i>'+esc(r.email)+'</span><span class="dc"><i class="dci">'+IC.phone+'</i>'+esc(r.phone)+'</span>'+
-        '<span class="dc"><i class="dci">'+IC.cal+'</i>Requested '+dmyOf(r.created)+' by '+esc(r.by)+'</span></div></div></div>'+
-      '<div class="dhead-acts"><button class="btn-ghost btn-sm" id="rd-show">Show Link</button><button class="x" id="rd-x" aria-label="Close">'+I.close+'</button></div></div>'+
-    '<div class="cl-vbody rd-body">'+
-      '<div class="rq-next"><div class="rq-next-t"><p>'+next[0]+'</p>'+linkLine+'</div>'+(next[1]?'<div class="rq-next-a">'+next[1]+'</div>':'')+'</div>'+
+      '<div class="dmetaline"><span class="ptitle">'+esc(co?(f.entity||'Company'):'Individual')+'</span>'+dc(IC.mail,mailto(f.email||r.email),f.email||r.email)+dc(IC.phone,esc(f.phone||r.phone),f.phone||r.phone)+'</div>'+
+      ((f.abn||addr||open)?'<div class="dmetaline">'+(f.abn?dc(IC.abn,'ABN '+esc(fmtABN(f.abn)),fmtABN(f.abn)):'')+(addr?dc(IC.pin,esc(addr)):'')+
+        (open?'<span class="dc"><i class="dci">'+IC.cal+'</i>'+(expired?'<b class="rq-exp">Link expired '+dmyOf(r.expires)+'</b>':'Link expires '+dmyOf(r.expires))+'</span>':'')+'</div>':'')+
+    '</div></div>'+
+    '<div class="dhead-acts">'+acts+'<button class="x" id="rd-x" aria-label="Close">'+I.close+'</button></div></div>'+
+    '<div class="btabs" role="tablist" aria-label="Onboarding request">'+tabs.map(function(t){
+      return '<button role="tab" id="rt-'+t[0]+'" data-rtab="'+t[0]+'" aria-controls="rdb" aria-selected="'+(t[0]===rqTab)+'" class="'+(t[0]===rqTab?'on':'')+'">'+t[1]+
+        (t[3]?'<span class="tab-n ok">'+I.tick+(t[2]!=null?t[2]:'')+'</span>':t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>'+
+    '<div class="cl-vbody" id="rdb" role="tabpanel" aria-labelledby="rt-'+rqTab+'" tabindex="0">'+
       (r.reason?'<div class="cl-note rq-reason">'+I.infoLg+'<span><b>'+(r.status==='rejected'?'Reason for rejecting':'Information requested')+':</b> '+esc(r.reason)+'</span></div>':'')+
-      '<section class="rq-sec"><h3>Progress</h3>'+steps+'</section>'+
-      '<section class="rq-sec"><div class="rq-sec-h"><h3>Services</h3><span>Set by staff. The client can’t change them.</span></div>'+
-        '<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th></tr></thead><tbody>'+r.services.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="r">'+money(x.price)+'</td></tr>'; }).join('')+
-        '<tr class="tot"><td>Total</td><td class="r">'+money(totalOf(r.services))+'</td></tr></tbody></table></section>'+
-      (r.form?'<section class="rq-sec"><h3>Details from the client</h3>'+formSummary(r.type,f)+'</section>':'')+
-      (r.kyc.length?'<section class="rq-sec"><h3>KYC documents</h3>'+kycRows(r.kyc,{})+'</section>':'')+
-      (r.letter.status==='signed'?'<section class="rq-sec"><div class="rq-sec-h"><h3>Engagement letter</h3><button class="linkbtn" id="rd-letter">'+OI.print+'Open as PDF</button></div>'+
-        '<p class="rq-p">Signed by <b>'+esc(r.letter.signature.name)+'</b> on '+dmyOf(r.letter.signedAt)+' through the onboarding link.</p></section>':'')+
-      '<section class="rq-sec"><h3>Activity</h3><div class="timeline">'+r.audit.slice().reverse().map(function(a){
-        return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(a.action)+(a.from||a.to?' <span class="rd-tr">'+esc(stName(a.from))+(a.from&&a.to?' → ':'')+esc(stName(a.to))+'</span>':'')+'</div>'+
-          '<div class="tlmeta">'+(a.note?esc(a.note)+' · ':'')+whenOf(a.t)+' · by <b>'+esc(a.by)+'</b></div></div>'; }).join('')+'</div></section>'+
-    '</div></div>';
+      rqTabHtml(r,rqTab,dirs,first)+'</div></div>';
   showDrawer(h); overlay._guard=function(){ openReqId=null; closeDrawer(); };
+  wireCopy(overlay.querySelector('.cl-dhead'));
   document.getElementById('rd-x').onclick=function(){ openReqId=null; closeDrawer(); };
-  document.getElementById('rd-show').onclick=function(){ showLink(r.token); };
   var cp=document.getElementById('rd-copy'); if(cp) cp.onclick=function(){ copyText(link,'Link copied'); };
-  var lt=document.getElementById('rd-letter'); if(lt) lt.onclick=function(){ printLetter(letterHtml({name:f.name||r.name,type:r.type,entity:f.entity||r.entity,email:f.email||r.email,address:f.address,abn:f.abn,services:r.services,date:r.created,staff:r.by,signature:r.letter.signature,signedAt:r.letter.signedAt})); };
-  overlay.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(r.kyc[+b.dataset.kpv]); }; });
-  overlay.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ openKyc(r.kyc[+b.dataset.kdl],true); }; });
-  overlay.querySelectorAll('[data-do]').forEach(function(b){ b.onclick=function(){ reqAction(r.id,b.dataset.do); }; });
+  overlay.querySelectorAll('[data-rtab]').forEach(function(t){ t.onclick=function(){ openRequestDetail(id,true,t.dataset.rtab); }; });
+  overlay.querySelectorAll('[data-kpv]').forEach(function(x){ x.onclick=function(){ openKyc(r.kyc[+x.dataset.kpv]); }; });
+  overlay.querySelectorAll('[data-kdl]').forEach(function(x){ x.onclick=function(){ openKyc(r.kyc[+x.dataset.kdl],true); }; });
+  overlay.querySelectorAll('[data-do]').forEach(function(x){ x.onclick=function(){ reqAction(r.id,x.dataset.do); }; });
+}
+function rqTabHtml(r,t,dirs,first){
+  var f=r.form||{};
+  if(t==='services') return '<div class="vbar"><p><b>'+r.services.length+'</b> service'+(r.services.length===1?'':'s')+' · '+money(totalOf(r.services))+' total. Set by staff; the client can’t change them.</p></div>'+
+    '<section class="vsec"><table class="mini"><thead><tr><th>Service</th><th class="r">Price</th></tr></thead><tbody>'+
+      r.services.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="r">'+money(x.price)+'</td></tr>'; }).join('')+'</tbody></table></section>';
+  if(t==='directors') return dirs.map(function(d,i){
+    return '<section class="vsec vdir"><div class="vsec-h"><div class="who2"><span class="av">'+esc(initials(d.name))+'</span><span><b>'+esc(d.name)+'</b><small>Director '+(i+1)+'</small></span></div></div>'+
+      '<dl class="fgrid">'+fv('Email address',d.email?mailto(d.email):'',{html:true,copy:d.email})+fv('Phone number',d.phone,{copy:d.phone})+fv('ABN',d.abn?fmtABN(d.abn):'')+fv('TFN',d.tfn?maskTFN(d.tfn):'')+'</dl></section>'; }).join('');
+  if(t==='documents') return r.kyc.length?'<section class="vsec">'+kycRows(r.kyc,{})+'</section>':'<p class="cl-muted vempty">No documents uploaded yet. '+first+' uploads them through the onboarding link.</p>';
+  if(t==='engagement'){
+    var signed=r.letter.status==='signed';
+    return '<div class="vbar"><p>'+pill(LETTER_STATUS,r.letter.status)+' '+(signed?'Signed by <b>'+esc(r.letter.signature.name)+'</b> on '+dmyOf(r.letter.signedAt)+' through the onboarding link.':first+' signs it through the onboarding link.')+'</p></div>'+
+      '<section class="vsec"><div class="el-wrap">'+letterHtml({name:f.name||r.name,type:r.type,entity:f.entity||r.entity,email:f.email||r.email,address:f.address,abn:f.abn,services:r.services,date:r.created,staff:r.by,
+        signerName:r.type==='company'?(f.directors&&f.directors[0]&&f.directors[0].name)||'':(f.name||r.name),signature:signed?r.letter.signature:null,signedAt:signed?r.letter.signedAt:null})+'</div></section>';
+  }
+  return '<section class="vsec"><div class="timeline">'+r.audit.slice().reverse().map(function(a){
+    return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(a.action)+(a.from||a.to?' <span class="rd-tr">'+esc(stName(a.from))+(a.from&&a.to?' → ':'')+esc(stName(a.to))+'</span>':'')+'</div>'+
+      '<div class="tlmeta">'+(a.note?esc(a.note)+' · ':'')+whenOf(a.t)+' · by <b>'+esc(a.by)+'</b></div></div>'; }).join('')+'</div></section>';
 }
 function stName(k){ return (ONB_STATUS[k]||INVITE_STATUS[k]||LETTER_STATUS[k]||[k])[0]; }
-function formSummary(type,f){
-  var row=function(k,v){ return '<div class="fv"><dt>'+k+'</dt><dd>'+(v?esc(v):'<span class="cl-muted">--</span>')+'</dd></div>'; }, a=f.address||{};
-  var h='<dl class="fgrid">'+row(type==='company'?'Company name':'Full name',f.name)+(type==='company'?row('Entity type',f.entity)+row('ACN',f.acn?fmtACN(f.acn):''):'')+
-    row('Email',f.email)+row('Phone',f.phone)+row('ABN',f.abn?fmtABN(f.abn):'')+row('TFN',f.tfn?maskTFN(f.tfn):'')+row('Communication email',f.commEmail)+row('Communication phone',f.commPhone)+
-    '<div class="fv wide"><dt>Address</dt><dd>'+esc([a.street,[a.suburb,a.state,a.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '))+'</dd></div></dl>';
-  if(type==='company'&&f.directors&&f.directors.length) h+='<p class="rd-sub">Directors</p>'+f.directors.map(function(d,i){ return '<dl class="fgrid rd-dir">'+row('Director '+(i+1),d.name)+row('Email',d.email)+row('Phone',d.phone)+row('TFN',d.tfn?maskTFN(d.tfn):'')+'</dl>'; }).join('');
-  return h;
-}
 /* review actions; each changes the onboarding status only once it has actually happened */
 function reqAction(id,what){
   ONB=loadOnb(); var r=reqById(id); if(!r) return;

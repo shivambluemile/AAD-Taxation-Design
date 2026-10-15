@@ -2762,6 +2762,8 @@ tbody tr:hover{background:#FCFCFD}
 .el-review.bad{border-color:#F3A3A3;background:#FFF7F7}
 /* ===== Add Client: clean sections, inline letter step ===== */
 .drawer.wz>.modal-head{border-bottom:0}
+.rq-done>p:first-child{font-size:14px;color:var(--ink);line-height:1.55;text-align:left}
+.rq-proto{margin-top:14px;padding:10px 12px;border-radius:10px;background:#FFF7EC;color:#7C4A03;font-size:12.5px;line-height:1.5;text-align:left}
 .rq-one .grid2{margin-top:16px!important}.rq-sp{margin-top:18px}
 .sp-row{align-items:end}.sp-rm{align-self:end;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center}
 .drawer.wz #cfb .wz-sec,.drawer.wz #rqb .wz-sec{border:0;border-radius:0;padding:0;background:none}
@@ -5109,13 +5111,13 @@ function rqPaint(){
 function rqDone(r){
   var body=document.getElementById('rqb'), foot=document.getElementById('rq-foot'), link=portalLink('onboard',r.token);
   if(document.getElementById('rq-steps')) document.getElementById('rq-steps').innerHTML=[['Client & services'],['Send request']].map(function(x){ return '<li class="done"><span>'+I.tick+'</span>'+x[0]+'</li>'; }).join('');
-  body.innerHTML='<div class="rq-done"><span class="rq-ok">'+I.tick+'</span><h3>Onboarding request sent</h3><p>'+esc(r.name)+' has been sent a secure link. The request is <b>Draft</b> until they submit the complete form.</p>'+
-    '<div class="rq-status">'+pill(ONB_STATUS,r.status)+'<span>Onboarding</span>'+pill(INVITE_STATUS,r.invite.status)+'<span>Invitation</span></div>'+
-    '<div class="rq-link"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="rq-copy" title="Copy link" aria-label="Copy link">'+I.copy+'</button></div></div>';
-  foot.innerHTML='<button class="btn-ghost" id="rq-close">Close</button><span class="sp-grow"></span><button class="btn-ghost" id="rq-show">'+I.eye+'Show Link</button><button class="btn-primary" id="rq-view">View request</button>';
+  // PROTOTYPE ONLY: this panel exists so the team can open the client's form; it isn't part of the real product
+  body.innerHTML='<div class="rq-done"><p>Please copy the below link on the next browser tab to view the onboarding form which will be shared on the client’s email/SMS:</p>'+
+    '<div class="rq-link"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="rq-copy" title="Copy link" aria-label="Copy link">'+I.copy+'</button></div>'+
+    '<p class="rq-proto">This panel won’t be shown in the real design. It’s only here in the prototype to give you the link to preview the form and steps the client will receive.</p></div>';
+  foot.innerHTML='<button class="btn-ghost" id="rq-close">Close</button><span class="sp-grow"></span><button class="btn-primary" id="rq-view">View request</button>';
   document.getElementById('rq-copy').onclick=function(){ copyText(link,'Link copied'); };
   document.getElementById('rq-close').onclick=function(){ rq=null; closeDrawer(); };
-  document.getElementById('rq-show').onclick=function(){ showLink(r.token); };
   document.getElementById('rq-view').onclick=function(){ rq=null; openRequestDetail(r.id); };
 }
 function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(function(){ toast(msg); },function(){ toast(msg); }); }catch(e){ toast(msg); } }

@@ -4671,19 +4671,17 @@ function wzNext(){
 /* step 2: services, KYC documents and a note on one page */
 function paintSvcStep(){
   var body=formBody();
-  body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">'+I.tag+'Services</div></div>'+
-      '<p class="cl-hint wz-sub">Each service is kept as its own record on '+esc(form.d.name||'the client')+'. Prices can’t go below the minimum set in Settings → Services.</p>'+
+  body.innerHTML='<section class="wz-sec"><div class="cl-sec"><div class="bsec">Services</div></div>'+
       '<div id="wz-sp"></div></section>'+
     '<section class="wz-sec" id="wz-kyc-sec"></section>'+
-    '<section class="wz-sec"><div class="cl-sec"><label class="bsec" for="wz-note">'+OI.note+'Notes</label></div>'+
+    '<section class="wz-sec"><div class="cl-sec"><label class="bsec" for="wz-note">Notes</label></div>'+
       '<textarea class="ftext wz-note" id="wz-note" rows="4" maxlength="2000" placeholder="Anything the team should know about this client, their services or their ID check">'+esc(wiz.note)+'</textarea></section>';
   wiz.picker=mountSvcPicker(document.getElementById('wz-sp'),wiz.services,wiz.svcErr,function(){ form.dirty=true; });
   paintKyc();
 }
 function paintKyc(){
   var sec=document.getElementById('wz-kyc-sec'); if(!sec) return;
-  sec.innerHTML='<div class="cl-sec"><div class="bsec">'+OI.shield+'KYC documents</div>'+(wiz.files.length?'<span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span>':'')+'</div>'+
-    '<p class="cl-hint wz-sub">Photo ID, proof of address, company extracts. Only admins, managers and accountants can open them.</p>'+
+  sec.innerHTML='<div class="cl-sec"><div class="bsec">KYC documents</div>'+(wiz.files.length?'<span class="cl-count">'+wiz.files.length+' file'+(wiz.files.length===1?'':'s')+'</span>':'')+'</div>'+
     dropZone('wz-kyc')+kycRows(wiz.files,{remove:true,empty:'No documents yet. You can also add them later from the client’s record.'});
   wireDrop('wz-kyc',function(list){ acceptFiles(list).forEach(function(f){ wiz.files.push({file:f,name:f.name,type:f.type,size:f.size,at:Date.now(),by:ME}); }); form.dirty=true; paintKyc(); });
   sec.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ wiz.files.splice(+b.dataset.krm,1); paintKyc(); }; });
@@ -7673,7 +7671,8 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .sf-who b{font-size:14px;color:var(--ink)}.sf-who span{font-size:12.5px;color:var(--mute)}
 .sf-sel{position:relative}.sf-sel select{appearance:none;-webkit-appearance:none;padding-right:34px}.sf-sel svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--mute)}
 .sf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.sf-bh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.sf-bh .flabel{margin:0}
+.sf-bh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;min-height:32px}.sf-bh .flabel{margin:0}
+.sf-bh .pill-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;line-height:1}.sf-bh .pill-btn svg{width:12px;height:12px;flex-shrink:0}
 .sf-brow{display:grid;grid-template-columns:1fr auto 1fr 40px;gap:10px;align-items:center;margin-bottom:8px}
 .sf-brow span{font-size:12.5px;color:var(--mute)}
 .sf-rm{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}.sf-rm:hover{background:#FEF2F2;color:var(--red)}
@@ -8353,7 +8352,7 @@ function paintShiftForm(){
     '<div class="modal-head"><h2 id="sf-t">'+(ed?'Edit shift':'Add Shift')+'</h2><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body">'+
       (ed?'<div class="sf-who"><b>'+esc(who.n)+'</b><span>'+esc(who.id)+' · '+weekday(fromKey(d.date))+', '+dmy(fromKey(d.date))+'</span></div>':
-        '<div><label class="flabel" for="sf-staff">Staff member <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain sm" id="sf-staff" data-sf="staff">'+
+        '<div><label class="flabel" for="sf-staff">Staff <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain sm" id="sf-staff" data-sf="staff">'+
           TEAM.map(function(m){ return '<option value="'+m.id+'"'+(m.id===d.staff?' selected':'')+'>'+esc(m.n)+' · '+m.id+'</option>'; }).join('')+'</select>'+I.chev+'</div>'+err('staff')+'</div>'+
         inp('date','Date','date',d.date,{req:true,max:dayKey()}))+
       '<div class="sf-grid">'+inp('start','Start time','time',d.start,{req:true})+inp('end','End time','time',d.end,{req:d.date!==dayKey()})+'</div>'+
@@ -8362,7 +8361,7 @@ function paintShiftForm(){
           return '<div class="sf-brow"><input class="fin plain sm'+(e['b'+i]?' bad':'')+'" type="time" data-bf="'+i+'" value="'+esc(x.from)+'" aria-label="Break '+(i+1)+' from"><span>to</span>'+
             '<input class="fin plain sm'+(e['b'+i]?' bad':'')+'" type="time" data-bt="'+i+'" value="'+esc(x.to)+'" aria-label="Break '+(i+1)+' to">'+
             '<button type="button" class="sf-rm" data-brm="'+i+'" aria-label="Remove break '+(i+1)+'">'+I.trash+'</button></div>'+err('b'+i);
-        }).join(''):'<p class="sf-none">No breaks.</p>')+'</div>'+
+        }).join(''):'<p class="sf-none">No break added</p>')+'</div>'+
       '<div><label class="flabel" for="sf-note">Comment</label><textarea class="ftext" id="sf-note" data-sf="note" rows="3" maxlength="300" placeholder="e.g. Forgot to clock in, times confirmed with the team">'+esc(d.note)+'</textarea></div>'+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-save">'+(ed?'Save changes':'Add Shift')+'</button></div></div>';

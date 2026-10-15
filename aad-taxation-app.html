@@ -3069,6 +3069,24 @@ tbody tr:hover{background:#FCFCFD}
 .rq-last{display:block;font-size:13px;color:var(--slate)}
 .rq-last small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
 .rd-body{padding-bottom:24px}
+.rd-body>.rq-next{margin-top:22px}
+.rq-next{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:16px 18px;border:1px solid #FDE3CC;background:#FFF8F1;border-radius:12px}
+.rq-next-t{min-width:0;flex:1 1 260px}.rq-next-t p{font-size:14px;font-weight:600;color:var(--ink);line-height:1.45}
+.rq-lk{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px;font-size:12.5px;color:var(--mute)}.rq-lk .linkbtn{padding:0;font-size:12.5px}.rq-exp{color:var(--red)}
+.rq-next-a{display:flex;gap:8px;flex-wrap:wrap}
+.rq-reason{margin-top:12px}
+.rq-sec{padding:24px 0 0}.rq-sec+.rq-sec{margin-top:24px;border-top:1px solid var(--line)}
+.rq-sec h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin-bottom:14px}
+.rq-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.rq-sec-h h3{margin:0}.rq-sec-h span{font-size:12.5px;color:var(--faint)}
+.rq-p{font-size:13.5px;color:var(--slate)}
+.rq-steps{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.rq-st{display:flex;gap:12px;align-items:center;padding:12px 16px;min-width:0}.rq-st+.rq-st{border-top:1px solid var(--line-soft)}
+.rq-st i{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid #D6DBE1;font-style:normal;font-size:12px;font-weight:800}
+.rq-st i svg{width:12px;height:12px}
+.rq-st.done i{background:#10B981;border-color:#10B981;color:#fff}.rq-st.part i{border-color:#F59E0B;background:#FFF7E6}.rq-st.bad i{background:#FEF2F2;border-color:#FCA5A5;color:#DC2626}
+.rq-st div{flex:1;min-width:0;display:flex;align-items:baseline;justify-content:space-between;gap:4px 16px;flex-wrap:wrap}
+.rq-st b{font-size:13.5px;font-weight:600;color:var(--ink)}.rq-st small{font-size:12.5px;color:var(--mute);text-align:right;overflow-wrap:anywhere}
+.rq-st.todo b{color:var(--slate)}.rq-st.bad small{color:#DC2626}
 .vsec .timeline{padding:4px 0 0 30px}
 .rd-body .vsec-h .vsec-acts{flex-wrap:wrap;gap:8px}
 .rd-body .btn-sm{display:inline-flex;align-items:center;gap:6px}
@@ -4924,18 +4942,16 @@ function requestsHtml(){
   var rows=ONB.requests.filter(function(r){ return (!q||(r.name+' '+r.email+' '+r.phone).toLowerCase().indexOf(q)>=0)&&(!RQS.status||r.status===RQS.status); });
   var h='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="rq-q" placeholder="Search by name, email or phone" aria-label="Search requests" value="'+esc(RQS.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+selHtml('rq-st','All Status',Object.keys(ONB_STATUS).map(function(k){ return [k,ONB_STATUS[k][0]]; }),RQS.status)+'</div></div>';
-  h+='<div class="card cl-table rq-table"><table><thead><tr><th>Prospective client</th><th>Contact info</th><th>Services</th><th>Onboarding</th><th>Invitation</th><th>Engagement letter</th><th>Last activity</th><th class="c">Actions</th></tr></thead><tbody>';
-  if(!ONB.requests.length) h+='<tr><td colspan="8"><div class="empty"><h3>No onboarding requests yet</h3><p>Send a prospective client a secure link to complete their own onboarding.</p><button class="btn-primary" id="rq-new2">'+OI.send+'Request Client</button></div></td></tr>';
-  else if(!rows.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p></div></td></tr>';
+  h+='<div class="card cl-table rq-table"><table><thead><tr><th>Prospective client</th><th>Contact info</th><th>Services</th><th>Onboarding</th><th>Invitation</th><th>Engagement letter</th><th>Last activity</th></tr></thead><tbody>';
+  if(!ONB.requests.length) h+='<tr><td colspan="7"><div class="empty"><h3>No onboarding requests yet</h3><p>Send a prospective client a secure link to complete their own onboarding.</p><button class="btn-primary" id="rq-new2">'+OI.send+'Request Client</button></div></td></tr>';
+  else if(!rows.length) h+='<tr><td colspan="7"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p></div></td></tr>';
   rows.forEach(function(r){
     var last=r.audit[r.audit.length-1];
     h+='<tr><td><button class="blink" data-rq="'+r.id+'">'+esc(r.name)+'</button><span class="cl-sub">'+esc(r.type==='company'?'Company':'Individual')+'</span></td>'+
       '<td><span class="contact"><span class="cl-em" title="'+esc(r.email)+'">'+esc(r.email)+'</span><span class="nowrap">'+esc(r.phone)+'</span></span></td>'+
       '<td class="nowrap">'+r.services.length+' · '+money(totalOf(r.services))+'</td>'+
       '<td>'+pill(ONB_STATUS,r.status)+'</td><td>'+pill(INVITE_STATUS,r.invite.status)+'</td><td>'+pill(LETTER_STATUS,r.letter.status)+'</td>'+
-      '<td class="nowrap"><span class="rq-last">'+esc(last?last.action:'')+'<small>'+(last?whenOf(last.t):'')+'</small></span></td>'+
-      '<td class="c"><span class="acts">'+
-        '<button class="act" data-rqlink="'+r.token+'" title="Show Link" aria-label="Show the client’s view for '+esc(r.name)+'">'+OI.link+'</button></span></td></tr>';
+      '<td class="nowrap"><span class="rq-last">'+esc(last?last.action:'')+'<small>'+(last?whenOf(last.t):'')+'</small></span></td></tr>';
   });
   return h+'</tbody></table></div>';
 }
@@ -4954,40 +4970,56 @@ function openRequestDetail(id,swap){
   openReqId=id;
   var f=r.form||{}, link=portalLink('onboard',r.token), expired=Date.now()>r.expires;
   var row=function(k,v){ return '<div class="fv"><dt>'+k+'</dt><dd>'+(v||'<span class="cl-muted">--</span>')+'</dd></div>'; };
-  var acts='';
-  if(r.status==='submitted') acts+='<button class="btn-primary btn-sm" data-do="review">Start review</button>';
-  if(r.status==='review') acts+='<button class="btn-primary btn-sm" data-do="approve">'+I.tick+'Approve &amp; complete</button><button class="btn-ghost btn-sm" data-do="info">Request information</button><button class="btn-ghost btn-sm danger-t" data-do="reject">Reject</button>';
-  if(['draft','info'].indexOf(r.status)>=0) acts+='<button class="btn-ghost btn-sm" data-do="resend">'+OI.send+'Resend invitation</button>';
-  if(r.status==='completed'&&r.clientId) acts+='<button class="btn-primary btn-sm" data-do="client">Open client record</button>';
+  var who=esc(f.name||r.name), first=r.type==='company'?who:esc(String(f.name||r.name).split(' ')[0]);
+  var lastSend=r.invite.sends[r.invite.sends.length-1], open=['draft','info'].indexOf(r.status)>=0;
+  /* what happens next, and the buttons for it */
+  var next={
+    draft:[r.form?first+' has started the form but hasn’t submitted it yet.':'Waiting for '+first+' to open the link and fill in the form.','<button class="btn-ghost btn-sm" data-do="resend">'+OI.send+'Resend invitation</button>'],
+    info:['Waiting for '+first+' to update the form.','<button class="btn-ghost btn-sm" data-do="resend">'+OI.send+'Resend invitation</button>'],
+    submitted:[first+' submitted the form. Review the details and documents.','<button class="btn-primary btn-sm" data-do="review">Start review</button>'],
+    review:['Check the details, KYC documents and signed letter, then decide.','<button class="btn-ghost btn-sm danger-t" data-do="reject">Reject</button><button class="btn-ghost btn-sm" data-do="info">Request information</button><button class="btn-primary btn-sm" data-do="approve">'+I.tick+'Approve &amp; complete</button>'],
+    completed:['Approved. '+who+' is now a client.',r.clientId?'<button class="btn-primary btn-sm" data-do="client">Open client record</button>':''],
+    rejected:['This request was rejected and the link no longer works.','']
+  }[r.status]||['',''];
+  var linkLine=open?'<div class="rq-lk"><span>'+(expired?'<b class="rq-exp">Link expired '+dmyOf(r.expires)+'</b>':'Link expires '+dmyOf(r.expires))+'</span><button class="linkbtn" id="rd-copy">'+I.copy+'Copy link</button></div>':'';
+  /* progress: one line per part of the onboarding */
+  var step=function(state,title,detail){ return '<li class="rq-st '+state+'"><i aria-hidden="true">'+(state==='done'?I.tick:state==='bad'?'!':'')+'</i><div><b>'+title+'</b><small>'+detail+'</small></div></li>'; };
+  var inv=r.invite.status==='failed'?'bad':r.invite.sends.length?'done':'todo';
+  var det=r.submittedAt?'done':r.form?'part':'todo';
+  var kyc=r.kyc.length?'done':'todo';
+  var let_=r.letter.status==='signed'?'done':'todo';
+  var rev=r.status==='completed'?'done':r.status==='rejected'?'bad':r.status==='review'?'part':'todo';
+  var steps='<ol class="rq-steps">'+
+    step(inv,'Invitation',inv==='bad'?'Delivery failed. Resend it.':lastSend?lastSend.channels.join(' + ')+' · '+whenOf(lastSend.at)+(r.invite.sends.length>1?' · '+r.invite.sends.length+' sends':''):'Not sent yet')+
+    step(det,'Client details',r.submittedAt?'Submitted '+whenOf(r.submittedAt):r.form?'Started, not submitted':'Not started')+
+    step(kyc,'KYC documents',r.kyc.length?r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' uploaded':'None yet')+
+    step(let_,'Engagement letter',r.letter.status==='signed'?'Signed by '+esc(r.letter.signature.name)+' · '+dmyOf(r.letter.signedAt):'Not signed yet')+
+    step(rev,'Staff review',r.status==='completed'?'Approved':r.status==='rejected'?'Rejected':r.status==='review'?'In progress':'After the client submits')+'</ol>';
   var h='<div class="drawer wide cl-view'+(swap?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="rd-t">'+
     '<div class="dhead cl-dhead"><div class="dprofile"><div class="dpmain"><p class="eyebrow">Onboarding request · '+esc(r.type==='company'?'Company':'Individual')+'</p>'+
-      '<h2 id="rd-t">'+esc(r.name)+' '+pill(ONB_STATUS,r.status)+'</h2>'+
+      '<h2 id="rd-t">'+who+' '+pill(ONB_STATUS,r.status)+'</h2>'+
       '<div class="dmetaline"><span class="dc"><i class="dci">'+IC.mail+'</i>'+esc(r.email)+'</span><span class="dc"><i class="dci">'+IC.phone+'</i>'+esc(r.phone)+'</span>'+
         '<span class="dc"><i class="dci">'+IC.cal+'</i>Requested '+dmyOf(r.created)+' by '+esc(r.by)+'</span></div></div></div>'+
-      '<div class="dhead-acts"><button class="btn-ghost btn-sm" id="rd-show">'+I.eye+'Show Link</button><button class="x" id="rd-x" aria-label="Close">'+I.close+'</button></div></div>'+
+      '<div class="dhead-acts"><button class="btn-ghost btn-sm" id="rd-show">Show Link</button><button class="x" id="rd-x" aria-label="Close">'+I.close+'</button></div></div>'+
     '<div class="cl-vbody rd-body">'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+OI.shield+'Status</h3><div class="vsec-acts">'+acts+'</div></div>'+
-        '<dl class="fgrid">'+row('Onboarding',pill(ONB_STATUS,r.status))+row('Invitation',pill(INVITE_STATUS,r.invite.status)+(r.invite.sends.length?' <small class="cl-muted">'+r.invite.sends.length+' send'+(r.invite.sends.length===1?'':'s')+'</small>':''))+
-          row('Engagement letter',pill(LETTER_STATUS,r.letter.status)+(r.letter.signedAt?' <small class="cl-muted">'+whenOf(r.letter.signedAt)+'</small>':''))+
-          row('Secure link',(expired&&['draft','info'].indexOf(r.status)>=0?'<span class="cl-err" style="margin:0">Expired '+dmyOf(r.expires)+'</span>':'Expires '+dmyOf(r.expires))+' <button class="copy" id="rd-copy" title="Copy link" aria-label="Copy link">'+I.copy+'</button>')+'</dl>'+
-        (r.status==='draft'&&r.form?'<div class="cl-note" style="margin-top:14px">'+I.infoLg+'<span>'+esc(r.name)+' has saved some details but hasn’t submitted the form, so the request stays <b>Draft</b>.</span></div>':'')+
-        (r.reason?'<div class="cl-note" style="margin-top:14px">'+I.infoLg+'<span><b>'+(r.status==='rejected'?'Rejected':'Information requested')+':</b> '+esc(r.reason)+'</span></div>':'')+'</section>'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+I.tag+'Requested services</h3><span class="cl-muted">Prices agreed by staff; the client can’t change them</span></div>'+
-        '<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th></tr></thead><tbody>'+r.services.map(function(s){ return '<tr><td>'+esc(s.name)+(Number(s.price)!==Number(s.adminPrice)?' <small class="cl-muted">admin price '+money(s.adminPrice)+'</small>':'')+'</td><td class="r">'+money(s.price)+'</td></tr>'; }).join('')+
+      '<div class="rq-next"><div class="rq-next-t"><p>'+next[0]+'</p>'+linkLine+'</div>'+(next[1]?'<div class="rq-next-a">'+next[1]+'</div>':'')+'</div>'+
+      (r.reason?'<div class="cl-note rq-reason">'+I.infoLg+'<span><b>'+(r.status==='rejected'?'Reason for rejecting':'Information requested')+':</b> '+esc(r.reason)+'</span></div>':'')+
+      '<section class="rq-sec"><h3>Progress</h3>'+steps+'</section>'+
+      '<section class="rq-sec"><div class="rq-sec-h"><h3>Services</h3><span>Set by staff. The client can’t change them.</span></div>'+
+        '<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th></tr></thead><tbody>'+r.services.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="r">'+money(x.price)+'</td></tr>'; }).join('')+
         '<tr class="tot"><td>Total</td><td class="r">'+money(totalOf(r.services))+'</td></tr></tbody></table></section>'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+I.user+'Details from the client</h3>'+(r.submittedAt?'<span class="cl-muted">Submitted '+whenOf(r.submittedAt)+'</span>':'')+'</div>'+
-        (r.form?formSummary(r.type,f):'<p class="cl-muted">Nothing yet. The client hasn’t filled in the form.</p>')+'</section>'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+OI.shield+'KYC documents</h3></div>'+kycRows(r.kyc,{empty:'No documents uploaded yet.'})+'</section>'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+OI.pen+'Engagement letter</h3>'+(r.letter.status==='signed'?'<button class="linkbtn" id="rd-letter">'+OI.print+'Open as PDF</button>':'')+'</div>'+
-        (r.letter.status==='signed'?'<p>Signed by <b>'+esc(r.letter.signature.name)+'</b> on '+whenOf(r.letter.signedAt)+' ('+esc(r.letter.signature.method)+').</p>':'<p class="cl-muted">The client signs the letter as part of the onboarding form.</p>')+'</section>'+
-      '<section class="vsec"><div class="vsec-h"><h3>'+I.clock+'Audit trail</h3></div><div class="timeline">'+r.audit.slice().reverse().map(function(a){
+      (r.form?'<section class="rq-sec"><h3>Details from the client</h3>'+formSummary(r.type,f)+'</section>':'')+
+      (r.kyc.length?'<section class="rq-sec"><h3>KYC documents</h3>'+kycRows(r.kyc,{})+'</section>':'')+
+      (r.letter.status==='signed'?'<section class="rq-sec"><div class="rq-sec-h"><h3>Engagement letter</h3><button class="linkbtn" id="rd-letter">'+OI.print+'Open as PDF</button></div>'+
+        '<p class="rq-p">Signed by <b>'+esc(r.letter.signature.name)+'</b> on '+dmyOf(r.letter.signedAt)+' through the onboarding link.</p></section>':'')+
+      '<section class="rq-sec"><h3>Activity</h3><div class="timeline">'+r.audit.slice().reverse().map(function(a){
         return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(a.action)+(a.from||a.to?' <span class="rd-tr">'+esc(stName(a.from))+(a.from&&a.to?' → ':'')+esc(stName(a.to))+'</span>':'')+'</div>'+
           '<div class="tlmeta">'+(a.note?esc(a.note)+' · ':'')+whenOf(a.t)+' · by <b>'+esc(a.by)+'</b></div></div>'; }).join('')+'</div></section>'+
     '</div></div>';
   showDrawer(h); overlay._guard=function(){ openReqId=null; closeDrawer(); };
   document.getElementById('rd-x').onclick=function(){ openReqId=null; closeDrawer(); };
   document.getElementById('rd-show').onclick=function(){ showLink(r.token); };
-  document.getElementById('rd-copy').onclick=function(){ copyText(link,'Link copied'); };
+  var cp=document.getElementById('rd-copy'); if(cp) cp.onclick=function(){ copyText(link,'Link copied'); };
   var lt=document.getElementById('rd-letter'); if(lt) lt.onclick=function(){ printLetter(letterHtml({name:f.name||r.name,type:r.type,entity:f.entity||r.entity,email:f.email||r.email,address:f.address,services:r.services,date:r.created,staff:r.by,signature:r.letter.signature,signedAt:r.letter.signedAt})); };
   overlay.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(r.kyc[+b.dataset.kpv]); }; });
   overlay.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ openKyc(r.kyc[+b.dataset.kdl],true); }; });

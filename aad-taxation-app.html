@@ -8107,6 +8107,13 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .sf-brow span{font-size:12.5px;color:var(--mute)}
 .sf-rm{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}.sf-rm:hover{background:#FEF2F2;color:var(--red)}
 .sf-none{font-size:13px;color:var(--faint)}
+.sf-drop{display:flex;align-items:center;gap:12px;border:1.5px dashed #D6DBE1;border-radius:12px;padding:14px 16px;background:#FCFCFD;cursor:pointer}
+.sf-drop:hover,.sf-drop.drag{border-color:var(--orange);background:var(--orange-soft)}
+.sf-dic{width:36px;height:36px;border-radius:10px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sf-drop b{display:block;font-size:13.5px;color:var(--ink)}.sf-drop small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
+.sf-files{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sf-file{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:9px 10px 9px 12px}
+.sf-fn{flex:1;min-width:0}.sf-fn b{display:block;font-size:13px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sf-fn small{font-size:12px;color:var(--faint)}
 .drawer.sf .ferr{margin-top:6px}
 .ad-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 24px 6px}
 .ad-who{display:flex;align-items:center;gap:12px;min-width:0}
@@ -8823,12 +8830,13 @@ function shiftForm(key){
   var r=key?dayOf(key):null;
   if(key&&!r){ toast('This shift no longer exists.',true); return closeDay(); }
   if(r&&r.mine&&r.today&&(data.today.status==='on'||data.today.status==='break')){ toast('This shift is still running. End it on the Dashboard before editing it.',true); return; }
-  var d={staff:ME.id,date:dayKey(),start:'09:00',end:'17:00',breaks:[],note:''};
+  var d={staff:ME.id,date:dayKey(),start:'09:00',end:'17:00',breaks:[],note:'',files:[]};
   if(r){
     var sh=shiftsOf(r.events)[0]||{start:null,end:null,breaks:[]};
     d={staff:r.staff,date:r.date,start:sh.start?hhmm(sh.start.at):'',end:sh.end?hhmm(sh.end.at):'',
        breaks:sh.breaks.map(function(x){ return {from:hhmm(x.s.at),to:x.e?hhmm(x.e.at):'',s:x.s,e:x.e}; }),
-       note:sh.end?(sh.end.note||''):(sh.start&&sh.start.note||'')};   // the notes are the end-of-shift note, or the start note while the shift has no end
+       note:sh.end?(sh.end.note||''):(sh.start&&sh.start.note||''),
+       files:((sh.end||sh.start||{}).files||[]).map(function(f){ return {n:f.n,s:f.s}; })};   // the notes are the end-of-shift note, or the start note while the shift has no end
   }
   sf={key:key,r:r,d:d,errs:{}};
   paintShiftForm();
@@ -8853,6 +8861,11 @@ function paintShiftForm(){
             '<button type="button" class="sf-rm" data-brm="'+i+'" aria-label="Remove break '+(i+1)+'">'+I.trash+'</button></div>'+err('b'+i);
         }).join(''):'<p class="sf-none">No break added</p>')+'</div>'+
       '<div><label class="flabel" for="sf-note">Notes</label><textarea class="ftext" id="sf-note" data-sf="note" rows="3" maxlength="300" placeholder="Enter notes">'+esc(d.note)+'</textarea></div>'+
+      '<div><span class="flabel">Documents</span>'+
+        '<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
+          '<span class="sf-dic">'+SF_UP+'</span><span><b>Click to upload or drag files here</b><small>PDF, JPG, PNG or Word · up to 5 MB each · max '+SF_MAX+' files</small></span></label>'+
+        (d.files.length?'<div class="sf-files">'+d.files.map(function(f,i){ return '<div class="sf-file">'+ftag(f.n)+'<span class="sf-fn"><b title="'+esc(f.n)+'">'+esc(f.n)+'</b><small>'+esc(f.s)+'</small></span>'+
+          '<button type="button" class="sf-rm" data-frm="'+i+'" title="Delete" aria-label="Delete '+esc(f.n)+'">'+I.trash+'</button></div>'; }).join('')+'</div>':'')+'</div>'+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-save">'+(ed?'Save changes':'Add Shift')+'</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
@@ -8860,10 +8873,30 @@ function paintShiftForm(){
   [].forEach.call(ov.querySelectorAll('[data-bf]'),function(el){ el.oninput=function(){ sf.d.breaks[+el.getAttribute('data-bf')].from=el.value; }; });
   [].forEach.call(ov.querySelectorAll('[data-bt]'),function(el){ el.oninput=function(){ sf.d.breaks[+el.getAttribute('data-bt')].to=el.value; }; });
   [].forEach.call(ov.querySelectorAll('[data-brm]'),function(el){ el.onclick=function(){ sf.d.breaks.splice(+el.getAttribute('data-brm'),1); sf.errs={}; paintShiftForm(); }; });
+  var fin=document.getElementById('sf-file'), drop=document.getElementById('sf-drop');
+  fin.onchange=function(){ sfAddFiles(fin.files); fin.value=''; };
+  drop.ondragover=function(ev){ ev.preventDefault(); drop.classList.add('drag'); };
+  drop.ondragleave=function(){ drop.classList.remove('drag'); };
+  drop.ondrop=function(ev){ ev.preventDefault(); drop.classList.remove('drag'); sfAddFiles(ev.dataTransfer.files); };
+  [].forEach.call(ov.querySelectorAll('[data-frm]'),function(el){ el.onclick=function(){ sf.d.files.splice(+el.getAttribute('data-frm'),1); paintShiftForm(); }; });
   document.getElementById('sf-addb').onclick=function(){ sf.d.breaks.push({from:'',to:''}); paintShiftForm(); var x=ov.querySelector('[data-bf="'+(sf.d.breaks.length-1)+'"]'); if(x) x.focus(); };
   var back=function(){ var k=sf.key; sf=null; if(k) openDay(k); else closeDay(); };
   document.getElementById('sf-x').onclick=back; document.getElementById('sf-cancel').onclick=back;
   document.getElementById('sf-save').onclick=saveShiftForm;
+}
+var SF_MAX=5, SF_BYTES=5*1048576, SF_EXT=['pdf','jpg','jpeg','png','doc','docx'];
+var SF_UP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>';
+function sfAddFiles(list){
+  var y=document.querySelector('.drawer.sf .modal-body'), keep=y?y.scrollTop:0;
+  [].forEach.call(list||[],function(f){
+    var ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(sf.d.files.length>=SF_MAX) return toast('You can attach up to '+SF_MAX+' files.',true);
+    if(SF_EXT.indexOf(ext)<0) return toast(f.name+' isn’t a PDF, JPG, PNG or Word file.',true);
+    if(f.size>SF_BYTES) return toast(f.name+' is larger than 5 MB.',true);
+    if(sf.d.files.some(function(x){ return x.n===f.name; })) return;
+    sf.d.files.push({n:f.name,s:fsize(f.size)});
+  });
+  paintShiftForm(); var y2=document.querySelector('.drawer.sf .modal-body'); if(y2) y2.scrollTop=keep;
 }
 function saveShiftForm(){
   var d=sf.d, e={}, today=dayKey();
@@ -8891,8 +8924,9 @@ function saveShiftForm(){
     var a=atOf(d.date,x.from), z=atOf(d.date,x.to), id='b-'+a;
     ev.push(mk('break_start',a,x.s,{brk:id})); ev.push(mk('break_end',z,x.e,{brk:id}));
   });
-  if(Ex){ var oe=keepS&&keepS.end; var en=mk('end',Ex,oe,{}); if(oe&&oe.files) en.files=oe.files; if(note) en.note=note; else delete en.note; ev.push(en); }
-  else if(note) ev[0].note=note;
+  delete ev[0].files;
+  if(Ex){ var oe=keepS&&keepS.end; var en=mk('end',Ex,oe,{}); if(d.files.length) en.files=d.files.slice(); else delete en.files; if(note) en.note=note; else delete en.note; ev.push(en); }
+  else { if(note) ev[0].note=note; if(d.files.length) ev[0].files=d.files.slice(); }
   var meta={by:ME.name,at:Date.now(),added:!sf.key};
   // photos of actions that no longer exist go with them
   if(old){ var kept=ev.map(function(x){ return x.photo; }); deletePhotos(old.events.filter(function(x){ return x.photo&&kept.indexOf(x.photo)<0; }).map(function(x){ return x.photo; })); }

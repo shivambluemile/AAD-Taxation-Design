@@ -12489,45 +12489,18 @@ table,td,th{font-size:13.5px}
 .qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
 <style id="sl-css">
-/* ================= Sales listing ================= */
-.sl-filters{padding:14px 16px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.sl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
-.sl-row>*{flex:1 1 150px;min-width:0}
-.sl-row .sl-q{flex:2.2 1 300px;width:auto;max-width:none}
-.sl-row .sel select{width:100%;min-width:0}
-.sl-row .rsel{flex:1 1 170px}.sl-row .rbtn{width:100%;min-width:0}
-.sl-price{flex:0 1 135px}.sl-price .fin{height:42px;font-size:14px}.sl-price .ferr{margin-top:4px}
-.sl-row .sl-go,.sl-row .sl-clear{flex:0 0 auto;height:42px;padding:0 18px}
-.sl-clear[disabled]{opacity:.5;cursor:not-allowed}
-.sl-sum{display:grid;grid-template-columns:repeat(2,minmax(0,240px));gap:12px;margin:0 0 14px}
-.sl-sum div{border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:#fff;cursor:help}
-.sl-sum dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#94A3B8}
-.sl-sum dd{margin:4px 0 0;font-family:'Manrope';font-size:20px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
-.sl-table{overflow:hidden}
-.sl-scroll{overflow-x:auto}
-.sl-table table{min-width:1060px;width:100%;table-layout:auto}
-.sl-table td.nowrap,.sl-table td.num{white-space:nowrap}
-.sl-table .qt-clip.sm{max-width:84px}.sl-table .qt-cname{max-width:122px}
-.sl-table td.num{font-size:13px}
-.sl-table tbody td{padding-left:8px;padding-right:8px}.card.sl-table thead th{padding-left:8px;padding-right:8px}
-.card.sl-table thead th{background:#3A3F44;color:#fff;border-bottom:0;padding:11px 10px;white-space:normal;line-height:1.3;vertical-align:bottom}
-.sl-table th.acc2{max-width:110px}
-.sl-table tbody td{padding:10px 10px;vertical-align:top}
-.sl-table thead th:first-child,.sl-table tbody td:first-child{padding-left:16px}
+/* Sales uses the shared list styles (filter bar, stats, table, ⋮ menu); only what's specific to sales is here */
+.sl-stats{grid-template-columns:repeat(2,minmax(0,240px))}
+.sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
+.sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
+.sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
+.sl-ferr{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--red);margin:-6px 0 12px 4px}
+.sl-table table{min-width:1120px}
 .sl-table th.r,.sl-table td.r{text-align:right}
 .sl-table .ar-sub{display:block;font-size:11px;color:var(--faint);margin-top:3px;white-space:nowrap}
-.sl-acts{width:200px;min-width:200px;line-height:1.7}
-.sl-by{white-space:normal}.sl-by .qt-clip{color:var(--ink);font-size:13px}.sl-by small{display:block;font-size:11.5px;color:var(--faint)}
-.sl-a{display:inline;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0;margin:0 12px 0 0;white-space:nowrap;background:none;border:0;cursor:pointer}
-.sl-a:hover,.sl-a:focus-visible{text-decoration:underline;text-underline-offset:2px;outline:none}
-.sl-a.danger{color:#BE123C}
-.sl-pend small{display:block;font-size:11px;font-weight:600;margin-top:3px;white-space:normal;line-height:1.35}
-.sl-table td.sl-pend{white-space:nowrap;min-width:92px}
-.sl-pend.paid small{color:#059669}.sl-pend.partial small{color:#B45309}.sl-pend.unpaid small{color:var(--faint)}
-.sl-pend.overdue,.sl-pend.overdue small{color:#BE123C}
-.sl-over td:first-child{box-shadow:inset 3px 0 0 #F43F5E}
+.sl-pend .ar-sub{display:flex;justify-content:flex-end}
+.state.p-unpaid i{background:#94A3B8}.state.p-partial i{background:#F59E0B}.state.p-paid i{background:#10B981}.state.p-overdue i{background:#FF5966}.state.p-overdue{color:#BE123C}
 .sl-dis td,.sl-dis .qt-cn,.sl-dis .name-link .name{color:var(--faint)}
-.sl-per{display:inline-block;vertical-align:middle}.sl-per select{height:30px;padding:0 26px 0 10px;font-size:12.5px;min-width:0}
 .sl-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .sl-form .fin,.sl-mail .fin{height:42px}
 .sl-mail{display:flex;flex-direction:column;gap:14px}
@@ -12539,7 +12512,7 @@ table,td,th{font-size:13.5px}
 .sl-mini{width:100%;border-collapse:collapse;font-size:12.5px}
 .sl-mini th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#64748B;padding:6px 8px;border-bottom:1px solid var(--line)}
 .sl-mini td{padding:7px 8px;border-bottom:1px solid var(--line-soft,#F1F2F4)}.sl-mini .r{text-align:right}.sl-mini .tot td{font-weight:700;border-bottom:0}
-@media (max-width:700px){.sl-sum{grid-template-columns:1fr 1fr}.sl-form{grid-template-columns:1fr}.sl-price{flex:1 1 120px}}
+@media (max-width:700px){.sl-stats{grid-template-columns:1fr 1fr}.sl-form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -12805,7 +12778,7 @@ var state={f:null,applied:null,page:1,per:10,errs:{}};
 function copyF(f){ return JSON.parse(JSON.stringify(f)); }
 function anyFilter(f){ var b=blank(); return Object.keys(b).some(function(k){ return String(f[k])!==String(b[k]); }); }
 function filtered(){
-  var f=state.applied, q=f.q.trim().toLowerCase(), lo=f.min===''?null:+f.min, hi=f.max===''?null:+f.max;
+  var f=state.applied, q=f.q.trim().toLowerCase(), bad=Object.keys(state.errs).length, lo=bad||f.min===''?null:+f.min, hi=bad||f.max===''?null:+f.max;
   return st.list.filter(inScope).filter(function(s){
     if(f.status&&s.status!==f.status) return false;
     if(f.pay&&payStatus(s)!==f.pay) return false;
@@ -12838,25 +12811,23 @@ function render(){
   var svcNames=[]; try{ svcNames=loadCatalog().services.map(function(x){ return x.name; }); }catch(x){}
   rows.forEach(function(s){ (s.items||[]).forEach(function(x){ if(svcNames.indexOf(x.name)<0) svcNames.push(x.name); }); });
   var pp=function(list){ return list.map(function(n){ return [n,n]; }); };
-  var h=head()+
-    '<div class="card sl-filters"><div class="sl-row">'+
-      '<div class="search sl-q">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div>'+
-      selF('f-pay','Payment Status',Object.keys(PAY).map(function(k){ return [k,PAY[k]]; }),f.pay)+
-      selF('f-acc','All Accountants',pp(ASSIGNABLE.map(function(x){ return x.name; })),f.acc)+
-      selF('f-branch','All Branches',pp(BRANCHES),f.branch)+
-      selF('f-svc','Services',pp(svcNames.sort()),f.svc)+
-    '</div><div class="sl-row">'+
-      rangeHtml(f)+
-      selF('f-ptype','Payment Type',pp(PAY_TYPES),f.ptype)+
-      selF('f-status','Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
-      '<div class="sl-price"><label class="sr" for="f-min">From Price</label><input class="fin plain'+(e.min?' bad':'')+'" id="f-min" inputmode="decimal" placeholder="From Price" value="'+esc(f.min)+'">'+(e.min?'<span class="ferr show">'+esc(e.min)+'</span>':'')+'</div>'+
-      '<div class="sl-price"><label class="sr" for="f-max">To Price</label><input class="fin plain'+(e.max?' bad':'')+'" id="f-max" inputmode="decimal" placeholder="To Price" value="'+esc(f.max)+'">'+(e.max?'<span class="ferr show">'+esc(e.max)+'</span>':'')+'</div>'+
-      '<button class="btn-primary sl-go" id="sl-go">Filter</button><button class="btn-ghost sl-clear" id="sl-clear"'+(anyFilter(state.applied)||anyFilter(f)?'':' disabled')+'>Clear Filter</button>'+
-    '</div></div>';
   var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0));
-  h+='<dl class="sl-sum"><div title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
-    '<div title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div></dl>';
-  h+='<div class="card sl-table"><div class="sl-scroll"><table><thead><tr><th>Date</th><th>Sale ID</th><th>Client</th><th>Branch</th><th class="r">Sale</th><th class="r">Pending</th><th>Accountant</th><th class="acc2">Additional Accountant</th><th>Added By</th><th>Actions</th></tr></thead><tbody>';
+  var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
+    '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div></dl>';
+  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
+    '<span class="lbl">'+I.filter+'Filter By:</span>'+
+    rangeHtml(f)+
+    selF('f-pay','Payment Status',Object.keys(PAY).map(function(k){ return [k,PAY[k]]; }),f.pay)+
+    selF('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
+    selF('f-ptype','Payment Type',pp(PAY_TYPES),f.ptype)+
+    selF('f-acc','All Accountants',pp(ASSIGNABLE.map(function(x){ return x.name; })),f.acc)+
+    selF('f-branch','All Branches',pp(BRANCHES),f.branch)+
+    selF('f-svc','All Services',pp(svcNames.sort()),f.svc)+
+    '<div class="sl-price"><label class="sr" for="f-min">From Price</label><input class="'+(e.min?'bad':'')+'" id="f-min" inputmode="decimal" placeholder="From Price" value="'+esc(f.min)+'" title="'+esc(e.min||'Lowest sale amount')+'"></div>'+
+    '<div class="sl-price"><label class="sr" for="f-max">To Price</label><input class="'+(e.max?'bad':'')+'" id="f-max" inputmode="decimal" placeholder="To Price" value="'+esc(f.max)+'" title="'+esc(e.max||'Highest sale amount')+'"></div>'+
+    '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>'+
+    (e.min||e.max?'<p class="sl-ferr" role="alert">'+I.warn+esc(e.min||e.max)+'</p>':'');
+  h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th>Date</th><th>Sale ID</th><th>Client</th><th>Branch</th><th class="r">Sale</th><th class="r">Pending</th><th>Accountant</th><th>Additional Accountant</th><th>Added By</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!st.list.filter(inScope).length) h+='<tr><td colspan="10"><div class="empty"><h3>No sales yet</h3><p>Sales appear here once they’re added, or when a quotation is converted to a sale.</p><button class="btn-primary" id="sl-add2">'+I.plus+'Add Sale</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="sl-clear2">Clear Filter</button></div></td></tr>';
   page.forEach(function(s){
@@ -12867,13 +12838,13 @@ function render(){
       '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
       '<td class="num r">'+money(s.amount)+'</td>'+
-      '<td class="num r sl-pend '+ps+'">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small>'+PAY[ps]+(ps==='overdue'?'<br>due '+dmyOf(s.due):'')+'</small>')+'</td>'+
+      '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'"'+(ps==='overdue'?' title="Due '+dmyOf(s.due)+'"':'')+'><i></i>'+PAY[ps]+'</span></small>')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant)+'">'+esc(s.accountant||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant2)+'">'+(s.accountant2?esc(s.accountant2):'<span class="ar-dash">—</span>')+'</span></td>'+
-      '<td><div class="qt-meta sl-by"><span class="qt-clip sm" title="'+esc(s.by)+'">'+esc(s.by)+'</span><small title="'+esc(whenOf(s.at||s.date))+'">'+dmyOf(s.at||s.date)+'</small></div></td>'+
-      '<td class="sl-acts">'+actionsFor(s).map(function(a){ return '<button class="sl-a'+(a[2]?' '+a[2]:'')+'" data-a="'+a[0]+'" data-s="'+s.id+'">'+esc(a[1])+'</button>'; }).join('')+'</td></tr>';
+      '<td><div class="qt-meta">'+whenOf(s.at||s.date).replace(' · ',', ')+'<span class="qt-clip" title="'+esc(s.by)+'">by '+esc(s.by)+'</span></div></td>'+
+      '<td class="c"><button class="qt-more" data-menu="'+s.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(s.id)+'" title="Actions">'+I.dots+'</button></td></tr>';
   });
-  h+='</tbody></table></div>'+pager(rows.length)+'</div>';
+  h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead(); wireFilters();
 }
 function wireHead(){
@@ -12882,28 +12853,25 @@ function wireHead(){
 }
 function wireFilters(){
   var f=state.f, qi=document.getElementById('q');
-  qi.oninput=function(){ f.q=qi.value; }; qi.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); applyFilters(); } };
-  [['f-pay','pay'],['f-acc','acc'],['f-branch','branch'],['f-svc','svc'],['f-ptype','ptype'],['f-status','status']].forEach(function(p){ var el=document.getElementById(p[0]); if(el) el.onchange=function(){ f[p[1]]=this.value; }; });
-  ['min','max'].forEach(function(k){ var el=document.getElementById('f-'+k); el.oninput=function(){ f[k]=el.value.trim(); }; el.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); applyFilters(); } }; });
+  qi.oninput=function(){ f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+  [['f-pay','pay'],['f-acc','acc'],['f-branch','branch'],['f-svc','svc'],['f-ptype','ptype'],['f-status','status']].forEach(function(p){ var el=document.getElementById(p[0]); if(el) el.onchange=function(){ f[p[1]]=this.value; state.page=1; render(); }; });
+  ['min','max'].forEach(function(k){ var el=document.getElementById('f-'+k); el.onchange=function(){ f[k]=el.value.trim(); applyFilters(); }; el.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el.onchange(); } }; });
   bindRange();
-  document.getElementById('sl-go').onclick=applyFilters;
-  var clear=function(){ state.f=blank(); state.applied=blank(); state.errs={}; state.page=1; render(); toast('Filters cleared'); };
-  document.getElementById('sl-clear').onclick=clear; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
+  var clear=function(){ state.f=blank(); state.applied=state.f; state.errs={}; state.page=1; render(); };
+  document.getElementById('clearf').onclick=clear; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
   var a2=document.getElementById('sl-add2'); if(a2) a2.onclick=function(){ later('Add Sale'); };
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
-  var per=document.getElementById('sl-per'); if(per) per.onchange=function(){ state.per=+per.value; state.page=1; render(); };
 }
 function applyFilters(){
-  state.errs=checkFilters(state.f);
-  if(Object.keys(state.errs).length){ render(); var b=content.querySelector('.sl-price .bad'); if(b) b.focus(); return toast('Check the price range',true); }
-  state.applied=copyF(state.f); state.page=1; render();
+  state.errs=checkFilters(state.f); state.page=1; render();
+  if(Object.keys(state.errs).length){ var b=content.querySelector('.sl-price .bad'); if(b) b.focus(); }
 }
 function pager(total){
   var pages=Math.max(1,Math.ceil(total/state.per)); if(state.page>pages) state.page=pages;
-  var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total), lo=Math.max(1,state.page-2), hi=Math.min(pages,lo+4); lo=Math.max(1,hi-4);
-  var h='<div class="tfoot"><p><label for="sl-per">Show</label> <span class="sel sl-per"><select id="sl-per">'+[10,25,50,100].map(function(n){ return '<option'+(n===state.per?' selected':'')+'>'+n+'</option>'; }).join('')+'</select>'+I.chev+'</span> · Showing '+from+' to '+to+' of '+total+' sales</p><div class="pager">';
+  var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total);
+  var h='<div class="tfoot"><p>Showing '+from+' to '+to+' of '+total+' entries</p><div class="pager">';
   h+='<button data-p="'+(state.page-1)+'"'+(state.page===1?' disabled':'')+' aria-label="Previous">‹</button>';
-  for(var i=lo;i<=hi;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
+  for(var i=1;i<=pages;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
   return h+'<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
 }
 
@@ -12924,14 +12892,42 @@ function actionsFor(s){
   if(isManager()&&!(s.payments||[]).length&&s.status!=='sent'&&!s.quotationId) a.push(['delete','Delete','danger']);
   return a;
 }
+var MI=(function(){ var s=function(p){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {edit:s('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),request:s('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),review:s('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>'),
+    send:s('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>'),resend:s('<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>'),pay:s('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>'),
+    remind:s('<path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/>'),pdf:s('<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/>'),
+    log:s('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),quote:s('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>'),
+    disable:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>')}; })();
+var menuEl=null;
+function closeMenu(){ if(menuEl){ var b=content.querySelector('[data-menu="'+menuEl.dataset.s+'"]'); if(b) b.setAttribute('aria-expanded','false'); menuEl.remove(); menuEl=null; } }
+function openMenu(btn){
+  var id=btn.getAttribute('data-menu'); if(menuEl&&menuEl.dataset.s===id) return closeMenu(); closeMenu();
+  var s=byId(id); if(!s) return;
+  var list=actionsFor(s), main=list.filter(function(a){ return !a[2]; }), risky=list.filter(function(a){ return a[2]; });
+  var item=function(a){ return '<button role="menuitem" data-a="'+a[0]+'" data-s="'+s.id+'"'+(a[2]?' class="'+a[2]+'"':'')+'>'+MI[a[0]]+'<span>'+esc(a[1])+'</span></button>'; };
+  menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.s=id;
+  menuEl.innerHTML=main.map(item).join('')+(risky.length?'<hr role="separator">'+risky.map(item).join(''):'');
+  document.body.appendChild(menuEl);
+  var r=btn.getBoundingClientRect(), mh=menuEl.offsetHeight, top=r.bottom+4; if(top+mh>window.innerHeight-8) top=Math.max(8,r.top-mh-4);
+  menuEl.style.top=top+'px'; menuEl.style.left=Math.max(8,r.right-menuEl.offsetWidth)+'px';
+  btn.setAttribute('aria-expanded','true'); menuEl.querySelector('button').focus();
+  [].forEach.call(menuEl.querySelectorAll('[data-a]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-a'); closeMenu(); doAction(k,id); }; });
+  menuEl.onkeydown=function(e){ var it=[].slice.call(menuEl.querySelectorAll('button')), i=it.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); it[(i+1)%it.length].focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); it[(i-1+it.length)%it.length].focus(); }
+    if(e.key==='Escape'){ closeMenu(); btn.focus(); } };
+}
+document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });
+window.addEventListener('resize',closeMenu); content.addEventListener('scroll',closeMenu,true);
 content.addEventListener('click',function(ev){
-  var b=ev.target.closest('[data-a],[data-do="log"]'); if(!b) return;
-  reload(); var s=byId(b.getAttribute('data-s')); if(!s){ render(); return toast('This sale no longer exists.',true); }
-  var k=b.getAttribute('data-a')||'log';
+  var m=ev.target.closest('[data-menu]'); if(m) return openMenu(m);
+  var b=ev.target.closest('[data-do="log"]'); if(b) doAction('log',b.getAttribute('data-s'));
+});
+function doAction(k,id){
+  reload(); var s=byId(id); if(!s){ render(); return toast('This sale no longer exists.',true); }
   ({edit:function(){ later('Edit Sale',s); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
     pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ openLog(s.id); },
     quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
-});
+}
 /* screens designed separately: Add Sale, Edit Sale */
 function later(name,s){
   modal('<div class="confirm-body"><h3 id="m-t">'+esc(name)+(s?' · '+esc(s.id):'')+'</h3><p>The '+esc(name)+' screen is designed separately and isn’t part of this listing step yet. This option will open it once it’s built.</p></div>'+
@@ -13136,7 +13132,7 @@ function exportPdf(){
 /* ---------- start ---------- */
 RANGES=[[['today','Today'],['this_week','This Week'],['this_month','This Month'],['last_month','Last Month'],['this_year','This Year']]];
 /* the date range above writes into the filters being chosen; Filter applies them */
-state.f=blank(); state.applied=blank();
+state.f=blank(); state.applied=state.f;
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
 setTimeout(function(){ reload(); render(); },0);
 window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });

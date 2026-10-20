@@ -9890,6 +9890,27 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .drawer .at-tl{padding:6px 0 0 32px}
 .drawer .at-tl:before{left:13px;top:12px}
 .drawer .sect-title{margin-bottom:-6px}
+/* ===== Step 3: Quotation Details: the module's side panel (header, tabs, sections), as in Attendance ===== */
+.ad-hacts .btn-primary{height:34px;padding:0 14px;font-size:12.5px;display:inline-flex;align-items:center}
+.qd-sub{font-size:12.5px;color:var(--mute);margin-top:4px}
+.ad-sec h3 .qd-h3a{margin-left:auto;font-family:'Inter';font-size:12.5px;font-weight:600;color:var(--orange-ink)}
+.ad-sec h3 .qd-h3a:hover{text-decoration:underline;text-underline-offset:2px}
+.qd-dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 20px;margin:0}
+.qd-dl dt{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:4px}
+.qd-dl dd{margin:0;font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
+.qd-dl dd small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
+.qd-dl dd a{color:var(--ink)}.qd-dl dd a:hover{color:var(--orange-ink)}
+.qd-t{width:100%}
+.qd-t thead th{padding:10px 14px}.qd-t tbody td{padding:11px 14px;font-size:13.5px;vertical-align:top}
+.qd-t tbody tr:hover{background:none}
+.qd-t td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.qd-t td b{display:block;font-weight:600;color:var(--ink)}
+.qf-tot.qd-tot{width:320px;margin:14px 0 0 auto}
+.qd-txt{margin-top:14px}
+.qd-txt h4{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:6px}
+.qd-txt p{font-size:13.5px;color:var(--slate);line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.qd-none{font-size:13.5px;color:var(--faint)}
+@media (max-width:760px){.qd-dl{grid-template-columns:repeat(2,minmax(0,1fr))}.qf-tot.qd-tot{width:100%}.qd-tbl{overflow-x:auto}.qd-t{min-width:520px}}
 /* ===== Email + SMS send screen (copied from the Clients module, scoped to .ss) ===== */
 .ss .selbox{position:relative}
 .ss .selbox select{appearance:none;-webkit-appearance:none;width:100%;height:44px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 34px 0 14px;font-size:13.5px;color:var(--ink)}
@@ -10461,7 +10482,7 @@ function render(){
   page.forEach(function(q){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
-      '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the activity history"><span class="name">'+esc(q.id)+'</span></button></td>'+
+      '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the quotation details"><span class="name">'+esc(q.id)+'</span></button></td>'+
       '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+'</td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="num r">'+money(q.amount)+'</td>'+
@@ -10483,6 +10504,7 @@ function render(){
   document.getElementById('clearf').onclick=clear; var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
   var a2=document.getElementById('qt-add2'); if(a2) a2.onclick=function(){ route('create'); };
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
+  if(detailId) paintDetail(true);   // the open quotation follows every change
 }
 function wireHead(){ document.getElementById('qt-add').onclick=function(){ route('create'); }; }
 
@@ -10521,7 +10543,8 @@ function menuFor(q){
 /* screens built in later steps: each action goes through route(), the one hand-off point */
 var NEXT={create:['Add Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['Quotation PDF','a later step'],
   send:['Send quotation by email','a later step'],resend:['Resend Quotation (email)','a later step'],};
-var ROUTES={create:function(){ openForm(null); },edit:function(q){ openForm(q.id); },send:function(q){ openSend(q.id); },convert:function(q){ confirmConvert(q.id); }};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
+var ROUTES={create:function(){ openForm(null); },edit:function(q){ openForm(q.id); },send:function(q){ openSend(q.id); },convert:function(q){ confirmConvert(q.id); },
+  view:function(q){ openDetail(q.id); },preview:function(q){ previewDoc(q); },pdf:function(q){ downloadDoc(q); }};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
 function route(key,q){
   if(ROUTES[key]) return ROUTES[key](q);
   var n=NEXT[key];
@@ -10751,20 +10774,53 @@ function leaveForm(){
   document.getElementById('ql-no').onclick=closeDlg;
   document.getElementById('ql-go').onclick=function(){ closeDlg(); QF=null; closeOv(); };
 }
+/* the quotation document, as the client sees it. m: {id,dateTxt,dueTxt,to,toSub,items:[{name,desc,qty,price}],T:{sub,disc,gst,total},notes,terms}
+   Client-facing only: nothing internal goes in here */
+function docHtml(m){
+  var T=m.T;
+  return '<div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
+    '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+esc(m.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+esc(m.dateTxt)+'</dd></div><div><dt>Due date</dt><dd>'+esc(m.dueTxt)+'</dd></div></dl></div>'+
+    '<p class="qf-doc-to"><span>Prepared for</span><b>'+(m.to?esc(m.to):'No client chosen yet')+'</b>'+(m.toSub?esc(m.toSub):'')+'</p>'+
+    '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
+      (m.items.length?m.items.map(function(x){ return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r">'+money(x.qty*x.price)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
+    '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+'<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
+    (m.notes?'<p class="qf-doc-n">'+esc(m.notes).replace(/\n/g,'<br>')+'</p>':'')+
+    (m.terms?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+esc(m.terms).replace(/\n/g,'<br>')+'</p></div>':'')+'</div>'+
+    '<img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div>';
+}
+function showDoc(m){
+  dlg.innerHTML='<div class="modal qf-pvm" role="dialog" aria-modal="true" aria-labelledby="qp-t"><div class="modal-head"><h2 id="qp-t">Preview · '+esc(m.id)+'</h2><button id="qp-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body">'+docHtml(m)+'</div></div>';
+  dlg.classList.add('open'); document.getElementById('qp-x').onclick=closeDlg; document.getElementById('qp-x').focus();
+}
 /* Preview: the quotation as the client will see it, from what's in the form (nothing is saved) */
 function previewForm(){
-  var d=QF.d, T=totalsOf(d), c=formClient(), items=d.items.filter(function(x){ return x.svcId; });
-  dlg.innerHTML='<div class="modal qf-pvm" role="dialog" aria-modal="true" aria-labelledby="qp-t"><div class="modal-head"><h2 id="qp-t">Preview · '+esc(QF.id)+'</h2><button id="qp-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body"><div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
-      '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+esc(QF.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+(d.date?fmtD(d.date):'—')+'</dd></div><div><dt>Due date</dt><dd>'+(d.due?fmtD(d.due):'—')+'</dd></div></dl></div>'+
-      '<p class="qf-doc-to"><span>Prepared for</span><b>'+(c?esc(d.onName||c.name):'No client chosen yet')+'</b>'+(c&&d.onName&&d.onName!==c.name?esc(c.name):'')+'</p>'+
-      '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
-        (items.length?items.map(function(x){ var q=num(x.qty)||0, p=num(x.price)||0; return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="c">'+q+'</td><td class="r">'+money(p)+'</td><td class="r">'+money(q*p)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
-      '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
-      (d.customerNotes.trim()?'<p class="qf-doc-n">'+esc(d.customerNotes.trim()).replace(/\n/g,'<br>')+'</p>':'')+
-      (d.terms.trim()?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+esc(d.terms.trim()).replace(/\n/g,'<br>')+'</p></div>':'')+'</div>'+
-      '<img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div></div></div>';
-  dlg.classList.add('open'); document.getElementById('qp-x').onclick=closeDlg; document.getElementById('qp-x').focus();
+  var d=QF.d, c=formClient();
+  showDoc({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:c?(d.onName||c.name):'',toSub:c&&d.onName&&d.onName!==c.name?c.name:'',
+    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
+    T:totalsOf(d),notes:d.customerNotes.trim(),terms:d.terms.trim()});
+}
+/* a saved quotation's totals: the saved figures, worked out the same way as the form (rates include GST; GST is 1/11 of the total) */
+function savedTotals(q){
+  var sub=q.subtotal!=null?q.subtotal:round2((q.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=round2(+q.discountAmt||0), total=q.amount!=null?q.amount:round2(sub-disc);
+  return {sub:sub,disc:disc,gst:q.gst!=null?q.gst:round2(total/11),total:total};
+}
+function docOf(q){
+  var c=client(q);
+  return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:q.onName||c.name,toSub:q.onName&&q.onName!==c.name?c.name:'',
+    items:(q.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),T:savedTotals(q),notes:q.customerNotes||'',terms:q.terms||''};
+}
+function previewDoc(q){ showDoc(docOf(q)); }
+/* Download PDF: the same document on its own page and the browser's print dialog, where it saves as a PDF (like the engagement letter) */
+function downloadDoc(q){
+  var w=window.open('','_blank'); if(!w) return toast('Allow pop-ups to download the PDF',true);
+  var css=[].map.call(document.styleSheets,function(sh){ try{ return [].filter.call(sh.cssRules,function(r){ return r.selectorText&&/qf-(doc|tot)/.test(r.selectorText); }).map(function(r){ return r.cssText; }).join('\n'); }catch(e){ return ''; } }).join('\n');
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Quotation '+esc(q.id)+' · '+esc(FIRM.name)+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">'+
+    '<style>:root{--line:#E5E7EB;--slate:#475569;--ink:#0F172A}*{box-sizing:border-box}body{margin:0;background:#E5E7EB;padding:24px;font-family:Inter,Arial,sans-serif}.qf-doc{max-width:794px;margin:0 auto}'+css+
+    '@page{size:A4;margin:0}@media print{body{background:#fff;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.qf-doc{box-shadow:none;max-width:none}}</style></head><body>'+docHtml(docOf(q))+
+    '<scr'+'ipt>setTimeout(function(){window.print()},600)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
+  w.document.close();
 }
 
 var QI=(function(){ var v=function(p,w){ return '<svg width="'+(w||14)+'" height="'+(w||14)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
@@ -10994,7 +11050,7 @@ function convert(id){
     if(q.invoiceId||dup){ if(!q.invoiceId){ q.invoiceId=dup.id; setStatus(q,'converted','converted',{sale:dup.id,note:'Invoice '+dup.id}); QuoteStore.save(st); }
       closeDlg(); render(); return toast(q.id+' is already invoiced ('+q.invoiceId+').',true); }
     if(q.status!=='accepted'){ closeDlg(); render(); return toast('Only an accepted quotation can be converted to a sale.',true); }
-    var n=2000+inv.list.length+1; while(inv.list.some(function(x){ return x.id==='INV-'+n; })) n++;
+    var n=2000+inv.list.length+1; while(inv.list.some(function(x){ return x.id==='INV-'+n; })||st.list.some(function(x){ return x.invoiceId==='INV-'+n; })) n++;   // never reuse a number a quotation already points to
     var rec={id:'INV-'+n,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,amount:q.amount,by:ME.name,at:Date.now()};
     inv.list.push(rec);
     if(!saveInvoices(inv)){ closeDlg(); return toast('The invoice couldn’t be created. Nothing was changed.',true); }
@@ -11050,20 +11106,111 @@ function confirmDelete(id){
   };
 }
 
-/* ---------- activity history (newest first) ---------- */
+/* ---------- activity history (newest first), from the quotation's own audit records ---------- */
+function histHtml(q){
+  var hist=(q.history||[]).slice().sort(function(a,b){ return b.t-a.t; });
+  if(!hist.length) return '<p class="qd-none">No activity has been recorded for this quotation yet.</p>';
+  return '<ol class="qh-list">'+hist.map(function(e){
+    var tr=e.from||e.to?'<span class="qh-tr">'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
+    return '<li class="'+(e.ok?'':'bad')+'"><i aria-hidden="true"></i><div><b>'+esc((EV[e.type]||[e.type])[0])+'</b>'+tr+(e.note?'<span class="qh-note">'+esc(e.note)+'</span>':'')+
+      '<small>'+(e.by==='System'?'Automatic':'by '+esc(e.by))+' · '+whenOf(e.t)+'</small></div></li>'; }).join('')+'</ol>';
+}
 function openHistory(id){
-  var q=byId(id); if(!q) return; var c=client(q), hist=(q.history||[]).slice().reverse();
+  var q=byId(id); if(!q) return; var c=client(q);
   ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="qh-t">'+
     '<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qh-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p>'+esc(c.name)+' · '+money(q.amount)+(q.invoiceId?' · Invoice '+esc(q.invoiceId):'')+'</p></div>'+
       '<div class="ad-hacts"><button class="ad-ib" id="qh-x" aria-label="Close">'+I.close+'</button></div></div>'+
-    '<div class="ad-body"><section class="ad-sec"><h3>Activity history</h3><ol class="qh-list">'+hist.map(function(e){
-      var tr=e.from||e.to?'<span class="qh-tr">'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
-      return '<li class="'+(e.ok?'':'bad')+'"><i aria-hidden="true"></i><div><b>'+EV[e.type][0]+'</b>'+tr+(e.note?'<span class="qh-note">'+esc(e.note)+'</span>':'')+
-        '<small>'+(e.by==='System'?'Automatic':'by '+esc(e.by))+' · '+whenOf(e.t)+'</small></div></li>'; }).join('')+'</ol></section></div></div>';
+    '<div class="ad-body"><section class="ad-sec"><h3>Activity history</h3>'+histHtml(q)+'</section></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   document.getElementById('qh-x').onclick=closeOv; document.getElementById('qh-x').focus();
 }
-function closeOv(){ ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; if(QF&&!QF.dirty) QF=null; }
+
+/* ---------- Step 3: Quotation Details, in the side panel (re-drawn after every change; Send and Edit return to it) ---------- */
+var detailId=null, qdTab='details';
+function openDetail(id){
+  closeMenu(); reload(); var q=byId(id);
+  if(!q) return toast('This quotation no longer exists.',true);
+  if(!inScope(q)) return toast('You don’t have access to this quotation.',true);
+  detailId=id; qdTab='details'; paintDetail();
+}
+function closeDetail(){ detailId=null; closeOv(); }
+function canManage(q){ return isManager()||q.accountant===ME.name||q.by===ME.name; }
+/* the header actions: only what the status allows and the user may do (the same rules as the list menu) */
+function detailActions(q){
+  var s=q.status, own=canManage(q), a=[];
+  if((s==='draft'||s==='sent')&&own) a.push(['send',s==='sent'?'Send again':'Send','primary']);
+  if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale','primary']);
+  if((s==='draft'||s==='sent')&&own) a.push(['edit','Edit',AI.edit]);
+  a.push(['preview','Preview PDF',MI.preview],['pdf','Download PDF',AI.pdf]);
+  if((s==='sent'||s==='accepted')&&own) a.push(['cancel','Cancel quotation',MI.cancel,'danger']);
+  return a;
+}
+function paintDetail(keep){
+  if(ov.classList.contains('open')&&!ov.querySelector('.qd-drawer')) return;   // Send or Edit is open on top; the details come back when it closes
+  var q=byId(detailId);
+  if(!q||!inScope(q)){ var was=!!ov.querySelector('.qd-drawer'); detailId=null; if(was) closeOv(); return; }
+  var prev=document.getElementById('qd-b'), y=keep&&prev?prev.scrollTop:0;
+  var c=client(q), cr=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0], T=savedTotals(q), items=q.items||[];
+  var hist=q.history||[], ok=hist.filter(function(e){ return e.ok; });
+  var made=hist.filter(function(e){ return e.type==='created'; })[0];
+  var edits=ok.filter(function(e){ return e.type==='edited'; }), lastEdit=edits[edits.length-1];
+  var acts=ok.filter(function(e){ return ['sent','resent','accepted','rejected','cancelled','converted','expired'].indexOf(e.type)>=0; }), lastAct=acts[acts.length-1];
+  var when=function(t){ return whenOf(t).replace(' · ',', '); };
+  var dd=function(label,val,sub){ return '<div><dt>'+label+'</dt><dd>'+(val||'<span class="qd-none">—</span>')+(sub?'<small>'+sub+'</small>':'')+'</dd></div>'; };
+  var latest=lastAct?(lastAct.type==='expired'?'Expired on '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+' · '+when(lastAct.t)):'';
+  if(!['details','services','activity'].some(function(k){ return k===qdTab; })) qdTab='details';
+
+  var head='<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qd-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p class="qd-sub">'+esc(c.name)+' · '+money(T.total)+'</p></div>'+
+    '<div class="ad-hacts">'+detailActions(q).map(function(a){
+      return a[2]==='primary'?'<button class="btn-primary" data-qa="'+a[0]+'">'+esc(a[1])+'</button>'
+        :'<button class="ad-ib'+(a[3]?' '+a[3]:'')+'" data-qa="'+a[0]+'" title="'+esc(a[1])+'" aria-label="'+esc(a[1])+'">'+a[2]+'</button>'; }).join('')+
+      '<button class="ad-ib" id="qd-x" aria-label="Close">'+I.close+'</button></div></div>';
+  var tabs='<div class="btabs" role="tablist" aria-label="Quotation details">'+[['details','Details'],['services','Services and pricing',items.length],['activity','Activity',hist.length]].map(function(t){
+    var on=t[0]===qdTab; return '<button role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-qtab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
+
+  var b='';
+  if(qdTab==='details'){
+    b+='<section class="ad-sec"><h3>Overview</h3><dl class="qd-dl">'+
+      dd('Quotation ID',esc(q.id))+dd('Status',badge(q.status),latest)+dd('Quotation date',dmyOf(q.created))+dd('Valid until',dmyOf(q.validUntil))+
+      dd('Created',when(made?made.t:q.created))+dd('Created by',esc(made?made.by:q.by))+
+      (lastEdit?dd('Last updated',when(lastEdit.t))+dd('Last updated by',esc(lastEdit.by)):'')+'</dl></section>';
+    var abn=cr&&cr.abn?(typeof fmtABN==='function'?fmtABN(cr.abn):cr.abn):'';
+    b+='<section class="ad-sec"><h3>Client'+(cr?'<button class="qd-h3a" data-qd="client">View client</button>':'')+'</h3><dl class="qd-dl">'+
+      dd('Client name',esc(c.name),cr?esc(cr.type==='company'?(cr.entity||'Company'):'Individual'):'No longer on file')+
+      dd('Email address',c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+dd('Phone number',esc(c.phone||''))+(abn?dd('ABN',esc(abn)):'')+'</dl></section>';
+    b+='<section class="ad-sec"><h3>Assignment and additional information</h3><dl class="qd-dl">'+
+      dd('Branch',esc(q.branch))+dd('Accountant',esc(q.accountant))+(q.accountant2?dd('Additional accountant',esc(q.accountant2)):'')+dd('Prepared for',esc(q.onName||c.name))+'</dl>'+
+      '<div class="qd-txt"><h4>Client-facing notes</h4>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<p class="qd-none">No notes for the client</p>')+'</div>'+
+      '<div class="qd-txt"><h4>Terms and conditions</h4>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<p class="qd-none">No terms and conditions</p>')+'</div></section>';
+    if(q.invoiceId){   // only once it has been converted
+      var inv=loadInvoices().list.filter(function(x){ return x.id===q.invoiceId; })[0], cv=ok.filter(function(e){ return e.type==='converted'; }).pop();
+      b+='<section class="ad-sec"><h3>Linked sale</h3><dl class="qd-dl">'+
+        dd('Sale / invoice reference',esc(q.invoiceId))+dd('Converted',cv?when(cv.t):inv?when(inv.at):'')+dd('Converted by',esc(cv?cv.by:inv?inv.by:''))+dd('Amount',money(inv?inv.amount:T.total))+'</dl></section>';
+    }
+  }
+  if(qdTab==='services'){
+    var anyDesc=items.some(function(x){ return x.desc; });
+    b+='<section class="ad-sec"><h3>Services and pricing</h3><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th>'+(anyDesc?'<th>Description</th>':'')+'<th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
+      (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0;
+        return '<tr><td><b>'+esc(x.name)+'</b></td>'+(anyDesc?'<td>'+(x.desc?esc(x.desc):'<span class="qd-none">—</span>')+'</td>':'')+'<td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
+        :'<tr><td colspan="'+(anyDesc?5:4)+'" class="qd-none">No services on this quotation</td></tr>')+
+      '</tbody></table></div>'+
+      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Total discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+
+        '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>';
+  }
+  if(qdTab==='activity') b+='<section class="ad-sec"><h3>Activity history</h3>'+histHtml(q)+'</section>';
+
+  ov.innerHTML='<div class="drawer ad qd-drawer" role="dialog" aria-modal="true" aria-labelledby="qd-t">'+head+tabs+'<div class="ad-body" id="qd-b" tabindex="0">'+b+'</div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('qd-b').scrollTop=y;
+  document.getElementById('qd-x').onclick=closeDetail;
+  ov.querySelectorAll('[data-qtab]').forEach(function(t){ t.onclick=function(){ qdTab=t.getAttribute('data-qtab'); paintDetail(); }; });
+  ov.querySelectorAll('[data-qa]').forEach(function(x){ x.onclick=function(){ act(x.getAttribute('data-qa'),detailId); }; });
+  var vc=ov.querySelector('[data-qd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+q.clientId); }catch(e){} };
+  if(!keep) document.getElementById('qd-x').focus();
+}
+function closeOv(){ var wasDetail=!!ov.querySelector('.qd-drawer'); ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; if(QF&&!QF.dirty) QF=null;
+  if(wasDetail) detailId=null; else if(detailId) paintDetail(); }
 function closeDlg(){ dlg.classList.remove('open'); dlg.innerHTML=''; }
 ov.addEventListener('mousedown',function(e){ if(e.target===ov){ if(QF) leaveForm(); else closeOv(); } });
 dlg.addEventListener('mousedown',function(e){ if(e.target===dlg) closeDlg(); });
@@ -15239,6 +15386,12 @@ function submit(){
     show(mod);
   }
   window.AADNav = select;                     // modules call parent.AADNav('attendance') etc.
+  /* open a module at one of its own addresses, e.g. AADOpen('clients', '#/clients/12') from a quotation's client */
+  window.AADOpen = function(mod, hash){
+    var fresh = !frames[mod]; select(mod); var f = frames[mod];
+    var to = function(){ try{ f.contentWindow.location.hash = hash; }catch(e){} };
+    if(fresh) f.addEventListener('load', function(){ setTimeout(to, 0); }, { once: true }); else to();
+  };
 
   /* ---------- profile menu: the admin can preview the app as a staff member and switch back ---------- */
   var VIEW_KEY = 'aad-view-as', ADMIN_ONLY = ['staff', 'settings'], cur = 'dashboard';

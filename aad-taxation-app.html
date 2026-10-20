@@ -10176,6 +10176,13 @@ table,td,th{font-size:13.5px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
 .qs-done{font-size:14px;color:var(--ink);line-height:1.55}
+/* Client link: the client's quotation page in preview mode */
+.pv-layer{position:fixed;inset:0;z-index:400;background:#F7F8FA;display:flex;flex-direction:column}
+.pv-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 18px;background:#181C1E;color:#fff}
+.pv-tag{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;background:var(--orange);padding:5px 10px;border-radius:999px}
+.pv-note{font-size:12.5px;color:#CBD5E1}.pv-bar .sp-grow{flex:1}
+.pv-bar .btn-ghost{background:transparent;color:#fff;border-color:#475569}.pv-bar .btn-ghost:hover{background:#2B3238}
+.pv-frame{flex:1;width:100%;border:0;background:#F7F8FA}
 .qs-lk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 12px;background:#FAFBFC}
 .qs-lk span{flex:1;min-width:0;font-size:12.5px;color:var(--slate);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rq-proto{padding:10px 12px;border-radius:10px;background:#FFF7EC;color:#7C4A03;font-size:12.5px;line-height:1.5}
@@ -10210,16 +10217,6 @@ table,td,th{font-size:13.5px}
 .qf-tot dd{margin:0;font-variant-numeric:tabular-nums;color:var(--ink)}
 .qf-tot .t{border-top:1px solid var(--line);margin-top:4px;padding-top:9px;font-weight:800;font-size:15px}.qf-tot .t dt,.qf-tot .t dd{color:var(--ink);font-family:'Manrope'}
 .qf-pvm{max-width:720px;width:calc(100% - 32px)}.qf-pvm .modal-body{background:#E9EBEE;max-height:72vh;overflow:auto}
-.qf-doc{background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.1)}.qf-doc img{display:block;width:100%}
-.qf-doc-b{padding:22px 34px 30px;font-size:13px;color:#111}
-.qf-doc-top{display:flex;justify-content:space-between;gap:20px;margin-bottom:16px}.qf-doc-top h3{font-family:'Manrope';font-size:24px;font-weight:800;margin:0}
-.qf-doc-top dl{margin:0}.qf-doc-top dl div{display:flex;justify-content:space-between;gap:16px}.qf-doc-top dt{color:#555}.qf-doc-top dd{margin:0;font-weight:600}
-.qf-doc-to span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666}.qf-doc-to b{display:block}
-.qf-doc-t{width:100%;border-collapse:collapse;margin-top:14px}.qf-doc-t th,.qf-doc-t td{border-bottom:1px solid #E5E7EB;padding:8px 6px;text-align:left;vertical-align:top}
-.qf-doc-t th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#F3F4F6}.qf-doc-t .r{text-align:right}.qf-doc-t .c{text-align:center}
-.qf-doc-t small{display:block;color:#666;margin-top:2px}.qf-doc-t .qf-none{color:#888;text-align:center;padding:16px}
-.qf-tot.doc{margin:12px 0 0 auto;width:45%;background:none;border:0;padding:0}
-.qf-doc-n{margin-top:18px;color:#333}.qf-doc-tc{margin-top:16px}.qf-doc-tc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:4px}.qf-doc-tc p{margin:0;color:#444;font-size:12px}
 @media (max-width:900px){.qf-grid,.qf-foot{grid-template-columns:1fr}.qf-thead{display:none}.qf-row{grid-template-columns:1fr 1fr}.qf-row>div:nth-child(3){grid-column:1/-1}.qf-line{justify-content:flex-start}.qf-tot.doc{width:100%}}
 .qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
@@ -10607,6 +10604,7 @@ function act(k,id){
   if(k==='cancel') return confirmCancel(id);
   if(k==='accept'||k==='reject') return confirmOutcome(id,k==='accept'?'accepted':'rejected');
   if(k==='delete') return confirmDelete(id);
+  if(k==='link') return showClientLink(q);
   route(k,q);
 }
 content.addEventListener('click',function(e){
@@ -10637,11 +10635,11 @@ function openForm(id){
   if(q&&['draft','sent'].indexOf(q.status)<0) return toast('Only draft and sent quotations can be edited.',true);
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
-      clientId:q.clientId,onName:q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
+      clientId:q.clientId,onName:q.onName||q.clientName||'',toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
       customerNotes:q.customerNotes||'',terms:q.terms||''
-    }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+    }:{clientId:null,onName:'',toName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:''}};
   paintForm();
 }
@@ -10655,7 +10653,7 @@ function paintForm(focusId){
   var clientField=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b><button type="button" class="act" id="qf-chg" title="Change client" aria-label="Change client">'+I.close+'</button></div>'
     :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="qf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(QF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="qf-list">'+
       '<ul class="qf-list" id="qf-list" role="listbox"'+(QF.pick.trim()?'':' hidden')+'>'+clientMatches(QF.pick)+'</ul></div>';
-  var names=nameOptions(c);
+  var names=nameOptions(c), noClient='<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>';
   var lines=d.items.map(function(x,i){
     var s=x.svcId?svcById(x.svcId):null, min=s?s.price:0, q=num(x.qty), p=num(x.price), amt=x.svcId&&q>0&&p>=0?q*p:0;
     var taken=d.items.filter(function(y,j){ return j!==i&&y.svcId; }).map(function(y){ return y.svcId; });
@@ -10677,12 +10675,13 @@ function paintForm(focusId){
     '<div class="modal-body" id="qf-body">'+
       '<div class="qf-grid">'+
         field('Select Client',true,clientField,'client')+
-        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName')+
         field('Select Branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
         field('Select Accountant',true,sel('qf-acc','accountant',ASSIGNABLE.map(function(s){ return s.name; }),d.accountant,'Select'),'accountant')+
-        field('Quotation Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
         field('Additional Accountant',false,sel('qf-acc2','accountant2',ASSIGNABLE.map(function(s){ return s.name; }).filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+
+        field('Quotation Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
         field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+
+        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
+        field('To the name of',true,c?sel('qf-to','toName',names,d.toName,'Addressed to'):noClient,'toName')+
       '</div>'+
       '<section class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
@@ -10728,8 +10727,8 @@ function wireForm(focusId){
       if(ev.key==='Enter'&&i>=0){ ev.preventDefault(); choose(it[i].getAttribute('data-cid')); } };
     list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
   }
-  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; QF.pick=''; delete QF.errs.client; delete QF.errs.onName; touch(); repaint('qf-on'); }
-  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; touch(); repaint('qf-q'); };
+  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.toName=c.name; QF.pick=''; delete QF.errs.client; delete QF.errs.onName; delete QF.errs.toName; touch(); repaint('qf-on'); }
+  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.toName=''; touch(); repaint('qf-q'); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
     var s=x.svcId?svcById(x.svcId):null; if(s&&x.cat&&(s.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }   // the item no longer fits the category
     touch(); repaint('qf-s'+i); }; });
@@ -10755,7 +10754,7 @@ function wireForm(focusId){
 function checkForm(full){
   var d=QF.d, e={}, T=totalsOf(d), filled=d.items.filter(function(x){ return x.svcId; });
   if(d.clientId==null||!formClient()) e.client='Choose the client this quotation is for';
-  else if(full&&!d.onName) e.onName='Choose who the quotation is made out to';
+  else { if(full&&!d.onName) e.onName='Choose who the quotation is made out to'; if(full&&!d.toName) e.toName='Choose who the quotation is addressed to'; }
   if(full&&!d.branch) e.branch='Choose the branch';
   if(full&&!d.accountant) e.accountant='Choose the accountant';
   if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
@@ -10785,7 +10784,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&['draft','sent'].indexOf(q.status)<0){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:d.toName||d.onName||c.name,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,amount:T.total,discount:null,discountAmt:0,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
@@ -10808,18 +10807,8 @@ function leaveForm(){
 }
 /* the quotation document, as the client sees it. m: {id,dateTxt,dueTxt,to,toSub,items:[{name,desc,qty,price}],T:{sub,disc,gst,total},notes,terms}
    Client-facing only: nothing internal goes in here */
-function docHtml(m){
-  var T=m.T;
-  return '<div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
-    '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+esc(m.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+esc(m.dateTxt)+'</dd></div><div><dt>Due date</dt><dd>'+esc(m.dueTxt)+'</dd></div></dl></div>'+
-    '<p class="qf-doc-to"><span>Prepared for</span><b>'+(m.to?esc(m.to):'No client chosen yet')+'</b>'+(m.toSub?esc(m.toSub):'')+'</p>'+
-    '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
-      (m.items.length?m.items.map(function(x){ return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r">'+money(x.qty*x.price)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
-    '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+'<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
-    (m.notes?'<p class="qf-doc-n">'+esc(m.notes).replace(/\n/g,'<br>')+'</p>':'')+
-    (m.terms?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+esc(m.terms).replace(/\n/g,'<br>')+'</p></div>':'')+'</div>'+
-    '<img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div>';
-}
+function docHtml(m){ return quoteDocHtml(m); }
+ensureQuoteCss(document);   // the document's look comes from the shared core, the same as on the client's link
 function showDoc(m){
   dlg.innerHTML='<div class="modal qf-pvm" role="dialog" aria-modal="true" aria-labelledby="qp-t"><div class="modal-head"><h2 id="qp-t">Preview · '+esc(m.id)+'</h2><button id="qp-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body">'+docHtml(m)+'</div></div>';
@@ -10828,7 +10817,8 @@ function showDoc(m){
 /* Preview: the quotation as the client will see it, from what's in the form (nothing is saved) */
 function previewForm(){
   var d=QF.d, c=formClient();
-  showDoc({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:c?(d.onName||c.name):'',toSub:c&&d.onName&&d.onName!==c.name?c.name:'',
+  var to=c?(d.onName||c.name):'';
+  showDoc({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.toName&&d.toName!==to?d.toName:'',sign:null,
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
     T:totalsOf(d),notes:d.customerNotes.trim(),terms:d.terms.trim()});
 }
@@ -10837,23 +10827,10 @@ function savedTotals(q){
   var sub=q.subtotal!=null?q.subtotal:round2((q.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=round2(+q.discountAmt||0), total=q.amount!=null?q.amount:round2(sub-disc);
   return {sub:sub,disc:disc,gst:q.gst!=null?q.gst:round2(total/11),total:total};
 }
-function docOf(q){
-  var c=client(q);
-  return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:q.onName||c.name,toSub:q.onName&&q.onName!==c.name?c.name:'',
-    items:(q.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),T:savedTotals(q),notes:q.customerNotes||'',terms:q.terms||''};
-}
+function docOf(q){ return quoteDocOf(q,client(q).name); }
 function previewDoc(q){ showDoc(docOf(q)); }
 /* Download PDF: the same document on its own page and the browser's print dialog, where it saves as a PDF (like the engagement letter) */
-function downloadDoc(q){
-  var w=window.open('','_blank'); if(!w) return toast('Allow pop-ups to download the PDF',true);
-  var css=[].map.call(document.styleSheets,function(sh){ try{ return [].filter.call(sh.cssRules,function(r){ return r.selectorText&&/qf-(doc|tot)/.test(r.selectorText); }).map(function(r){ return r.cssText; }).join('\n'); }catch(e){ return ''; } }).join('\n');
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Quotation '+esc(q.id)+' · '+esc(FIRM.name)+'</title>'+
-    '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">'+
-    '<style>:root{--line:#E5E7EB;--slate:#475569;--ink:#0F172A}*{box-sizing:border-box}body{margin:0;background:#E5E7EB;padding:24px;font-family:Inter,Arial,sans-serif}.qf-doc{max-width:794px;margin:0 auto}'+css+
-    '@page{size:A4;margin:0}@media print{body{background:#fff;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.qf-doc{box-shadow:none;max-width:none}}</style></head><body>'+docHtml(docOf(q))+
-    '<scr'+'ipt>setTimeout(function(){window.print()},600)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
-  w.document.close();
-}
+function downloadDoc(q){ if(!printQuote(docOf(q))) toast('Allow pop-ups to download the PDF',true); }
 
 var QI=(function(){ var v=function(p,w){ return '<svg width="'+(w||14)+'" height="'+(w||14)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
   return {info:v('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>',13),warn:v('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'),
@@ -11030,7 +11007,8 @@ function sendScreen(body,foot,cfg){
 function openSend(id){
   reload(); var q=byId(id); if(!q) return;
   var again=q.status==='sent', c=client(q), token=q.token||newToken(), link=portalLink('quote',token);
-  var ctx=tplCtx({name:c.name,type:c.type,entity:c.entity,services:(q.items||[]).map(function(x){ return {name:x.name,price:(x.qty||1)*x.price}; }),staff:ME.name,kind:'quotation',link:link});
+  var to=q.toName&&q.toName!==c.name?q.toName:'';
+  var ctx=tplCtx({name:to||c.name,type:to?'individual':c.type,entity:c.entity,services:(q.items||[]).map(function(x){ return {name:x.name,price:(x.qty||1)*x.price}; }),staff:ME.name,kind:'quotation',link:link});
   ctx.quote_number=q.id; ctx.quote_amount=money(q.amount); ctx.valid_until=dmyOf(q.validUntil); ctx.quote_link=link; ctx.total_fee=money(q.amount);
   ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="qs-t">'+
     '<div class="modal-head"><h2 id="qs-t">'+(again?'Send again':'Send quotation')+' · '+esc(q.id)+'</h2><button id="qs-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -11166,6 +11144,23 @@ function openDetail(id){
   detailId=id; qdTab='services'; paintDetail();
 }
 function closeDetail(){ detailId=null; closeOv(); }
+/* Client link: the page the client opens from the email or SMS, in preview mode (nothing is signed or saved), and the real link to copy */
+function showClientLink(q){
+  var src; try{ src=parent.AADPortalSrc(); }catch(e){ return toast('Preview isn’t available here',true); }
+  var link=portalLink('quote',q.token);
+  var layer=document.createElement('div'); layer.className='pv-layer'; layer.setAttribute('role','dialog'); layer.setAttribute('aria-modal','true'); layer.setAttribute('aria-label','Client view preview');
+  layer.innerHTML='<div class="pv-bar"><span class="pv-tag">Client view · preview</span><span class="pv-note">What '+esc(q.toName||client(q).name)+' sees from the link. Nothing you sign here is saved.</span>'+
+    '<span class="sp-grow"></span><button class="btn-ghost btn-sm" id="pv-copy">Copy real link</button><button class="btn-primary btn-sm" id="pv-x">Close preview</button></div>';
+  var fr=document.createElement('iframe'); fr.className='pv-frame'; fr.title='Client quotation preview';
+  fr.dataset.kind='quote'; fr.dataset.token=q.token; fr.dataset.preview='1'; fr.setAttribute('srcdoc',src);
+  layer.appendChild(fr); document.body.appendChild(layer);
+  var close=function(){ layer.remove(); document.removeEventListener('keydown',esc2,true); };
+  var esc2=function(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
+  document.addEventListener('keydown',esc2,true);
+  layer.querySelector('#pv-x').onclick=close;
+  layer.querySelector('#pv-copy').onclick=function(){ try{ navigator.clipboard.writeText(link).then(function(){ toast('Link copied'); },function(){ toast('Link copied'); }); }catch(e){ toast('Link copied'); } };
+  layer.querySelector('#pv-x').focus();
+}
 function canManage(q){ return isManager()||q.accountant===ME.name||q.by===ME.name; }
 /* the header actions: only what the status allows and the user may do (the same rules as the list menu) */
 function detailActions(q){
@@ -11173,6 +11168,7 @@ function detailActions(q){
   if((s==='draft'||s==='sent')&&own) a.push(['send',s==='sent'?'Send again':'Send','primary']);
   if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale','primary']);
   if((s==='draft'||s==='sent')&&own) a.push(['edit','Edit']);
+  if(q.token&&s!=='draft') a.push(['link','Client link']);
   a.push(['preview','Preview PDF'],['pdf','Download PDF']);
   if((s==='sent'||s==='accepted')&&own) a.push(['cancel','Cancel quotation','','danger']);
   return a;
@@ -11204,7 +11200,7 @@ function paintDetail(keep){
   var latest=lastAct?(lastAct.type==='expired'?'Expired '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+', '+dmyOf(lastAct.t)):'';
   if(q.invoiceId) latest=(latest?latest+' · ':'')+'Sale <b>'+esc(q.invoiceId)+'</b>';   // the linked sale, once, beside who converted it and when
   var head='<div class="cl-dhead"><div class="dpmain"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
-      '<div class="dmetaline">'+dc(QD_IC.user,who+(q.onName&&q.onName!==c.name?' <small>for '+esc(q.onName)+'</small>':''))+
+      '<div class="dmetaline">'+dc(QD_IC.user,who+(q.onName&&q.onName!==c.name?' <small>on the name of</small> '+esc(q.onName):'')+(q.toName&&q.toName!==(q.onName||c.name)?' <small>to</small> '+esc(q.toName):''))+
         (c.email?dc(QD_IC.mail,'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)):'')+
         (c.phone?dc(QD_IC.phone,esc(c.phone)+copy(c.phone)):'')+'</div>'+
       '<div class="dmetaline">'+dc(QD_IC.cal,dmyOf(q.created)+' <small>to</small> '+dmyOf(q.validUntil))+dc(QD_IC.branch,esc(q.branch))+
@@ -14610,6 +14606,61 @@ function letterHtml(c){                               // c: {name,type,entity,em
       '<div class="lt-body">'+p+'</div><img class="lt-foot" src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd · ABN 91 692 752 702 · Dandenong (Head Office)"></section>';
   }).join('')+'</div>';
 }
+/* ---------- the quotation document (Quotations' preview and PDF, and the client's quotation link) ---------- */
+/* m: {id,dateTxt,dueTxt,to,toSub,attn,items:[{name,desc,qty,price}],T:{sub,disc,gst,total},notes,terms,sign:{name,sig,at}|null} */
+function quoteDocOf(q,cname){
+  var r2=function(n){ return Math.round(n*100)/100; }, to=q.onName||cname;
+  var sub=q.subtotal!=null?q.subtotal:r2((q.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=r2(+q.discountAmt||0), total=q.amount!=null?q.amount:r2(sub-disc);
+  return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:to,toSub:q.onName&&q.onName!==cname?cname:'',attn:q.toName&&q.toName!==to?q.toName:'',
+    items:(q.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
+    T:{sub:sub,disc:disc,gst:q.gst!=null?q.gst:r2(total/11),total:total},notes:q.customerNotes||'',terms:q.terms||'',
+    sign:q.signature?{name:q.signedBy||'',sig:q.signature,at:q.signedAt}:null};
+}
+function quoteDocHtml(m){
+  var e=escH, T=m.T, sg=m.sign, sig=sg&&sg.sig;
+  return '<div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
+    '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+e(m.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+e(m.dateTxt)+'</dd></div><div><dt>Due date</dt><dd>'+e(m.dueTxt)+'</dd></div></dl></div>'+
+    '<p class="qf-doc-to"><span>Prepared for</span><b>'+(m.to?e(m.to):'No client chosen yet')+'</b>'+(m.toSub?e(m.toSub):'')+(m.attn?'<em>Attention: '+e(m.attn)+'</em>':'')+'</p>'+
+    '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
+      (m.items.length?m.items.map(function(x){ return '<tr><td><b>'+e(x.name)+'</b>'+(x.desc?'<small>'+e(x.desc)+'</small>':'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r">'+money(x.qty*x.price)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
+    '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+'<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
+    (m.notes?'<p class="qf-doc-n">'+e(m.notes).replace(/\n/g,'<br>')+'</p>':'')+
+    (m.terms?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+e(m.terms).replace(/\n/g,'<br>')+'</p></div>':'')+
+    '<div class="qf-doc-sg"><p class="qf-doc-sgt">Acceptance</p><div><span>Name</span><b>'+(sg?e(sg.name):'')+'</b></div>'+
+      '<div><span>Signature</span><b>'+(sig?(sig.method==='type'?'<em style="font-family:'+e(sig.font||'cursive')+'">'+e(sig.text)+'</em>':'<img src="'+sig.data+'" alt="Signature">'):'')+'</b></div>'+
+      '<div><span>Date</span><b>'+(sg&&sg.at?dmyOf(sg.at):'')+'</b></div></div>'+
+    '</div><img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div>';
+}
+var QUOTE_DOC_CSS=
+  '.qf-doc{background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.1);color:#111;text-align:left}.qf-doc img{display:block;width:100%;max-width:none}'+
+  '.qf-doc-b{padding:22px 34px 30px;font-size:13px;color:#111}'+
+  '.qf-doc-top{display:flex;justify-content:space-between;gap:20px;margin-bottom:16px}.qf-doc-top h3{font-family:Manrope,Inter,sans-serif;font-size:24px;font-weight:800;margin:0}'+
+  '.qf-doc-top dl{margin:0}.qf-doc-top dl div{display:flex;justify-content:space-between;gap:16px}.qf-doc-top dt{color:#555}.qf-doc-top dd{margin:0;font-weight:600}'+
+  '.qf-doc-to{margin:0}.qf-doc-to span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666}.qf-doc-to b{display:block}.qf-doc-to em{display:block;font-style:normal;color:#333;margin-top:2px}'+
+  '.qf-doc-t{width:100%;border-collapse:collapse;margin-top:14px}.qf-doc-t th,.qf-doc-t td{border-bottom:1px solid #E5E7EB;padding:8px 6px;text-align:left;vertical-align:top;font-size:13px}'+
+  '.qf-doc-t th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#F3F4F6}.qf-doc-t .r{text-align:right}.qf-doc-t .c{text-align:center}'+
+  '.qf-doc-t small{display:block;color:#666;margin-top:2px}.qf-doc-t .qf-none{color:#888;text-align:center;padding:16px}'+
+  '.qf-doc .qf-tot.doc{margin:12px 0 0 auto;width:45%;background:none;border:0;padding:0}'+
+  '.qf-doc .qf-tot div{display:flex;justify-content:space-between;gap:16px;padding:5px 0;font-size:13.5px;color:#475569}.qf-doc .qf-tot dd{margin:0;font-variant-numeric:tabular-nums;color:#0F172A}'+
+  '.qf-doc .qf-tot .t{border-top:1px solid #E5E7EB;margin-top:4px;padding-top:9px;font-weight:800;font-size:15px}.qf-doc .qf-tot .t dt,.qf-doc .qf-tot .t dd{color:#0F172A;font-family:Manrope,Inter,sans-serif}'+
+  '.qf-doc-n{margin:18px 0 0;color:#333}.qf-doc-tc{margin-top:16px}.qf-doc-tc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:4px}.qf-doc-tc p{margin:0;color:#444;font-size:12px}'+
+  '.qf-doc-sg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 24px;margin-top:24px;padding-top:14px;border-top:1px solid #E5E7EB}'+
+  '.qf-doc-sgt{grid-column:1/-1;margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#666}'+
+  '.qf-doc-sg span{display:block;font-size:11px;color:#666;margin-bottom:4px}.qf-doc-sg b{display:flex;align-items:flex-end;min-height:46px;border-bottom:1px dashed #9CA3AF;font-weight:600;padding-bottom:4px;overflow:hidden}'+
+  '.qf-doc-sg b img{height:42px;width:auto;max-width:100%;object-fit:contain}.qf-doc-sg b em{font-style:normal;font-weight:400;font-size:26px;line-height:1.1;color:#1E3A8A;white-space:nowrap}'+
+  '@media (max-width:640px){.qf-doc-b{padding:16px}.qf-doc-top{flex-direction:column;gap:10px}.qf-doc .qf-tot.doc{width:100%}.qf-doc-sg{grid-template-columns:1fr}}';
+function ensureQuoteCss(doc){ doc=doc||document; if(doc.getElementById('qdoc-css')) return; var s=doc.createElement('style'); s.id='qdoc-css'; s.textContent=QUOTE_DOC_CSS; doc.head.appendChild(s);
+  if(!doc.getElementById('qdoc-font')){ var l=doc.createElement('link'); l.id='qdoc-font'; l.rel='stylesheet'; l.href=SIG_FONT_URL; doc.head.appendChild(l); } }
+/* Download PDF: the document on its own page with the browser's print dialog, where it saves as a PDF. false when pop-ups are blocked */
+function printQuote(m){
+  var w=window.open('','_blank'); if(!w) return false;
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Quotation '+escH(m.id)+' · '+escH(FIRM.name)+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"><link href="'+SIG_FONT_URL+'" rel="stylesheet">'+
+    '<style>*{box-sizing:border-box}body{margin:0;background:#E5E7EB;padding:24px;font-family:Inter,Arial,sans-serif}.qf-doc{max-width:794px;margin:0 auto}'+QUOTE_DOC_CSS+
+    '@page{size:A4;margin:0}@media print{body{background:#fff;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.qf-doc{box-shadow:none;max-width:none}}</style></head><body>'+quoteDocHtml(m)+
+    '<scr'+'ipt>setTimeout(function(){window.print()},700)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
+  w.document.close(); return true;
+}
 function escH(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); }
 var LETTER_CSS =
   '.el-doc{container-type:inline-size;display:flex;flex-direction:column;gap:14px;width:100%;max-width:794px;margin:0 auto}'+
@@ -14907,6 +14958,8 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .lw{background:#E9EBEE;border-radius:12px;padding:14px;overflow:auto;max-height:70vh;margin-bottom:18px}
 .agree{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--slate);margin-top:14px}
 .qv-meta{margin-bottom:18px}
+.qv-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.qv-top h2{margin:0}
+.qv-doc{margin-bottom:22px}.qv-doc .qf-doc{max-width:794px;margin:0 auto}
 .qv-note{margin-top:16px;font-size:13.5px;color:var(--slate);line-height:1.55}.qv-terms{margin-top:14px;font-size:12.5px;color:var(--mute);line-height:1.55}.qv-terms b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}.qv-terms p{margin:0}
 .agree input{margin-top:2px;accent-color:var(--orange)}
 .signed{display:flex;gap:10px;align-items:center;background:#ECFDF5;border:1px solid #BBF7D0;color:#047857;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
@@ -15030,34 +15083,39 @@ function quoteClient(q){ try{ var cl=JSON.parse(localStorage.getItem('aad-client
 function paintQuote(){
   var st=loadQuotes(), q=st&&st.list.filter(function(x){ return x.token===TOKEN; })[0];
   if(!q) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
-  var c=quoteClient(q), who=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name?c.directors[0].name:c.name, first=String(who||'').split(' ')[0];
-  var acc=q.history.filter(function(h){ return h.type==='accepted'; }).pop();
   if(q.status==='cancelled') return closed('x','This quotation was withdrawn','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
   if(q.status==='rejected') return closed('x','This quotation is closed','You let us know you didn’t want to go ahead. Contact '+FIRM.name+' on '+FIRM.phone+' if that’s changed.');
+  ensureQuoteCss(document);
+  var c=quoteClient(q), dir=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name;
+  var who=q.toName||dir||c.name, first=String(who||'').split(' ')[0], doc=quoteDocOf(q,c.name);
+  var acc=(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop();
   var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
-  var rows=q.items.map(function(x){ return '<tr><td>'+e(x.name)+(x.qty>1?' × '+x.qty:'')+'</td><td>'+money(x.qty*x.price)+'</td></tr>'; }).join('');
   var done=q.status==='accepted'||q.status==='converted';
   app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1><p>'+e(q.id)+' from '+FIRM.name+' · Valid until '+dmyOf(q.validUntil)+'</p></div>'+
-    (done?'<div class="signed">'+IC.tick+'<span>You accepted this quotation on '+whenOf(acc?acc.t:Date.now())+'. We’ll be in touch to get started.</span></div>':'')+
-    '<div class="card">'+
-      '<dl class="ty-meta qv-meta"><div><dt>Prepared for</dt><dd>'+e(q.onName||c.name)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Branch</dt><dd>'+e(q.branch)+'</dd></div></dl>'+
-      '<table class="svc"><thead><tr><th>Service</th><th>Price (incl. GST)</th></tr></thead><tbody>'+rows+'<tr class="tot"><td>Total</td><td>'+money(q.amount)+'</td></tr></tbody></table>'+
-      (q.customerNotes?'<p class="qv-note">'+e(q.customerNotes).replace(/\n/g,'<br>')+'</p>':'')+
-      (q.terms?'<div class="qv-terms"><b>Terms &amp; Conditions</b><p>'+e(q.terms).replace(/\n/g,'<br>')+'</p></div>':'')+
+    (done?'<div class="signed">'+IC.tick+'<span>'+(q.signedAt?'You signed and accepted this quotation on '+whenOf(q.signedAt):'You accepted this quotation on '+whenOf(acc?acc.t:Date.now()))+'. We’ll be in touch to get started.</span></div>':'')+
+    '<div class="card"><div class="qv-top"><h2>Quotation '+e(q.id)+'</h2><button class="btn sec" id="qa-pdf">Download PDF</button></div>'+
+      '<div class="lw qv-doc">'+quoteDocHtml(doc)+'</div>'+
       (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
-        '<label class="agree"><input type="checkbox" id="qa-ok"><span>I accept this quotation and its prices.</span></label><span class="err" id="qa-e" hidden>Tick the box to confirm</span>'+
-        '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Accept quotation</button></div>')+
+        '<h2>Sign to accept</h2><p class="sub">Read the quotation above, then sign below to accept it.</p>'+
+        '<label class="l" for="qa-n">Your full name <span class="req">*</span></label><input class="in" id="qa-n" value="'+e(who)+'" maxlength="80">'+
+        '<div id="qa-pad" style="margin-top:16px"></div>'+
+        '<label class="agree"><input type="checkbox" id="qa-ok"><span>I have read this quotation and accept its services, prices and terms.</span></label><span class="err" id="qa-e" hidden></span>'+
+        '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Sign and accept</button></div>')+
     '</div>';
+  document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var go=document.getElementById('qa-go'); if(!go) return;
+  var pad=sigPad(document.getElementById('qa-pad'),who), nm=document.getElementById('qa-n'); nm.oninput=function(){ pad.setName(nm.value); };
   go.onclick=function(){
-    if(!document.getElementById('qa-ok').checked){ document.getElementById('qa-e').hidden=false; return; }
-    if(PREVIEW){ toast('Preview only: in the real link this accepts the quotation'); return; }
-    var v=loadQuotes(), x=v&&v.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return paintQuote();
+    var n=nm.value.trim(), v=pad.value(n), er=document.getElementById('qa-e');
+    var m=!n?'Enter your full name':!v?'Add your signature: draw it, select a style or upload an image':!document.getElementById('qa-ok').checked?'Tick the box to confirm you accept':'';
+    if(m){ er.textContent=m; er.hidden=false; return; }
+    if(PREVIEW){ toast('Preview only: in the real link this signs and accepts the quotation'); return; }
+    var all=loadQuotes(), x=all&&all.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return paintQuote();
     if(x.status!=='sent') return paintQuote();                      // already accepted, or changed by the firm meanwhile
-    var from=x.status; x.status='accepted';
-    x.history.push({type:'accepted',by:who||c.name,t:Date.now(),from:from,to:'accepted',note:'Accepted through the quotation link',ok:true,sale:''});
-    try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); }catch(err){ x.status=from; return toast('We couldn’t record your acceptance. Please try again.',true); }
-    paintQuote(); window.scrollTo(0,0); toast('Thank you, your quotation is accepted');
+    var from=x.status; x.status='accepted'; x.signature=v; x.signedBy=n; x.signedAt=Date.now();
+    x.history.push({type:'accepted',by:n,t:x.signedAt,from:from,to:'accepted',note:'Signed and accepted through the quotation link ('+(v.method==='type'?'selected style':v.method==='draw'?'drawn':'uploaded')+' signature)',ok:true,sale:''});
+    try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ return toast('We couldn’t record your signature. Please try again.',true); }
+    paintQuote(); window.scrollTo(0,0); toast('Thank you, your quotation is signed and accepted');
   };
 }
 if(KIND==='quote') paintQuote();

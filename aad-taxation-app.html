@@ -9981,7 +9981,7 @@ table,td,th{font-size:13.5px}
 .qt-sort svg{opacity:.35}.qt-sort.asc svg,.qt-sort.desc svg{opacity:1;color:var(--orange-ink)}
 .qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
 .qt-cn{font-weight:600;color:var(--ink)}
-.qt-st .ar-sub{font-size:11px;max-width:170px;line-height:1.35;margin-top:3px}
+.qt-st .ar-sub{font-size:11px;white-space:nowrap;line-height:1.35;margin-top:3px}
 .state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-acc i{background:#10B981}.state.q-conv i{background:#8B5CF6}
 .state.q-rej i{background:#FF5966}.state.q-exp i{background:#F59E0B}.state.q-can i{background:#CBD5E1}.state.q-can{color:var(--mute)}
 .qt-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute);border:1px solid transparent}
@@ -10034,7 +10034,7 @@ table,td,th{font-size:13.5px}
 .qt-menu button:hover,.qt-menu button:focus-visible{background:#FFF4EA;color:#C2630F;outline:none}.qt-menu button:hover svg,.qt-menu button:focus-visible svg{color:#C2630F}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
-.qt-clip.qt-cname{max-width:200px}
+.qt-clip.qt-cname{max-width:150px}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
@@ -10214,11 +10214,13 @@ function client(q){ var c=clients.filter(function(x){ return String(x.id)===Stri
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
 function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
-/* the latest action under the badge: who did it and when */
+/* under the badge: who did the latest action and when (the badge says what it was) */
 function attrLine(q){
   var h=(q.history||[]).filter(function(e){ return e.ok&&e.type!=='send_failed'; }), e=h[h.length-1];
-  if(!e) return q.by?'Created by '+esc(q.by)+' on '+stamp(q.created):'';   // older records without history: the creator, if known
-  return e.type==='expired'?'Expired on '+dmyOf(e.t):EV[e.type][1]+' '+esc(e.by)+' on '+stamp(e.t);
+  var when=function(x){ return whenOf(x).replace(' · ',', '); };   // dd-mm-yyyy, hh:mm AM
+  if(!e) return when(q.created);   // older records without history: when it was created
+  if(e.type==='created') return when(e.t);   // the creator is in Created By
+  return e.type==='expired'?'on '+dmyOf(e.t):'by '+esc(e.by)+' · '+when(e.t);   // the badge already says what happened
 }
 
 /* ---------- summary: counted over every quotation you can see, not the current filters ---------- */
@@ -10370,9 +10372,9 @@ function render(){
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th class="c">Actions</th></tr></thead><tbody>';
-  if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
-  else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
+  if(!all.length) h+='<tr><td colspan="9"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
+  else if(!page.length) h+='<tr><td colspan="9"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
@@ -10383,6 +10385,7 @@ function render(){
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
+      '<td><span class="qt-clip sm" title="'+esc(q.by)+'">'+esc(q.by)+'</span></td>'+
       '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'" title="Actions">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';

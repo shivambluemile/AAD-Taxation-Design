@@ -14875,6 +14875,9 @@ button{background:none;border:0;cursor:pointer}
 .sugg button:hover,.sugg button:focus{background:#F6F7F9;outline:none}.sugg button svg{color:var(--orange);margin-top:1px;flex-shrink:0}
 .sugg small{display:block;color:var(--mute);font-size:12px;margin-top:1px}.sugg-none{padding:12px 14px;font-size:13px;color:var(--mute)}
 .ty{text-align:center;padding:40px 36px 34px}
+.qw-eyebrow{font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green,#059669);margin-bottom:6px}
+.qw-acts{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.qv-acts{display:flex;gap:8px;flex-wrap:wrap}
 .ty-art{width:240px;max-width:80%;height:auto;display:block;margin:0 auto 10px}
 .ty-env{animation:tyFloat 3.2s ease-in-out infinite}.ty-lines{animation:tyLines 3.2s ease-in-out infinite}
 @keyframes tyFloat{50%{transform:translate(4px,-6px)}}@keyframes tyLines{50%{transform:translateX(-6px);opacity:.7}}
@@ -15080,6 +15083,7 @@ var STEPS=['Your details','Please find below the services','Engagement letter'],
 var Q_KEY='aad-quotations-v1';
 function loadQuotes(){ try{ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); return v&&Array.isArray(v.list)?v:null; }catch(err){ return null; } }
 function quoteClient(q){ try{ var cl=JSON.parse(localStorage.getItem('aad-clients-v1')||'[]').filter(function(c){ return String(c.id)===String(q.clientId); })[0]; return cl||{name:q.clientName||'',email:''}; }catch(err){ return {name:q.clientName||'',email:''}; } }
+var qShowDoc=false;
 function paintQuote(){
   var st=loadQuotes(), q=st&&st.list.filter(function(x){ return x.token===TOKEN; })[0];
   if(!q) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
@@ -15091,9 +15095,9 @@ function paintQuote(){
   var acc=(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop();
   var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
   var done=q.status==='accepted'||q.status==='converted';
+  if(done&&!qShowDoc) return quoteWelcome(q,c,who,doc,acc);
   app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1><p>'+e(q.id)+' from '+FIRM.name+' · Valid until '+dmyOf(q.validUntil)+'</p></div>'+
-    (done?'<div class="signed">'+IC.tick+'<span>'+(q.signedAt?'You signed and accepted this quotation on '+whenOf(q.signedAt):'You accepted this quotation on '+whenOf(acc?acc.t:Date.now()))+'. We’ll be in touch to get started.</span></div>':'')+
-    '<div class="card"><div class="qv-top"><h2>Quotation '+e(q.id)+'</h2><button class="btn sec" id="qa-pdf">Download PDF</button></div>'+
+    '<div class="card"><div class="qv-top"><h2>Quotation '+e(q.id)+'</h2><span class="qv-acts">'+(done?'<button class="btn sec" id="qa-back">Back</button>':'')+'<button class="btn sec" id="qa-pdf">Download PDF</button></span></div>'+
       '<div class="lw qv-doc">'+quoteDocHtml(doc)+'</div>'+
       (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
         '<h2>Sign to accept</h2><p class="sub">Read the quotation above, then sign below to accept it.</p>'+
@@ -15103,6 +15107,7 @@ function paintQuote(){
         '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Sign and accept</button></div>')+
     '</div>';
   document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+  var bk=document.getElementById('qa-back'); if(bk) bk.onclick=function(){ qShowDoc=false; paintQuote(); window.scrollTo(0,0); };
   var go=document.getElementById('qa-go'); if(!go) return;
   var pad=sigPad(document.getElementById('qa-pad'),who), nm=document.getElementById('qa-n'); nm.oninput=function(){ pad.setName(nm.value); };
   go.onclick=function(){
@@ -15115,8 +15120,25 @@ function paintQuote(){
     var from=x.status; x.status='accepted'; x.signature=v; x.signedBy=n; x.signedAt=Date.now();
     x.history.push({type:'accepted',by:n,t:x.signedAt,from:from,to:'accepted',note:'Signed and accepted through the quotation link ('+(v.method==='type'?'selected style':v.method==='draw'?'drawn':'uploaded')+' signature)',ok:true,sale:''});
     try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ return toast('We couldn’t record your signature. Please try again.',true); }
-    paintQuote(); window.scrollTo(0,0); toast('Thank you, your quotation is signed and accepted');
+    qShowDoc=false; paintQuote(); window.scrollTo(0,0);
   };
+}
+function quoteWelcome(q,c,who,doc,acc){
+  var first=String(who||c.name||'').trim().split(' ')[0], at=q.signedAt||(acc&&acc.t)||Date.now(), mail=c.email||'';
+  app.innerHTML='<div class="card ty qw" role="status">'+TY_ART+
+    '<p class="qw-eyebrow">Quotation accepted</p>'+
+    '<h1>Welcome to '+FIRM.name+(first?', '+e(first):'')+'!</h1>'+
+    '<p class="ty-lead">Thank you for choosing us. Your quotation is signed and we’re ready to get started on your services.</p>'+
+    '<dl class="ty-meta"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Accepted</dt><dd>'+whenOf(at)+'</dd></div><div><dt>Total (inc. GST)</dt><dd>'+money(doc.T.total)+'</dd></div></dl>'+
+    '<div class="ty-next"><h2>What happens next</h2><ol>'+
+      '<li><b>Your accountant will be in touch</b><span>'+(q.accountant?e(q.accountant)+' will contact you':'We’ll contact you')+(mail?' at '+e(mail):'')+', usually within one business day.</span></li>'+
+      '<li><b>Get your paperwork ready</b><span>Keep receipts, statements and any ATO letters handy so we can start straight away.</span></li>'+
+      '<li><b>We’ll send your invoice</b><span>It matches the quotation you accepted. You don’t need to do anything until it arrives.</span></li></ol></div>'+
+    '<div class="qw-acts"><button class="btn sec" id="qw-view">View signed quotation</button><button class="btn sec" id="qw-pdf">Download PDF</button></div>'+
+    '<p class="ty-help">Questions? Call <a href="tel:'+FIRM.phone.replace(/ /g,'')+'">'+FIRM.phone+'</a> or email <a href="mailto:'+FIRM.email+'">'+FIRM.email+'</a>.</p></div>';
+  document.getElementById('qw-view').onclick=function(){ qShowDoc=true; paintQuote(); window.scrollTo(0,0); };
+  document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+  window.scrollTo(0,0);
 }
 if(KIND==='quote') paintQuote();
 if(KIND==='onboard') bootOnboard();

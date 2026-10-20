@@ -2150,7 +2150,7 @@ tbody tr:hover{background:#FCFCFD}
 /* ================= Drawer ================= */
 .overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
 .drawer{
-  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  background:#fff;width:100%;max-width:min(880px,94vw);height:100%;display:flex;flex-direction:column;
   box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
 }
 .drawer .modal-body{flex:1;overflow-y:auto}
@@ -2961,7 +2961,6 @@ tbody tr:hover{background:#FCFCFD}
 @media (prefers-reduced-motion:reduce){.spin{animation:none}}
 
 /* wizard */
-.drawer.wz{max-width:min(760px,96vw)}
 .wz-head{align-items:flex-start}
 .wz-head>div{min-width:0}
 .wz-steps{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:12px;padding:0}
@@ -4628,12 +4627,13 @@ function signDialog(name,onApply){
 }
 
 /* ---------- reusable email + SMS sending screen ---------- */
-/* cfg: {kind:'engagement'|'onboarding', title, to:{email,phone}, ctx, sendLabel, back(), done(result)} */
+/* cfg: {kind:'engagement'|'onboarding'|'quotation', title, to:{email,phone}, ctx, sendLabel, backLabel, back(), done(result)}
+   Quotations keeps its own copy of this screen (src-quotations); keep the two in step */
 var MSG_MAX=500;   // email and SMS messages, as written (before shortcodes are filled in)
 function sendScreen(body,foot,cfg){
   var et=EMAIL_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; }), stp=SMS_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; });
   var s={email:true,sms:true,eTpl:et[0].id,sTpl:stp[0].id,to:cfg.to.email||'',cc:'',bcc:'',subject:et[0].subject,body:et[0].body,smsTo:cfg.to.phone||'',smsBody:stp[0].body,errs:{},busy:false,fail:'',pv:false,last:'body'};
-  var codes=SHORTCODES.filter(function(c){ return !(cfg.kind==='engagement'&&c[0]==='onboarding_link')&&!(cfg.kind==='onboarding'&&c[0]==='signing_link'); });
+  var codes=codesFor(cfg.kind), need=LINK_CODE[cfg.kind];
   s.showCc=false; s.showBcc=false; s.eMode='write'; s.sMode='write'; s.fold={email:true,sms:true};   // both sections start open
   /* the email is written in a small rich-text editor (bold, italic, underline); templates are plain text, so lines become <br> */
   function toHtml(t){ return esc(t).replace(/\n/g,'<br>'); }
@@ -4692,7 +4692,7 @@ function sendScreen(body,foot,cfg){
         '<div class="ss-cnt">'+s.smsBody.length+'/'+MSG_MAX+' characters</div>'+err('smsBody')+'</div></div></section>';
     if(s.fail) h+='<div class="alert-err" role="alert">'+I.warnSm+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent. Check the details and try again.</span></div>';
     body.innerHTML='<div class="ss">'+h+'</div>';   // one block, so the drawer's gap doesn't space out every part
-    foot.innerHTML='<button class="btn-ghost" id="ss-back"'+(s.busy?' disabled':'')+'>Back</button><span class="sp-grow"></span>'+
+    foot.innerHTML='<button class="btn-ghost" id="ss-back"'+(s.busy?' disabled':'')+'>'+(cfg.backLabel||'Back')+'</button><span class="sp-grow"></span>'+
       '<button class="btn-primary" id="ss-send"'+(s.busy?' disabled':'')+'>'+(s.busy?'<span class="spin"></span>Sending…':OI.send+(cfg.sendLabel||'Send'))+'</button>';
     wire();
   }
@@ -4768,12 +4768,12 @@ function sendScreen(body,foot,cfg){
       if(!s.to.trim()) e.to='Enter the client’s email address';
       if(!s.subject.trim()) e.subject='Add a subject';
       if(!s.body.trim()) e.body='Add a message'; else if(s.body.length>MSG_MAX) e.body='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.body+s.subject).length) e.body='Unknown shortcode '+badCodes(s.body+s.subject)[0];
-      else if(s.body.indexOf(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')<0) e.body='Include '+(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')+' so the client can open it';
+      else if(s.body.indexOf(need)<0) e.body='Include '+need+' so the client can open it';
     }
     if(s.sms){
       if(!String(s.smsTo||'').trim()) e.smsTo='Enter the client’s mobile number';
       if(!s.smsBody.trim()) e.smsBody='Add a message'; else if(s.smsBody.length>MSG_MAX) e.smsBody='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.smsBody).length) e.smsBody='Unknown shortcode '+badCodes(s.smsBody)[0];
-      else if(s.smsBody.indexOf(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}')<0) e.smsBody='Include '+(cfg.kind==='engagement'?'{signing_link}':'{onboarding_link}');
+      else if(s.smsBody.indexOf(need)<0) e.smsBody='Include '+need;
     }
     return e;
   }
@@ -5873,7 +5873,7 @@ tbody tr:hover{background:#FCFCFD}
 /* ================= Drawer ================= */
 .overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
 .drawer{
-  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  background:#fff;width:100%;max-width:min(880px,94vw);height:100%;display:flex;flex-direction:column;
   box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
 }
 .drawer .modal-body{flex:1;overflow-y:auto}
@@ -7594,7 +7594,7 @@ tbody tr:hover{background:#FCFCFD}
 /* ================= Drawer ================= */
 .overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
 .drawer{
-  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  background:#fff;width:100%;max-width:min(880px,94vw);height:100%;display:flex;flex-direction:column;
   box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
 }
 .drawer .modal-body{flex:1;overflow-y:auto}
@@ -8079,7 +8079,6 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi:hover b{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
-.drawer.ad{max-width:580px}
 .state.leave i{background:#8B5CF6}
 .db-lv{color:#6D28D9}.db-lv b{color:#6D28D9}
 .confirm-body .ol-ic{background:#F3EEFF;color:#6D28D9}
@@ -8095,7 +8094,6 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ad-tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 14px;flex-shrink:0}
 .btn-ghost.sm{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12.5px}
 .btn-ghost.danger{color:var(--red)}.btn-ghost.danger:hover{background:#FEF2F2;border-color:#FECACA}
-.drawer.sf{max-width:520px}
 .fin.sm{height:44px;font-size:13.5px}
 .fin:disabled{opacity:.6}
 .sf-who{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC}
@@ -9218,7 +9216,7 @@ tbody tr:hover{background:#FCFCFD}
 /* ================= Drawer ================= */
 .overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
 .drawer{
-  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  background:#fff;width:100%;max-width:min(880px,94vw);height:100%;display:flex;flex-direction:column;
   box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
 }
 .drawer .modal-body{flex:1;overflow-y:auto}
@@ -9703,7 +9701,6 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ar-fi:hover b{color:var(--orange-ink);text-decoration:underline;text-underline-offset:3px}
 .ar-fi small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 /* day panel: one calm column — headings, label/value rows, quoted comments, no boxed tables */
-.drawer.ad{max-width:580px}
 .state.leave i{background:#8B5CF6}
 .db-lv{color:#6D28D9}.db-lv b{color:#6D28D9}
 .confirm-body .ol-ic{background:#F3EEFF;color:#6D28D9}
@@ -9719,7 +9716,6 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .ad-tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 14px;flex-shrink:0}
 .btn-ghost.sm{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12.5px}
 .btn-ghost.danger{color:var(--red)}.btn-ghost.danger:hover{background:#FEF2F2;border-color:#FECACA}
-.drawer.sf{max-width:520px}
 .fin.sm{height:44px;font-size:13.5px}
 .fin:disabled{opacity:.6}
 .sf-who{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC}
@@ -9894,6 +9890,93 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .drawer .at-tl{padding:6px 0 0 32px}
 .drawer .at-tl:before{left:13px;top:12px}
 .drawer .sect-title{margin-bottom:-6px}
+/* ===== Email + SMS send screen (copied from the Clients module, scoped to .ss) ===== */
+.ss .selbox{position:relative}
+.ss .selbox select{appearance:none;-webkit-appearance:none;width:100%;height:44px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 34px 0 14px;font-size:13.5px;color:var(--ink)}
+.ss .selbox select:focus{outline:none;border-color:var(--orange);background:#fff}
+.ss .selbox svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--mute)}
+.ss .cl-err{font-size:12px;color:var(--red);font-weight:600;margin-top:6px;display:flex;gap:5px;align-items:center}
+.ss .cl-err[hidden]{display:none}
+.ss .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:4px 0}
+.ss .linkbtn:hover:not([disabled]){text-decoration:underline;text-underline-offset:2px}
+.ss .linkbtn.danger{color:var(--red)}
+.ss .linkbtn[disabled]{color:#B6BCC6;cursor:not-allowed}
+.ss .alert-err{display:flex;gap:10px;align-items:flex-start;background:#FFF1F2;border:1px solid #FECDD3;color:#BE123C;border-radius:8px;padding:11px 13px;font-size:13px;line-height:1.5;margin-top:14px}
+.ss .alert-err svg{flex-shrink:0;margin-top:2px}
+.ss .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;animation:obspin .8s linear infinite;display:inline-block}
+@keyframes obspin{to{transform:rotate(360deg)}}
+.ss .selbox select.bad{border-color:#F3A3A3;background:#FFF7F7}
+.ss-lbl{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B;margin-bottom:9px}
+.ss-chs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ss-chc{position:relative;display:flex;align-items:center;gap:12px;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+.ss-chc:hover{border-color:#D6DBE1}
+.ss-chc.on{border-color:var(--orange);background:#FFFBF7}
+.ss-chc input{position:absolute;opacity:0;pointer-events:none}
+.ss-chc:focus-within{box-shadow:0 0 0 3px rgba(241,137,52,.18)}
+.ss-chi{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#F1F2F4;color:var(--mute);flex-shrink:0}
+.ss-chi svg{width:18px;height:18px}
+.ss-chc.on .ss-chi{background:var(--orange-soft);color:var(--orange-ink)}
+.ss-cht{flex:1;min-width:0}
+.ss-cht b{display:block;font-size:14px;color:var(--ink)}
+.ss-cht small{display:block;font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.ss-chk{width:20px;height:20px;border-radius:6px;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.ss-chk svg{width:11px;height:11px;opacity:0}
+.ss-chc.on .ss-chk{background:var(--orange);border-color:var(--orange)}
+.ss-chc.on .ss-chk svg{opacity:1}
+.ss,.ss-chs,.ss-card,.ss-lbl,.wz-intro{flex-shrink:0}
+.ss .alert-err{margin-top:16px}
+.ss-card{margin-top:16px;border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.ss-card header{display:flex;align-items:center;gap:12px;padding:0;background:#FAFBFC;border-bottom:1px solid var(--line)}
+.ss-card:not(.open) header{border-bottom:0}
+.ss-acc{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px 16px;text-align:left;cursor:pointer;color:var(--mute)}
+.ss-acc svg{transition:transform .15s}.ss-card.open .ss-acc svg{transform:rotate(180deg)}
+.ss-acc:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(241,137,52,.45)}
+.ss-card header b{display:flex;align-items:center;gap:8px;font-family:'Manrope';font-size:14.5px;font-weight:800;color:var(--ink)}
+.ss-card header b svg{width:16px;height:16px;color:var(--orange)}
+.ss-in{padding:16px;display:flex;flex-direction:column;gap:16px}
+.ss-lrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;min-height:22px}
+.ss-lrow .flabel{margin-bottom:0}
+.ss-ccl{display:flex;gap:14px}
+.ss-ccl .linkbtn{padding:0;font-size:12px}
+.ss-codes{border:1px solid var(--line);border-radius:10px;background:#FAFBFC;padding:10px 12px 12px;margin-bottom:12px}
+.ss-in>.ss-codes{margin-bottom:0}
+.ss-codes-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ss-codes-h b{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B}
+.ss-codes-h span{font-size:12px;color:var(--faint)}
+.ss-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ss-code{height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--slate)}
+.ss-code:hover{border-color:var(--orange);color:var(--orange-ink);background:#FFFBF7}
+.ss-err{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--red);margin:6px 0}
+.ss-seg{display:inline-flex;background:#F1F2F4;border-radius:8px;padding:3px}
+.ss-seg button{padding:3px 12px;border-radius:6px;font-size:12px;font-weight:600;color:var(--mute)}
+.ss-seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(15,23,42,.08)}
+.ss-area{display:block}
+.ss-rte{border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+.ss-rte:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.ss-rte.bad{border-color:#F3A3A3}
+.ss-tools{display:flex;flex-wrap:wrap;align-items:center;gap:2px;padding:5px 6px;border-bottom:1px solid var(--line);background:#FAFBFC}
+.ss-tg{display:inline-flex;gap:2px;padding-right:6px;margin-right:4px;border-right:1px solid var(--line)}.ss-tg:last-child{border-right:0;margin-right:0;padding-right:0}
+.ss-tb{width:30px;height:28px;border-radius:6px;font-size:14px;color:var(--slate);display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,serif}
+.ss-tb:hover{background:#EEF0F3;color:var(--ink)}
+.ss-tb.on{background:var(--orange-soft);color:var(--orange-ink)}
+.ss-tb b{font-weight:800}.ss-ed ul,.ss-html ul{list-style:disc;padding-left:22px;margin:4px 0}.ss-ed ol,.ss-html ol{list-style:decimal;padding-left:22px;margin:4px 0}
+.ss-ed a,.ss-html a{color:#2563EB;text-decoration:underline}
+.ss-ed{min-height:220px;max-height:420px;overflow-y:auto;padding:12px 14px;font-size:14px;line-height:1.6;color:var(--ink);outline:none;white-space:pre-wrap;overflow-wrap:anywhere}
+.ss-html{font-size:13.5px;line-height:1.6;color:var(--ink);overflow-wrap:anywhere}
+.ss-rmf{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--mute);padding:2px 6px;border-radius:6px}
+.ss-rmf svg{width:11px;height:11px}.ss-rmf:hover{background:#FEF2F2;color:var(--red)}
+.ss-area.sms{min-height:84px}
+.ss-area.bad{border-color:#F3A3A3;background:#FFF7F7}
+.ss-mail{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#FCFCFD}
+.ss-mail b{display:block;font-size:14px;color:var(--ink)}
+.ss-mail span{display:block;font-size:12px;color:var(--faint);margin:2px 0 10px}
+.ss-mail pre,.ss-bubble{white-space:pre-wrap;font-family:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);overflow-wrap:anywhere}
+.ss-phone{background:#F1F3F6;border-radius:12px;padding:16px;display:flex}
+.ss-bubble{display:block;max-width:85%;background:#fff;border-radius:16px 16px 16px 4px;padding:10px 13px;box-shadow:0 1px 2px rgba(15,23,42,.06);font-size:13px}
+.ss-cnt{font-size:12px;color:var(--faint);margin-top:8px;text-align:right}
+@media (max-width:600px){.ss-chs{grid-template-columns:1fr}.ss-tpl{max-width:55%}}
+.ss .selbox select{background:#fff;border:1px solid var(--line)}
+.ss .selbox select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
 </style>
 <style id="aad-unify">
 /* ---------- one type system for every module ---------- */
@@ -9979,6 +10062,7 @@ table,td,th{font-size:13.5px}
 .qt-table thead th:first-child,.qt-table tbody td:first-child{padding-left:18px}.qt-table thead th:last-child,.qt-table tbody td:last-child{padding-right:14px}
 .qt-table th.r,.qt-table td.r{text-align:right}.qt-table th.c,.qt-table td.c{text-align:center}
 .qt-sort svg{opacity:.35}.qt-sort.asc svg,.qt-sort.desc svg{opacity:1;color:var(--orange-ink)}
+.qt-meta{font-size:12.5px;color:var(--slate);line-height:1.5;white-space:nowrap}.qt-meta span{font-size:11.5px;color:var(--faint)}
 .qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
 .qt-cn{font-weight:600;color:var(--ink)}
 .qt-st .ar-sub{font-size:11px;white-space:nowrap;line-height:1.35;margin-top:3px}
@@ -10043,7 +10127,6 @@ table,td,th{font-size:13.5px}
 .qs-lk span{flex:1;min-width:0;font-size:12.5px;color:var(--slate);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rq-proto{padding:10px 12px;border-radius:10px;background:#FFF7EC;color:#7C4A03;font-size:12.5px;line-height:1.5}
 /* Add / Edit Quotation */
-.drawer.sf.qf{max-width:1040px}
 .qf-no{font-family:'Inter';font-size:13px;font-weight:600;color:var(--mute);margin-left:6px;letter-spacing:0}
 .qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
 .qf-pick{position:relative}
@@ -10210,7 +10293,7 @@ var DevData={
 var st=null, loadErr=null, clients=[];
 function expireDue(){ var ch=false, today=isoDay(Date.now()); st.list.forEach(function(q){ if(q.status==='sent'&&isoDay(q.validUntil)<today){ setStatus(q,'expired','expired',{by:'System',t:q.validUntil}); ch=true; } }); if(ch) QuoteStore.save(st); }
 function reload(){ try{ st=QuoteStore.load(); clients=loadClients(); expireDue(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
-function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{name:c.name,email:c.email||''}:{name:q.clientName||'Client no longer on file',email:''}; }
+function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{name:c.name,email:c.email||'',phone:c.phone||'',type:c.type,entity:c.entity}:{name:q.clientName||'Client no longer on file',email:'',phone:''}; }
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
 function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
@@ -10385,7 +10468,7 @@ function render(){
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
-      '<td><span class="qt-clip sm" title="'+esc(q.by)+'">'+esc(q.by)+'</span></td>'+
+      '<td><div class="qt-meta">'+whenOf(q.created).replace(' · ',', ')+'<span class="qt-clip" title="'+esc(q.by)+'">by '+esc(q.by)+'</span></div></td>'+
       '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'" title="Actions">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
@@ -10684,53 +10767,206 @@ function previewForm(){
   dlg.classList.add('open'); document.getElementById('qp-x').onclick=closeDlg; document.getElementById('qp-x').focus();
 }
 
-/* ---------- Send: the quotation goes to the client by email with a link to view and accept it ---------- */
-var MSG_MAX=500;
-function openSend(id){
-  reload(); var q=byId(id); if(!q) return;
-  var again=q.status==='sent', c=client(q), first=String(c.name).split(' ')[0];
-  var s={to:c.email||'',subject:'Your quotation '+q.id+' from '+FIRM.name,body:'Hi '+first+',\n\nPlease find your quotation '+q.id+' for '+money(q.amount)+' (incl. GST). It’s valid until '+dmyOf(q.validUntil)+'.\n\nYou can view and accept it using the link below.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name,busy:false,errs:{},fail:''};
-  function paint(){
-    var e=s.errs, err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
-    ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="qs-t">'+
-      '<div class="modal-head"><h2 id="qs-t">'+(again?'Send again':'Send quotation')+' · '+esc(q.id)+'</h2><button id="qs-x" aria-label="Close">'+I.close+'</button></div>'+
-      '<div class="modal-body">'+
-        '<div><label class="flabel" for="qs-to">To <span class="req-star">*</span></label><input class="fin plain sm'+(e.to?' bad':'')+'" id="qs-to" type="email" value="'+esc(s.to)+'" autocomplete="off">'+err('to')+'</div>'+
-        '<div><label class="flabel" for="qs-sub">Subject <span class="req-star">*</span></label><input class="fin plain sm'+(e.subject?' bad':'')+'" id="qs-sub" value="'+esc(s.subject)+'">'+err('subject')+'</div>'+
-        '<div><label class="flabel" for="qs-body">Message <span class="req-star">*</span></label><textarea class="ftext'+(e.body?' bad':'')+'" id="qs-body" rows="9" maxlength="'+MSG_MAX+'">'+esc(s.body)+'</textarea>'+
-          '<div class="qs-cnt" id="qs-n">'+s.body.length+'/'+MSG_MAX+' characters</div>'+err('body')+'</div>'+
-        '<p class="qs-link">The email ends with a secure link where '+esc(first)+' can view the quotation and accept it.</p>'+
-        (s.fail?'<div class="qs-fail" role="alert">'+I.warn+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent.</span></div>':'')+
-      '</div>'+
-      '<div class="modal-foot"><button class="btn-ghost" id="qs-cancel"'+(s.busy?' disabled':'')+'>Cancel</button><button class="btn-primary" id="qs-go"'+(s.busy?' disabled':'')+'>'+(s.busy?'Sending…':(again?'Send again':'Send'))+'</button></div></div>';
-    ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-    ['to','sub','body'].forEach(function(k){ var el=document.getElementById('qs-'+k); el.oninput=function(){ s[k==='sub'?'subject':k]=el.value; if(k==='body') document.getElementById('qs-n').textContent=el.value.length+'/'+MSG_MAX+' characters'; }; });
-    document.getElementById('qs-x').onclick=closeOv; document.getElementById('qs-cancel').onclick=closeOv;
-    document.getElementById('qs-go').onclick=go;
+var QI=(function(){ var v=function(p,w){ return '<svg width="'+(w||14)+'" height="'+(w||14)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {info:v('<circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/>',13),warn:v('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>'),
+    mail:v('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'),phone:v('<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>'),
+    send:v('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>')}; })();
+/* ---------- reusable email + SMS sending screen ---------- */
+/* cfg: {kind:'engagement'|'onboarding'|'quotation', title, to:{email,phone}, ctx, sendLabel, backLabel, back(), done(result)}
+   This is a copy of the Clients module's send screen (src-clients); keep the two in step */
+var MSG_MAX=500;   // email and SMS messages, as written (before shortcodes are filled in)
+function sendScreen(body,foot,cfg){
+  var et=EMAIL_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; }), stp=SMS_TEMPLATES.filter(function(t){ return t.kind===cfg.kind; });
+  var s={email:true,sms:true,eTpl:et[0].id,sTpl:stp[0].id,to:cfg.to.email||'',cc:'',bcc:'',subject:et[0].subject,body:et[0].body,smsTo:cfg.to.phone||'',smsBody:stp[0].body,errs:{},busy:false,fail:'',pv:false,last:'body'};
+  var codes=codesFor(cfg.kind), need=LINK_CODE[cfg.kind];
+  s.showCc=false; s.showBcc=false; s.eMode='write'; s.sMode='write'; s.fold={email:true,sms:true};   // both sections start open
+  /* the email is written in a small rich-text editor (bold, italic, underline); templates are plain text, so lines become <br> */
+  function toHtml(t){ return esc(t).replace(/\n/g,'<br>'); }
+  function fillHtml(h){ return String(h||'').replace(/\{([a-z_]+)\}/g,function(m){ var v=fillTpl(m,cfg.ctx); return v===m?m:esc(v).replace(/\n/g,'<br>'); }); }
+  s.bodyHtml=toHtml(s.body);
+  var REQ=' <span class="req-star">*</span>';
+  function err(id){ return s.errs[id]?'<span class="cl-err">'+QI.info+esc(s.errs[id])+'</span>':''; }
+  function tplSel(id,list,val){ return '<div class="ss-f"><label class="flabel" for="'+id+'">Template'+REQ+'</label><span class="selbox"><select id="'+id+'">'+list.map(function(t){ return '<option value="'+t.id+'"'+(t.id===val?' selected':'')+'>'+esc(t.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span></div>'; }
+  function field(id,label,ph,extra,req){
+    return '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-'+id+'">'+label+(req?REQ:'')+'</label>'+(extra||'')+'</div>'+
+      '<input class="fin plain sm'+(s.errs[id]?' bad':'')+'" id="ss-'+id+'" data-ss="'+id+'" value="'+esc(s[id])+'" placeholder="'+esc(ph)+'" autocomplete="off">'+err(id)+'</div>'; }
+  function rmBtn(k,label){ return '<button type="button" class="ss-rmf" data-rmf="'+k+'" aria-label="Remove '+label+'">'+I.close+'Remove</button>'; }
+  /* shortcodes: click one to put it where the cursor is (email: in the Subject or the Message, whichever you were typing in) */
+  function chips(target,hint){ return '<div class="ss-codes" role="group" aria-label="Shortcodes"><div class="ss-codes-h"><b>Shortcodes</b><span>'+hint+'</span></div><div class="ss-chips">'+
+    codes.map(function(c){ return '<button type="button" class="ss-code" data-code="'+target+'|'+c[0]+'" title="Inserts {'+c[0]+'}">'+esc(c[1])+'</button>'; }).join('')+'</div></div>'; }
+  function modes(key){ return '<div class="ss-seg" role="tablist">'+[['write','Write'],['preview','Preview']].map(function(m){ var on=s[key]===m[0]; return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-mode="'+key+'|'+m[0]+'">'+m[1]+'</button>'; }).join('')+'</div>'; }
+  var SV=function(p){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  var TOOLS=[
+    [['bold','<b>B</b>','Bold (Ctrl+B)',1],['italic','<i>I</i>','Italic (Ctrl+I)',1],['underline','<u>U</u>','Underline (Ctrl+U)',1],['strikeThrough','<s>S</s>','Strikethrough',1]],
+    [['insertUnorderedList',SV('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/>'),'Bulleted list',1],
+     ['insertOrderedList',SV('<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 4h1v4M4 8h2M4 14.5a1.2 1.2 0 0 1 2 1L4 18h2.2"/>'),'Numbered list',1]],
+    [['justifyLeft',SV('<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>'),'Align left',1],['justifyCenter',SV('<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>'),'Align centre',1]],
+    [['link',SV('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),'Add link'],
+     ['unlink',SV('<path d="M10 14a4 4 0 0 0 5.7 0l1.5-1.5M14 10a4 4 0 0 0-5.7 0L6.8 11.5"/><path d="M4 4l16 16"/>'),'Remove link'],
+     ['removeFormat',SV('<path d="M6 5h12M10 5l-3 14M14 5l-1.2 5.5"/><path d="M15 15l5 5M20 15l-5 5"/>'),'Clear formatting']],
+    [['undo',SV('<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>'),'Undo (Ctrl+Z)'],['redo',SV('<path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/>'),'Redo (Ctrl+Y)']]
+  ];
+  function toolbar(){ return '<div class="ss-tools" role="toolbar" aria-label="Formatting">'+TOOLS.map(function(g){ return '<span class="ss-tg">'+g.map(function(t){
+    return '<button type="button" class="ss-tb" data-fmt="'+t[0]+'"'+(t[3]?' data-state="1"':'')+' title="'+t[2]+'" aria-label="'+t[2]+'"'+(t[3]?' aria-pressed="false"':'')+'>'+t[1]+'</button>'; }).join('')+'</span>'; }).join('')+'</div>'; }
+  function chCard(key,icon,label,dest){
+    var on=s[key];
+    return '<label class="ss-chc'+(on?' on':'')+'"><input type="checkbox" id="ss-'+key+'"'+(on?' checked':'')+'>'+
+      '<span class="ss-cht"><b>'+label+'</b></span><i class="ss-chk" aria-hidden="true">'+I.tick+'</i></label>';
   }
-  function go(){
-    var e={}; if(!s.to.trim()) e.to='Enter the client’s email address'; else if(!validEmail(s.to)) e.to='Enter a valid email address';
-    if(!s.subject.trim()) e.subject='Add a subject'; if(!s.body.trim()) e.body='Add a message';
-    s.errs=e; s.fail=''; if(Object.keys(e).length){ paint(); return; }
-    reload(); var x=byId(id); if(!x||['draft','sent'].indexOf(x.status)<0){ closeOv(); render(); return toast('This quotation can no longer be sent.',true); }
-    var token=x.token||newToken(), link=portalLink('quote',token), to=s.to.trim();
+  function paint(){
+    var smsText=fillTpl(s.smsBody,cfg.ctx), segs=Math.max(1,Math.ceil(smsText.length/160));
+    var cc=s.showCc||!!s.cc, bcc=s.showBcc||!!s.bcc;
+    var h=(cfg.intro||'')+'<div class="ss-lbl">'+(cfg.kind==='onboarding'?'Send the onboarding link by':'Send by')+'</div><div class="ss-chs">'+chCard('email',QI.mail,'Email',s.to)+chCard('sms',QI.phone,'SMS',s.smsTo)+'</div>'+err('channel');
+    var acc=function(k,t){ var o=s.fold[k]; return '<section class="ss-card'+(o?' open':'')+'"><header><button type="button" class="ss-acc" data-fold="'+k+'" aria-expanded="'+o+'" aria-controls="ss-in-'+k+'"><b>'+t+'</b>'+I.chev+'</button></header><div class="ss-in" id="ss-in-'+k+'"'+(o?'':' hidden')+'>'; };
+    if(s.email) h+=acc('email','Email')+
+      tplSel('ss-etpl',et,s.eTpl)+
+      field('to','To','client@example.com',cc&&bcc?'':'<span class="ss-ccl">'+(cc?'':'<button type="button" class="linkbtn" id="ss-showcc">Cc</button>')+(bcc?'':'<button type="button" class="linkbtn" id="ss-showbcc">Bcc</button>')+'</span>',true)+
+      (cc?field('cc','Cc','Separate addresses with commas',rmBtn('cc','Cc')):'')+(bcc?field('bcc','Bcc','Separate addresses with commas',rmBtn('bcc','Bcc')):'')+
+      field('subject','Subject','Subject','',true)+
+      (s.eMode==='write'?chips('email','Click to insert into the Subject or the Message, where your cursor is'):'')+   // between the two fields it serves
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Message'+REQ+'</label>'+modes('eMode')+'</div>'+
+        (s.eMode==='write'?'<div class="ss-rte'+(s.errs.body?' bad':'')+'">'+toolbar()+
+            '<div class="ss-ed" id="ss-body" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ss-body-l" aria-describedby="ss-body-n" tabindex="0">'+s.bodyHtml+'</div></div>'+
+            '<div class="ss-cnt" id="ss-body-n">'+String(s.body||'').length+'/'+MSG_MAX+' characters</div>'
+          :'<div class="ss-mail"><b>'+esc(fillTpl(s.subject,cfg.ctx))+'</b><span>To '+esc(s.to||'—')+'</span><div class="ss-html">'+fillHtml(s.bodyHtml)+'</div></div>')+err('body')+'</div></div></section>';
+    if(s.sms) h+=acc('sms','SMS')+
+      tplSel('ss-stpl',stp,s.sTpl)+field('smsTo','To','04XX XXX XXX','',true)+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" for="ss-smsBody">Message'+REQ+'</label>'+modes('sMode')+'</div>'+
+        (s.sMode==='write'?chips('smsBody','Click to insert where your cursor is')+'<textarea class="ftext ss-area sms'+(s.errs.smsBody?' bad':'')+'" id="ss-smsBody" data-ss="smsBody" rows="3" maxlength="'+MSG_MAX+'">'+esc(s.smsBody)+'</textarea>'
+          :'<div class="ss-phone"><span class="ss-bubble">'+esc(smsText)+'</span></div>')+
+        '<div class="ss-cnt">'+s.smsBody.length+'/'+MSG_MAX+' characters</div>'+err('smsBody')+'</div></div></section>';
+    if(s.fail) h+='<div class="alert-err" role="alert">'+QI.warn+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent. Check the details and try again.</span></div>';
+    body.innerHTML='<div class="ss">'+h+'</div>';   // one block, so the drawer's gap doesn't space out every part
+    foot.innerHTML='<button class="btn-ghost" id="ss-back"'+(s.busy?' disabled':'')+'>'+(cfg.backLabel||'Back')+'</button><span class="sp-grow"></span>'+
+      '<button class="btn-primary" id="ss-send"'+(s.busy?' disabled':'')+'>'+(s.busy?'<span class="spin"></span>Sending…':QI.send+(cfg.sendLabel||'Send'))+'</button>';
+    wire();
+  }
+  function clearErr(k,el){ if(!s.errs[k]) return; delete s.errs[k]; var box=el.closest('.ss-rte')||el; box.classList.remove('bad'); var nx=el.closest('.ss-f').querySelector('.cl-err'); if(nx) nx.remove(); }
+  function wire(){
+    body.querySelectorAll('[data-fold]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.fold, o=!s.fold[k]; s.fold[k]=o; b.setAttribute('aria-expanded',o); b.closest('.ss-card').classList.toggle('open',o); document.getElementById('ss-in-'+k).hidden=!o; }; });
+    body.querySelectorAll('[data-ss]').forEach(function(el){
+      el.oninput=function(){
+        var k=el.dataset.ss; s[k]=el.value; clearErr(k,el);
+        if(k==='smsBody') el.closest('.ss-f').querySelector('.ss-cnt').textContent=s.smsBody.length+'/'+MSG_MAX+' characters';
+        if(k==='to'||k==='smsTo'){ var sm=body.querySelector('#ss-'+(k==='to'?'email':'sms')).parentNode.querySelector('small'); if(sm) sm.textContent=el.value||'Add a recipient below'; }
+      };
+    });
+    var ed=document.getElementById('ss-body');
+    if(ed){
+      var sync=function(){ s.bodyHtml=ed.innerHTML; s.body=ed.innerText.replace(/ /g,' ').replace(/\n$/,''); clearErr('body',ed); var cn=document.getElementById('ss-body-n'); if(cn) cn.textContent=s.body.length+'/'+MSG_MAX+' characters'; };
+      var room=function(){ var sel=window.getSelection(), picked=sel.rangeCount&&ed.contains(sel.anchorNode)?sel.toString().length:0; return MSG_MAX-(ed.innerText.replace(/\n$/,'').length-picked); };
+      ed.addEventListener('beforeinput',function(ev){ var t=ev.inputType||''; if(t.indexOf('insert')!==0) return;
+        var add=t==='insertParagraph'||t==='insertLineBreak'?1:String(ev.data||'').length; if(add&&room()<add){ ev.preventDefault(); toast('The message can be up to '+MSG_MAX+' characters',true); } });
+      var keep=function(){ var sel=window.getSelection(); if(sel.rangeCount&&ed.contains(sel.anchorNode)) s.edRange=sel.getRangeAt(0).cloneRange(); };   // where the caret was, for shortcodes
+      var states=function(){ keep(); body.querySelectorAll('[data-state]').forEach(function(b){ var on=false; try{ on=document.queryCommandState(b.dataset.fmt); }catch(x){} b.classList.toggle('on',on); b.setAttribute('aria-pressed',on); }); };
+      ed.oninput=function(){ sync(); keep(); }; ed.onkeyup=ed.onmouseup=states; ed.onfocus=function(){ s.lastField='body'; states(); };
+      ed.onpaste=function(ev){ ev.preventDefault(); var t=(ev.clipboardData||window.clipboardData).getData('text/plain'), r=Math.max(0,room()); if(t.length>r){ t=t.slice(0,r); toast('The message can be up to '+MSG_MAX+' characters',true); } if(t) document.execCommand('insertText',false,t); };   // plain text only, within the limit
+      body.querySelectorAll('[data-fmt]').forEach(function(b){
+        b.onmousedown=function(ev){ ev.preventDefault(); };
+        b.onclick=function(){
+          if(document.activeElement!==ed){ ed.focus(); if(s.edRange){ var sl=window.getSelection(); sl.removeAllRanges(); sl.addRange(s.edRange); } }
+          var c=b.dataset.fmt;
+          if(c==='link'){
+            var sel=window.getSelection(), txt=sel.toString(), url=window.prompt('Link address (https://… or a shortcode such as {onboarding_link})','https://'); if(!url) return;
+            url=url.trim(); if(!/^(https?:\/\/|mailto:|\{[a-z_]+\}$)/i.test(url)){ toast('Use a full address starting with https://, or a shortcode',true); return; }
+            if(txt) document.execCommand('createLink',false,url); else document.execCommand('insertHTML',false,'<a href="'+esc(url)+'">'+esc(url)+'</a>');
+          } else document.execCommand(c,false,null);
+          sync(); states();
+        };
+      });
+    }
+    var ce=document.getElementById('ss-email'), cs=document.getElementById('ss-sms');
+    ce.onchange=function(){ s.email=ce.checked; delete s.errs.channel; paint(); };
+    cs.onchange=function(){ s.sms=cs.checked; delete s.errs.channel; paint(); };
+    var e1=document.getElementById('ss-etpl'); if(e1) e1.onchange=function(){ var t=et.filter(function(x){return x.id===e1.value;})[0]; s.eTpl=t.id; s.subject=t.subject; s.body=t.body; s.bodyHtml=toHtml(t.body); paint(); };
+    var e2=document.getElementById('ss-stpl'); if(e2) e2.onchange=function(){ var t=stp.filter(function(x){return x.id===e2.value;})[0]; s.sTpl=t.id; s.smsBody=t.body; paint(); };
+    var c1=document.getElementById('ss-showcc'); if(c1) c1.onclick=function(){ s.showCc=true; paint(); document.getElementById('ss-cc').focus(); };
+    var c2=document.getElementById('ss-showbcc'); if(c2) c2.onclick=function(){ s.showBcc=true; paint(); document.getElementById('ss-bcc').focus(); };
+    body.querySelectorAll('[data-rmf]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.rmf; s[k]=''; delete s.errs[k]; if(k==='cc') s.showCc=false; else s.showBcc=false; paint(); }; });
+    body.querySelectorAll('[data-mode]').forEach(function(b){ b.onclick=function(){ var p=b.dataset.mode.split('|'); s[p[0]]=p[1]; paint(); }; });
+    var subj=document.getElementById('ss-subject'); if(subj) subj.addEventListener('focus',function(){ s.lastField='subject'; });
+    body.querySelectorAll('[data-code]').forEach(function(b){
+      b.onmousedown=function(e){ e.preventDefault(); };          // keep the cursor where it is
+      b.onclick=function(){
+        var p=b.dataset.code.split('|'), code='{'+p[1]+'}', t=p[0];
+        if(t==='email'){ var ae=document.activeElement; t=ae&&ae.id==='ss-subject'?'subject':ae&&ae.id==='ss-body'?'body':(s.lastField||'body'); }   // whichever field you're in
+        var el=document.getElementById('ss-'+t); if(!el) return;
+        var left=el.isContentEditable?MSG_MAX-el.innerText.replace(/\n$/,'').length:el.maxLength>0?el.maxLength-el.value.length:1e9;
+        if(code.length>left){ toast('The message can be up to '+MSG_MAX+' characters',true); return; }
+        if(el.isContentEditable){
+          if(document.activeElement!==el){ el.focus(); var sel=window.getSelection(), r=s.edRange; if(!r){ r=document.createRange(); r.selectNodeContents(el); r.collapse(false); } sel.removeAllRanges(); sel.addRange(r); }
+          document.execCommand('insertText',false,code); el.oninput();
+        } else {
+          if(document.activeElement!==el&&el.selectionStart==null) el.selectionStart=el.selectionEnd=el.value.length;
+          var a=el.selectionStart, z=el.selectionEnd; el.value=el.value.slice(0,a)+code+el.value.slice(z); el.focus(); el.selectionStart=el.selectionEnd=a+code.length; el.oninput();
+        }
+      };
+    });
+    document.getElementById('ss-back').onclick=function(){ if(!s.busy) cfg.back(); };
+    document.getElementById('ss-send').onclick=send;
+  }
+  function badCodes(t){ var bad=[]; String(t).replace(/\{([a-z_]+)\}/g,function(m,k){ if(!SHORTCODES.some(function(c){return c[0]===k;})) bad.push(m); }); return bad; }
+  function validate(){
+    var e={}, list=function(v){ return String(v||'').split(',').map(function(x){return x.trim();}).filter(Boolean); };
+    if(!s.email&&!s.sms) e.channel='Choose Email, SMS or both';
+    if(s.email){
+      if(!s.to.trim()) e.to='Enter the client’s email address';
+      if(!s.subject.trim()) e.subject='Add a subject';
+      if(!s.body.trim()) e.body='Add a message'; else if(s.body.length>MSG_MAX) e.body='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.body+s.subject).length) e.body='Unknown shortcode '+badCodes(s.body+s.subject)[0];
+      else if(s.body.indexOf(need)<0) e.body='Include '+need+' so the client can open it';
+    }
+    if(s.sms){
+      if(!String(s.smsTo||'').trim()) e.smsTo='Enter the client’s mobile number';
+      if(!s.smsBody.trim()) e.smsBody='Add a message'; else if(s.smsBody.length>MSG_MAX) e.smsBody='Keep the message to '+MSG_MAX+' characters'; else if(badCodes(s.smsBody).length) e.smsBody='Unknown shortcode '+badCodes(s.smsBody)[0];
+      else if(s.smsBody.indexOf(need)<0) e.smsBody='Include '+need;
+    }
+    return e;
+  }
+  function send(){
+    s.errs=validate(); s.fail='';
+    if(Object.keys(s.errs).length){ ['to','cc','bcc','subject','body'].forEach(function(k){ if(s.errs[k]) s.fold.email=true; }); ['smsTo','smsBody'].forEach(function(k){ if(s.errs[k]) s.fold.sms=true; }); if(s.errs.body) s.eMode='write'; if(s.errs.smsBody) s.sMode='write'; if(s.errs.cc) s.showCc=true; if(s.errs.bcc) s.showBcc=true; paint(); var b=body.querySelector('.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
     s.busy=true; paint();
-    deliver({email:{to:to,cc:'',bcc:'',subject:s.subject,body:s.body+'\n\n'+link,html:esc(s.body).replace(/\n/g,'<br>')+'<br><br><a href="'+esc(link)+'">View and accept your quotation</a>'},sms:null}).then(function(res){
-      reload(); var y=byId(id); s.busy=false;
-      if(!res.ok){ log(y,'send_failed',{ok:false,note:res.error||'The email couldn’t be delivered'}); QuoteStore.save(st); s.fail=res.error||'The email couldn’t be delivered.'; paint(); render(); return; }
-      var re=y.status==='sent'; y.token=token;
-      if(re) log(y,'resent',{note:'To '+to}); else setStatus(y,'sent','sent',{note:'To '+to});
-      if(!QuoteStore.save(st)){ toast('The email went out but the quotation couldn’t be updated. Try again.',true); return; }
-      render(); sentPanel(y,to,link);
+    var msg={email:s.email?{to:s.to.trim(),cc:s.cc,bcc:s.bcc,subject:fillTpl(s.subject,cfg.ctx),body:fillTpl(s.body,cfg.ctx),html:fillHtml(s.bodyHtml),template:s.eTpl}:null,
+             sms:s.sms?{to:fmtPhone(s.smsTo),body:fillTpl(s.smsBody,cfg.ctx),template:s.sTpl}:null};
+    deliver(msg).then(function(r){
+      s.busy=false;
+      var rec={at:Date.now(),by:ME.name,channels:[s.email?'Email':'',s.sms?'SMS':''].filter(Boolean),emailTo:msg.email&&msg.email.to,smsTo:msg.sms&&msg.sms.to,ok:r.ok,error:r.error||''};
+      if(!r.ok){ s.fail=r.error; paint(); }
+      cfg.done(rec);
     });
   }
   paint();
+}
+
+/* ---------- Send: the quotation goes to the client by email and/or SMS with a link to view and accept it (same screen as Request Client) ---------- */
+function openSend(id){
+  reload(); var q=byId(id); if(!q) return;
+  var again=q.status==='sent', c=client(q), token=q.token||newToken(), link=portalLink('quote',token);
+  var ctx=tplCtx({name:c.name,type:c.type,entity:c.entity,services:(q.items||[]).map(function(x){ return {name:x.name,price:(x.qty||1)*x.price}; }),staff:ME.name,kind:'quotation',link:link});
+  ctx.quote_number=q.id; ctx.quote_amount=money(q.amount); ctx.valid_until=dmyOf(q.validUntil); ctx.quote_link=link; ctx.total_fee=money(q.amount);
+  ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="qs-t">'+
+    '<div class="modal-head"><h2 id="qs-t">'+(again?'Send again':'Send quotation')+' · '+esc(q.id)+'</h2><button id="qs-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body" id="qsb"></div><div class="modal-foot" id="qs-foot"></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('qs-x').onclick=closeOv;
+  sendScreen(document.getElementById('qsb'),document.getElementById('qs-foot'),{kind:'quotation',to:{email:c.email||'',phone:c.phone||''},ctx:ctx,
+    sendLabel:again?'Send again':'Send',backLabel:'Cancel',back:closeOv,
+    done:function(rec){
+      reload(); var y=byId(id);
+      if(!y||['draft','sent'].indexOf(y.status)<0){ closeOv(); render(); return toast('This quotation can no longer be sent.',true); }
+      var where=[rec.emailTo?'Email to '+rec.emailTo:'',rec.smsTo?'SMS to '+rec.smsTo:''].filter(Boolean).join(' · ');
+      if(!rec.ok){ log(y,'send_failed',{ok:false,note:rec.error||'The message couldn’t be delivered'}); QuoteStore.save(st); render(); return; }
+      var re=y.status==='sent'; y.token=token;
+      if(re) log(y,'resent',{note:where}); else setStatus(y,'sent','sent',{note:where});
+      if(!QuoteStore.save(st)){ toast('The quotation went out but couldn’t be updated. Try again.',true); return; }
+      render(); sentPanel(y,[rec.emailTo,rec.smsTo].filter(Boolean).join(' and '),link);
+    }});
 }
 /* PROTOTYPE ONLY: after sending, the link the client received, so the team can open the client's page */
 function sentPanel(q,to,link){
   var b=ov.querySelector('.modal-body'), f=ov.querySelector('.modal-foot'); if(!b) return;
   document.getElementById('qs-t').textContent='Quotation sent · '+q.id;
-  b.innerHTML='<p class="qs-done">'+esc(q.id)+' was emailed to <b>'+esc(to)+'</b>. Please copy the below link on the next browser tab to view the quotation as the client sees it:</p>'+
+  b.innerHTML='<p class="qs-done">'+esc(q.id)+' was sent to <b>'+esc(to)+'</b>. Please copy the below link on the next browser tab to view the quotation as the client sees it:</p>'+
     '<div class="qs-lk"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="qs-copy" title="Copy link" aria-label="Copy link">'+AI.copy+'</button></div>'+
     '<p class="rq-proto">This panel won’t be shown in the real design. It’s only here in the prototype to give you the link to preview what the client receives.</p>';
   f.innerHTML='<span></span><button class="btn-primary" id="qs-close">Done</button>';
@@ -11616,7 +11852,7 @@ tbody tr:hover{background:#FCFCFD}
 /* ================= Drawer ================= */
 .overlay.as-drawer{justify-content:flex-end;align-items:stretch;padding:0;overflow:hidden}
 .drawer{
-  background:#fff;width:100%;max-width:660px;height:100%;display:flex;flex-direction:column;
+  background:#fff;width:100%;max-width:min(880px,94vw);height:100%;display:flex;flex-direction:column;
   box-shadow:-18px 0 50px rgba(15,23,42,.18);animation:slideIn .22s ease-out;
 }
 .drawer .modal-body{flex:1;overflow-y:auto}
@@ -11776,7 +12012,6 @@ tbody tr:hover{background:#FCFCFD}
 #mb .modrow{background:#fff;border:1px solid var(--line)}
 
 /* branch detail tabs */
-.drawer.wide{max-width:min(1180px,94vw)}
 .btabs{display:flex;gap:4px;padding:0 32px;border-bottom:1px solid var(--line)}
 .btabs button{padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px}
 .btabs button:hover{color:var(--ink)}
@@ -13917,8 +14152,14 @@ function totalOf(services){ return services.reduce(function(a,s){ return a+Numbe
 var SHORTCODES = [
   ['client_name','Client name'],['first_name','First name'],['client_type','Client type'],['services','Services list'],
   ['total_fee','Total fees'],['onboarding_link','Onboarding link'],['signing_link','Signing link'],['expiry_date','Link expiry date'],
-  ['staff_name','Staff name'],['firm_name','Firm name'],['firm_phone','Firm phone']
+  ['staff_name','Staff name'],['firm_name','Firm name'],['firm_phone','Firm phone'],
+  ['quote_number','Quotation number'],['quote_amount','Quotation amount'],['valid_until','Valid until'],['quote_link','Quotation link']
 ];
+/* which messages each shortcode belongs to (a code that isn't listed works everywhere) */
+var CODE_KINDS={onboarding_link:['onboarding'],signing_link:['engagement'],expiry_date:['onboarding','engagement'],
+  quote_number:['quotation'],quote_amount:['quotation'],valid_until:['quotation'],quote_link:['quotation']};
+function codesFor(kind){ return SHORTCODES.filter(function(c){ var k=CODE_KINDS[c[0]]; return !k||k.indexOf(kind)>=0; }); }
+var LINK_CODE={engagement:'{signing_link}',onboarding:'{onboarding_link}',quotation:'{quote_link}'};   // every message must carry its link
 var EMAIL_TEMPLATES = [
   { id:'eng-std', kind:'engagement', name:'Engagement letter · signature request',
     subject:'Please sign your engagement letter with {firm_name}',
@@ -13931,12 +14172,20 @@ var EMAIL_TEMPLATES = [
     body:'Hi {first_name},\n\nWelcome to {firm_name}. To get started, please complete your onboarding form. It takes about 10 minutes and you can save and come back to it.\n\nServices we’ve agreed:\n{services}\nTotal fees: {total_fee}\n\nStart here:\n{onboarding_link}\n\nThis secure link expires on {expiry_date}.\n\nKind regards,\n{staff_name}\n{firm_name}' },
   { id:'onb-rem', kind:'onboarding', name:'Client onboarding · reminder',
     subject:'Reminder: finish your onboarding with {firm_name}',
-    body:'Hi {first_name},\n\nYour onboarding isn’t finished yet. You can pick up where you left off here:\n{onboarding_link}\n\nThe link expires on {expiry_date}.\n\nThanks,\n{staff_name}' }
+    body:'Hi {first_name},\n\nYour onboarding isn’t finished yet. You can pick up where you left off here:\n{onboarding_link}\n\nThe link expires on {expiry_date}.\n\nThanks,\n{staff_name}' },
+  { id:'qt-std', kind:'quotation', name:'Quotation · send to client',
+    subject:'Your quotation {quote_number} from {firm_name}',
+    body:'Hi {first_name},\n\nPlease find your quotation {quote_number} for {quote_amount} (incl. GST). It’s valid until {valid_until}.\n\nServices quoted:\n{services}\n\nView and accept it here:\n{quote_link}\n\nIf you have any questions, call us on {firm_phone}.\n\nKind regards,\n{staff_name}\n{firm_name}' },
+  { id:'qt-rem', kind:'quotation', name:'Quotation · reminder',
+    subject:'Reminder: your quotation {quote_number} from {firm_name}',
+    body:'Hi {first_name},\n\nA quick reminder that your quotation {quote_number} for {quote_amount} is valid until {valid_until}. You can view and accept it here:\n{quote_link}\n\nThanks,\n{staff_name}' }
 ];
 var SMS_TEMPLATES = [
   { id:'eng-sms', kind:'engagement', name:'Engagement letter · signature request', body:'Hi {first_name}, your {firm_name} engagement letter is ready to sign: {signing_link} (expires {expiry_date})' },
   { id:'onb-sms', kind:'onboarding', name:'Client onboarding · invitation', body:'Hi {first_name}, please complete your {firm_name} onboarding here: {onboarding_link} (expires {expiry_date})' },
-  { id:'onb-sms-rem', kind:'onboarding', name:'Client onboarding · reminder', body:'Reminder from {firm_name}: finish your onboarding at {onboarding_link}' }
+  { id:'onb-sms-rem', kind:'onboarding', name:'Client onboarding · reminder', body:'Reminder from {firm_name}: finish your onboarding at {onboarding_link}' },
+  { id:'qt-sms', kind:'quotation', name:'Quotation · send to client', body:'Hi {first_name}, your {firm_name} quotation {quote_number} for {quote_amount} is ready to view and accept: {quote_link} (valid until {valid_until})' },
+  { id:'qt-sms-rem', kind:'quotation', name:'Quotation · reminder', body:'Reminder from {firm_name}: quotation {quote_number} is valid until {valid_until}. View it at {quote_link}' }
 ];
 function fillTpl(text,ctx){ return String(text||'').replace(/\{([a-z_]+)\}/g,function(m,k){ return ctx[k]!=null?String(ctx[k]):m; }); }
 function tplCtx(o){                                   // o: {name,type,entity,services,staff,link,kind,expires}

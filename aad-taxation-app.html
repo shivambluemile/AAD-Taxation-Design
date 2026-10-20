@@ -9978,10 +9978,7 @@ table,td,th{font-size:13.5px}
 .qt-table thead th,.qt-table tbody td{padding-left:8px;padding-right:8px}.qt-table tbody td{padding-top:10px;padding-bottom:10px}
 .qt-table thead th:first-child,.qt-table tbody td:first-child{padding-left:18px}.qt-table thead th:last-child,.qt-table tbody td:last-child{padding-right:14px}
 .qt-table th.r,.qt-table td.r{text-align:right}.qt-table th.c,.qt-table td.c{text-align:center}
-.qt-sort{display:inline-flex;align-items:center;gap:5px;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;text-align:left;line-height:1.3}.qt-sort svg{flex-shrink:0}.qt-table thead th{white-space:normal;vertical-align:bottom}.qt-table td.qt-st{min-width:166px}.qt-table tbody td{font-size:13px}.qt-table thead th:last-child{width:64px}
 .qt-sort svg{opacity:.35}.qt-sort.asc svg,.qt-sort.desc svg{opacity:1;color:var(--orange-ink)}
-.qt-sort.asc svg .dn,.qt-sort.desc svg .up{opacity:.2}
-.qt-table th.r .qt-sort{flex-direction:row-reverse}
 .qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
 .qt-cn{font-weight:600;color:var(--ink)}
 .qt-st .ar-sub{font-size:11px;max-width:170px;line-height:1.35;margin-top:3px}
@@ -9995,9 +9992,6 @@ table,td,th{font-size:13.5px}
 .qt-menu button:hover,.qt-menu button:focus-visible{background:#FFF4EA;color:#C2630F;outline:none}
 .qt-menu button.danger{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2;color:#BE123C}
 .qt-menu small{font-size:10.5px;font-weight:700;letter-spacing:.3px;color:#94A3B8;background:#F1F2F4;border-radius:999px;padding:1px 7px}
-.qt-range{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mute)}
-.qt-range input{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font:inherit;font-size:13px;color:var(--ink);background:#fff}
-.qt-range input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
 .qh-list{list-style:none;margin:0;padding:0}
 .qh-list li{position:relative;display:flex;gap:12px;padding:0 0 16px}
 .qh-list li:not(:last-child):before{content:'';position:absolute;left:5px;top:14px;bottom:0;width:1px;background:var(--line)}
@@ -10007,6 +10001,38 @@ table,td,th{font-size:13.5px}
 .qh-note{display:block;font-size:12.5px;color:var(--slate);margin-top:2px}.qh-list small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
 @media (max-width:1180px){.qt-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:640px){.qt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rsel{position:relative}
+.rbtn{
+  display:inline-flex;align-items:center;gap:8px;height:42px;min-width:168px;background:var(--field);border:1px solid var(--field);
+  border-radius:8px;padding:0 13px 0 14px;font-size:14px;color:#4B5563;white-space:nowrap;
+}
+.rbtn svg:first-child{color:#6B7280;flex-shrink:0}
+.rbtn span{flex:1;text-align:left}
+.rbtn svg:last-child{color:#6B7280;flex-shrink:0;transition:transform .15s}
+.rbtn[aria-expanded="true"]{border-color:var(--orange);background:#fff}
+.rbtn[aria-expanded="true"] svg:last-child{transform:rotate(180deg)}
+.rbtn.set{background:var(--orange-soft);border-color:var(--orange-soft);color:var(--orange-ink)}
+.rbtn.set svg{color:var(--orange-ink)!important}
+.rpop{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:40;width:340px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:0 18px 44px rgba(15,23,42,.16);padding:6px;
+}
+.rpop[hidden]{display:none}
+.rlist{max-height:min(560px,68vh);overflow-y:auto}
+.rlist hr{border:0;border-top:1px solid var(--line-soft);margin:5px 6px}
+.ropt{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 11px;border-radius:7px;font-size:13.5px;color:var(--slate);text-align:left}
+.ropt small{font-size:11.5px;color:var(--faint);white-space:nowrap}
+.ropt:hover,.ropt:focus-visible{background:#F6F7F9;color:var(--ink);outline:none}
+.ropt.on{background:var(--orange-soft);color:var(--orange-ink);font-weight:600}
+.ropt.on small{color:var(--orange-ink);opacity:.75}
+.rcustom{padding:10px 8px 6px}
+.rc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rc-grid label span{display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#64748B;margin-bottom:6px}
+.rc-grid .fin{height:42px;padding:0 10px;font-size:13.5px}
+.rcustom .ferr{margin-top:8px}
+.rc-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+@media (max-width:600px){.rpop{right:auto;left:0;width:min(310px,calc(100vw - 40px))}}
+@media (max-width:860px){.filterbar .search{width:100%}}
 </style>
 </head>
 <body>
@@ -10134,10 +10160,10 @@ function client(q){ var c=clients.filter(function(x){ return String(x.id)===Stri
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
 function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
-/* the latest action under the badge, unless it's the creation (already in Created By) */
+/* the latest action under the badge: who did it and when */
 function attrLine(q){
-  var h=(q.history||[]).filter(function(e){ return e.ok&&e.type!=='created'&&e.type!=='send_failed'; }), e=h[h.length-1];
-  if(!e) return '';
+  var h=(q.history||[]).filter(function(e){ return e.ok&&e.type!=='send_failed'; }), e=h[h.length-1];
+  if(!e) return q.by?'Created by '+esc(q.by)+' on '+stamp(q.created):'';   // older records without history: the creator, if known
   return e.type==='expired'?'Expired on '+dmyOf(e.t):EV[e.type][1]+' '+esc(e.by)+' on '+stamp(e.t);
 }
 
@@ -10151,31 +10177,118 @@ function summary(list){
 
 /* ---------- filters and sorting ---------- */
 var state={f:blank(),page:1,per:10,sort:{k:'created',d:-1}};
-function blank(){ return {q:'',status:'',qd:'',qdFrom:'',qdTo:'',branch:'',acc:''}; }
-function anyFilter(f){ return !!(f.q.trim()||f.status||f.qd||f.branch||f.acc); }
-function quoteRange(k,from,to){
-  var n=new Date(), y=n.getFullYear(), m=n.getMonth(), t=isoDay(n);
-  if(k==='month') return [y+'-'+pad(m+1)+'-01',t];
-  if(k==='last') return [isoDay(new Date(y,m-1,1)),isoDay(new Date(y,m,0))];
-  if(k==='90') return [isoDay(Date.now()-89*864e5),t];
-  if(k==='fy'){ var fy=m>=6?y:y-1; return [fy+'-07-01',t]; }
-  if(k==='custom') return [from||'0000-01-01',to||'9999-12-31'];
-  return null;
+function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',status:'',range:DEFAULT_RANGE,from:d[0],to:d[1],branch:''}; }
+function anyFilter(f){ return !!(f.q.trim()||f.status||f.range!==DEFAULT_RANGE||f.branch); }
+/* date range: the same control as the Leave module (presets + custom dates), This Month by default */
+var DEFAULT_RANGE='this_month';
+function fmtD(iso){ return iso?iso.split('-').reverse().join('-'):''; }
+function rIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function rangeOf(key){
+  var t=new Date(); t.setHours(0,0,0,0);
+  var y=t.getFullYear(), m=t.getMonth(), mon=addDays(t,-((t.getDay()+6)%7));   // weeks run Monday to Sunday
+  var q=Math.floor(m/3), fy=m>=6?y:y-1;                                           // financial year: 1 July to 30 June
+  var R=function(a,b){ return [rIso(a),rIso(b)]; };
+  switch(key){
+    case 'today':        return R(t,t);
+    case 'this_week':    return R(mon,addDays(mon,6));
+    case 'last_week':    return R(addDays(mon,-7),addDays(mon,-1));
+    case 'next_week':    return R(addDays(mon,7),addDays(mon,13));
+    case 'this_month':   return R(new Date(y,m,1),new Date(y,m+1,0));
+    case 'last_month':   return R(new Date(y,m-1,1),new Date(y,m,0));
+    case 'next_month':   return R(new Date(y,m+1,1),new Date(y,m+2,0));
+    case 'last_30':      return R(addDays(t,-29),t);
+    case 'next_30':      return R(t,addDays(t,29));
+    case 'this_quarter': return R(new Date(y,q*3,1),new Date(y,q*3+3,0));
+    case 'last_quarter': return R(new Date(y,q*3-3,1),new Date(y,q*3,0));
+    case 'this_fy':      return R(new Date(fy,6,1),new Date(fy+1,5,30));
+    case 'last_fy':      return R(new Date(fy-1,6,1),new Date(fy,5,30));
+    case 'this_year':    return R(new Date(y,0,1),new Date(y,11,31));
+    case 'last_year':    return R(new Date(y-1,0,1),new Date(y-1,11,31));
+    default:             return ['',''];                                           // all dates
+  }
 }
+var RANGES=[
+  [['today','Today'],['this_week','This Week'],['this_month','This Month'],['this_year','This Year']]
+];
+function rangeName(key){ for(var g=0;g<RANGES.length;g++) for(var i=0;i<RANGES[g].length;i++) if(RANGES[g][i][0]===key) return RANGES[g][i][1]; return 'Custom Range'; }
+function fmtRange(a,b){
+  if(!a&&!b) return 'Any date';
+  return a===b?fmtD(a):fmtD(a)+' – '+fmtD(b);
+}
+var CAL='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+function rangeHtml(f){
+  var label=f.range==='custom'?fmtRange(f.from,f.to):rangeName(f.range);
+  var h='<div class="rsel" id="rsel"><button type="button" class="rbtn'+(f.range!==DEFAULT_RANGE?' set':'')+'" id="rbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="rpop" title="'+esc(fmtRange(f.from,f.to))+'">'+
+    CAL+'<span>'+esc(label)+'</span>'+I.chev+'</button><div class="rpop" id="rpop" role="dialog" aria-label="Choose a date range" hidden><div class="rlist">';
+  RANGES.forEach(function(g,gi){
+    if(gi) h+='<hr>';
+    g.forEach(function(r){
+      var rr=rangeOf(r[0]);
+      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span><small>'+(r[0]==='all'?'':esc(fmtRange(rr[0],rr[1])))+'</small></button>';
+    });
+  });
+  h+='<hr><button type="button" class="ropt'+(f.range==='custom'?' on':'')+'" data-r="custom"><span>Custom Range</span><small>'+(f.range==='custom'?esc(fmtRange(f.from,f.to)):'Pick dates')+'</small></button></div>'+
+    '<div class="rcustom" id="rcustom" hidden><div class="rc-grid">'+
+    '<label><span>From</span><input type="date" id="rc-from" class="fin plain"></label>'+
+    '<label><span>To</span><input type="date" id="rc-to" class="fin plain"></label></div>'+
+    '<p class="ferr" id="rc-err" role="alert"></p>'+
+    '<div class="rc-btns"><button type="button" class="btn-ghost" id="rc-back">Back</button><button type="button" class="btn-primary" id="rc-apply">Apply</button></div></div>'+
+    '</div></div>';
+  return h;
+}
+function bindRange(){
+  var btn=document.getElementById('rbtn'), pop=document.getElementById('rpop'), list=pop.querySelector('.rlist'), cust=document.getElementById('rcustom');
+  var from=document.getElementById('rc-from'), to=document.getElementById('rc-to'), err=document.getElementById('rc-err');
+  function open(){ pop.hidden=false; btn.setAttribute('aria-expanded','true'); list.hidden=false; cust.hidden=true; var on=pop.querySelector('.ropt.on')||pop.querySelector('.ropt'); on.focus(); }
+  function close(focus){ pop.hidden=true; btn.setAttribute('aria-expanded','false'); if(focus) btn.focus(); }
+  function apply(key,a,b){ var f=state.f; f.range=key; f.from=a; f.to=b; state.page=1; render(); document.getElementById('rbtn').focus(); }
+  function showCustom(){
+    var f=state.f, t=rIso(new Date());
+    from.value=f.from||t; to.value=f.to||f.from||t; to.min=from.value;
+    err.classList.remove('show'); list.hidden=true; cust.hidden=false; from.focus();
+  }
+  btn.onclick=function(){ pop.hidden?open():close(); };
+  list.onclick=function(e){
+    var o=e.target.closest('.ropt'); if(!o) return;
+    var k=o.getAttribute('data-r');
+    if(k==='custom'){ showCustom(); return; }
+    var r=rangeOf(k); apply(k,r[0],r[1]);
+  };
+  list.onkeydown=function(e){
+    var opts=[].slice.call(list.querySelectorAll('.ropt')), i=opts.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); opts[Math.min(opts.length-1,i+1)].focus(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); opts[Math.max(0,i-1)].focus(); }
+  };
+  from.onchange=function(){ to.min=from.value; if(to.value&&to.value<from.value) to.value=from.value; err.classList.remove('show'); };
+  to.onchange=function(){ err.classList.remove('show'); };
+  document.getElementById('rc-back').onclick=function(){ cust.hidden=true; list.hidden=false; (pop.querySelector('.ropt[data-r="custom"]')).focus(); };
+  document.getElementById('rc-apply').onclick=function(){
+    if(!from.value||!to.value){ err.textContent='Choose both a From and a To date.'; err.classList.add('show'); return; }
+    if(to.value<from.value){ err.textContent='To date can’t be earlier than From date.'; err.classList.add('show'); return; }
+    apply('custom',from.value,to.value);
+  };
+  pop.onkeydown=function(e){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); close(true); } };
+}
+// click outside closes the range menu
+document.addEventListener('mousedown',function(e){
+  var p=document.getElementById('rpop'); if(!p||p.hidden) return;
+  if(!e.target.closest('#rsel')){ p.hidden=true; document.getElementById('rbtn').setAttribute('aria-expanded','false'); }
+});
+
+
 var SORTS={id:function(q){ return +q.id.replace(/\D/g,''); },client:function(q){ return client(q).name.toLowerCase(); },created:function(q){ return q.created; },expiry:function(q){ return q.validUntil; },
   amount:function(q){ return q.amount; },branch:function(q){ return q.branch.toLowerCase(); },acc:function(q){ return q.accountant.toLowerCase(); },status:function(q){ return STATUS[q.status][0]; },by:function(q){ return String(q.by).toLowerCase(); }};
 function filtered(){
-  var f=state.f, q=f.q.trim().toLowerCase(), qr=quoteRange(f.qd,f.qdFrom,f.qdTo), k=SORTS[state.sort.k], d=state.sort.d;
+  var f=state.f, q=f.q.trim().toLowerCase(), k=SORTS[state.sort.k], d=state.sort.d;
   return scoped().filter(function(x){
     if(f.status&&x.status!==f.status) return false;
     if(f.branch&&x.branch!==f.branch) return false;
-    if(f.acc&&x.accountant!==f.acc) return false;
-    if(qr){ var a=isoDay(x.created); if(a<qr[0]||a>qr[1]) return false; }
+    if(f.from||f.to){ var a=isoDay(x.created); if(f.from&&a<f.from||f.to&&a>f.to) return false; }
     if(!q) return true; var c=client(x); return (x.id+' '+c.name+' '+c.email).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){ var A=k(a), B=k(b); return A<B?-d:A>B?d:(b.created-a.created); });
 }
 function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" aria-label="'+esc(all)+'"><option value="">'+all+'</option>'+opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; }
-function rangeInputs(a,b,va,vb,label){ return '<span class="qt-range"><input type="date" id="'+a+'" aria-label="'+label+' from" value="'+esc(va)+'"><span>to</span><input type="date" id="'+b+'" aria-label="'+label+' to" value="'+esc(vb)+'"></span>'; }
 function pager(total){
   var pages=Math.max(1,Math.ceil(total/state.per)); if(state.page>pages) state.page=pages;
   var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total);
@@ -10184,7 +10297,6 @@ function pager(total){
   for(var i=1;i<=pages;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
   return h+'<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
 }
-function th(k,label,cls){ var on=state.sort.k===k; return '<th'+(cls?' class="'+cls+'"':'')+' aria-sort="'+(on?(state.sort.d>0?'ascending':'descending'):'none')+'"><button class="qt-sort'+(on?(state.sort.d>0?' asc':' desc'):'')+'" data-sort="'+k+'">'+label+I.sort+'</button></th>'; }
 
 /* ---------- the page ---------- */
 function head(){
@@ -10200,41 +10312,36 @@ function render(){
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
-    selHtml('f-qd','All Dates',[['month','This Month'],['last','Last Month'],['90','Last 90 Days'],['fy','This Financial Year'],['custom','Custom Range']],f.qd)+
-    (f.qd==='custom'?rangeInputs('f-qdf','f-qdt',f.qdFrom,f.qdTo,'Quotation date'):'')+
+    rangeHtml(f)+
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
-    selHtml('f-acc','All Accountants',people(ASSIGNABLE.map(function(s){ return s.name; })),f.acc)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card ar-table qt-table"><table><thead><tr>'+th('id','Quotation Number')+th('client','Client')+th('created','Quotation Date')+th('expiry','Expiry Date')+th('amount','Total Amount','r')+
-    th('branch','Branch')+th('acc','Assigned Accountant')+th('status','Status')+th('by','Created By')+'<th class="c">Actions</th></tr></thead><tbody>';
-  if(!all.length) h+='<tr><td colspan="10"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Create Quotation</button></div></td></tr>';
-  else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Date</th><th>Quotation ID</th><th>Client</th><th>Branch</th><th class="r">Amount</th><th>Status</th><th>Accountant</th><th class="c">Actions</th></tr></thead><tbody>';
+  if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Create Quotation</button></div></td></tr>';
+  else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
+      '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="View details"><span class="name">'+esc(q.id)+'</span></button></td>'+
       '<td><span class="qt-clip" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.email?'<small class="ar-sub qt-clip" title="'+esc(c.email)+'">'+esc(c.email)+'</small>':'')+'</td>'+
-      '<td class="num">'+dmyOf(q.created)+'</td>'+
-      '<td class="num">'+dmyOf(q.validUntil)+'</td>'+
-      '<td class="num r">'+money(q.amount)+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
-      '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
+      '<td class="num r">'+money(q.amount)+'</td>'+
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
-      '<td><span class="qt-clip sm" title="'+esc(q.by)+'">'+esc(q.by)+'</span></td>'+
+      '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
       '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead();
   var qi=document.getElementById('q');
   qi.oninput=function(){ state.f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-status','status'],['f-qd','qd'],['f-qdf','qdFrom'],['f-qdt','qdTo'],['f-branch','branch'],['f-acc','acc']].forEach(function(p){
+  [['f-status','status'],['f-branch','branch']].forEach(function(p){
     var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
+  bindRange();
   var clear=function(){ state.f=blank(); state.page=1; render(); };
   document.getElementById('clearf').onclick=clear; var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
   var a2=document.getElementById('qt-add2'); if(a2) a2.onclick=function(){ route('create'); };
-  [].forEach.call(content.querySelectorAll('[data-sort]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-sort'); state.sort=state.sort.k===k?{k:k,d:-state.sort.d}:{k:k,d:k==='created'||k==='expiry'||k==='amount'?-1:1}; render(); }; });
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
 }
 function wireHead(){ document.getElementById('qt-add').onclick=function(){ route('create'); }; }
@@ -10367,6 +10474,7 @@ document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if
 window.addEventListener('storage',function(e){ if((e.key===Q_KEY||e.key==='aad-clients-v1')&&!ov.classList.contains('open')){ reload(); render(); } });
 
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading quotations…</h3></div></div>';
+state.f=blank();   // the date range code above is ready now: start on This Month
 setTimeout(function(){ reload(); render(); },0);
 })();
 

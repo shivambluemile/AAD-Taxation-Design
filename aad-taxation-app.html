@@ -10143,7 +10143,7 @@ var I={
 };
 var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
-  send_failed:['Email not sent',''],accepted:['Accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to invoice','Converted by'],expired:['Validity ended','Expired']};
+  send_failed:['Email not sent',''],accepted:['Accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function esc(s){ return escH(s); }
@@ -10370,7 +10370,7 @@ function render(){
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Actions</th></tr></thead><tbody>';
+  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
@@ -10383,7 +10383,7 @@ function render(){
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
-      '<td class="nowrap"><span class="acts">'+menuFor(q)[0].map(function(a){ return '<button class="act" data-mi="'+a[0]+'" data-q="'+q.id+'" title="'+esc(a[1])+'" aria-label="'+esc(a[1])+' '+esc(q.id)+'">'+AI[a[0]]+'</button>'; }).join('')+'</span></td></tr>';   // the same icon buttons as the other tables
+      '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'" title="Actions">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead();
@@ -10429,7 +10429,7 @@ function menuFor(q){
   if((s==='draft'||s==='sent')&&edit) a.push(['edit','Edit']);
   if((s==='draft'||s==='sent')&&edit) a.push(['send',s==='sent'?'Send again':'Send']);
   a.push(['pdf','Download PDF']);
-  if(s==='accepted'&&isManager()) a.push(['convert','Convert to invoice']);   // labels show as the button tooltip
+  if(s==='accepted'&&isManager()) a.push(['convert','Convert to sale']);
   return [a];
 }
 /* screens built in later steps: each action goes through route(), the one hand-off point */
@@ -10469,7 +10469,7 @@ function act(k,id){
   route(k,q);
 }
 content.addEventListener('click',function(e){
-  var m=e.target.closest('[data-mi][data-q]'); if(m) return act(m.getAttribute('data-mi'),m.getAttribute('data-q'));   // actions sit in the row
+  var m=e.target.closest('[data-menu]'); if(m) return openMenu(m);
   var v=e.target.closest('[data-do="view"]'); if(v){ reload(); if(ROUTES.view) return ROUTES.view(byId(v.getAttribute('data-q'))); openHistory(v.getAttribute('data-q')); }
 });
 document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });
@@ -10532,7 +10532,7 @@ function paintForm(focusId){
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
   ov.innerHTML='<div class="drawer sf qf" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
-    '<div class="modal-head"><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation')+' <span class="qf-no">'+esc(QF.id)+'</span></h2><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-head"><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation')+'</h2><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
       '<div class="qf-grid">'+
         field('Select Client',true,clientField,'client')+
@@ -10741,9 +10741,9 @@ function loadInvoices(){ try{ var v=JSON.parse(localStorage.getItem(INV_KEY)||'n
 function saveInvoices(v){ try{ localStorage.setItem(INV_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 function confirmConvert(id){
   reload(); var q=byId(id); if(!q) return;
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qv-t"><div class="confirm-body"><h3 id="qv-t">Convert '+esc(q.id)+' to an invoice?</h3>'+
-    '<p>An invoice for <strong>'+esc(client(q).name)+'</strong> of '+money(q.amount)+' is created with the same services and prices, and the quotation becomes Invoiced. It can’t be edited or converted again.</p></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qv-no">Cancel</button><button class="btn-primary" id="qv-go">Convert to invoice</button></div></div>';
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qv-t"><div class="confirm-body"><h3 id="qv-t">Convert '+esc(q.id)+' to a sale?</h3>'+
+    '<p>A sale for <strong>'+esc(client(q).name)+'</strong> of '+money(q.amount)+' is created and invoiced with the same services and prices, and the quotation becomes Invoiced. It can’t be edited or converted again.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qv-no">Cancel</button><button class="btn-primary" id="qv-go">Convert to sale</button></div></div>';
   dlg.classList.add('open'); document.getElementById('qv-go').focus();
   document.getElementById('qv-no').onclick=closeDlg;
   document.getElementById('qv-go').onclick=function(){ this.disabled=true; convert(id); };
@@ -10754,14 +10754,14 @@ function convert(id){
     reload(); var q=byId(id), inv=loadInvoices(), dup=inv.list.filter(function(x){ return x.quotationId===id; })[0];
     if(q.invoiceId||dup){ if(!q.invoiceId){ q.invoiceId=dup.id; setStatus(q,'converted','converted',{sale:dup.id,note:'Invoice '+dup.id}); QuoteStore.save(st); }
       closeDlg(); render(); return toast(q.id+' is already invoiced ('+q.invoiceId+').',true); }
-    if(q.status!=='accepted'){ closeDlg(); render(); return toast('Only an accepted quotation can be converted to an invoice.',true); }
+    if(q.status!=='accepted'){ closeDlg(); render(); return toast('Only an accepted quotation can be converted to a sale.',true); }
     var n=2000+inv.list.length+1; while(inv.list.some(function(x){ return x.id==='INV-'+n; })) n++;
     var rec={id:'INV-'+n,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,amount:q.amount,by:ME.name,at:Date.now()};
     inv.list.push(rec);
     if(!saveInvoices(inv)){ closeDlg(); return toast('The invoice couldn’t be created. Nothing was changed.',true); }
     q.invoiceId=rec.id; setStatus(q,'converted','converted',{sale:rec.id,note:'Invoice '+rec.id});
     if(!QuoteStore.save(st)){ inv.list.pop(); saveInvoices(inv); closeDlg(); return toast('The quotation couldn’t be updated, so the invoice was undone.',true); }
-    closeDlg(); render(); toast(q.id+' converted to invoice '+rec.id);
+    closeDlg(); render(); toast(q.id+' converted to a sale · invoiced as '+rec.id);
   } finally { converting[id]=false; }
 }
 

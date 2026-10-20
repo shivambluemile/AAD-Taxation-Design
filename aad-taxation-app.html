@@ -9968,23 +9968,36 @@ table,td,th{font-size:13.5px}
 @media (max-width:600px){#dlg.overlay{align-items:center;padding:20px 16px}}
 </style>
 <style id="qt-css">
-.qt-table table{min-width:1040px}
-.qt-table thead th,.qt-table tbody td{padding-left:9px;padding-right:9px}.qt-table tbody td{padding-top:10px;padding-bottom:10px}.qt-table thead th:first-child,.qt-table tbody td:first-child{padding-left:20px}.qt-table thead th:last-child,.qt-table tbody td:last-child{padding-right:20px}
-.qt-table th.r,.qt-table td.r{text-align:right}
-.qt-clip{display:block;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:110px}
-.qt-st .ar-sub{font-size:11px;white-space:nowrap;margin-top:3px}
-.state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-acc i{background:#10B981}.state.q-conv i{background:#8B5CF6}
+.page-head .page-sub{color:var(--mute);margin-top:4px}
+.qt-dev{display:inline-flex;align-items:center;height:22px;padding:0 9px;margin-left:8px;border-radius:999px;background:#FFF7EC;color:#B45309;font-family:'Inter';font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:4px;cursor:help}
+.qt-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 14px}
+.qt-stats .stat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;cursor:help}
+.qt-stats dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#94A3B8;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qt-stats dd{margin:0;font-family:'Manrope';font-size:20px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.qt-table table{min-width:1080px}
+.qt-table thead th,.qt-table tbody td{padding-left:8px;padding-right:8px}.qt-table tbody td{padding-top:10px;padding-bottom:10px}
+.qt-table thead th:first-child,.qt-table tbody td:first-child{padding-left:18px}.qt-table thead th:last-child,.qt-table tbody td:last-child{padding-right:14px}
+.qt-table th.r,.qt-table td.r{text-align:right}.qt-table th.c,.qt-table td.c{text-align:center}
+.qt-sort{display:inline-flex;align-items:center;gap:5px;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;text-align:left;line-height:1.3}.qt-sort svg{flex-shrink:0}.qt-table thead th{white-space:normal;vertical-align:bottom}.qt-table td.qt-st{min-width:166px}.qt-table tbody td{font-size:13px}.qt-table thead th:last-child{width:64px}
+.qt-sort svg{opacity:.35}.qt-sort.asc svg,.qt-sort.desc svg{opacity:1;color:var(--orange-ink)}
+.qt-sort.asc svg .dn,.qt-sort.desc svg .up{opacity:.2}
+.qt-table th.r .qt-sort{flex-direction:row-reverse}
+.qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
+.qt-cn{font-weight:600;color:var(--ink)}
+.qt-st .ar-sub{font-size:11px;max-width:170px;line-height:1.35;margin-top:3px}
+.state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-conv i{background:#10B981}
 .state.q-rej i{background:#FF5966}.state.q-exp i{background:#F59E0B}.state.q-can i{background:#CBD5E1}.state.q-can{color:var(--mute)}
-.qt-acts{display:inline-flex;align-items:center;flex-wrap:nowrap}
-.qt-acts button{font-size:12.5px;font-weight:600;color:var(--orange-ink);white-space:nowrap}.qt-acts button:hover{text-decoration:underline;text-underline-offset:3px}
-.qt-acts .sep{color:#D6DBE1;margin:0 7px}
+.qt-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute);border:1px solid transparent}
+.qt-more:hover,.qt-more[aria-expanded=true]{background:#F6F7F9;border-color:var(--line);color:var(--ink)}
+.qt-more:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.2)}
+.qt-menu{position:fixed;z-index:60;min-width:220px;background:#fff;border:1px solid #EBEEF0;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.14);padding:6px}
+.qt-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:8px 12px;border-radius:8px;font-size:13px;font-weight:600;color:#334155;text-align:left}
+.qt-menu button:hover,.qt-menu button:focus-visible{background:#FFF4EA;color:#C2630F;outline:none}
+.qt-menu button.danger{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2;color:#BE123C}
+.qt-menu small{font-size:10.5px;font-weight:700;letter-spacing:.3px;color:#94A3B8;background:#F1F2F4;border-radius:999px;padding:1px 7px}
 .qt-range{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mute)}
 .qt-range input{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font:inherit;font-size:13px;color:var(--ink);background:#fff}
 .qt-range input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
-.qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
-.qs-att{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13px;color:var(--ink)}.qs-att span:nth-child(2){flex:1;font-weight:600}
-.qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
-.qh-acts{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 12px}
 .qh-list{list-style:none;margin:0;padding:0}
 .qh-list li{position:relative;display:flex;gap:12px;padding:0 0 16px}
 .qh-list li:not(:last-child):before{content:'';position:absolute;left:5px;top:14px;bottom:0;width:1px;background:var(--line)}
@@ -9992,7 +10005,8 @@ table,td,th{font-size:13.5px}
 .qh-list li.bad i{background:#FF5966;box-shadow:0 0 0 3px #FEE2E2}
 .qh-list b{font-size:13.5px;color:var(--ink);margin-right:8px}.qh-tr{font-size:12px;color:var(--faint)}
 .qh-note{display:block;font-size:12.5px;color:var(--slate);margin-top:2px}.qh-list small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
-@media (max-width:600px){.qh-acts{padding:0 18px 12px}}
+@media (max-width:1180px){.qt-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.qt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -10032,11 +10046,11 @@ table,td,th{font-size:13.5px}
 <script>/*@@ONB_CORE@@*/<\/script>
 <script>
 (function(){
-/* ================= Quotations: list, status with who did what last, row actions and a full activity history =================
-   PROTOTYPE store: this browser's localStorage (aad-quotations-v1, sales in aad-sales-v1). A real build reads and writes these through the API. */
-var Q_KEY='aad-quotations-v1', S_KEY='aad-sales-v1';
-var ME={name:'John Doe',role:(function(){ try{ return localStorage.getItem('aad-view-as')==='staff'?'Accountant':'Admin'; }catch(e){ return 'Admin'; } })()};
-function canManage(){ return ME.role==='Admin'||ME.role==='Manager'; }   // convert and cancel are for admins and managers
+/* ================= Quotations · Step 1: the listing =================
+   Data: QuoteStore below is the only place that reads or writes quotations. In this prototype it uses this browser's
+   localStorage (aad-quotations-v1); swap its two functions for the quotations API without touching the screen.
+   Clients come from the Clients store, staff and branches from the Staff module's records: nothing is copied. */
+var Q_KEY='aad-quotations-v1';
 var I={
   chev:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
   search:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
@@ -10044,121 +10058,133 @@ var I={
   close:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   plus:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   tick:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
-  warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>'
+  warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v5"/><circle cx="12" cy="17.5" r=".8" fill="currentColor" stroke="none"/><path d="M10.3 3.9 2.6 17.4A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3.1L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+  dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
+  sort:'<svg width="10" height="12" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0 9.5 5h-9z" class="up"/><path d="M5 14 .5 9h9z" class="dn"/></svg>'
 };
-var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Converted','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
-/* what each event is called in the history, and how the latest one reads under the badge */
-var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation emailed','Sent by'],resent:['Quotation emailed again','Resent by'],
-  send_failed:['Email not sent',''],accepted:['Marked as accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],
-  cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to a sale','Converted by'],expired:['Validity ended','Expired']};
-var ATTR=['created','edited','sent','resent','accepted','rejected','cancelled','converted','expired'];   // events that can appear under the badge (never a failed send)
-var BRANCHES=['Blacktown Sydney','Brisbane','Craigieburn','Dandenong','Derrimut','Dubbo','Geelong','Hobart'];
-var ACCOUNTANTS=['John Doe','Marthew','Daniel Wu','Priya Nair'];
+var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],converted:['Converted','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
+var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
+  send_failed:['Email not sent',''],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to a sale','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function esc(s){ return escH(s); }
 function toast(msg,err){ var t=document.getElementById('toast'); t.innerHTML=(err?I.warn:I.tick)+esc(msg); t.style.background=err?'#BE123C':''; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove('show'); },3200); }
 function pad(n){ return ('0'+n).slice(-2); }
 function isoDay(t){ var d=new Date(t); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function stamp(t){ var x=whenOf(t).split(' · '); return x[0]+' at '+x[1]; }   // dd-mm-yyyy at hh:mm AM
 
-/* ---------- store ---------- */
-var loadErr=null;
+/* ---------- people and places: read from the existing Staff and Clients records ---------- */
+var STAFF=[], BRANCHES=[];
+(function(){
+  var src=''; try{ var el=parent.document.getElementById('src-staff'); src=el?el.textContent:''; }catch(e){}
+  var block=(src.match(/var STAFF=\[([\s\S]*?)\];/)||[])[1]||'', re=/\{id:'([^']+)',n:'([^']+)',e:'[^']*',p:'[^']*',t:'([^']+)',b:\[([^\]]*)\],x:\d+,s:([01])\}/g, m, seen={};
+  while((m=re.exec(block))){ if(m[5]!=='1'||seen[m[2]]) continue; seen[m[2]]=1; STAFF.push({id:m[1],name:m[2],role:m[3],branches:(m[4].match(/'([^']+)'/g)||[]).map(function(x){ return x.slice(1,-1); })}); }
+  var br=(src.match(/var BRANCHES=\[([^\]]*)\]/)||[])[1]; BRANCHES=br?(br.match(/'([^']+)'/g)||[]).map(function(x){ return x.slice(1,-1); }):[];
+})();
+var ME={name:'John Doe',branch:'Blacktown Sydney',role:(function(){ try{ return localStorage.getItem('aad-view-as')==='staff'?'Accountant':'Admin'; }catch(e){ return 'Admin'; } })()};
+if(!STAFF.some(function(s){ return s.name===ME.name; })) STAFF.unshift({id:'KPG1000',name:ME.name,role:'Admin',branches:[ME.branch]});
+var ASSIGNABLE=STAFF.filter(function(s){ return ['Accountant','Bookkeeping','Admin'].indexOf(s.role)>=0; });
 function loadClients(){ try{ var v=JSON.parse(localStorage.getItem('aad-clients-v1')||'null'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
-function loadQ(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)){ v={list:seed(),next:0}; v.next=v.list.length; saveQ(v); } return v; }
-function saveQ(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
-function loadSales(){ try{ var v=JSON.parse(localStorage.getItem(S_KEY)||'null'); return v&&Array.isArray(v.list)?v:{list:[]}; }catch(e){ return {list:[]}; } }
-function saveSales(v){ try{ localStorage.setItem(S_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
-function log(q,type,o){ o=o||{}; var e={type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',email:o.email||'',ok:o.ok!==false,sale:o.sale||''}; (q.history=q.history||[]).push(e); return e; }
-function setStatus(q,to,type,o){ o=o||{}; var from=q.status; q.status=to; o.from=from; o.to=to; return log(q,type,o); }
-/* PROTOTYPE ONLY: first-run sample quotations for the clients already in this browser, each with the history that got it to its status */
-function seed(){
-  var cl=loadClients().filter(function(c){ return c.active!==false; });
-  if(!cl.length) cl=[{id:'c1',name:'Bright Spark Electrical Pty Ltd',email:'admin@brightspark.com.au'},{id:'c2',name:'Liam Carter',email:'liam.carter@gmail.com'},{id:'c3',name:'Ella Fitzgerald',email:'ella.fitz@gmail.com'},
-    {id:'c4',name:'Mohammed Ali',email:'mohammed.ali@hotmail.com'},{id:'c5',name:'Nguyen & Tran Partners',email:'office@nguyentran.com.au'},{id:'c6',name:'Coastal Property Holdings Trust',email:'trustee@coastalproperty.com.au'}];
-  var svc=[]; try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}
-  if(!svc.length) svc=[{name:'Individual Tax Return',price:150},{name:'BAS Lodgement (Quarterly)',price:250},{name:'Company Tax Return',price:1200}];
-  var day=864e5, now=Date.now(), plan=['draft','sent','accepted','converted','draft','sent','rejected','accepted','expired','sent','cancelled','converted','draft'], list=[];
-  plan.forEach(function(st,i){
-    var c=cl[i%cl.length], made=now-(40-i*3)*day-(i*37%9)*36e5, acc=ACCOUNTANTS[(i+1)%ACCOUNTANTS.length];
-    var items=[svc[i%svc.length]].concat(i%3?[svc[(i*5+2)%svc.length]]:[]).map(function(s){ return {name:s.name,qty:1,price:s.price}; });
-    var q={id:'Q-'+(1001+i),created:made,by:acc,client:{id:c.id,name:c.name,email:c.email||''},branch:BRANCHES[i%BRANCHES.length],accountant:acc,items:items,
-      amount:items.reduce(function(a,x){ return a+x.qty*x.price; },0),validUntil:made+VALID_DAYS*day,status:'draft',history:[]};
-    log(q,'created',{by:acc,t:made,to:'draft'});
-    if(st==='draft'){ if(i===4) log(q,'edited',{by:'John Doe',t:made+5*36e5}); }
-    else{
-      var sentAt=made+(1+i%2)*day;
-      setStatus(q,'sent','sent',{by:acc,t:sentAt,email:q.client.email,note:'To '+q.client.email});
-      if(st==='accepted'||st==='converted') setStatus(q,'accepted','accepted',{by:acc,t:sentAt+3*day,note:'Client accepted by email'});
-      if(st==='rejected') setStatus(q,'rejected','rejected',{by:acc,t:sentAt+4*day,note:'Client chose another provider'});
-      if(st==='cancelled') setStatus(q,'cancelled','cancelled',{by:'John Doe',t:sentAt+2*day,note:'Duplicate of another quotation'});
-      if(st==='expired'){ q.created=now-45*day; q.history[0].t=q.created; q.history[1].t=q.created+day; q.validUntil=q.created+VALID_DAYS*day; }   // left unanswered past its validity
-    }
-    list.push(q);
-  });
-  // the two converted ones have their sales
-  var sales=loadSales(), n=sales.list.length;
-  list.forEach(function(q){ if(plan[list.indexOf(q)]!=='converted') return; var at=q.history[q.history.length-1].t+day, sid='S-'+(5001+n++);
-    sales.list.push({id:sid,quotationId:q.id,client:q.client,items:q.items,amount:q.amount,by:'John Doe',at:at}); q.saleId=sid; setStatus(q,'converted','converted',{by:'John Doe',t:at,sale:sid,note:'Sale '+sid}); });
-  saveSales(sales);
-  return list;
-}
-/* a sent quotation past its validity is Expired; the history says when, and that it happened on its own */
-function expireDue(st){
-  var changed=false, today=isoDay(Date.now());
-  st.list.forEach(function(q){ if(q.status==='sent'&&isoDay(q.validUntil)<today){ setStatus(q,'expired','expired',{by:'System',t:q.validUntil}); changed=true; } });
-  if(changed) saveQ(st);
-}
-var st=null;
-function reload(){ try{ st=loadQ(); expireDue(st); syncClients(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
-function syncClients(){ var cl=loadClients(); st.list.forEach(function(q){ var c=cl.filter(function(x){ return String(x.id)===String(q.client.id); })[0]; if(c){ q.client.name=c.name; q.client.email=c.email||q.client.email; } }); }
+
+/* ---------- permissions: admins and managers see and manage everything; other staff see their own and their branch's ---------- */
+function isManager(){ return ME.role==='Admin'||ME.role==='Manager'; }
+function inScope(q){ return isManager()||q.accountant===ME.name||q.by===ME.name||q.branch===ME.branch; }
+
+/* ---------- QuoteStore: the one data access point ---------- */
+var QuoteStore={
+  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==3){ var seed=DevData.quotations(); v={v:3,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
+  save:function(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
+};
+function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
+function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to; log(q,type,o); }
+
+/* ---------- DEVELOPMENT DATA (temporary): sample quotations for the clients in this browser. Remove when the API is connected. ---------- */
+var DevData={
+  quotations:function(){
+    var cl=loadClients().filter(function(c){ return c.active!==false; }).slice(0,10), svc=[];
+    try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}
+    if(!cl.length||!svc.length||!ASSIGNABLE.length) return [];
+    var day=864e5, now=Date.now(), plan=['draft','sent','converted','draft','sent','rejected','sent','expired','cancelled','converted','sent','draft','sent','converted'], out=[];
+    plan.forEach(function(st,i){
+      var c=cl[i%cl.length], who=ASSIGNABLE[i%ASSIGNABLE.length], by=ASSIGNABLE[(i+1)%ASSIGNABLE.length].name, made=now-(42-i*3)*day-(i*37%9)*36e5;
+      var items=[svc[i%svc.length]].concat(i%3?[svc[(i*5+2)%svc.length]]:[]).map(function(s){ return {name:s.name,qty:1,price:s.price}; });
+      var q={id:'Q-'+(1001+i),created:made,by:by,clientId:c.id,clientName:c.name,branch:(BRANCHES[i%Math.max(1,BRANCHES.length)]||''),accountant:who.name,items:items,
+        amount:items.reduce(function(a,x){ return a+x.qty*x.price; },0),validUntil:made+VALID_DAYS*day,status:'draft',history:[],dev:true};
+      log(q,'created',{by:by,t:made,to:'draft'});
+      if(st!=='draft'){
+        var sent=made+(1+i%2)*day; setStatus(q,'sent','sent',{by:who.name,t:sent});
+        if(st==='rejected') setStatus(q,'rejected','rejected',{by:who.name,t:sent+4*day,note:'Client chose another provider'});
+        if(st==='cancelled') setStatus(q,'cancelled','cancelled',{by:ME.name,t:sent+2*day,note:'Duplicate quotation'});
+        if(st==='converted'){ q.saleId='S-'+(5001+i); setStatus(q,'converted','converted',{by:ME.name,t:sent+5*day,sale:q.saleId,note:'Sale '+q.saleId}); }
+        if(st==='expired'){ q.created=now-50*day; q.history[0].t=q.created; q.history[1].t=q.created+day; q.validUntil=q.created+VALID_DAYS*day; }
+      }
+      out.push(q);
+    });
+    var cap=now-36e5; out.forEach(function(q){ q.history.forEach(function(e){ if(e.t>cap) e.t=cap; }); });   // nothing in the future
+    return out;
+  }
+};
+
+/* ---------- load ---------- */
+var st=null, loadErr=null, clients=[];
+function expireDue(){ var ch=false, today=isoDay(Date.now()); st.list.forEach(function(q){ if(q.status==='sent'&&isoDay(q.validUntil)<today){ setStatus(q,'expired','expired',{by:'System',t:q.validUntil}); ch=true; } }); if(ch) QuoteStore.save(st); }
+function reload(){ try{ st=QuoteStore.load(); clients=loadClients(); expireDue(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
+function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{name:c.name,email:c.email||''}:{name:q.clientName||'Client no longer on file',email:''}; }
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
-function stamp(t){ var x=whenOf(t).split(' · '); return x[0]+' '+x[1]; }   // dd-mm-yyyy hh:mm AM
-function lastAttr(q){ var h=(q.history||[]).filter(function(e){ return e.ok&&ATTR.indexOf(e.type)>=0; }); return h[h.length-1]||null; }
-function attrLine(q){
-  var e=lastAttr(q);
-  if(!e) return q.by?'Created by '+esc(q.by)+' on '+stamp(q.created):'';   // older records without history: the creator, if known
-  if(e.type==='expired') return 'Expired on '+dmyOf(e.t);
-  return EV[e.type][1]+' '+esc(e.by)+' on '+stamp(e.t);
-}
+function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
-
-/* ---------- what can be done with each status ---------- */
-function actionsFor(q){
-  var a=[];
-  if(['draft','sent','expired'].indexOf(q.status)>=0) a.push(['edit','Edit']);
-  if(q.status==='draft') a.push(['send','Send']); else if(q.status==='sent') a.push(['send','Resend']);
-  a.push(['pdf','PDF']);
-  if(q.status==='accepted'&&!q.saleId&&canManage()) a.push(['convert','Convert To Sale']);
-  return a;
+/* the latest action under the badge, unless it's the creation (already in Created By) */
+function attrLine(q){
+  var h=(q.history||[]).filter(function(e){ return e.ok&&e.type!=='created'&&e.type!=='send_failed'; }), e=h[h.length-1];
+  if(!e) return '';
+  return e.type==='expired'?'Expired on '+dmyOf(e.t):EV[e.type][1]+' '+esc(e.by)+' on '+stamp(e.t);
 }
 
-/* ---------- filters ---------- */
-var state={f:blank(),page:1,per:10};
-function blank(){ return {q:'',status:'',branch:'',accountant:'',range:'',from:'',to:''}; }
-function anyFilter(f){ return !!(f.q.trim()||f.status||f.branch||f.accountant||f.range); }
-function rangeOf(f){
-  var now=new Date(), y=now.getFullYear(), m=now.getMonth(), t=isoDay(now);
-  if(f.range==='month') return [y+'-'+pad(m+1)+'-01',t];
-  if(f.range==='last'){ var a=new Date(y,m-1,1), b=new Date(y,m,0); return [isoDay(a),isoDay(b)]; }
-  if(f.range==='90') return [isoDay(Date.now()-89*864e5),t];
-  if(f.range==='fy'){ var fy=m>=6?y:y-1; return [fy+'-07-01',t]; }
-  if(f.range==='custom') return [f.from||'0000-01-01',f.to||'9999-12-31'];
+/* ---------- summary: counted over every quotation you can see, not the current filters ---------- */
+function summary(list){
+  var by=function(s){ return list.filter(function(q){ return q.status===s; }); }, open=by('sent');
+  return [['Total Quotations',list.length,'Every quotation you have access to'],['Draft',by('draft').length,'Created, not sent yet'],
+    ['Sent — Awaiting Response',open.length,'Sent and still within their validity'],['Converted',by('converted').length,'Turned into a sale'],
+    ['Open Quotation Value',money(open.reduce(function(a,q){ return a+q.amount; },0)),'Total of sent quotations awaiting a response. Excludes drafts and converted, rejected, expired and cancelled quotations.']];
+}
+
+/* ---------- filters and sorting ---------- */
+var state={f:blank(),page:1,per:10,sort:{k:'created',d:-1}};
+function blank(){ return {q:'',status:'',qd:'',qdFrom:'',qdTo:'',ex:'',exFrom:'',exTo:'',branch:'',acc:'',by:''}; }
+function anyFilter(f){ return !!(f.q.trim()||f.status||f.qd||f.ex||f.branch||f.acc||f.by); }
+function quoteRange(k,from,to){
+  var n=new Date(), y=n.getFullYear(), m=n.getMonth(), t=isoDay(n);
+  if(k==='month') return [y+'-'+pad(m+1)+'-01',t];
+  if(k==='last') return [isoDay(new Date(y,m-1,1)),isoDay(new Date(y,m,0))];
+  if(k==='90') return [isoDay(Date.now()-89*864e5),t];
+  if(k==='fy'){ var fy=m>=6?y:y-1; return [fy+'-07-01',t]; }
+  if(k==='custom') return [from||'0000-01-01',to||'9999-12-31'];
   return null;
 }
+function expiryRange(k,from,to){
+  var t=isoDay(Date.now());
+  if(k==='7') return [t,isoDay(Date.now()+7*864e5)];
+  if(k==='30') return [t,isoDay(Date.now()+30*864e5)];
+  if(k==='past') return ['0000-01-01',isoDay(Date.now()-864e5)];
+  if(k==='custom') return [from||'0000-01-01',to||'9999-12-31'];
+  return null;
+}
+var SORTS={id:function(q){ return +q.id.replace(/\D/g,''); },client:function(q){ return client(q).name.toLowerCase(); },created:function(q){ return q.created; },expiry:function(q){ return q.validUntil; },
+  amount:function(q){ return q.amount; },branch:function(q){ return q.branch.toLowerCase(); },acc:function(q){ return q.accountant.toLowerCase(); },status:function(q){ return STATUS[q.status][0]; },by:function(q){ return String(q.by).toLowerCase(); }};
 function filtered(){
-  var f=state.f, q=f.q.trim().toLowerCase(), r=rangeOf(f);
-  return st.list.filter(function(x){
+  var f=state.f, q=f.q.trim().toLowerCase(), qr=quoteRange(f.qd,f.qdFrom,f.qdTo), er=expiryRange(f.ex,f.exFrom,f.exTo), k=SORTS[state.sort.k], d=state.sort.d;
+  return scoped().filter(function(x){
     if(f.status&&x.status!==f.status) return false;
     if(f.branch&&x.branch!==f.branch) return false;
-    if(f.accountant&&x.accountant!==f.accountant) return false;
-    if(r){ var d=isoDay(x.created); if(d<r[0]||d>r[1]) return false; }
-    return !q||(x.id+' '+x.client.name).toLowerCase().indexOf(q)>=0;
-  }).sort(function(a,b){ return b.created-a.created; });
+    if(f.acc&&x.accountant!==f.acc) return false;
+    if(f.by&&x.by!==f.by) return false;
+    if(qr){ var a=isoDay(x.created); if(a<qr[0]||a>qr[1]) return false; }
+    if(er){ var b=isoDay(x.validUntil); if(b<er[0]||b>er[1]) return false; }
+    if(!q) return true; var c=client(x); return (x.id+' '+c.name+' '+c.email).toLowerCase().indexOf(q)>=0;
+  }).sort(function(a,b){ var A=k(a), B=k(b); return A<B?-d:A>B?d:(b.created-a.created); });
 }
-function selHtml(id,all,opts,val){
-  return '<div class="sel"><select id="'+id+'" aria-label="'+esc(all)+'"><option value="">'+all+'</option>'+
-    opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+'</select>'+I.chev+'</div>';
-}
+function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" aria-label="'+esc(all)+'"><option value="">'+all+'</option>'+opts.map(function(o){ return '<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; }
+function rangeInputs(a,b,va,vb,label){ return '<span class="qt-range"><input type="date" id="'+a+'" aria-label="'+label+' from" value="'+esc(va)+'"><span>to</span><input type="date" id="'+b+'" aria-label="'+label+' to" value="'+esc(vb)+'"></span>'; }
 function pager(total){
   var pages=Math.max(1,Math.ceil(total/state.per)); if(state.page>pages) state.page=pages;
   var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total);
@@ -10167,206 +10193,176 @@ function pager(total){
   for(var i=1;i<=pages;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
   return h+'<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
 }
+function th(k,label,cls){ var on=state.sort.k===k; return '<th'+(cls?' class="'+cls+'"':'')+' aria-sort="'+(on?(state.sort.d>0?'ascending':'descending'):'none')+'"><button class="qt-sort'+(on?(state.sort.d>0?' asc':' desc'):'')+'" data-sort="'+k+'">'+label+I.sort+'</button></th>'; }
 
 /* ---------- the page ---------- */
+function head(){
+  return '<div class="page-head"><div><h1>Quotations'+(st&&st.list.some(function(q){ return q.dev; })?' <span class="qt-dev" title="These quotations are temporary development data, not live business records. They are replaced once the quotations API is connected.">Sample data</span>':'')+'</h1>'+
+    '<p class="page-sub">Manage client quotations and track their progress.</p></div>'+
+    '<div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Create Quotation</button></div></div>';
+}
 function render(){
-  var f=state.f;
-  var h='<nav class="crumbs" aria-label="Breadcrumb"><button id="qt-home">Home</button><span class="sep">/</span><span class="cur" aria-current="page">Quotations</span></nav>'+
-    '<div class="page-head"><h1>Quotations</h1><div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Add Quotation</button></div></div>';
   if(loadErr||!st){
-    content.innerHTML=h+'<div class="card"><div class="empty"><h3>Quotations couldn’t be loaded</h3><p>Something went wrong reading the quotations. Try again.</p><button class="btn-ghost" id="qt-retry">Try again</button></div></div>';
+    content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Quotations couldn’t be loaded</h3><p>Something went wrong while reading the quotations. Try again.</p><button class="btn-ghost" id="qt-retry">Try again</button></div></div>';
     document.getElementById('qt-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
   }
-  var rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per);
-  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by quotation ID or client" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
+  var f=state.f, all=scoped(), rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per);
+  var h=head()+'<dl class="qt-stats">'+summary(all).map(function(c){ return '<div class="stat" title="'+esc(c[2])+'"><dt>'+esc(c[0])+'</dt><dd>'+c[1]+'</dd></div>'; }).join('')+'</dl>';
+  var people=function(list){ return list.map(function(n){ return [n,n]; }); };
+  var creators=all.map(function(q){ return q.by; }).filter(function(n,i,a){ return a.indexOf(n)===i; }).sort();
+  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
-    selHtml('f-range','Any date',[['month','This month'],['last','Last month'],['90','Last 90 days'],['fy','This financial year'],['custom','Custom range']],f.range)+
-    (f.range==='custom'?'<span class="qt-range"><input type="date" id="f-from" aria-label="From date" value="'+esc(f.from)+'"><span>to</span><input type="date" id="f-to" aria-label="To date" value="'+esc(f.to)+'"></span>':'')+
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
-    selHtml('f-branch','All Branches',BRANCHES.map(function(b){ return [b,b]; }),f.branch)+
-    selHtml('f-acc','All Accountants',ACCOUNTANTS.map(function(a){ return [a,a]; }),f.accountant)+
+    selHtml('f-qd','Any quotation date',[['month','Created this month'],['last','Created last month'],['90','Created in the last 90 days'],['fy','Created this financial year'],['custom','Created between…']],f.qd)+
+    (f.qd==='custom'?rangeInputs('f-qdf','f-qdt',f.qdFrom,f.qdTo,'Quotation date'):'')+
+    selHtml('f-ex','Any expiry date',[['7','Expires in 7 days'],['30','Expires in 30 days'],['past','Already past expiry'],['custom','Expires between…']],f.ex)+
+    (f.ex==='custom'?rangeInputs('f-exf','f-ext',f.exFrom,f.exTo,'Expiry date'):'')+
+    selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
+    selHtml('f-acc','All Accountants',people(ASSIGNABLE.map(function(s){ return s.name; })),f.acc)+
+    selHtml('f-by','Created by anyone',people(creators),f.by)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Date</th><th>Client</th><th>Branch</th><th>Accountant</th><th class="r">Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
-  if(!st.list.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations you create appear here.</p></div></td></tr>';
-  else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
+  h+='<div class="card ar-table qt-table"><table><thead><tr>'+th('id','Quotation Number')+th('client','Client')+th('created','Quotation Date')+th('expiry','Expiry Date')+th('amount','Total Amount','r')+
+    th('branch','Branch')+th('acc','Assigned Accountant')+th('status','Status')+th('by','Created By')+'<th class="c">Actions</th></tr></thead><tbody>';
+  if(!all.length) h+='<tr><td colspan="10"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Create Quotation</button></div></td></tr>';
+  else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
-    var acts=actionsFor(q);
+    var c=client(q), at=attrLine(q);
     h+='<tr>'+
-      '<td class="nowrap"><button class="name-link" data-hist="'+q.id+'" title="Open the activity history"><span class="name">'+esc(q.id)+'</span></button></td>'+
+      '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="View details"><span class="name">'+esc(q.id)+'</span></button></td>'+
+      '<td><span class="qt-clip" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.email?'<small class="ar-sub qt-clip" title="'+esc(c.email)+'">'+esc(c.email)+'</small>':'')+'</td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
-      '<td><span class="qt-clip" title="'+esc(q.client.name)+'">'+esc(q.client.name)+'</span></td>'+
+      '<td class="num">'+dmyOf(q.validUntil)+'</td>'+
+      '<td class="num r">'+money(q.amount)+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
-      '<td class="num r">'+money(q.amount)+'</td>'+
-      '<td class="qt-st">'+badge(q.status)+'<small class="ar-sub">'+attrLine(q)+'</small></td>'+
-      '<td class="nowrap"><span class="qt-acts">'+acts.map(function(a,i){ return (i?'<span class="sep" aria-hidden="true">|</span>':'')+'<button data-act="'+a[0]+'" data-q="'+q.id+'">'+a[1]+'</button>'; }).join('')+'</span></td></tr>';
+      '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
+      '<td><span class="qt-clip sm" title="'+esc(q.by)+'">'+esc(q.by)+'</span></td>'+
+      '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
-  content.innerHTML=h;
-  wireHead();
+  content.innerHTML=h; wireHead();
   var qi=document.getElementById('q');
   qi.oninput=function(){ state.f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-range','range'],['f-status','status'],['f-branch','branch'],['f-acc','accountant'],['f-from','from'],['f-to','to']].forEach(function(p){
+  [['f-status','status'],['f-qd','qd'],['f-qdf','qdFrom'],['f-qdt','qdTo'],['f-ex','ex'],['f-exf','exFrom'],['f-ext','exTo'],['f-branch','branch'],['f-acc','acc'],['f-by','by']].forEach(function(p){
     var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
   var clear=function(){ state.f=blank(); state.page=1; render(); };
   document.getElementById('clearf').onclick=clear; var c2=document.getElementById('clear2'); if(c2) c2.onclick=clear;
+  var a2=document.getElementById('qt-add2'); if(a2) a2.onclick=function(){ route('create'); };
+  [].forEach.call(content.querySelectorAll('[data-sort]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-sort'); state.sort=state.sort.k===k?{k:k,d:-state.sort.d}:{k:k,d:k==='created'||k==='expiry'||k==='amount'?-1:1}; render(); }; });
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
 }
-function wireHead(){
-  document.getElementById('qt-home').onclick=function(){ try{ parent.AADNav('dashboard'); }catch(e){} };
-  document.getElementById('qt-add').onclick=function(){ toast('Add Quotation opens the Create Quotation screen, the next screen to build.'); };
+function wireHead(){ document.getElementById('qt-add').onclick=function(){ route('create'); }; }
+
+/* ---------- row actions: what each status allows, and who may do it ---------- */
+function menuFor(q){
+  var s=q.status, own=q.accountant===ME.name||q.by===ME.name, edit=isManager()||own, a=[];
+  a.push(['view','View Details']);
+  if(s==='draft'||(s==='sent'&&edit)) a.push(['edit','Edit']);
+  a.push(['preview','Preview Quotation']);
+  if(s!=='draft') a.push(['pdf','Download PDF']);
+  if(s==='draft'&&edit) a.push(['send','Send Quotation']);
+  if(s==='sent'&&edit) a.push(['resend','Resend Quotation']);
+  if(s==='sent'&&isManager()) a.push(['convert','Convert to Sale']);
+  if(s==='converted'&&q.saleId) a.push(['sale','View Linked Sale']);
+  if(s==='sent'&&isManager()) a.push(['cancel','Cancel Quotation','danger']);
+  if(s==='draft'&&(isManager()||q.by===ME.name)) a.push(['delete','Delete Draft','danger']);
+  if(s!=='draft') a.push(['history','View Activity History']);
+  return a;
+}
+/* screens built in later steps: each action goes through route(), the one hand-off point */
+var NEXT={create:['Create Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['PDF download','a later step'],
+  send:['Send Quotation (email)','a later step'],resend:['Resend Quotation (email)','a later step'],convert:['Convert to Sale','a later step'],sale:['Linked sale in Sales','the Sales module']};
+var ROUTES={};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
+function route(key,q){
+  if(ROUTES[key]) return ROUTES[key](q);
+  var n=NEXT[key];
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qn-t"><div class="confirm-body"><h3 id="qn-t">'+esc(n[0])+(q?' · '+esc(q.id):'')+'</h3>'+
+    '<p>This opens the '+esc(n[0])+' screen, which is built in '+esc(n[1])+'. Nothing has been changed.</p></div>'+
+    '<div class="modal-foot"><button class="btn-primary" id="qn-ok">OK</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('qn-ok').onclick=closeDlg; document.getElementById('qn-ok').focus();
+}
+var menuEl=null;
+function closeMenu(){ if(menuEl){ var b=content.querySelector('[data-menu="'+menuEl.dataset.q+'"]'); if(b) b.setAttribute('aria-expanded','false'); menuEl.remove(); menuEl=null; } }
+function openMenu(btn){
+  var id=btn.getAttribute('data-menu'); if(menuEl&&menuEl.dataset.q===id) return closeMenu(); closeMenu();
+  var q=byId(id); if(!q) return;
+  menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.q=id;
+  menuEl.innerHTML=menuFor(q).map(function(a){ return '<button role="menuitem" data-mi="'+a[0]+'"'+(a[2]?' class="'+a[2]+'"':'')+'>'+a[1]+(NEXT[a[0]]?'<small>'+esc(NEXT[a[0]][1].replace('a later step','Later').replace('the Sales module','Sales'))+'</small>':'')+'</button>'; }).join('');
+  document.body.appendChild(menuEl);
+  var r=btn.getBoundingClientRect(), mh=menuEl.offsetHeight, top=r.bottom+4; if(top+mh>window.innerHeight-8) top=Math.max(8,r.top-mh-4);
+  menuEl.style.top=top+'px'; menuEl.style.left=Math.max(8,r.right-menuEl.offsetWidth)+'px';
+  btn.setAttribute('aria-expanded','true'); menuEl.querySelector('button').focus();
+  [].forEach.call(menuEl.querySelectorAll('[data-mi]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-mi'); closeMenu(); act(k,id); }; });
+  menuEl.onkeydown=function(e){ var it=[].slice.call(menuEl.querySelectorAll('button')), i=it.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); it[(i+1)%it.length].focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); it[(i-1+it.length)%it.length].focus(); }
+    if(e.key==='Escape'){ closeMenu(); btn.focus(); } };
+}
+function act(k,id){
+  reload(); var q=byId(id); if(!q) return toast('This quotation no longer exists.',true);
+  if(k==='history') return openHistory(id);
+  if(k==='cancel') return confirmCancel(id);
+  if(k==='delete') return confirmDelete(id);
+  route(k,q);
 }
 content.addEventListener('click',function(e){
-  var h=e.target.closest('[data-hist]'); if(h) return openHistory(h.getAttribute('data-hist'));
-  var b=e.target.closest('[data-act]'); if(!b) return;
-  var q=byId(b.getAttribute('data-q')); if(!q) return;
-  var a=b.getAttribute('data-act');
-  if(a==='edit') return toast('Edit opens '+q.id+' in the Create Quotation screen, the next screen to build.');
-  if(a==='send') return openSend(q.id);
-  if(a==='pdf') return openPdf(q);
-  if(a==='convert') return confirmConvert(q.id);
+  var m=e.target.closest('[data-menu]'); if(m) return openMenu(m);
+  var v=e.target.closest('[data-do="view"]'); if(v){ reload(); route('view',byId(v.getAttribute('data-q'))); }
 });
+document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });
+window.addEventListener('resize',closeMenu); content.addEventListener('scroll',closeMenu,true);
 
-/* ---------- Send / Resend: email the quotation to the client; only a successful send changes anything ---------- */
-var MSG_MAX=500;
-function openSend(id){
-  reload(); var q=byId(id); if(!q) return;
-  var re=q.status==='sent', first=String(q.client.name).split(' ')[0];
-  var s={to:q.client.email||'',subject:'Quotation '+q.id+' from '+FIRM.name,body:'Hi '+first+',\n\nPlease find attached quotation '+q.id+' for '+money(q.amount)+' (incl. GST), valid until '+dmyOf(q.validUntil)+'.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name,busy:false,errs:{},fail:''};
-  function paint(){
-    var e=s.errs, err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
-    ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="qs-t">'+
-      '<div class="modal-head"><h2 id="qs-t">'+(re?'Resend':'Send')+' quotation '+esc(q.id)+'</h2><button id="qs-x" aria-label="Close">'+I.close+'</button></div>'+
-      '<div class="modal-body">'+
-        '<div><label class="flabel" for="qs-to">To <span class="req-star">*</span></label><input class="fin plain sm'+(e.to?' bad':'')+'" id="qs-to" type="email" value="'+esc(s.to)+'" autocomplete="off">'+err('to')+'</div>'+
-        '<div><label class="flabel" for="qs-sub">Subject <span class="req-star">*</span></label><input class="fin plain sm'+(e.subject?' bad':'')+'" id="qs-sub" value="'+esc(s.subject)+'">'+err('subject')+'</div>'+
-        '<div><label class="flabel" for="qs-body">Message <span class="req-star">*</span></label><textarea class="ftext'+(e.body?' bad':'')+'" id="qs-body" rows="8" maxlength="'+MSG_MAX+'">'+esc(s.body)+'</textarea>'+
-          '<div class="qs-cnt" id="qs-n">'+s.body.length+'/'+MSG_MAX+' characters</div>'+err('body')+'</div>'+
-        '<div class="qs-att"><span class="ar-ft" style="background:#FDECEC;color:#C2410C">PDF</span><span>'+esc(q.id)+'.pdf</span><button class="name-link" id="qs-pv">Preview</button></div>'+
-        (s.fail?'<div class="qs-fail" role="alert">'+I.warn+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' The quotation wasn’t marked as sent.</span></div>':'')+
-      '</div>'+
-      '<div class="modal-foot"><button class="btn-ghost" id="qs-cancel"'+(s.busy?' disabled':'')+'>Cancel</button><button class="btn-primary" id="qs-go"'+(s.busy?' disabled':'')+'>'+(s.busy?'Sending…':(re?'Resend':'Send'))+'</button></div></div>';
-    ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-    ['to','sub','body'].forEach(function(k){ var el=document.getElementById('qs-'+k); el.oninput=function(){ s[k==='sub'?'subject':k]=el.value; if(k==='body') document.getElementById('qs-n').textContent=el.value.length+'/'+MSG_MAX+' characters'; }; });
-    document.getElementById('qs-x').onclick=closeOv; document.getElementById('qs-cancel').onclick=closeOv;
-    document.getElementById('qs-pv').onclick=function(){ openPdf(q); };
-    document.getElementById('qs-go').onclick=go;
-  }
-  function go(){
-    var e={}; if(!s.to.trim()) e.to='Enter the client’s email address'; else if(!validEmail(s.to)) e.to='Enter a valid email address';
-    if(!s.subject.trim()) e.subject='Add a subject'; if(!s.body.trim()) e.body='Add a message'; else if(s.body.length>MSG_MAX) e.body='Keep the message to '+MSG_MAX+' characters';
-    s.errs=e; s.fail=''; if(Object.keys(e).length){ paint(); return; }
-    s.busy=true; paint();
-    deliver({email:{to:s.to.trim(),cc:'',bcc:'',subject:s.subject,body:s.body,html:esc(s.body).replace(/\n/g,'<br>'),attachment:q.id+'.pdf'},sms:null}).then(function(r){
-      reload(); var x=byId(id); s.busy=false;
-      if(!r.ok){ log(x,'send_failed',{email:s.to.trim(),ok:false,note:r.error||'Delivery failed'}); saveQ(st); s.fail=r.error||'The email couldn’t be delivered.'; paint(); render(); return; }
-      var again=x.status==='sent';
-      setStatus(x,'sent',again?'resent':'sent',{email:s.to.trim(),note:'To '+s.to.trim()});
-      if(!saveQ(st)){ toast('The email was sent but the quotation couldn’t be updated. Try again.',true); return; }
-      closeOv(); render(); toast(x.id+(again?' resent to ':' sent to ')+s.to.trim());
-    });
-  }
-  paint();
-}
-
-/* ---------- Convert To Sale: one sale per quotation, linked both ways ---------- */
-var converting={};
-function confirmConvert(id){
-  reload(); var q=byId(id); if(!q) return;
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qc-t"><div class="confirm-body"><h3 id="qc-t">Convert '+esc(q.id)+' to a sale?</h3>'+
-    '<p>This creates a sale for <strong>'+esc(q.client.name)+'</strong> of '+money(q.amount)+' with the same services, and marks the quotation Converted.</p></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qc-no">Cancel</button><button class="btn-primary" id="qc-go">Convert To Sale</button></div></div>';
-  dlg.classList.add('open');
+/* ---------- destructive actions: confirmed first, recorded in the history ---------- */
+function confirmCancel(id){
+  var q=byId(id);
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qc-t"><div class="confirm-body"><h3 id="qc-t">Cancel '+esc(q.id)+'?</h3>'+
+    '<p>The quotation for <strong>'+esc(client(q).name)+'</strong> can no longer be accepted or converted. It stays in the list as Cancelled.</p>'+
+    '<label class="flabel" for="qc-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="qc-n" rows="3" maxlength="300"></textarea><span class="ferr" id="qc-e">Add a reason</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qc-no">Keep quotation</button><button class="btn-danger" id="qc-go">Cancel quotation</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('qc-n').focus();
   document.getElementById('qc-no').onclick=closeDlg;
-  document.getElementById('qc-go').onclick=function(){ this.disabled=true; convert(id); };
+  document.getElementById('qc-go').onclick=function(){
+    var n=document.getElementById('qc-n').value.trim(); if(!n){ document.getElementById('qc-e').classList.add('show'); return; }
+    reload(); var x=byId(id); if(!x||x.status!=='sent'){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
+    setStatus(x,'cancelled','cancelled',{note:n}); if(!QuoteStore.save(st)){ return toast('Couldn’t save the change. Try again.',true); }
+    closeDlg(); render(); toast(id+' cancelled');
+  };
 }
-function convert(id){
-  if(converting[id]) return; converting[id]=true;
-  try{
-    reload(); var q=byId(id), sales=loadSales();
-    var dup=sales.list.filter(function(s){ return s.quotationId===id; })[0];
-    if(q.saleId||dup){ if(!q.saleId&&dup){ q.saleId=dup.id; setStatus(q,'converted','converted',{note:'Linked to existing sale '+dup.id,sale:dup.id}); saveQ(st); }
-      closeDlg(); render(); toast(q.id+' is already converted to sale '+(q.saleId||dup.id)+'.',true); return; }
-    if(q.status!=='accepted'){ closeDlg(); render(); toast('Only an accepted quotation can be converted.',true); return; }
-    var n=sales.list.length+1, sid='S-'+(5000+n); while(sales.list.some(function(s){ return s.id===sid; })) sid='S-'+(5000+(++n));
-    var sale={id:sid,quotationId:q.id,client:q.client,items:q.items,amount:q.amount,by:ME.name,at:Date.now()};
-    sales.list.push(sale);
-    if(!saveSales(sales)){ closeDlg(); toast('The sale couldn’t be created. Nothing was changed.',true); return; }
-    q.saleId=sid; setStatus(q,'converted','converted',{sale:sid,note:'Sale '+sid});
-    if(!saveQ(st)){ sales.list.pop(); saveSales(sales); closeDlg(); toast('The quotation couldn’t be updated, so the sale was undone.',true); return; }
-    closeDlg(); render(); toast(q.id+' converted to sale '+sid);
-  } finally { converting[id]=false; }
-}
-
-/* ---------- the quotation's activity history (newest first), with the outcome actions ---------- */
-function openHistory(id){
-  reload(); var q=byId(id); if(!q) return;
-  var acts=[];
-  if(q.status==='sent'){ acts.push(['accepted','Mark accepted']); acts.push(['rejected','Mark rejected']); }
-  if(['draft','sent','accepted','expired'].indexOf(q.status)>=0&&canManage()) acts.push(['cancelled','Cancel quotation']);
-  var hist=(q.history||[]).slice().reverse();
-  ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="qh-t">'+
-    '<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qh-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div>'+
-      '<p>'+esc(q.client.name)+' · '+money(q.amount)+(q.saleId?' · Sale '+esc(q.saleId):'')+'</p></div>'+
-      '<div class="ad-hacts"><button class="ad-ib" id="qh-x" aria-label="Close">'+I.close+'</button></div></div>'+
-    (acts.length?'<div class="qh-acts">'+acts.map(function(a){ return '<button class="btn-ghost sm" data-out="'+a[0]+'">'+a[1]+'</button>'; }).join('')+'</div>':'')+
-    '<div class="ad-body"><section class="ad-sec"><h3>Activity</h3><ol class="qh-list">'+hist.map(function(e){
-      var tr=e.from||e.to?'<span class="qh-tr">'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
-      return '<li class="'+(e.ok?'':'bad')+'"><i aria-hidden="true"></i><div><b>'+EV[e.type][0]+'</b>'+tr+
-        (e.note?'<span class="qh-note">'+esc(e.note)+'</span>':'')+
-        '<small>'+(e.by==='System'?'Automatic':'by '+esc(e.by))+' · '+whenOf(e.t)+'</small></div></li>'; }).join('')+'</ol></section></div></div>';
-  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-  document.getElementById('qh-x').onclick=closeOv;
-  [].forEach.call(ov.querySelectorAll('[data-out]'),function(b){ b.onclick=function(){ outcome(q.id,b.getAttribute('data-out')); }; });
-}
-function outcome(id,to){
-  var q=byId(id), lbl={accepted:'Mark '+id+' as accepted?',rejected:'Mark '+id+' as rejected?',cancelled:'Cancel '+id+'?'}[to];
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qo-t"><div class="confirm-body"><h3 id="qo-t">'+lbl+'</h3>'+
-    '<label class="flabel" for="qo-n" style="margin-top:12px">'+(to==='accepted'?'Note (optional)':'Reason <span class="req-star">*</span>')+'</label><textarea class="ftext" id="qo-n" rows="3" maxlength="300"></textarea><span class="ferr" id="qo-e">Add a reason</span></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qo-no">Back</button><button class="'+(to==='cancelled'||to==='rejected'?'btn-danger':'btn-primary')+'" id="qo-go">'+(to==='accepted'?'Mark accepted':to==='rejected'?'Mark rejected':'Cancel quotation')+'</button></div></div>';
+function confirmDelete(id){
+  var q=byId(id);
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qd-t"><div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="qd-t">Delete draft '+esc(q.id)+'?</h3>'+
+    '<p>The draft for <strong>'+esc(client(q).name)+'</strong> is removed for good. This can’t be undone.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qd-no">Cancel</button><button class="btn-danger" id="qd-go">Delete draft</button></div></div>';
   dlg.classList.add('open');
-  document.getElementById('qo-no').onclick=closeDlg;
-  document.getElementById('qo-go').onclick=function(){
-    var n=document.getElementById('qo-n').value.trim(); if(to!=='accepted'&&!n){ document.getElementById('qo-e').classList.add('show'); return; }
-    reload(); var x=byId(id); if(!x) return;
-    setStatus(x,to,to,{note:n}); if(!saveQ(st)){ toast('Couldn’t save the change. Try again.',true); return; }
-    closeDlg(); render(); openHistory(id); toast(id+' '+(to==='accepted'?'marked as accepted':to==='rejected'?'marked as rejected':'cancelled'));
+  document.getElementById('qd-no').onclick=closeDlg;
+  document.getElementById('qd-go').onclick=function(){
+    reload(); var x=byId(id); if(!x||x.status!=='draft'){ closeDlg(); render(); return toast('Only a draft can be deleted.',true); }
+    st.list=st.list.filter(function(y){ return y.id!==id; }); if(!QuoteStore.save(st)){ return toast('Couldn’t delete the draft. Try again.',true); }
+    closeDlg(); render(); toast('Draft '+id+' deleted');
   };
 }
 
-/* ---------- PDF: the quotation on the letterhead, ready to save as a PDF ---------- */
-function openPdf(q){
-  var w=window.open('','_blank'); if(!w){ toast('Allow pop-ups to open the PDF',true); return; }
-  var gst=Math.round(q.amount/11*100)/100;
-  var html='<div class="el-doc"><section class="el-sheet"><img class="lt-head" src="'+LH_HEAD+'" alt="AAD Taxation"><div class="lt-body qd">'+
-    '<div class="qd-top"><h1>Quotation</h1><dl><div><dt>Quotation no.</dt><dd>'+esc(q.id)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Valid until</dt><dd>'+dmyOf(q.validUntil)+'</dd></div></dl></div>'+
-    '<div class="qd-to"><span>Prepared for</span><b>'+esc(q.client.name)+'</b>'+(q.client.email?'<em>'+esc(q.client.email)+'</em>':'')+'</div>'+
-    '<div class="qd-to"><span>Branch · Accountant</span><b>'+esc(q.branch)+' · '+esc(q.accountant)+'</b></div>'+
-    '<table class="lt-tbl qd-t"><thead><tr><th>Service</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead><tbody>'+
-      q.items.map(function(x){ return '<tr><td>'+esc(x.name)+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r">'+money(x.qty*x.price)+'</td></tr>'; }).join('')+
-    '</tbody></table><dl class="qd-tot"><div><dt>Includes GST of</dt><dd>'+money(gst)+'</dd></div><div class="t"><dt>Total (incl. GST)</dt><dd>'+money(q.amount)+'</dd></div></dl>'+
-    '<p class="qd-n">This quotation is valid until '+dmyOf(q.validUntil)+'. To accept it, reply to the email it came with or call us on 03 9115 1581.</p>'+
-    '</div><img class="lt-foot" src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></section></div>';
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>'+esc(q.id)+' · Quotation · '+esc(FIRM.name)+'</title><style>'+LETTER_CSS+
-    'body{margin:0;background:#E5E7EB;padding:24px;font-family:Inter,Arial,sans-serif}.bar{max-width:794px;margin:0 auto 14px;display:flex;justify-content:flex-end}.bar button{font:600 13px Inter,Arial,sans-serif;background:#F18934;color:#fff;border:0;border-radius:8px;padding:9px 16px;cursor:pointer}'+
-    '.qd-top{display:flex;justify-content:space-between;align-items:flex-start;gap:2em;margin-bottom:2em}.qd-top h1{font-size:2.2em;margin:0;color:#181C1E}.qd-top dl{margin:0}.qd-top dl div{display:flex;gap:1em;justify-content:space-between;margin-bottom:.3em}.qd-top dt{color:#555}.qd-top dd{margin:0;font-weight:600}'+
-    '.qd-to{margin-bottom:1em}.qd-to span{display:block;font-size:.85em;color:#666;text-transform:uppercase;letter-spacing:.05em}.qd-to b{display:block}.qd-to em{font-style:normal;color:#444}'+
-    '.qd-t{width:100%;margin-top:1.5em}.qd-t td.r,.qd-t th:nth-child(n+3){text-align:right}.qd-t td.c{text-align:center}'+
-    '.qd-tot{margin:1em 0 0 auto;width:45%}.qd-tot div{display:flex;justify-content:space-between;padding:.3em 0}.qd-tot dd{margin:0}.qd-tot .t{border-top:1px solid #333;font-weight:700;font-size:1.1em}.qd-n{margin-top:3em;color:#444}'+
-    '@page{size:A4;margin:0}@media print{body{background:#fff;padding:0}.bar{display:none}.el-doc{max-width:none}.el-sheet{box-shadow:none}}</style></head><body>'+
-    '<div class="bar"><button onclick="window.print()">Download PDF</button></div>'+html+'</body></html>');
-  w.document.close();
+/* ---------- activity history (newest first) ---------- */
+function openHistory(id){
+  var q=byId(id); if(!q) return; var c=client(q), hist=(q.history||[]).slice().reverse();
+  ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="qh-t">'+
+    '<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qh-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p>'+esc(c.name)+' · '+money(q.amount)+(q.saleId?' · Sale '+esc(q.saleId):'')+'</p></div>'+
+      '<div class="ad-hacts"><button class="ad-ib" id="qh-x" aria-label="Close">'+I.close+'</button></div></div>'+
+    '<div class="ad-body"><section class="ad-sec"><h3>Activity history</h3><ol class="qh-list">'+hist.map(function(e){
+      var tr=e.from||e.to?'<span class="qh-tr">'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
+      return '<li class="'+(e.ok?'':'bad')+'"><i aria-hidden="true"></i><div><b>'+EV[e.type][0]+'</b>'+tr+(e.note?'<span class="qh-note">'+esc(e.note)+'</span>':'')+
+        '<small>'+(e.by==='System'?'Automatic':'by '+esc(e.by))+' · '+whenOf(e.t)+'</small></div></li>'; }).join('')+'</ol></section></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('qh-x').onclick=closeOv; document.getElementById('qh-x').focus();
 }
-
 function closeOv(){ ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; }
 function closeDlg(){ dlg.classList.remove('open'); dlg.innerHTML=''; }
 ov.addEventListener('mousedown',function(e){ if(e.target===ov) closeOv(); });
 dlg.addEventListener('mousedown',function(e){ if(e.target===dlg) closeDlg(); });
-document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if(dlg.classList.contains('open')) return closeDlg(); closeOv(); });
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if(menuEl) return closeMenu(); if(dlg.classList.contains('open')) return closeDlg(); closeOv(); });
 window.addEventListener('storage',function(e){ if((e.key===Q_KEY||e.key==='aad-clients-v1')&&!ov.classList.contains('open')){ reload(); render(); } });
 
-content.innerHTML='<div class="card"><div class="empty"><h3>Loading quotations…</h3></div></div>';
+content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading quotations…</h3></div></div>';
 setTimeout(function(){ reload(); render(); },0);
 })();
 

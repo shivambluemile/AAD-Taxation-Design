@@ -10035,6 +10035,13 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:200px}
+.qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
+.qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
+.qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
+.qs-done{font-size:14px;color:var(--ink);line-height:1.55}
+.qs-lk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 12px;background:#FAFBFC}
+.qs-lk span{flex:1;min-width:0;font-size:12.5px;color:var(--slate);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rq-proto{padding:10px 12px;border-radius:10px;background:#FFF7EC;color:#7C4A03;font-size:12.5px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -10092,7 +10099,7 @@ var I={
 };
 var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
-  send_failed:['Email not sent',''],accepted:['Marked as accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to a sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
+  send_failed:['Email not sent',''],accepted:['Accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to invoice','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function esc(s){ return escH(s); }
@@ -10120,13 +10127,14 @@ function inScope(q){ return isManager()||q.accountant===ME.name||q.by===ME.name|
 
 /* ---------- QuoteStore: the one data access point ---------- */
 var QuoteStore={
-  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==4){ var seed=DevData.quotations(); v={v:4,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
+  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==5){ var seed=DevData.quotations(); v={v:5,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
   save:function(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
 function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to; log(q,type,o); }
 
 /* ---------- DEVELOPMENT DATA (temporary): sample quotations for the clients in this browser. Remove when the API is connected. ---------- */
+function clientName(c){ return c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name?c.directors[0].name:c.name; }
 var DevData={
   quotations:function(){
     var cl=loadClients().filter(function(c){ return c.active!==false; }).slice(0,10), svc=[];
@@ -10141,10 +10149,10 @@ var DevData={
       log(q,'created',{by:by,t:made,to:'draft'});
       if(st!=='draft'){
         var sent=made+(1+i%2)*day; setStatus(q,'sent','sent',{by:who.name,t:sent});
-        if(st==='accepted'||st==='converted') setStatus(q,'accepted','accepted',{by:who.name,t:sent+2*day,note:'Client accepted by email'});
+        if(st==='accepted'||st==='converted') setStatus(q,'accepted','accepted',{by:clientName(c),t:sent+2*day,note:'Accepted through the quotation link'});
         if(st==='rejected') setStatus(q,'rejected','rejected',{by:who.name,t:sent+4*day,note:'Client chose another provider'});
         if(st==='cancelled') setStatus(q,'cancelled','cancelled',{by:ME.name,t:sent+2*day,note:'Duplicate quotation'});
-        if(st==='converted'){ q.saleId='S-'+(5001+i); setStatus(q,'converted','converted',{by:ME.name,t:sent+5*day,sale:q.saleId,note:'Sale '+q.saleId}); }
+        if(st==='converted'){ q.invoiceId='INV-'+(2001+i); setStatus(q,'converted','converted',{by:ME.name,t:sent+5*day,sale:q.invoiceId,note:'Invoice '+q.invoiceId}); }
         if(st==='expired'){ q.created=now-50*day; q.history[0].t=q.created; q.history[1].t=q.created+day; q.validUntil=q.created+VALID_DAYS*day; }
       }
       out.push(q);
@@ -10173,7 +10181,7 @@ function attrLine(q){
 function summary(list){
   var by=function(s){ return list.filter(function(q){ return q.status===s; }); }, open=by('sent').concat(by('accepted'));
   return [['Total Quotations',list.length,'Every quotation you have access to'],['Draft',by('draft').length,'Created, not sent yet'],
-    ['Sent — Awaiting Response',by('sent').length,'Sent, still within their validity, with no answer recorded yet'],['Invoiced',by('converted').length,'Converted into a sale'],
+    ['Sent — Awaiting Response',by('sent').length,'Sent, still within their validity, with no answer recorded yet'],['Invoiced',by('converted').length,'Converted to an invoice'],
     ['Open Quotation Value',money(open.reduce(function(a,q){ return a+q.amount; },0)),'Total of sent and accepted quotations not yet invoiced. Excludes drafts and invoiced, rejected, expired and cancelled quotations.']];
 }
 
@@ -10368,20 +10376,21 @@ var AI=(function(){ var s=function(p){ return '<svg width="14" height="14" viewB
   return {edit:s('<path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/>'),
     send:s('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>'),
     pdf:s('<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/>'),
-    convert:s('<path d="M4 8h13l-3-3M20 16H7l3 3"/>')}; })();
+    copy:s('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>'),
+    convert:s('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/>')}; })();
 /* the four actions, each only where it applies */
 function menuFor(q){
   var s=q.status, edit=isManager()||q.accountant===ME.name||q.by===ME.name, a=[];
   if((s==='draft'||s==='sent')&&edit) a.push(['edit','Edit']);
   if((s==='draft'||s==='sent')&&edit) a.push(['send',s==='sent'?'Send again':'Send']);
   a.push(['pdf','Download PDF']);
-  if((s==='sent'||s==='accepted')&&isManager()) a.push(['convert','Convert to sale']);   // labels show as the button tooltip
+  if(s==='accepted'&&isManager()) a.push(['convert','Convert to invoice']);   // labels show as the button tooltip
   return [a];
 }
 /* screens built in later steps: each action goes through route(), the one hand-off point */
 var NEXT={create:['Create Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['Quotation PDF','a later step'],
-  send:['Send quotation by email','a later step'],resend:['Resend Quotation (email)','a later step'],convert:['Convert to Sale','a later step'],sale:['Linked sale in Sales','the Sales module']};
-var ROUTES={};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
+  send:['Send quotation by email','a later step'],resend:['Resend Quotation (email)','a later step'],};
+var ROUTES={send:function(q){ openSend(q.id); },convert:function(q){ confirmConvert(q.id); }};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
 function route(key,q){
   if(ROUTES[key]) return ROUTES[key](q);
   var n=NEXT[key];
@@ -10420,6 +10429,90 @@ content.addEventListener('click',function(e){
 });
 document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });
 window.addEventListener('resize',closeMenu); content.addEventListener('scroll',closeMenu,true);
+
+/* ---------- Send: the quotation goes to the client by email with a link to view and accept it ---------- */
+var MSG_MAX=500;
+function openSend(id){
+  reload(); var q=byId(id); if(!q) return;
+  var again=q.status==='sent', c=client(q), first=String(c.name).split(' ')[0];
+  var s={to:c.email||'',subject:'Your quotation '+q.id+' from '+FIRM.name,body:'Hi '+first+',\n\nPlease find your quotation '+q.id+' for '+money(q.amount)+' (incl. GST). It’s valid until '+dmyOf(q.validUntil)+'.\n\nYou can view and accept it using the link below.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name,busy:false,errs:{},fail:''};
+  function paint(){
+    var e=s.errs, err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
+    ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="qs-t">'+
+      '<div class="modal-head"><h2 id="qs-t">'+(again?'Send again':'Send quotation')+' · '+esc(q.id)+'</h2><button id="qs-x" aria-label="Close">'+I.close+'</button></div>'+
+      '<div class="modal-body">'+
+        '<div><label class="flabel" for="qs-to">To <span class="req-star">*</span></label><input class="fin plain sm'+(e.to?' bad':'')+'" id="qs-to" type="email" value="'+esc(s.to)+'" autocomplete="off">'+err('to')+'</div>'+
+        '<div><label class="flabel" for="qs-sub">Subject <span class="req-star">*</span></label><input class="fin plain sm'+(e.subject?' bad':'')+'" id="qs-sub" value="'+esc(s.subject)+'">'+err('subject')+'</div>'+
+        '<div><label class="flabel" for="qs-body">Message <span class="req-star">*</span></label><textarea class="ftext'+(e.body?' bad':'')+'" id="qs-body" rows="9" maxlength="'+MSG_MAX+'">'+esc(s.body)+'</textarea>'+
+          '<div class="qs-cnt" id="qs-n">'+s.body.length+'/'+MSG_MAX+' characters</div>'+err('body')+'</div>'+
+        '<p class="qs-link">The email ends with a secure link where '+esc(first)+' can view the quotation and accept it.</p>'+
+        (s.fail?'<div class="qs-fail" role="alert">'+I.warn+'<span><b>Couldn’t send.</b> '+esc(s.fail)+' Nothing was marked as sent.</span></div>':'')+
+      '</div>'+
+      '<div class="modal-foot"><button class="btn-ghost" id="qs-cancel"'+(s.busy?' disabled':'')+'>Cancel</button><button class="btn-primary" id="qs-go"'+(s.busy?' disabled':'')+'>'+(s.busy?'Sending…':(again?'Send again':'Send'))+'</button></div></div>';
+    ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+    ['to','sub','body'].forEach(function(k){ var el=document.getElementById('qs-'+k); el.oninput=function(){ s[k==='sub'?'subject':k]=el.value; if(k==='body') document.getElementById('qs-n').textContent=el.value.length+'/'+MSG_MAX+' characters'; }; });
+    document.getElementById('qs-x').onclick=closeOv; document.getElementById('qs-cancel').onclick=closeOv;
+    document.getElementById('qs-go').onclick=go;
+  }
+  function go(){
+    var e={}; if(!s.to.trim()) e.to='Enter the client’s email address'; else if(!validEmail(s.to)) e.to='Enter a valid email address';
+    if(!s.subject.trim()) e.subject='Add a subject'; if(!s.body.trim()) e.body='Add a message';
+    s.errs=e; s.fail=''; if(Object.keys(e).length){ paint(); return; }
+    reload(); var x=byId(id); if(!x||['draft','sent'].indexOf(x.status)<0){ closeOv(); render(); return toast('This quotation can no longer be sent.',true); }
+    var token=x.token||newToken(), link=portalLink('quote',token), to=s.to.trim();
+    s.busy=true; paint();
+    deliver({email:{to:to,cc:'',bcc:'',subject:s.subject,body:s.body+'\n\n'+link,html:esc(s.body).replace(/\n/g,'<br>')+'<br><br><a href="'+esc(link)+'">View and accept your quotation</a>'},sms:null}).then(function(res){
+      reload(); var y=byId(id); s.busy=false;
+      if(!res.ok){ log(y,'send_failed',{ok:false,note:res.error||'The email couldn’t be delivered'}); QuoteStore.save(st); s.fail=res.error||'The email couldn’t be delivered.'; paint(); render(); return; }
+      var re=y.status==='sent'; y.token=token;
+      if(re) log(y,'resent',{note:'To '+to}); else setStatus(y,'sent','sent',{note:'To '+to});
+      if(!QuoteStore.save(st)){ toast('The email went out but the quotation couldn’t be updated. Try again.',true); return; }
+      render(); sentPanel(y,to,link);
+    });
+  }
+  paint();
+}
+/* PROTOTYPE ONLY: after sending, the link the client received, so the team can open the client's page */
+function sentPanel(q,to,link){
+  var b=ov.querySelector('.modal-body'), f=ov.querySelector('.modal-foot'); if(!b) return;
+  document.getElementById('qs-t').textContent='Quotation sent · '+q.id;
+  b.innerHTML='<p class="qs-done">'+esc(q.id)+' was emailed to <b>'+esc(to)+'</b>. Please copy the below link on the next browser tab to view the quotation as the client sees it:</p>'+
+    '<div class="qs-lk"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="qs-copy" title="Copy link" aria-label="Copy link">'+AI.copy+'</button></div>'+
+    '<p class="rq-proto">This panel won’t be shown in the real design. It’s only here in the prototype to give you the link to preview what the client receives.</p>';
+  f.innerHTML='<span></span><button class="btn-primary" id="qs-close">Done</button>';
+  document.getElementById('qs-close').onclick=closeOv;
+  document.getElementById('qs-copy').onclick=function(){ try{ navigator.clipboard.writeText(link).then(function(){ toast('Link copied'); },function(){ toast('Link copied'); }); }catch(e){ toast('Link copied'); } };
+}
+
+/* ---------- Convert to invoice: one invoice per quotation, linked both ways, then the status is Invoiced ---------- */
+var INV_KEY='aad-invoices-v1', converting={};
+function loadInvoices(){ try{ var v=JSON.parse(localStorage.getItem(INV_KEY)||'null'); return v&&Array.isArray(v.list)?v:{list:[]}; }catch(e){ return {list:[]}; } }
+function saveInvoices(v){ try{ localStorage.setItem(INV_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function confirmConvert(id){
+  reload(); var q=byId(id); if(!q) return;
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qv-t"><div class="confirm-body"><h3 id="qv-t">Convert '+esc(q.id)+' to an invoice?</h3>'+
+    '<p>An invoice for <strong>'+esc(client(q).name)+'</strong> of '+money(q.amount)+' is created with the same services and prices, and the quotation becomes Invoiced. It can’t be edited or converted again.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qv-no">Cancel</button><button class="btn-primary" id="qv-go">Convert to invoice</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('qv-go').focus();
+  document.getElementById('qv-no').onclick=closeDlg;
+  document.getElementById('qv-go').onclick=function(){ this.disabled=true; convert(id); };
+}
+function convert(id){
+  if(converting[id]) return; converting[id]=true;
+  try{
+    reload(); var q=byId(id), inv=loadInvoices(), dup=inv.list.filter(function(x){ return x.quotationId===id; })[0];
+    if(q.invoiceId||dup){ if(!q.invoiceId){ q.invoiceId=dup.id; setStatus(q,'converted','converted',{sale:dup.id,note:'Invoice '+dup.id}); QuoteStore.save(st); }
+      closeDlg(); render(); return toast(q.id+' is already invoiced ('+q.invoiceId+').',true); }
+    if(q.status!=='accepted'){ closeDlg(); render(); return toast('Only an accepted quotation can be converted to an invoice.',true); }
+    var n=2000+inv.list.length+1; while(inv.list.some(function(x){ return x.id==='INV-'+n; })) n++;
+    var rec={id:'INV-'+n,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,amount:q.amount,by:ME.name,at:Date.now()};
+    inv.list.push(rec);
+    if(!saveInvoices(inv)){ closeDlg(); return toast('The invoice couldn’t be created. Nothing was changed.',true); }
+    q.invoiceId=rec.id; setStatus(q,'converted','converted',{sale:rec.id,note:'Invoice '+rec.id});
+    if(!QuoteStore.save(st)){ inv.list.pop(); saveInvoices(inv); closeDlg(); return toast('The quotation couldn’t be updated, so the invoice was undone.',true); }
+    closeDlg(); render(); toast(q.id+' converted to invoice '+rec.id);
+  } finally { converting[id]=false; }
+}
 
 /* ---------- destructive actions: confirmed first, recorded in the history ---------- */
 function confirmCancel(id){
@@ -10471,7 +10564,7 @@ function confirmDelete(id){
 function openHistory(id){
   var q=byId(id); if(!q) return; var c=client(q), hist=(q.history||[]).slice().reverse();
   ov.innerHTML='<div class="drawer ad" role="dialog" aria-modal="true" aria-labelledby="qh-t">'+
-    '<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qh-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p>'+esc(c.name)+' · '+money(q.amount)+(q.saleId?' · Sale '+esc(q.saleId):'')+'</p></div>'+
+    '<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qh-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p>'+esc(c.name)+' · '+money(q.amount)+(q.invoiceId?' · Invoice '+esc(q.invoiceId):'')+'</p></div>'+
       '<div class="ad-hacts"><button class="ad-ib" id="qh-x" aria-label="Close">'+I.close+'</button></div></div>'+
     '<div class="ad-body"><section class="ad-sec"><h3>Activity history</h3><ol class="qh-list">'+hist.map(function(e){
       var tr=e.from||e.to?'<span class="qh-tr">'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
@@ -14123,6 +14216,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .file div{flex:1;min-width:0}.file b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file small{font-size:12px;color:var(--faint)}
 .lw{background:#E9EBEE;border-radius:12px;padding:14px;overflow:auto;max-height:70vh;margin-bottom:18px}
 .agree{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--slate);margin-top:14px}
+.qv-meta{margin-bottom:18px}
 .agree input{margin-top:2px;accent-color:var(--orange)}
 .signed{display:flex;gap:10px;align-items:center;background:#ECFDF5;border:1px solid #BBF7D0;color:#047857;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
 .rv dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px}
@@ -14238,6 +14332,42 @@ function clientNameFor(L){ try{ var cl=JSON.parse(localStorage.getItem('aad-clie
 /* ================= onboarding form ================= */
 var R=null, step=1, errs={}, f=null, mem={kyc:[],sig:null};
 var STEPS=['Your details','Please find below the services','Engagement letter'], LAST=3;
+/* ================= quotation page: the client views the quotation and accepts it ================= */
+var Q_KEY='aad-quotations-v1';
+function loadQuotes(){ try{ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); return v&&Array.isArray(v.list)?v:null; }catch(err){ return null; } }
+function quoteClient(q){ try{ var cl=JSON.parse(localStorage.getItem('aad-clients-v1')||'[]').filter(function(c){ return String(c.id)===String(q.clientId); })[0]; return cl||{name:q.clientName||'',email:''}; }catch(err){ return {name:q.clientName||'',email:''}; } }
+function paintQuote(){
+  var st=loadQuotes(), q=st&&st.list.filter(function(x){ return x.token===TOKEN; })[0];
+  if(!q) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
+  var c=quoteClient(q), who=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name?c.directors[0].name:c.name, first=String(who||'').split(' ')[0];
+  var acc=q.history.filter(function(h){ return h.type==='accepted'; }).pop();
+  if(q.status==='cancelled') return closed('x','This quotation was withdrawn','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
+  if(q.status==='rejected') return closed('x','This quotation is closed','You let us know you didn’t want to go ahead. Contact '+FIRM.name+' on '+FIRM.phone+' if that’s changed.');
+  var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
+  var rows=q.items.map(function(x){ return '<tr><td>'+e(x.name)+(x.qty>1?' × '+x.qty:'')+'</td><td>'+money(x.qty*x.price)+'</td></tr>'; }).join('');
+  var done=q.status==='accepted'||q.status==='converted';
+  app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1><p>'+e(q.id)+' from '+FIRM.name+' · Valid until '+dmyOf(q.validUntil)+'</p></div>'+
+    (done?'<div class="signed">'+IC.tick+'<span>You accepted this quotation on '+whenOf(acc?acc.t:Date.now())+'. We’ll be in touch to get started.</span></div>':'')+
+    '<div class="card">'+
+      '<dl class="ty-meta qv-meta"><div><dt>Prepared for</dt><dd>'+e(c.name)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Branch</dt><dd>'+e(q.branch)+'</dd></div></dl>'+
+      '<table class="svc"><thead><tr><th>Service</th><th>Price (incl. GST)</th></tr></thead><tbody>'+rows+'<tr class="tot"><td>Total</td><td>'+money(q.amount)+'</td></tr></tbody></table>'+
+      (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
+        '<label class="agree"><input type="checkbox" id="qa-ok"><span>I accept this quotation and its prices.</span></label><span class="err" id="qa-e" hidden>Tick the box to confirm</span>'+
+        '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Accept quotation</button></div>')+
+    '</div>';
+  var go=document.getElementById('qa-go'); if(!go) return;
+  go.onclick=function(){
+    if(!document.getElementById('qa-ok').checked){ document.getElementById('qa-e').hidden=false; return; }
+    if(PREVIEW){ toast('Preview only: in the real link this accepts the quotation'); return; }
+    var v=loadQuotes(), x=v&&v.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return paintQuote();
+    if(x.status!=='sent') return paintQuote();                      // already accepted, or changed by the firm meanwhile
+    var from=x.status; x.status='accepted';
+    x.history.push({type:'accepted',by:who||c.name,t:Date.now(),from:from,to:'accepted',note:'Accepted through the quotation link',ok:true,sale:''});
+    try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); }catch(err){ x.status=from; return toast('We couldn’t record your acceptance. Please try again.',true); }
+    paintQuote(); window.scrollTo(0,0); toast('Thank you, your quotation is accepted');
+  };
+}
+if(KIND==='quote') paintQuote();
 if(KIND==='onboard') bootOnboard();
 function bootOnboard(){
   R=ONB.requests.filter(function(x){ return x.token===TOKEN; })[0];
@@ -14725,8 +14855,8 @@ function submit(){
 
   if(window.innerWidth <= 860) document.body.classList.add('collapsed');
   window.AADPortalSrc=function(){ return source('portal'); };      // Clients uses this for Show Link previews
-  // a client's secure link (#portal/onboard/<token> or #portal/sign/<token>) opens only the client-facing page
-  var pm=(location.hash||'').match(/^#portal\/(onboard|sign)\/([a-f0-9]{20,})$/);
+  // a client's secure link (#portal/onboard|sign|quote/<token>) opens only the client-facing page
+  var pm=(location.hash||'').match(/^#portal\/(onboard|sign|quote)\/([a-f0-9]{20,})$/);
   if(pm){
     document.body.classList.add('portal-mode');
     var pf=document.createElement('iframe'); pf.className='portal-frame'; pf.title='Client onboarding';

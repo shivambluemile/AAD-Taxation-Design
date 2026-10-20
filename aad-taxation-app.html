@@ -10054,15 +10054,17 @@ table,td,th{font-size:13.5px}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
+.qf-tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
 .qf-thead,.qf-row{display:grid;grid-template-columns:150px minmax(0,1.2fr) minmax(0,1.3fr) 76px 120px 92px 30px;gap:10px;align-items:start}
-.qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:8px}.qf-thead .r{text-align:right}
-.qf-rows{display:flex;flex-direction:column;gap:10px}
-.qf-ta{min-height:42px;height:42px;padding-top:10px;padding-bottom:10px;resize:vertical;line-height:1.4}
+.qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line);padding:11px 12px;align-items:center}.qf-thead .r{text-align:right}
+.qf-rows{display:flex;flex-direction:column}
+.qf-row{padding:10px 12px;border-bottom:1px solid #F1F2F4}.qf-row:last-child{border-bottom:0}.qf-row:hover{background:#FCFCFD}
+.qf-ta{min-height:42px;height:42px;padding-top:10px;padding-bottom:10px;resize:none;overflow:hidden;line-height:1.4}
 .qf-price{position:relative;display:flex;align-items:center}.qf-cur{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13.5px;line-height:1;color:var(--mute);pointer-events:none}
 .qf-price .fin{padding-left:24px;width:100%}
 .qf-line{height:42px;display:flex;align-items:center;justify-content:flex-end;font-size:13.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .qf-rm{height:42px;display:flex;align-items:center;justify-content:center}
-.qf-rerr{grid-column:1/-1;margin-top:-4px}
+.qf-rerr{grid-column:1/-1;margin-top:-2px}
 .qf-add{margin-top:12px}
 .qf-foot{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;border-top:1px solid var(--line);padding-top:16px}
 .qf-notes{display:flex;flex-direction:column;gap:16px}
@@ -10083,6 +10085,7 @@ table,td,th{font-size:13.5px}
 .qf-tot.doc{margin:12px 0 0 auto;width:45%;background:none;border:0;padding:0}
 .qf-doc-n{margin-top:18px;color:#333}.qf-doc-tc{margin-top:16px}.qf-doc-tc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:4px}.qf-doc-tc p{margin:0;color:#444;font-size:12px}
 @media (max-width:900px){.qf-grid,.qf-foot{grid-template-columns:1fr}.qf-thead{display:none}.qf-row{grid-template-columns:1fr 1fr}.qf-row>div:nth-child(3){grid-column:1/-1}.qf-line{justify-content:flex-start}.qf-tot.doc{width:100%}}
+.qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -10540,8 +10543,8 @@ function paintForm(focusId){
         field('Additional Accountant',false,sel('qf-acc2','accountant2',ASSIGNABLE.map(function(s){ return s.name; }).filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+
         field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+
       '</div>'+
-      '<section class="qf-items"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
-        '<div class="qf-rows">'+lines+'</div>'+err('items')+
+      '<section class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="pill-btn quiet qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
       '<div class="qf-foot">'+
         '<div class="qf-notes"><div><label class="flabel" for="qf-cn">Customer Notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="2" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Will be displayed on the quote</small></div>'+
@@ -10593,7 +10596,10 @@ function wireForm(focusId){
     if(s){ x.svcId=s.id; x.name=s.name; x.desc=s.desc||''; if(!x.cat&&s.cats&&s.cats.length) x.cat=String(s.cats[0]); if(!x.price||num(x.price)<s.price) x.price=String(s.price); if(!x.qty) x.qty='1'; }
     else { var c0=x.cat; d.items[i]=blankLine(); d.items[i].cat=c0; }
     delete QF.errs['s'+i]; delete QF.errs['p'+i]; delete QF.errs.items; touch(); repaint('qf-q'+i); }; });
-  [].forEach.call(ov.querySelectorAll('[data-desc]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-desc')].desc=el.value; touch(); }; });
+  /* the description shows two lines in the table and opens up to the full text while you edit it */
+  var fit=function(el,open){ el.style.height='auto'; el.style.height=(open?Math.max(42,el.scrollHeight+2):Math.min(Math.max(42,el.scrollHeight+2),62))+'px'; el.classList.toggle('open',!!open); };
+  [].forEach.call(ov.querySelectorAll('[data-desc]'),function(el){ fit(el); el.onfocus=function(){ fit(el,true); }; el.onblur=function(){ fit(el); el.scrollTop=0; };
+    el.oninput=function(){ d.items[+el.getAttribute('data-desc')].desc=el.value; fit(el,true); touch(); }; });
   [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-qty')].qty=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); QF.errs={}; touch(); repaint(); }; });

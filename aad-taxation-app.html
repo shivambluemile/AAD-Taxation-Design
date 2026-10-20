@@ -12489,6 +12489,20 @@ table,td,th{font-size:13.5px}
 .qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
 <style id="sl-css">
+/* Add / Edit Sale: the Add Quotation drawer, plus a Fee column, one document and the financial summary */
+.drawer.sl-sf{max-width:min(1040px,96vw)}
+.sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:140px minmax(0,1.1fr) minmax(0,1.3fr) 80px 72px 112px 88px 30px}
+.sl-fee{color:var(--mute);font-weight:500}
+.sl-dates{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sl-up{border-top:1px solid var(--line);padding-top:16px}
+.sl-sf .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}
+.sl-sf .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
+.sl-sf .qf-tot .sl-disc{align-items:center;min-height:32px}
+.sl-disc dd{display:flex;align-items:center;gap:4px}
+.sl-dinp{width:120px}.sl-dinp .fin{height:34px}
+.sl-derr{margin:0 0 4px;text-align:right}
+.qf-tot .sl-pendrow{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px;font-weight:600}.qf-tot .sl-pendrow dt{color:var(--ink)}
+@media (max-width:900px){.sl-sf .qf-row{grid-template-columns:1fr 1fr}.sl-sf .sl-fee{justify-content:flex-start}}
 /* Sales uses the shared list styles (filter bar, stats, table, ⋮ menu); only what's specific to sales is here */
 .sl-stats{grid-template-columns:repeat(2,minmax(0,240px))}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
@@ -12848,7 +12862,7 @@ function render(){
   content.innerHTML=h; wireHead(); wireFilters();
 }
 function wireHead(){
-  document.getElementById('sl-add').onclick=function(){ later('Add Sale'); };
+  document.getElementById('sl-add').onclick=function(){ openSaleForm(); };
   var p=document.getElementById('sl-pdf'); if(p) p.onclick=exportPdf; var c=document.getElementById('sl-csv'); if(c) c.onclick=exportCsv;
 }
 function wireFilters(){
@@ -12859,7 +12873,7 @@ function wireFilters(){
   bindRange();
   var clear=function(){ state.f=blank(); state.applied=state.f; state.errs={}; state.page=1; render(); };
   document.getElementById('clearf').onclick=clear; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
-  var a2=document.getElementById('sl-add2'); if(a2) a2.onclick=function(){ later('Add Sale'); };
+  var a2=document.getElementById('sl-add2'); if(a2) a2.onclick=function(){ openSaleForm(); };
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
 }
 function applyFilters(){
@@ -12924,16 +12938,250 @@ content.addEventListener('click',function(ev){
 });
 function doAction(k,id){
   reload(); var s=byId(id); if(!s){ render(); return toast('This sale no longer exists.',true); }
-  ({edit:function(){ later('Edit Sale',s); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
+  ({edit:function(){ openSaleForm(s.id); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
     pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ openLog(s.id); },
     quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
 }
-/* screens designed separately: Add Sale, Edit Sale */
-function later(name,s){
-  modal('<div class="confirm-body"><h3 id="m-t">'+esc(name)+(s?' · '+esc(s.id):'')+'</h3><p>The '+esc(name)+' screen is designed separately and isn’t part of this listing step yet. This option will open it once it’s built.</p></div>'+
-    '<div class="modal-foot"><button class="btn-primary" id="m-ok">Got it</button></div>');
-  document.getElementById('m-ok').onclick=closeDlg;
+/* ---------- Add Sale / Edit Sale: the same form as Add Quotation, with the sale's own fields ---------- */
+var SF=null;   // {id, isNew, d:{...}, errs:{}, dirty, busy}
+function catalogAll(){ try{ return loadCatalog(); }catch(e){ return {categories:[],services:[]}; } }
+function svcById(id){ return catalogAll().services.filter(function(s){ return s.id===id; })[0]; }
+function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
+function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
+/* the invoice is made out to the client, or for a company one of its directors (as on quotations) */
+function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
+/* never reuse an invoice number, including ones a quotation already points to */
+function nextSaleId(){ var qs=quotes(), ids=st.list.map(function(s){ return s.id; }).concat(qs?qs.list.map(function(q){ return q.invoiceId; }).filter(Boolean):[]);
+  var n=ids.reduce(function(m,id){ return Math.max(m,+String(id).replace(/\D/g,'')||0); },2000)+1; return 'INV-'+n; }
+/* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total */
+function saleTotals(d,paid){
+  var sub=r2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
+  var disc=d.showDisc?num(d.discount):0; if(!(disc>0)) disc=0; disc=Math.min(disc,sub);
+  var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:r2(total/11),total:total,pending:Math.max(0,r2(total-(paid||0)))};
 }
+function formClient(){ return SF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(SF.d.clientId); })[0]:null; }
+function openSaleForm(id){
+  reload(); var s=id?byId(id):null;
+  if(id&&!s) return toast('This sale no longer exists.',true);
+  if(s&&s.status==='disabled') return toast('A disabled sale can’t be edited.',true);
+  var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(x){ return x.name===ME.name; })[0];
+  SF={id:s?s.id:nextSaleId(),isNew:!s,errs:{},dirty:false,busy:false,pick:'',paid:s?paidOf(s):0,d:s?{
+      clientId:s.clientId,onName:s.onName||client(s).name,branch:s.branch||'',accountant:s.accountant||'',accountant2:s.accountant2||'',date:isoDay(s.date),due:isoDay(s.due),
+      items:(s.items&&s.items.length?s.items:[blankLine()]).map(function(x){ var v=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
+        return {cat:x.cat!=null?String(x.cat):(v&&v.cats&&v.cats[0]!=null?String(v.cats[0]):''),svcId:v?v.id:null,name:x.name||'',desc:x.desc||'',qty:String(x.qty!=null?x.qty:1),price:x.price!=null?String(x.price):''}; }),
+      showDisc:!!s.discountAmt,discount:s.discountAmt?String(s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||''
+    }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
+      items:[blankLine()],showDisc:false,discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
+  paintSaleForm();
+}
+function clientMatches(q){
+  q=String(q||'').trim().toLowerCase(); if(!q) return '';
+  var dq=q.replace(/\D/g,'');
+  var m=clients.filter(function(c){ if(c.active===false) return false;
+    if((c.name+' '+(c.email||'')).toLowerCase().indexOf(q)>=0) return true;
+    return dq.length>=3&&[c.phone,c.abn,c.tfn].some(function(v){ return String(v||'').replace(/\D/g,'').indexOf(dq)>=0; }); }).slice(0,8);
+  if(!m.length) return '<li class="qf-none">No client matches. Add them in Clients first.</li>';
+  return m.map(function(c,i){ return '<li role="option" tabindex="-1" data-cid="'+esc(c.id)+'"'+(i===0?' class="on"':'')+'><b>'+esc(c.name)+'</b><span>'+[c.email,c.phone].filter(Boolean).map(esc).join(' · ')+'</span></li>'; }).join('');
+}
+/* the upload rules and look of Add Shift's documents (Attendance): PDF, JPG, PNG or Word, 5 MB */
+var DOC_EXT=['pdf','jpg','jpeg','png','doc','docx'], DOC_MAX=5*1048576;
+var DOC_UP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>';
+var FT={pdf:['PDF','#FDECEC','#C2410C'],jpg:['JPG','#E8F1FD','#2563EB'],jpeg:['JPG','#E8F1FD','#2563EB'],png:['PNG','#E8F1FD','#2563EB'],doc:['DOC','#EEF2FF','#4F46E5'],docx:['DOC','#EEF2FF','#4F46E5']};
+function ftag(n){ var e=(String(n).split('.').pop()||'').toLowerCase(), t=FT[e]||[(e||'file').toUpperCase(),'#F1F2F4','#475569'];
+  return '<span class="ar-ft" style="background:'+t[1]+';color:'+t[2]+'">'+t[0]+'</span>'; }
+function fsizeOf(b){ return b<1048576?Math.max(1,Math.round(b/1024))+' KB':(b/1048576).toFixed(1)+' MB'; }
+function paintSaleForm(focusId){
+  var d=SF.d, e=SF.errs, T=saleTotals(d,SF.paid), c=formClient(), cat=catalogAll(), cats=cat.categories.filter(function(x){ return x.active!==false; }), svc=cat.services.filter(function(x){ return x.active; });
+  var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
+  var sel=function(id,k,opts,val,ph){ return '<div class="sf-sel"><select class="fin plain sm'+(e[k]?' bad':'')+'" id="'+id+'" data-sf="'+k+'"><option value="">'+ph+'</option>'+
+    opts.map(function(o){ return '<option value="'+esc(o)+'"'+(String(o)===String(val)?' selected':'')+'>'+esc(o)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; };
+  var field=function(label,req,html,k,forId){ return '<div><label class="flabel"'+(forId?' for="'+forId+'"':'')+'>'+label+(req?' <span class="req-star">*</span>':'')+'</label>'+html+(k?err(k):'')+'</div>'; };
+  var clientField=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b>'+(SF.isNew?'<button type="button" class="act" id="sf-chg" title="Change client" aria-label="Change client">'+I.close+'</button>':'')+'</div>'
+    :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="sf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(SF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="sf-list">'+
+      '<ul class="qf-list" id="sf-list" role="listbox"'+(SF.pick.trim()?'':' hidden')+'>'+clientMatches(SF.pick)+'</ul></div>';
+  var names=nameOptions(c), staff=ASSIGNABLE.map(function(x){ return x.name; });
+  var lines=d.items.map(function(x,i){
+    var v=x.svcId?svcById(x.svcId):null, fee=v?v.price:null, q=num(x.qty), p=num(x.price), amt=x.svcId&&q>0&&p>=0?q*p:0;
+    var taken=d.items.filter(function(y,j){ return j!==i&&y.svcId; }).map(function(y){ return y.svcId; });
+    var list=svc.filter(function(o){ return (!x.cat||(o.cats||[]).map(String).indexOf(x.cat)>=0)&&(taken.indexOf(o.id)<0||o.id===x.svcId); });
+    var lineErr=e['s'+i]||e['q'+i]||e['p'+i];
+    return '<div class="qf-row">'+
+      '<div><label class="sr" for="sf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="sf-c'+i+'" data-cat="'+i+'"><option value="">All categories</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="sf-s'+i+'">Item details, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm'+(e['s'+i]?' bad':'')+'" id="sf-s'+i+'" data-svc="'+i+'"><option value="">Choose an item</option>'+
+        list.map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="sf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="sf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
+      '<div class="qf-line sl-fee" title="The fee for this service in Settings → Services. The rate can’t be lower.">'+(fee!=null?money(fee):'<span class="ar-dash">—</span>')+'</div>'+
+      '<div><label class="sr" for="sf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="sf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
+      '<div class="qf-price"><label class="sr" for="sf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="sf-p'+i+'" data-price="'+i+'" type="number" min="'+(fee||0)+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+fee+'"':' placeholder="0.00" disabled')+'></div>'+
+      '<div class="qf-line num">'+money(amt)+'</div>'+
+      '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+MI['delete']+'</button></div>'+
+      (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
+  }).join('');
+  var doc=d.doc?'<div class="sf-file">'+ftag(d.doc.name)+'<span class="sf-fn"><b title="'+esc(d.doc.name)+'">'+esc(d.doc.name)+'</b><small>'+fsizeOf(d.doc.size)+'</small></span>'+
+      '<button type="button" class="sf-rm" id="sf-docrm" title="Remove" aria-label="Remove '+esc(d.doc.name)+'">'+MI['delete']+'</button></div>'
+    :'<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
+      '<span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
+  ov.innerHTML='<div class="drawer sf qf sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
+    '<div class="modal-head"><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body" id="sf-body">'+
+      '<div class="qf-grid">'+
+        field('Select Client',true,clientField,'client')+
+        field('On the Name Of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+
+        field('Select Branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
+        field('Select Staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
+        field('Additional Accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+
+        '<div class="sl-dates">'+field('Invoice Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
+          field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div>'+
+      '</div>'+
+      '<section class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Fee</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
+        '<button type="button" class="pill-btn quiet qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
+      '<section class="sl-up"><span class="flabel">Upload Document</span>'+doc+err('doc')+'</section>'+
+      '<div class="qf-foot">'+
+        '<div class="qf-notes"><div><label class="flabel" for="sf-cn">Customer Notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="2" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Will be displayed on the invoice</small></div>'+
+          '<div><label class="flabel" for="sf-tc">Terms &amp; Conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="3" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
+          '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></div>'+
+        '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+
+          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'<span class="qf-price sl-dinp"><span class="qf-cur">$</span><input class="fin plain sm'+(e.discount?' bad':'')+'" id="sf-disc" type="number" min="0" step="0.01" inputmode="decimal" value="'+esc(d.discount)+'" aria-label="Discount in dollars"></span><button type="button" class="act" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button>'
+            :'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add Discount</button>')+'</dd></div>'+
+          (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
+          '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+          '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+money(T.pending)+'</dd></div></dl>'+
+      '</div>'+err('total')+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="sf-go">Submit</button></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  wireSaleForm(focusId);
+}
+function liveTotals(){
+  var d=SF.d, T=saleTotals(d,SF.paid);
+  [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),null,money(T.gst),money(T.total),money(T.pending)];
+  [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
+}
+function wireSaleForm(focusId){
+  var d=SF.d, touch=function(){ SF.dirty=true; };
+  var repaint=function(fid){ var keep=document.getElementById('sf-body').scrollTop; paintSaleForm(); document.getElementById('sf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
+  [].forEach.call(ov.querySelectorAll('[data-sf]'),function(el){
+    var k=el.getAttribute('data-sf'), live=el.tagName==='TEXTAREA'||el.type==='text'||el.id==='sf-ref';
+    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete SF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2=''; if(!live) repaint(el.id); };
+  });
+  var pick=document.getElementById('sf-q');
+  if(pick){
+    var list=document.getElementById('sf-list');
+    pick.oninput=function(){ SF.pick=pick.value; list.innerHTML=clientMatches(pick.value); list.hidden=!pick.value.trim(); };
+    pick.onkeydown=function(ev){ var it=[].slice.call(list.querySelectorAll('[data-cid]')), i=it.findIndex(function(x){ return x.classList.contains('on'); });
+      if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){ ev.preventDefault(); if(!it.length) return; if(i>=0) it[i].classList.remove('on'); i=(i+(ev.key==='ArrowDown'?1:-1)+it.length)%it.length; it[i].classList.add('on'); it[i].scrollIntoView({block:'nearest'}); }
+      if(ev.key==='Enter'&&i>=0){ ev.preventDefault(); choose(it[i].getAttribute('data-cid')); } };
+    list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
+  }
+  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; SF.pick=''; delete SF.errs.client; delete SF.errs.onName; touch(); repaint('sf-on'); }
+  var chg=document.getElementById('sf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; touch(); repaint('sf-q'); };
+  [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
+    var v=x.svcId?svcById(x.svcId):null; if(v&&x.cat&&(v.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }
+    touch(); repaint('sf-s'+i); }; });
+  [].forEach.call(ov.querySelectorAll('[data-svc]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-svc'), v=svcById(+el.value), x=d.items[i];
+    if(v){ x.svcId=v.id; x.name=v.name; x.desc=v.desc||''; if(!x.cat&&v.cats&&v.cats.length) x.cat=String(v.cats[0]); if(!x.price||num(x.price)<v.price) x.price=String(v.price); if(!x.qty) x.qty='1'; }
+    else { var c0=x.cat; d.items[i]=blankLine(); d.items[i].cat=c0; }
+    delete SF.errs['s'+i]; delete SF.errs['p'+i]; delete SF.errs.items; touch(); repaint('sf-q'+i); }; });
+  var fit=function(el,open){ el.style.height='auto'; el.style.height=(open?Math.max(42,el.scrollHeight+2):Math.min(Math.max(42,el.scrollHeight+2),62))+'px'; el.classList.toggle('open',!!open); };
+  [].forEach.call(ov.querySelectorAll('[data-desc]'),function(el){ fit(el); el.onfocus=function(){ fit(el,true); }; el.onblur=function(){ fit(el); el.scrollTop=0; };
+    el.oninput=function(){ d.items[+el.getAttribute('data-desc')].desc=el.value; fit(el,true); touch(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-qty')].qty=el.value; touch(); liveTotals(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); SF.errs={}; touch(); repaint(); }; });
+  document.getElementById('sf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('sf-c'+(d.items.length-1)); };
+  /* discount: a dollar amount off the sub total, as on quotations */
+  var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
+  var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
+  var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; delete SF.errs.discount; touch(); liveTotals(); };
+  /* document: one file, picked or dropped */
+  var take=function(f){ if(!f) return; var ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(DOC_EXT.indexOf(ext)<0) SF.errs.doc=f.name+' isn’t a PDF, JPG, PNG or Word file.';
+    else if(f.size>DOC_MAX) SF.errs.doc=f.name+' is larger than 5 MB.';
+    else if(!f.size) SF.errs.doc=f.name+' is empty. Choose another file.';
+    else { delete SF.errs.doc; d.doc={name:f.name,size:f.size,type:f.type||ext,file:f}; touch(); }
+    repaint(); };
+  var fi=document.getElementById('sf-file'), dz=document.getElementById('sf-drop');
+  if(fi){ fi.onchange=function(){ take(fi.files[0]); fi.value=''; };
+    dz.ondragover=function(ev){ ev.preventDefault(); dz.classList.add('drag'); }; dz.ondragleave=function(){ dz.classList.remove('drag'); };
+    dz.ondrop=function(ev){ ev.preventDefault(); dz.classList.remove('drag'); if(ev.dataTransfer.files.length>1){ SF.errs.doc='Upload one document at a time.'; return repaint(); } take(ev.dataTransfer.files[0]); }; }
+  var rmd=document.getElementById('sf-docrm'); if(rmd) rmd.onclick=function(){ d.doc=null; touch(); repaint(); };
+  document.getElementById('sf-x').onclick=leaveSaleForm; document.getElementById('sf-cancel').onclick=leaveSaleForm;
+  document.getElementById('sf-go').onclick=submitSale;
+  if(focusId){ var f=document.getElementById(focusId); if(f) f.focus(); }
+}
+function checkSale(){
+  var d=SF.d, e={}, T=saleTotals(d,SF.paid), filled=d.items.filter(function(x){ return x.svcId; });
+  if(d.clientId==null||!formClient()) e.client='Choose the client this sale is for';
+  else if(!d.onName) e.onName='Choose who the invoice is made out to';
+  if(!d.branch) e.branch='Choose the branch';
+  if(!d.accountant) e.accountant='Choose the staff member';
+  if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
+  if(!d.date) e.date='Enter the invoice date';
+  if(!d.due) e.due='Enter the due date'; else if(d.date&&d.due<d.date) e.due='The due date must be on or after the invoice date';
+  d.items.forEach(function(x,i){
+    if(!x.svcId){ if(d.items.length>1) e['s'+i]='Choose an item, or remove this line'; return; }
+    var q=num(x.qty), p=num(x.price), v=svcById(x.svcId), min=v?v.price:0;
+    if(!(q>0)||Math.round(q)!==q) e['q'+i]='Quantity must be a whole number above 0';
+    else if(x.price===''||!isFinite(p)) e['p'+i]='Enter the rate';
+    else if(p<min) e['p'+i]='The rate can’t be below the '+money(min)+' fee set in Settings → Services';
+  });
+  if(!filled.length) e.items='Add at least one line';
+  if(d.showDisc){ var dv=num(d.discount); if(d.discount===''||!isFinite(dv)||dv<0) e.discount='Enter the discount in dollars, or remove it'; else if(dv>T.sub) e.discount='The discount can’t be more than the sub total'; }
+  if(filled.length&&T.total<=0&&!e.discount) e.total='The total must be more than $0.00';
+  if(SF.paid>0&&T.total<SF.paid) e.total='The total can’t be less than the '+money(SF.paid)+' already paid';
+  if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
+  return e;
+}
+function submitSale(){
+  if(SF.busy) return;                                    // one save per click, however many clicks
+  SF.errs=checkSale();
+  if(Object.keys(SF.errs).length){ paintSaleForm(); var b=ov.querySelector('.bad, .ferr.show'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } return toast('Fix the highlighted fields to save the sale',true); }
+  SF.busy=true; var go=document.getElementById('sf-go'); go.disabled=true; go.textContent='Saving…';
+  var d=SF.d, fail=function(msg){ SF.busy=false; var g=document.getElementById('sf-go'); if(g){ g.disabled=false; g.textContent='Submit'; } toast(msg,true); };
+  var store=d.doc&&d.doc.file?putSaleFile('sale-'+SF.id+'-'+Date.now(),d.doc.file):Promise.resolve(null);
+  store.then(function(key){
+    reload(); var c=formClient(), T=saleTotals(d,SF.paid), s=SF.isNew?null:byId(SF.id);
+    if(!SF.isNew&&(!s||s.status==='disabled')) return fail('This sale can no longer be edited.');
+    var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
+    var doc=d.doc?{name:d.doc.name,size:d.doc.size,type:d.doc.type,key:key||d.doc.key||null}:null;
+    var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
+      items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price))}; }),
+      subtotal:T.sub,discountAmt:T.disc,gst:T.gst,amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};
+    if(SF.isNew){
+      if(byId(SF.id)) SF.id=nextSaleId();               // the number was taken meanwhile
+      s={id:SF.id,by:ME.name,at:Date.now(),status:'draft',payments:[],history:[]}; for(var k in fields) s[k]=fields[k];
+      log(s,'created',{note:fields.items.length+' line'+(fields.items.length===1?'':'s')+' · '+money(T.total)+(T.disc?' after '+money(T.disc)+' discount':'')});
+      st.list.push(s);
+    } else {
+      var was=money(s.amount); for(var k2 in fields) s[k2]=fields[k2];
+      if(s.editRequest&&s.editRequest.status==='approved'&&s.editRequest.by===ME.name) s.editRequest.status='used';   // an approved request covers one edit
+      log(s,'edited',{note:was===money(T.total)?money(T.total):was+' → '+money(T.total)});
+    }
+    if(!save()) return fail('Couldn’t save the sale. Nothing was changed.');
+    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); toast(isNew?'Sale '+id+' added':'Sale '+id+' updated');
+  },function(){ fail('The document couldn’t be stored. Try again, or remove it.'); });
+}
+/* documents are kept in this browser's private storage (IndexedDB) next to the sale */
+function putSaleFile(key,file){
+  return new Promise(function(res,rej){
+    try{ var rq=indexedDB.open('aad-sale-files',1);
+      rq.onupgradeneeded=function(){ rq.result.createObjectStore('files'); };
+      rq.onsuccess=function(){ var tx=rq.result.transaction('files','readwrite'); tx.objectStore('files').put(file,key); tx.oncomplete=function(){ res(key); }; tx.onerror=function(){ rej(tx.error); }; };
+      rq.onerror=function(){ rej(rq.error); };
+    }catch(e){ rej(e); }
+  });
+}
+function leaveSaleForm(){
+  if(!SF||!SF.dirty){ SF=null; return closeOv(); }
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="sl-t"><div class="confirm-body"><h3 id="sl-t">Discard your changes?</h3><p>What you’ve entered isn’t saved.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="sl-no">Keep editing</button><button class="btn-danger" id="sl-go2">Discard</button></div></div>';
+  dlg.classList.add('open');
+  document.getElementById('sl-no').onclick=closeDlg;
+  document.getElementById('sl-go2').onclick=function(){ closeDlg(); SF=null; closeOv(); };
+}
+
 function modal(inner,wide){ dlg.innerHTML='<div class="modal'+(wide?'':' sm')+'" role="dialog" aria-modal="true" aria-labelledby="m-t">'+inner+'</div>'; dlg.classList.add('open'); var f=dlg.querySelector('input,textarea,select,.btn-primary,.btn-danger'); if(f) f.focus(); }
 function closeDlg(){ dlg.classList.remove('open'); dlg.innerHTML=''; }
 function fieldErr(id,msg){ var el=document.getElementById(id); if(el){ el.textContent=msg; el.classList.add('show'); } }
@@ -13081,9 +13329,9 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(dlg.cl
 
 /* ---------- the invoice document: the quotation layout titled as a tax invoice, with what's been paid ---------- */
 function invoiceHtml(s){
-  var c=client(s), sub=r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0));
-  var m={id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:c.name,toSub:'',attn:'',items:(s.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
-    T:{sub:sub,disc:0,gst:r2(s.amount/11),total:s.amount},notes:'',terms:'',sign:null};
+  var c=client(s), sub=s.subtotal!=null?s.subtotal:r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), to=s.onName||c.name;
+  var m={id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',items:(s.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
+    T:{sub:sub,disc:r2(+s.discountAmt||0),gst:r2(s.amount/11),total:s.amount},notes:s.customerNotes||'',terms:s.terms||'',sign:null};
   var h=quoteDocHtml(m).replace('<h3>Quotation</h3>','<h3>Tax Invoice</h3>').replace('Quotation no.','Invoice no.').replace('Quotation date','Invoice date').replace('Prepared for','Bill to');
   var a=h.indexOf('<div class="qf-doc-sg">'), b=h.lastIndexOf('</div><img');
   var pay='<dl class="qf-tot doc"><div><dt>Paid</dt><dd>'+money(paidOf(s))+'</dd></div><div class="t"><dt>Balance due</dt><dd>'+money(pendingOf(s))+'</dd></div></dl>'+

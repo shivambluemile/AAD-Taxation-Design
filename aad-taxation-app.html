@@ -10034,7 +10034,11 @@ table,td,th{font-size:13.5px}
 .qt-menu button:hover,.qt-menu button:focus-visible{background:#FFF4EA;color:#C2630F;outline:none}.qt-menu button:hover svg,.qt-menu button:focus-visible svg{color:#C2630F}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
-.qt-clip.qt-cname{max-width:230px}
+.qt-clip.qt-cname{max-width:200px}
+.qt-acts{display:inline-flex;align-items:center;white-space:nowrap}
+.qt-acts button{font-size:12.5px;font-weight:600;color:var(--orange-ink)}.qt-acts button:hover{text-decoration:underline;text-underline-offset:3px}
+.qt-acts button:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:3px}
+.qt-acts .sep{color:#D6DBE1;margin:0 7px}
 </style>
 </head>
 <body>
@@ -10318,7 +10322,7 @@ function render(){
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
-  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th class="c">Actions</th></tr></thead><tbody>';
+  h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Actions</th></tr></thead><tbody>';
   if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Create Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
@@ -10331,7 +10335,7 @@ function render(){
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
-      '<td class="c"><button class="qt-more" data-menu="'+q.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(q.id)+'">'+I.dots+'</button></td></tr>';
+      '<td class="nowrap"><span class="qt-acts">'+menuFor(q)[0].map(function(a,i){ return (i?'<span class="sep" aria-hidden="true">|</span>':'')+'<button data-mi="'+a[0]+'" data-q="'+q.id+'" aria-label="'+esc(a[1])+' '+esc(q.id)+'">'+esc(a[1])+'</button>'; }).join('')+'</span></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead();
@@ -10409,7 +10413,7 @@ function act(k,id){
   route(k,q);
 }
 content.addEventListener('click',function(e){
-  var m=e.target.closest('[data-menu]'); if(m) return openMenu(m);
+  var m=e.target.closest('[data-mi][data-q]'); if(m) return act(m.getAttribute('data-mi'),m.getAttribute('data-q'));   // actions sit in the row
   var v=e.target.closest('[data-do="view"]'); if(v){ reload(); if(ROUTES.view) return ROUTES.view(byId(v.getAttribute('data-q'))); openHistory(v.getAttribute('data-q')); }
 });
 document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });

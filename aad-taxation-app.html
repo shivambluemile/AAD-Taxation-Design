@@ -10035,10 +10035,6 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:200px}
-.qt-acts{display:inline-flex;align-items:center;white-space:nowrap}
-.qt-acts button{font-size:12.5px;font-weight:600;color:var(--orange-ink)}.qt-acts button:hover{text-decoration:underline;text-underline-offset:3px}
-.qt-acts button:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:3px}
-.qt-acts .sep{color:#D6DBE1;margin:0 7px}
 </style>
 </head>
 <body>
@@ -10335,7 +10331,7 @@ function render(){
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
-      '<td class="nowrap"><span class="qt-acts">'+menuFor(q)[0].map(function(a,i){ return (i?'<span class="sep" aria-hidden="true">|</span>':'')+'<button data-mi="'+a[0]+'" data-q="'+q.id+'" aria-label="'+esc(a[1])+' '+esc(q.id)+'">'+esc(a[1])+'</button>'; }).join('')+'</span></td></tr>';
+      '<td class="nowrap"><span class="acts">'+menuFor(q)[0].map(function(a){ return '<button class="act" data-mi="'+a[0]+'" data-q="'+q.id+'" title="'+esc(a[1])+'" aria-label="'+esc(a[1])+' '+esc(q.id)+'">'+AI[a[0]]+'</button>'; }).join('')+'</span></td></tr>';   // the same icon buttons as the other tables
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead();
@@ -10367,13 +10363,19 @@ var MI=(function(){ var s=function(p){ return '<svg width="16" height="16" viewB
     history:s('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
     cancel:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),
     'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>')}; })();
+/* row action icons: the app's 14px action icons (Clients' edit pencil, the shared download arrow) */
+var AI=(function(){ var s=function(p){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {edit:s('<path d="M12 20h8"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3 20l1.5-4.5Z"/>'),
+    send:s('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>'),
+    pdf:s('<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/>'),
+    convert:s('<path d="M4 8h13l-3-3M20 16H7l3 3"/>')}; })();
 /* the four actions, each only where it applies */
 function menuFor(q){
   var s=q.status, edit=isManager()||q.accountant===ME.name||q.by===ME.name, a=[];
   if((s==='draft'||s==='sent')&&edit) a.push(['edit','Edit']);
-  if((s==='draft'||s==='sent')&&edit) a.push(['send','Send']);
-  a.push(['pdf','PDF']);
-  if((s==='sent'||s==='accepted')&&isManager()) a.push(['convert','Convert to sale']);
+  if((s==='draft'||s==='sent')&&edit) a.push(['send',s==='sent'?'Send again':'Send']);
+  a.push(['pdf','Download PDF']);
+  if((s==='sent'||s==='accepted')&&isManager()) a.push(['convert','Convert to sale']);   // labels show as the button tooltip
   return [a];
 }
 /* screens built in later steps: each action goes through route(), the one hand-off point */

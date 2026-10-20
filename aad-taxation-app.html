@@ -10034,6 +10034,7 @@ table,td,th{font-size:13.5px}
 .qt-menu button:hover,.qt-menu button:focus-visible{background:#FFF4EA;color:#C2630F;outline:none}.qt-menu button:hover svg,.qt-menu button:focus-visible svg{color:#C2630F}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
+.qt-clip.qt-cname{max-width:230px}
 </style>
 </head>
 <body>
@@ -10324,7 +10325,7 @@ function render(){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
       '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the activity history"><span class="name">'+esc(q.id)+'</span></button></td>'+
-      '<td><span class="qt-clip" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.email?'<small class="ar-sub qt-clip" title="'+esc(c.email)+'">'+esc(c.email)+'</small>':'')+'</td>'+
+      '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+'</td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="num r">'+money(q.amount)+'</td>'+
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+

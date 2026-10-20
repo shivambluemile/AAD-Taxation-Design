@@ -12489,6 +12489,15 @@ table,td,th{font-size:13.5px}
 .qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
 <style id="sl-css">
+/* Sale Details: the Quotation Details panel, as wide as Add Sale for the sale lines */
+.drawer.sd-drawer{max-width:min(1040px,96vw)}
+.state.s-draft i{background:#94A3B8}.state.s-sent i{background:#3B82F6}.state.s-dis i{background:#CBD5E1}.state.s-dis{color:var(--mute)}.state.s-req i{background:#F59E0B}
+.sd-t td.sd-desc{color:var(--slate);max-width:260px;overflow-wrap:anywhere}
+.qd-t td .state+small{display:block;margin-top:3px;font-size:12px;color:var(--mute)}
+.sd-drawer .fgrid.sd-one{grid-template-columns:1fr;gap:18px}
+.sd-drawer .fgrid.sd-one p{margin:0;color:var(--ink)}
+.sd-drawer .sf-file{max-width:460px}
+.qf-tot .sd-paid dt small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
 /* Add / Edit Sale: the Add Quotation drawer, plus a Fee column, one document and the financial summary */
 .drawer.sl-sf{max-width:min(1040px,96vw)}
 .sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:140px minmax(0,1.1fr) minmax(0,1.3fr) 80px 72px 112px 88px 30px}
@@ -12520,9 +12529,7 @@ table,td,th{font-size:13.5px}
 .sl-mail{display:flex;flex-direction:column;gap:14px}
 .sl-att{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--slate);background:#FAFBFC;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
 .sl-quote{margin-top:8px;padding:10px 12px;background:#FAFBFC;border-radius:8px;color:var(--slate)}
-.drawer.sl-log{max-width:560px}.sl-lsub{font-size:12.5px;color:var(--mute);margin-top:4px}
 .sl-h3{font-family:'Manrope';font-size:14.5px;font-weight:800;margin:0 0 10px;color:var(--ink)}
-.sl-log section+section{margin-top:22px}
 .sl-mini{width:100%;border-collapse:collapse;font-size:12.5px}
 .sl-mini th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#64748B;padding:6px 8px;border-bottom:1px solid var(--line)}
 .sl-mini td{padding:7px 8px;border-bottom:1px solid var(--line-soft,#F1F2F4)}.sl-mini .r{text-align:right}.sl-mini .tot td{font-weight:700;border-bottom:0}
@@ -12727,7 +12734,7 @@ var SaleStore={
     return v; },
   save:function(v){ try{ localStorage.setItem(INV_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
-function log(s,type,o){ o=o||{}; (s.history=s.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),note:o.note||'',ok:o.ok!==false}); }
+function log(s,type,o){ o=o||{}; var e={type:type,by:o.by||ME.name,t:o.t||Date.now(),note:o.note||'',ok:o.ok!==false}; if(o.to) e.to=o.to; (s.history=s.history||[]).push(e); }
 function quotes(){ try{ var v=JSON.parse(localStorage.getItem('aad-quotations-v1')||'null'); return v&&Array.isArray(v.list)?v:null; }catch(e){ return null; } }
 /* sales converted from a quotation carry only the basics; the rest is filled in from the quotation once */
 function normalise(s){
@@ -12848,7 +12855,7 @@ function render(){
     var c=client(s), ps=payStatus(s), pend=pendingOf(s), dis=s.status==='disabled';
     h+='<tr class="'+(dis?'sl-dis':ps==='overdue'?'sl-over':'')+'">'+
       '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
-      '<td class="nowrap"><button class="name-link" data-do="log" data-s="'+s.id+'" title="Open the sale’s history"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
+      '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
       '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
       '<td class="num r">'+money(s.amount)+'</td>'+
@@ -12860,6 +12867,7 @@ function render(){
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h; wireHead(); wireFilters();
+  if(detailId) paintDetail(true);   // the open sale follows every change
 }
 function wireHead(){
   document.getElementById('sl-add').onclick=function(){ openSaleForm(); };
@@ -12934,12 +12942,12 @@ document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e
 window.addEventListener('resize',closeMenu); content.addEventListener('scroll',closeMenu,true);
 content.addEventListener('click',function(ev){
   var m=ev.target.closest('[data-menu]'); if(m) return openMenu(m);
-  var b=ev.target.closest('[data-do="log"]'); if(b) doAction('log',b.getAttribute('data-s'));
+  var b=ev.target.closest('[data-do="open"]'); if(b) openDetail(b.getAttribute('data-s'));
 });
 function doAction(k,id){
   reload(); var s=byId(id); if(!s){ render(); return toast('This sale no longer exists.',true); }
   ({edit:function(){ openSaleForm(s.id); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
-    pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ openLog(s.id); },
+    pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ if(detailId===s.id&&ov.querySelector('.sd-drawer')){ sdTab='activity'; paintDetail(); } else openDetail(s.id,'activity'); },
     quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
 }
 /* ---------- Add Sale / Edit Sale: the same form as Add Quotation, with the sale's own fields ---------- */
@@ -13243,12 +13251,12 @@ function mailDialog(s,kind){
     deliver({email:{to:to,subject:sb,body:bd,attachment:s.id+'.pdf'}}).then(function(r){
       sending=false; reload(); var x=byId(s.id); if(!x){ closeDlg(); render(); return; }
       if(!r.ok){
-        log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(r.error||'The email service didn’t accept it'),ok:false}); save();
+        log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(r.error||'The email service didn’t accept it'),ok:false,to:to}); save();
         document.getElementById('e-fail').innerHTML='<div class="qs-fail">'+I.warn+'<span><b>Not sent.</b> '+esc(r.error||'The email service didn’t accept it.')+' Check the address and try again.</span></div>';
         go.disabled=false; go.textContent='Try again'; return;
       }
-      if(rem) log(x,'reminder',{note:'To '+to+' · '+money(pendingOf(x))+' owing'});
-      else { var was=x.status; x.status='sent'; x.sentAt=Date.now(); log(x,was==='sent'?'resent':'sent',{note:'To '+to+' · invoice '+x.id+'.pdf attached'}); }
+      if(rem) log(x,'reminder',{note:'To '+to+' · '+money(pendingOf(x))+' owing',to:to});
+      else { var was=x.status; x.status='sent'; x.sentAt=Date.now(); log(x,was==='sent'?'resent':'sent',{note:'To '+to+' · invoice '+x.id+'.pdf attached',to:to}); }
       commit(x,rem?'Reminder sent to '+to:'Invoice '+x.id+' sent to '+to);
     });
   };
@@ -13310,22 +13318,166 @@ function toQuotation(s){
   };
 }
 
-/* ---------- Log: the sale's audit history, newest first ---------- */
-function openLog(id){
-  reload(); var s=byId(id); if(!s) return;
-  var pays=(s.payments||[]).filter(function(p){ return !p.void; });
-  ov.innerHTML='<div class="drawer sl-log" role="dialog" aria-modal="true" aria-labelledby="lg-t"><div class="modal-head"><div><h2 id="lg-t">'+esc(s.id)+' · Log</h2><p class="sl-lsub">'+esc(client(s).name)+' · '+money(s.amount)+' · '+(s.status==='disabled'?'Disabled':PAY[payStatus(s)]+(pendingOf(s)>0?', '+money(pendingOf(s))+' owing':''))+'</p></div><button id="lg-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body">'+(pays.length?'<section><h3 class="sl-h3">Payments</h3><table class="sl-mini"><thead><tr><th>Date</th><th>Type</th><th>Reference</th><th class="r">Amount</th></tr></thead><tbody>'+
-      pays.map(function(p){ return '<tr><td>'+dmyOf(p.at)+'</td><td>'+esc(p.type)+'</td><td>'+(p.ref?esc(p.ref):'<span class="ar-dash">—</span>')+'</td><td class="r">'+money(p.amount)+'</td></tr>'; }).join('')+
-      '<tr class="tot"><td colspan="3">Paid</td><td class="r">'+money(paidOf(s))+'</td></tr></tbody></table></section>':'')+
-    '<section><h3 class="sl-h3">History</h3><ul class="qh-list">'+(s.history||[]).slice().reverse().map(function(e){
-      return '<li'+(e.ok===false?' class="bad"':'')+'><i></i><div><b>'+esc(EV[e.type]||e.type)+'</b>'+(e.note?'<span class="qh-note">'+esc(e.note)+'</span>':'')+'<small>'+whenOf(e.t)+(e.by?' · by '+esc(e.by):'')+'</small></div></li>'; }).join('')+'</ul></section></div></div>';
-  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-  document.getElementById('lg-x').onclick=closeOv; document.getElementById('lg-x').focus();
+/* ---------- Sale Details: the Quotation Details panel (header with info lines and actions, tabs, sections), filled from the saved sale ---------- */
+var detailId=null, sdTab='services';
+var SD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {user:v('<circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>'),mail:v('<rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="m4 7 8 6 8-6"/>'),
+    phone:v('<path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/>'),
+    cal:v('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),branch:v('<path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5V14h4v5.5"/>'),
+    staff:v('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/>'),clock:v('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    copy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
+    down:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
+    dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>'}; })();
+var MAIL_EV=['sent','resent','send_failed','reminder','reminder_failed'];
+function badge(st0){ var x=STATUS[st0]||[st0,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
+/* the header actions: the list menu's rules (status, permissions, edit requests); Log is the Activities tab here, Disable and Delete stay in the list */
+function detailActions(s){
+  var lab={edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation'};
+  return actionsFor(s).filter(function(a){ return lab[a[0]]; }).map(function(a){ return [a[0],lab[a[0]]]; });
 }
-function closeOv(){ ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; }
-ov.addEventListener('mousedown',function(e){ if(e.target===ov) closeOv(); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(dlg.classList.contains('open')) closeDlg(); else if(ov.classList.contains('open')) closeOv(); } });
+/* the saved totals; older sales (converted from quotations) have only the amount */
+function savedTotals(s){
+  var sub=s.subtotal!=null?s.subtotal:r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=r2(+s.discountAmt||0);
+  return {sub:sub,disc:disc,gst:s.gst!=null?s.gst:r2(s.amount/11),total:s.amount};
+}
+/* the service behind a line: by id, or by name for lines converted from older quotations */
+function svcOf(x){ return (x.svcId?svcById(x.svcId):null)||catalogAll().services.filter(function(c){ return c.name===x.name; })[0]||null; }
+function catName(x){
+  var cat=catalogAll(), id=x.cat!=null&&x.cat!==''?String(x.cat):null;
+  if(id==null){ var v=svcOf(x); id=v&&v.cats&&v.cats.length?String(v.cats[0]):null; }
+  var c=id!=null?cat.categories.filter(function(k){ return String(k.id)===id; })[0]:null; return c?c.name:'';
+}
+function feeOf(x){ if(x.fee!=null) return x.fee; var v=svcOf(x); return v?v.price:null; }
+/* who an email went to: recorded with the email, or read from the note on older entries */
+function mailTo(e){ if(e.to) return e.to; var m=/^To ([^ ·]+)/.exec(e.note||''); return m?m[1]:''; }
+function mailWhy(e){ var p=String(e.note||'').split(' · '); return p.length>1?p.slice(1).join(' · '):''; }
+
+function openDetail(id,tab){
+  closeMenu(); reload();
+  if(!st) return toast('Sales couldn’t be loaded. Try again.',true);
+  var s=byId(id);
+  if(!s) return toast('This sale no longer exists.',true);
+  if(!inScope(s)) return toast('You don’t have access to this sale.',true);
+  detailId=id; sdTab=tab||'services'; paintDetail();
+}
+function closeDetail(){ detailId=null; closeOv(); }
+function paintDetail(keep){
+  if(ov.classList.contains('open')&&!ov.querySelector('.sd-drawer')) return;   // Edit is open on top; the details come back when it closes
+  var s=st&&byId(detailId);
+  if(!s||!inScope(s)){ var was=!!ov.querySelector('.sd-drawer'); detailId=null; if(was){ closeOv(); toast('This sale is no longer available.',true); } return; }
+  var prev=document.getElementById('sd-b'), y=keep&&prev?prev.scrollTop:0;
+  var c=client(s), cr=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0], T=savedTotals(s), items=s.items||[], dis=s.status==='disabled';
+  var hist=s.history||[], pays=s.payments||[], mails=hist.filter(function(e){ return MAIL_EV.indexOf(e.type)>=0; });
+  var when=function(t){ return whenOf(t).replace(' · ',', '); };
+  var tabs=[['services','Services',items.length],['payments','Payments',pays.length],['notes','Notes and documents'],['emails','Emails',mails.length],['activity','Activities',hist.length]];
+  if(!tabs.some(function(t){ return t[0]===sdTab; })) sdTab='services';
+
+  /* header: the sale information, each fact once */
+  var dc=function(icon,html,tip){ return html?'<span class="dc"'+(tip?' title="'+tip+'"':'')+'><i class="dci">'+icon+'</i>'+html+'</span>':''; };
+  var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+SD_IC.copy+'</button>'; };
+  var who=cr?'<button class="qd-cl" data-sd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+(s.clientId!=null?' <small>(no longer on file)</small>':'');
+  var on=s.onName&&s.onName!==c.name?' <small>on the name of</small> '+esc(s.onName):'';
+  var ps=payStatus(s), er=s.editRequest;
+  var head='<div class="cl-dhead"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+badge(s.status)+(dis?'':'<span class="state p-'+ps+'"><i></i>'+PAY[ps]+'</span>')+
+        (er&&er.status==='pending'?'<span class="state s-req"><i></i>Edit requested</span>':'')+'</h2>'+
+      '<div class="dmetaline">'+dc(SD_IC.user,who+on)+(c.email?dc(SD_IC.mail,'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)):'')+
+        (cr&&cr.phone?dc(SD_IC.phone,esc(cr.phone)+copy(cr.phone)):'')+'</div>'+
+      '<div class="dmetaline">'+dc(SD_IC.cal,dmyOf(s.date)+' <small>due</small> '+dmyOf(s.due),'Invoice date and due date')+dc(SD_IC.branch,esc(s.branch||''),'Branch')+
+        dc(SD_IC.staff,esc(s.accountant||'')+(s.accountant2?' <small>with</small> '+esc(s.accountant2):''),'Staff and additional accountant')+
+        dc(SD_IC.clock,'Added by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+'</div></div>'+
+    '<div class="dhead-acts">'+detailActions(s).map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
+      '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
+  var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
+    var o=t[0]===sdTab; return '<button role="tab" aria-selected="'+o+'" class="'+(o?'on':'')+'" data-stab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
+
+  var b='';
+  if(sdTab==='services'){
+    var credit=r2(pays.filter(function(p){ return !p.void&&p.type==='Client Credit'; }).reduce(function(a,p){ return a+p.amount; },0));
+    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. Rates include GST.</p></div>'+
+      '<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t sd-t"><thead><tr><th>Category</th><th>Item Details</th><th>Description</th><th class="r">Fee</th><th class="r">Quantity</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
+      (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0, fee=feeOf(x), cn=catName(x);
+        return '<tr><td>'+(cn?esc(cn):'<span class="cl-muted">—</span>')+'</td><td><b>'+esc(x.name)+'</b></td><td class="sd-desc">'+(x.desc?esc(x.desc):'<span class="cl-muted">—</span>')+'</td>'+
+          '<td class="r num">'+(fee!=null?money(fee):'<span class="cl-muted">—</span>')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
+        :'<tr><td colspan="7" class="cl-muted">No services on this sale</td></tr>')+
+      '</tbody></table></div>'+
+      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div>'+
+        '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+        '<div class="sd-paid"><dt>Amount Paid'+(credit?'<small>incl. '+money(credit)+' client credit</small>':'')+'</dt><dd>'+money(paidOf(s))+'</dd></div>'+
+        '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+(dis?'<span class="cl-muted">— Disabled</span>':money(pendingOf(s)))+'</dd></div></dl></section>';
+  }
+  if(sdTab==='payments'){
+    b=pays.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Payment date</th><th>Reference</th><th>Payment type</th><th class="r">Amount received</th><th>Recorded by</th><th>Status</th></tr></thead><tbody>'+
+        pays.slice().sort(function(a,z){ return z.at-a.at; }).map(function(p){
+          var stt=p.void?['Voided','p-overdue']:p.type==='Client Credit'?['Credit applied','p-partial']:['Received','p-paid'];
+          return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
+            '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span></td></tr>'; }).join('')+
+        '</tbody></table></div></section>'
+      :'<section class="vsec"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p></section>';
+  }
+  if(sdTab==='notes'){
+    var d=s.doc;
+    b='<section class="vsec"><h3>On the invoice</h3><dl class="fgrid sd-one"><div><dt>Customer Notes</dt><dd>'+(s.customerNotes?'<p>'+esc(s.customerNotes)+'</p>':'<span class="cl-muted">No notes for the client</span>')+'</dd></div>'+
+        '<div><dt>Terms &amp; Conditions</dt><dd>'+(s.terms?'<p>'+esc(s.terms)+'</p>':'<span class="cl-muted">No terms and conditions</span>')+'</dd></div></dl></section>'+
+      '<section class="vsec"><h3>Internal</h3><dl class="fgrid sd-one"><div><dt>Document</dt><dd>'+
+        (d?'<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><button class="name-link" data-doc="open" title="Open '+esc(d.name)+'"><b class="name">'+esc(d.name)+'</b></button><small>'+fsizeOf(d.size)+'</small></span>'+
+            '<button type="button" class="sf-rm" data-doc="down" title="Download" aria-label="Download '+esc(d.name)+'">'+SD_IC.down+'</button></div>'
+          :'<span class="cl-muted">No document uploaded</span>')+'</dd></div>'+
+        '<div><dt>Referrals</dt><dd>'+(s.referral?esc(s.referral):'<span class="cl-muted">No referral</span>')+'</dd></div></dl></section>';
+  }
+  if(sdTab==='emails'){
+    b=mails.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Email</th><th>Recipient</th><th>Date and time</th><th>Result</th><th>Sent by</th></tr></thead><tbody>'+
+        mails.slice().sort(function(a,z){ return z.t-a.t; }).map(function(e){ var rem=/^reminder/.test(e.type), why=mailWhy(e), to=mailTo(e);
+          return '<tr><td><b>'+(rem?'Payment reminder':e.type==='resent'?'Invoice resent':'Invoice')+'</b></td><td>'+(to?esc(to):'<span class="cl-muted">—</span>')+'</td><td class="num">'+when(e.t)+'</td>'+
+            '<td>'+(e.ok===false?'<span class="state p-overdue"><i></i>Not sent</span>'+(why?'<small>'+esc(why)+'</small>':''):'<span class="state p-paid"><i></i>Sent</span>')+'</td><td>'+esc(e.by||'—')+'</td></tr>'; }).join('')+
+        '</tbody></table></div></section>'
+      :'<section class="vsec"><p class="cl-muted">The invoice hasn’t been emailed yet.</p></section>';
+  }
+  if(sdTab==='activity'){
+    var list=hist.slice().sort(function(a,z){ return z.t-a.t; });
+    b='<section class="vsec">'+(list.length?'<div class="timeline">'+list.map(function(e){
+      return '<div class="tlitem'+(e.ok===false?' bad':'')+'"><span class="dot">'+SD_IC.dot+'</span><div class="tlttl">'+esc(EV[e.type]||e.type)+'</div>'+
+        (e.note?'<div class="tlnote">'+esc(e.note)+'</div>':'')+'<div class="tlmeta">'+when(e.t)+(e.by?' · by <b>'+esc(e.by)+'</b>':'')+'</div></div>'; }).join('')+'</div>'
+      :'<p class="cl-muted">No activity has been recorded for this sale yet.</p>')+'</section>';
+  }
+
+  ov.innerHTML='<div class="drawer qd-drawer sd-drawer" role="dialog" aria-modal="true" aria-labelledby="sd-t">'+head+tabsH+'<div class="cl-vbody" id="sd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('sd-b').scrollTop=y;
+  document.getElementById('sd-x').onclick=closeDetail;
+  ov.querySelectorAll('[data-stab]').forEach(function(t){ t.onclick=function(){ sdTab=t.getAttribute('data-stab'); paintDetail(); }; });
+  ov.querySelectorAll('[data-sa]').forEach(function(x){ x.onclick=function(){ doAction(x.getAttribute('data-sa'),detailId); }; });
+  ov.querySelectorAll('.sd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
+    try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
+  ov.querySelectorAll('[data-doc]').forEach(function(x){ x.onclick=function(){ openDoc(s,x.getAttribute('data-doc')==='down'); }; });
+  var vc=ov.querySelector('[data-sd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+s.clientId); }catch(e){} };
+  if(!keep) document.getElementById('sd-x').focus();
+}
+/* the uploaded document, from this browser's storage: PDFs and images open in a new tab, anything else downloads */
+function getSaleFile(key){
+  return new Promise(function(res,rej){
+    try{ var rq=indexedDB.open('aad-sale-files',1);
+      rq.onupgradeneeded=function(){ rq.result.createObjectStore('files'); };
+      rq.onsuccess=function(){ var g=rq.result.transaction('files').objectStore('files').get(key); g.onsuccess=function(){ res(g.result||null); }; g.onerror=function(){ rej(g.error); }; };
+      rq.onerror=function(){ rej(rq.error); };
+    }catch(e){ rej(e); }
+  });
+}
+function openDoc(s,download){
+  var d=s.doc; if(!d) return;
+  var gone=function(){ toast('“'+d.name+'” isn’t stored in this browser, so it can’t be opened here.',true); };
+  if(!d.key) return gone();
+  getSaleFile(d.key).then(function(blob){
+    if(!blob) return gone();
+    var url=URL.createObjectURL(blob), ext=(d.name.split('.').pop()||'').toLowerCase();
+    if(!download&&['pdf','jpg','jpeg','png'].indexOf(ext)>=0){ var w=window.open(url,'_blank'); if(!w) toast('Allow pop-ups to open the document',true); }
+    else { var a=document.createElement('a'); a.href=url; a.download=d.name; document.body.appendChild(a); a.click(); a.remove(); }
+    setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+  },gone);
+}
+function closeOv(){ var wasDetail=!!ov.querySelector('.sd-drawer'); ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow='';
+  if(wasDetail) detailId=null; else if(detailId) paintDetail(); }
+ov.addEventListener('mousedown',function(e){ if(e.target===ov){ if(SF) leaveSaleForm(); else closeOv(); } });
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if(menuEl) return closeMenu(); if(dlg.classList.contains('open')) return closeDlg(); if(SF) return leaveSaleForm(); if(ov.classList.contains('open')) closeOv(); });
 
 /* ---------- the invoice document: the quotation layout titled as a tax invoice, with what's been paid ---------- */
 function invoiceHtml(s){

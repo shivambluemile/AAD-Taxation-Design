@@ -10042,34 +10042,35 @@ table,td,th{font-size:13.5px}
 .qs-lk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px 8px 8px 12px;background:#FAFBFC}
 .qs-lk span{flex:1;min-width:0;font-size:12.5px;color:var(--slate);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rq-proto{padding:10px 12px;border-radius:10px;background:#FFF7EC;color:#7C4A03;font-size:12.5px;line-height:1.5}
-/* Create / Edit Quotation */
-.drawer.sf.qf{max-width:760px}
+/* Add / Edit Quotation */
+.drawer.sf.qf{max-width:1040px}
 .qf-no{font-family:'Inter';font-size:13px;font-weight:600;color:var(--mute);margin-left:6px;letter-spacing:0}
-.qf-sec+.qf-sec{margin-top:4px}
-.qf-h{display:block;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}
+.qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
 .qf-pick{position:relative}
 .qf-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;list-style:none;margin:0;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);max-height:260px;overflow-y:auto}
 .qf-list li{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:7px;cursor:pointer}
 .qf-list li b{font-size:13.5px;font-weight:600;color:var(--ink)}.qf-list li span{font-size:12px;color:var(--faint)}
 .qf-list li.on,.qf-list li:hover{background:var(--orange-soft)}.qf-list li.qf-none{cursor:default;font-size:13px;color:var(--mute)}.qf-list li.qf-none:hover{background:none}
-.qf-client{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#FAFBFC}
-.qf-cmain{display:flex;flex-direction:column;gap:2px;min-width:0}.qf-cmain b{font-size:14px;color:var(--ink)}.qf-cmain span{font-size:12.5px;color:var(--mute);overflow-wrap:anywhere}
-.qf-thead,.qf-row{display:grid;grid-template-columns:minmax(0,1fr) 72px 150px 100px 30px;gap:10px;align-items:start}
+.qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qf-items{border-top:1px solid var(--line);padding-top:16px}
+.qf-thead,.qf-row{display:grid;grid-template-columns:150px minmax(0,1.2fr) minmax(0,1.3fr) 76px 120px 92px 30px;gap:10px;align-items:start}
 .qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:8px}.qf-thead .r{text-align:right}
 .qf-rows{display:flex;flex-direction:column;gap:10px}
-.qf-desc{display:block;font-size:12px;color:var(--faint);margin-top:5px;line-height:1.4}
-.qf-price{position:relative}.qf-cur{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13.5px;line-height:1;color:var(--mute);pointer-events:none;margin-top:0}
-.qf-price{display:flex;align-items:center}.qf-price .fin{padding-left:24px;width:100%}
+.qf-ta{min-height:42px;height:42px;padding-top:10px;padding-bottom:10px;resize:vertical;line-height:1.4}
+.qf-price{position:relative;display:flex;align-items:center}.qf-cur{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13.5px;line-height:1;color:var(--mute);pointer-events:none}
+.qf-price .fin{padding-left:24px;width:100%}
 .qf-line{height:42px;display:flex;align-items:center;justify-content:flex-end;font-size:13.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .qf-rm{height:42px;display:flex;align-items:center;justify-content:center}
 .qf-rerr{grid-column:1/-1;margin-top:-4px}
 .qf-add{margin-top:12px}
-.qf-sum{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft,#F1F2F4)}
-.qf-disc{width:220px}.qf-dwrap{display:grid;grid-template-columns:70px 1fr;gap:8px;margin-top:8px}
-.qf-tot{margin:0;min-width:240px}.qf-tot div{display:flex;justify-content:space-between;gap:16px;padding:4px 0;font-size:13.5px;color:var(--slate)}
-.qf-tot dd{margin:0;font-variant-numeric:tabular-nums;color:var(--ink)}
-.qf-tot .t{border-top:1px solid var(--line);margin-top:4px;padding-top:8px;font-weight:800;font-size:15px}.qf-tot .t dt,.qf-tot .t dd{color:var(--ink);font-family:'Manrope'}
+.qf-foot{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;border-top:1px solid var(--line);padding-top:16px}
+.qf-notes{display:flex;flex-direction:column;gap:16px}
 .qf-hint{display:block;font-size:12px;color:var(--faint);margin-top:6px}
+.qf-tot{margin:0;background:#FAFBFC;border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.qf-tot div{display:flex;justify-content:space-between;gap:16px;padding:5px 0;font-size:13.5px;color:var(--slate)}
+.qf-tot dd{margin:0;font-variant-numeric:tabular-nums;color:var(--ink)}
+.qf-tot .t{border-top:1px solid var(--line);margin-top:4px;padding-top:9px;font-weight:800;font-size:15px}.qf-tot .t dt,.qf-tot .t dd{color:var(--ink);font-family:'Manrope'}
 .qf-pvm{max-width:720px;width:calc(100% - 32px)}.qf-pvm .modal-body{background:#E9EBEE;max-height:72vh;overflow:auto}
 .qf-doc{background:#fff;box-shadow:0 6px 20px rgba(15,23,42,.1)}.qf-doc img{display:block;width:100%}
 .qf-doc-b{padding:22px 34px 30px;font-size:13px;color:#111}
@@ -10079,8 +10080,9 @@ table,td,th{font-size:13.5px}
 .qf-doc-t{width:100%;border-collapse:collapse;margin-top:14px}.qf-doc-t th,.qf-doc-t td{border-bottom:1px solid #E5E7EB;padding:8px 6px;text-align:left;vertical-align:top}
 .qf-doc-t th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#F3F4F6}.qf-doc-t .r{text-align:right}.qf-doc-t .c{text-align:center}
 .qf-doc-t small{display:block;color:#666;margin-top:2px}.qf-doc-t .qf-none{color:#888;text-align:center;padding:16px}
-.qf-tot.doc{margin:12px 0 0 auto;width:45%}
-@media (max-width:640px){.qf-thead{display:none}.qf-row{grid-template-columns:1fr 1fr;}.qf-svc{grid-column:1/-1}.qf-line{justify-content:flex-start}.qf-sum{flex-direction:column}.qf-disc,.qf-tot{width:100%}.qf-tot.doc{width:100%}}
+.qf-tot.doc{margin:12px 0 0 auto;width:45%;background:none;border:0;padding:0}
+.qf-doc-n{margin-top:18px;color:#333}.qf-doc-tc{margin-top:16px}.qf-doc-tc span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666;margin-bottom:4px}.qf-doc-tc p{margin:0;color:#444;font-size:12px}
+@media (max-width:900px){.qf-grid,.qf-foot{grid-template-columns:1fr}.qf-thead{display:none}.qf-row{grid-template-columns:1fr 1fr}.qf-row>div:nth-child(3){grid-column:1/-1}.qf-line{justify-content:flex-start}.qf-tot.doc{width:100%}}
 </style>
 </head>
 <body>
@@ -10349,7 +10351,7 @@ function pager(total){
 
 /* ---------- the page ---------- */
 function head(){
-  return '<div class="page-head"><h1>Quotations</h1><div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Create Quotation</button></div></div>';
+  return '<div class="page-head"><h1>Quotations</h1><div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Add Quotation</button></div></div>';
 }
 function render(){
   if(loadErr||!st){
@@ -10366,7 +10368,7 @@ function render(){
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
   h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Actions</th></tr></thead><tbody>';
-  if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Create Quotation</button></div></td></tr>';
+  if(!all.length) h+='<tr><td colspan="8"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
     var c=client(q), at=attrLine(q);
@@ -10428,7 +10430,7 @@ function menuFor(q){
   return [a];
 }
 /* screens built in later steps: each action goes through route(), the one hand-off point */
-var NEXT={create:['Create Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['Quotation PDF','a later step'],
+var NEXT={create:['Add Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['Quotation PDF','a later step'],
   send:['Send quotation by email','a later step'],resend:['Resend Quotation (email)','a later step'],};
 var ROUTES={create:function(){ openForm(null); },edit:function(q){ openForm(q.id); },send:function(q){ openSend(q.id); },convert:function(q){ confirmConvert(q.id); }};   // later steps register here, e.g. ROUTES.create=function(){ … }; until then route() explains where it leads
 function route(key,q){
@@ -10470,94 +10472,108 @@ content.addEventListener('click',function(e){
 document.addEventListener('mousedown',function(e){ if(menuEl&&!menuEl.contains(e.target)&&!e.target.closest('[data-menu]')) closeMenu(); });
 window.addEventListener('resize',closeMenu); content.addEventListener('scroll',closeMenu,true);
 
-/* ---------- Step 2: Create / Edit Quotation ---------- */
+/* ---------- Step 2: Add / Edit Quotation ---------- */
 var QF=null;   // the form being edited: {id, isNew, d:{...}, errs:{}, dirty}
-function catalog(){ try{ return loadCatalog().services; }catch(e){ return []; } }
-function svcById(id){ return catalog().filter(function(s){ return s.id===id; })[0]; }
+function catalogAll(){ try{ return loadCatalog(); }catch(e){ return {categories:[],services:[]}; } }
+function svcById(id){ return catalogAll().services.filter(function(s){ return s.id===id; })[0]; }
 function nextQuoteId(){ var n=st.list.reduce(function(m,q){ return Math.max(m,+String(q.id).replace(/\D/g,'')||0); },1000); return 'Q-'+(n+1); }
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
 function round2(x){ return Math.round(x*100)/100; }
-/* totals: prices include GST (as everywhere in the app), so GST is the 1/11 share of the final total */
+function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
+/* rates include GST, as everywhere in the app: the total is the sum of the lines and GST is the 1/11 share of it */
 function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
-  var dv=num(d.discVal), disc=0;
-  if(d.discVal!==''&&isFinite(dv)&&dv>0) disc=d.discType==='pct'?round2(sub*Math.min(dv,100)/100):Math.min(dv,sub);
-  var total=round2(sub-disc);
-  return {sub:sub,disc:disc,total:total,gst:round2(total/11)};
+  return {sub:sub,gst:round2(sub/11),total:sub};
 }
+/* who the quotation (and later the invoice) is made out to: the client, or for a company one of its directors */
+function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
 function openForm(id){
   reload(); var q=id?byId(id):null;
   if(id&&!q) return toast('This quotation no longer exists.',true);
   if(q&&['draft','sent'].indexOf(q.status)<0) return toast('Only draft and sent quotations can be edited.',true);
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
-      clientId:q.clientId,date:isoDay(q.created),expiry:isoDay(q.validUntil),accountant:q.accountant,branch:q.branch,notes:q.notes||'',
-      items:q.items.map(function(x){ var s=x.svcId?svcById(x.svcId):catalog().filter(function(c){ return c.name===x.name; })[0]; return {svcId:s?s.id:null,name:x.name,desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:String(x.qty),price:String(x.price)}; }),
-      discType:(q.discount&&q.discount.type)||'pct',discVal:q.discount&&q.discount.value!=null?String(q.discount.value):''
-    }:{clientId:null,date:today,expiry:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',branch:me&&me.branches[0]||ME.branch||'',notes:'',
-      items:[{svcId:null,name:'',desc:'',qty:'1',price:''}],discType:'pct',discVal:''}};
+      clientId:q.clientId,onName:q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
+      items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
+        return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
+      customerNotes:q.customerNotes||'',terms:q.terms||''
+    }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+      items:[blankLine()],customerNotes:'',terms:''}};
   paintForm();
 }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
-function paintForm(focusSel){
-  var d=QF.d, e=QF.errs, T=totalsOf(d), c=formClient(), svc=catalog().filter(function(s){ return s.active; });
+function paintForm(focusId){
+  var d=QF.d, e=QF.errs, T=totalsOf(d), c=formClient(), cat=catalogAll(), cats=cat.categories.filter(function(x){ return x.active!==false; }), svc=cat.services.filter(function(s){ return s.active; });
   var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
   var sel=function(id,k,opts,val,ph){ return '<div class="sf-sel"><select class="fin plain sm'+(e[k]?' bad':'')+'" id="'+id+'" data-qf="'+k+'"><option value="">'+ph+'</option>'+
-    opts.map(function(o){ return '<option value="'+esc(o)+'"'+(o===val?' selected':'')+'>'+esc(o)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; };
-  var clientBox=c?'<div class="qf-client"><div class="qf-cmain"><b>'+esc(c.name)+'</b><span>'+[c.email,c.phone].filter(Boolean).map(esc).join(' · ')+'</span>'+
-      (c.address&&(c.address.street||c.address.suburb)?'<span>'+esc([c.address.street,[c.address.suburb,c.address.state,c.address.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', '))+'</span>':'')+'</div>'+
-      '<button type="button" class="name-link" id="qf-chg"><span class="name">Change</span></button></div>'
-    :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="qf-q" type="search" placeholder="Search by client name or email" autocomplete="off" value="'+esc(QF.pick)+'" aria-autocomplete="list" aria-controls="qf-list">'+
+    opts.map(function(o){ var v=Array.isArray(o)?o[0]:o, l=Array.isArray(o)?o[1]:o; return '<option value="'+esc(v)+'"'+(String(v)===String(val)?' selected':'')+'>'+esc(l)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; };
+  var field=function(label,req,html,k){ return '<div><label class="flabel">'+label+(req?' <span class="req-star">*</span>':'')+'</label>'+html+(k?err(k):'')+'</div>'; };
+  var clientField=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b><button type="button" class="act" id="qf-chg" title="Change client" aria-label="Change client">'+I.close+'</button></div>'
+    :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="qf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(QF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="qf-list">'+
       '<ul class="qf-list" id="qf-list" role="listbox"'+(QF.pick.trim()?'':' hidden')+'>'+clientMatches(QF.pick)+'</ul></div>';
-  var rows=d.items.map(function(x,i){
-    var s=x.svcId?svcById(x.svcId):null, min=s?s.price:0, q=num(x.qty), p=num(x.price), line=x.svcId&&q>0&&p>=0?q*p:0;
+  var names=nameOptions(c);
+  var lines=d.items.map(function(x,i){
+    var s=x.svcId?svcById(x.svcId):null, min=s?s.price:0, q=num(x.qty), p=num(x.price), amt=x.svcId&&q>0&&p>=0?q*p:0;
     var taken=d.items.filter(function(y,j){ return j!==i&&y.svcId; }).map(function(y){ return y.svcId; });
+    var list=svc.filter(function(o){ return (!x.cat||(o.cats||[]).map(String).indexOf(x.cat)>=0)&&(taken.indexOf(o.id)<0||o.id===x.svcId); });
+    var lineErr=e['s'+i]||e['q'+i]||e['p'+i];
     return '<div class="qf-row">'+
-      '<div class="qf-svc"><label class="sr" for="qf-s'+i+'">Service '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm'+(e['s'+i]?' bad':'')+'" id="qf-s'+i+'" data-svc="'+i+'"><option value="">Choose a service</option>'+
-        svc.filter(function(o){ return taken.indexOf(o.id)<0||o.id===x.svcId; }).map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'+
-        (x.desc?'<small class="qf-desc">'+esc(x.desc)+'</small>':'')+'</div>'+
-      '<div class="qf-qty"><label class="sr" for="qf-q'+i+'">Quantity</label><input class="fin plain sm'+(e['q'+i]?' bad':'')+'" id="qf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="numeric" value="'+esc(x.qty)+'"></div>'+
-      '<div class="qf-price"><label class="sr" for="qf-p'+i+'">Unit price</label><span class="qf-cur">$</span><input class="fin plain sm'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
-      '<div class="qf-line num">'+money(line)+'</div>'+
-      '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove service" aria-label="Remove service '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
-      (e['s'+i]||e['q'+i]||e['p'+i]?'<span class="ferr show qf-rerr">'+esc(e['s'+i]||e['q'+i]||e['p'+i])+'</span>':'')+'</div>';
+      '<div><label class="sr" for="qf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="qf-c'+i+'" data-cat="'+i+'"><option value="">All categories</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="qf-s'+i+'">Item, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm'+(e['s'+i]?' bad':'')+'" id="qf-s'+i+'" data-svc="'+i+'"><option value="">Choose an item</option>'+
+        list.map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="qf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="qf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
+      '<div><label class="sr" for="qf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="qf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
+      '<div class="qf-price"><label class="sr" for="qf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
+      '<div class="qf-line num">'+money(amt)+'</div>'+
+      '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
+      (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
   ov.innerHTML='<div class="drawer sf qf" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
-    '<div class="modal-head"><h2 id="qf-t">'+(QF.isNew?'Create Quotation':'Edit Quotation')+' <span class="qf-no">'+esc(QF.id)+'</span></h2><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-head"><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation')+' <span class="qf-no">'+esc(QF.id)+'</span></h2><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
-      '<section class="qf-sec"><h3 class="qf-h">Client</h3>'+clientBox+err('client')+'</section>'+
-      '<section class="qf-sec"><h3 class="qf-h">Quotation details</h3><div class="sf-grid">'+
-        '<div><label class="flabel" for="qf-date">Quotation date <span class="req-star">*</span></label><input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">'+err('date')+'</div>'+
-        '<div><label class="flabel" for="qf-exp">Expiry date <span class="req-star">*</span></label><input class="fin plain sm'+(e.expiry?' bad':'')+'" id="qf-exp" data-qf="expiry" type="date" value="'+esc(d.expiry)+'"'+(d.date?' min="'+d.date+'"':'')+'>'+err('expiry')+'</div>'+
-        '<div><label class="flabel" for="qf-acc">Accountant <span class="req-star">*</span></label>'+sel('qf-acc','accountant',ASSIGNABLE.map(function(s){ return s.name; }),d.accountant,'Choose an accountant')+err('accountant')+'</div>'+
-        '<div><label class="flabel" for="qf-br">Branch <span class="req-star">*</span></label>'+sel('qf-br','branch',BRANCHES,d.branch,'Choose a branch')+err('branch')+'</div>'+
-      '</div></section>'+
-      '<section class="qf-sec"><h3 class="qf-h">Services</h3>'+
-        '<div class="qf-thead" aria-hidden="true"><span>Service</span><span>Qty</span><span>Unit price (incl. GST)</span><span class="r">Line total</span><span></span></div>'+
-        '<div class="qf-rows">'+rows+'</div>'+err('items')+
-        '<button type="button" class="pill-btn quiet qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add service</button>'+
-        '<div class="qf-sum"><div class="qf-disc"><label class="flabel" for="qf-dv">Discount</label><div class="qf-dwrap"><div class="sf-sel"><select class="fin plain sm" id="qf-dt" data-qf="discType" aria-label="Discount type"><option value="pct"'+(d.discType==='pct'?' selected':'')+'>%</option><option value="amt"'+(d.discType==='amt'?' selected':'')+'>$</option></select>'+I.chev+'</div>'+
-          '<input class="fin plain sm'+(e.disc?' bad':'')+'" id="qf-dv" data-qf="discVal" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" value="'+esc(d.discVal)+'"></div>'+err('disc')+'</div>'+
-          '<dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div><div><dt>GST included</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total</dt><dd>'+money(T.total)+'</dd></div></dl></div>'+err('total')+
-      '</section>'+
-      '<section class="qf-sec"><label class="qf-h" for="qf-notes">Internal notes</label><textarea class="ftext" id="qf-notes" data-qf="notes" rows="3" maxlength="500" placeholder="Enter notes">'+esc(d.notes)+'</textarea><small class="qf-hint">Only your team sees these. They aren’t on the quotation.</small></section>'+
+      '<div class="qf-grid">'+
+        field('Select Client',true,clientField,'client')+
+        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName')+
+        field('Select Branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
+        field('Select Accountant',true,sel('qf-acc','accountant',ASSIGNABLE.map(function(s){ return s.name; }),d.accountant,'Select'),'accountant')+
+        field('Quotation Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
+        field('Additional Accountant',false,sel('qf-acc2','accountant2',ASSIGNABLE.map(function(s){ return s.name; }).filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+
+        field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+
+      '</div>'+
+      '<section class="qf-items"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-rows">'+lines+'</div>'+err('items')+
+        '<button type="button" class="pill-btn quiet qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
+      '<div class="qf-foot">'+
+        '<div class="qf-notes"><div><label class="flabel" for="qf-cn">Customer Notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="2" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Will be displayed on the quote</small></div>'+
+          '<div><label class="flabel" for="qf-tc">Terms &amp; Conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="3" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></div>'+
+        '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
+      '</div>'+err('total')+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as Draft</button><button class="btn-primary" id="qf-send">Send quotation</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-  wireForm(focusSel);
+  wireForm(focusId);
 }
 function clientMatches(q){
   q=String(q||'').trim().toLowerCase(); if(!q) return '';
-  var m=clients.filter(function(c){ return c.active!==false&&(c.name+' '+(c.email||'')).toLowerCase().indexOf(q)>=0; }).slice(0,8);
+  var dq=q.replace(/\D/g,'');
+  var m=clients.filter(function(c){ if(c.active===false) return false;
+    if((c.name+' '+(c.email||'')).toLowerCase().indexOf(q)>=0) return true;
+    return dq.length>=3&&[c.phone,c.abn,c.tfn].some(function(v){ return String(v||'').replace(/\D/g,'').indexOf(dq)>=0; }); }).slice(0,8);
   if(!m.length) return '<li class="qf-none">No client matches. Add them in Clients first.</li>';
-  return m.map(function(c,i){ return '<li role="option" tabindex="-1" data-cid="'+esc(c.id)+'"'+(i===0?' class="on"':'')+'><b>'+esc(c.name)+'</b><span>'+esc(c.email||'')+'</span></li>'; }).join('');
+  return m.map(function(c,i){ return '<li role="option" tabindex="-1" data-cid="'+esc(c.id)+'"'+(i===0?' class="on"':'')+'><b>'+esc(c.name)+'</b><span>'+[c.email,c.phone].filter(Boolean).map(esc).join(' · ')+'</span></li>'; }).join('');
 }
-function wireForm(focusSel){
-  var d=QF.d, body=document.getElementById('qf-body'), y=body.scrollTop;
+function liveTotals(){
+  var d=QF.d, T=totalsOf(d);
+  [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
+  var dd=ov.querySelectorAll('.qf-tot dd'); if(dd.length===3){ dd[0].textContent=money(T.sub); dd[1].textContent=money(T.gst); dd[2].textContent=money(T.total); }
+}
+function wireForm(focusId){
+  var d=QF.d, body=document.getElementById('qf-body');
   var touch=function(){ QF.dirty=true; };
+  var repaint=function(fid){ var keep=document.getElementById('qf-body').scrollTop; paintForm(); document.getElementById('qf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-qf]'),function(el){
-    var k=el.getAttribute('data-qf'), live=el.tagName==='TEXTAREA'||el.id==='qf-dv';
-    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch(); if(k==='discVal'||k==='discType') return liveTotals(); if(!live) repaint(el.id); };
+    var k=el.getAttribute('data-qf'), live=el.tagName==='TEXTAREA';
+    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2=''; if(!live) repaint(el.id); };
   });
   var pick=document.getElementById('qf-q');
   if(pick){
@@ -10568,51 +10584,45 @@ function wireForm(focusSel){
       if(ev.key==='Enter'&&i>=0){ ev.preventDefault(); choose(it[i].getAttribute('data-cid')); } };
     list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
   }
-  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; QF.pick=''; delete QF.errs.client; touch(); repaint(); }
-  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; touch(); repaint('qf-q'); };
+  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; QF.pick=''; delete QF.errs.client; delete QF.errs.onName; touch(); repaint('qf-on'); }
+  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; touch(); repaint('qf-q'); };
+  [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
+    var s=x.svcId?svcById(x.svcId):null; if(s&&x.cat&&(s.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }   // the item no longer fits the category
+    touch(); repaint('qf-s'+i); }; });
   [].forEach.call(ov.querySelectorAll('[data-svc]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-svc'), s=svcById(+el.value), x=d.items[i];
-    if(s){ x.svcId=s.id; x.name=s.name; x.desc=s.desc||''; if(!x.price||num(x.price)<s.price) x.price=String(s.price); if(!x.qty) x.qty='1'; } else d.items[i]={svcId:null,name:'',desc:'',qty:'1',price:''};
-    delete QF.errs['s'+i]; delete QF.errs['p'+i]; delete QF.errs.items; touch(); repaint(); }; });
-  [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ var i=+el.getAttribute('data-qty'); d.items[i].qty=el.value; touch(); liveTotals(); }; });
-  [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ var i=+el.getAttribute('data-price'); d.items[i].price=el.value; touch(); liveTotals(); }; });
-  [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ var i=+el.getAttribute('data-rm'); d.items.splice(i,1); if(!d.items.length) d.items.push({svcId:null,name:'',desc:'',qty:'1',price:''}); QF.errs={}; touch(); repaint(); }; });
-  document.getElementById('qf-add').onclick=function(){ d.items.push({svcId:null,name:'',desc:'',qty:'1',price:''}); touch(); repaint('qf-s'+(d.items.length-1)); };
+    if(s){ x.svcId=s.id; x.name=s.name; x.desc=s.desc||''; if(!x.cat&&s.cats&&s.cats.length) x.cat=String(s.cats[0]); if(!x.price||num(x.price)<s.price) x.price=String(s.price); if(!x.qty) x.qty='1'; }
+    else { var c0=x.cat; d.items[i]=blankLine(); d.items[i].cat=c0; }
+    delete QF.errs['s'+i]; delete QF.errs['p'+i]; delete QF.errs.items; touch(); repaint('qf-q'+i); }; });
+  [].forEach.call(ov.querySelectorAll('[data-desc]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-desc')].desc=el.value; touch(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-qty')].qty=el.value; touch(); liveTotals(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); QF.errs={}; touch(); repaint(); }; });
+  document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;
   document.getElementById('qf-draft').onclick=function(){ submitForm('draft'); };
   document.getElementById('qf-send').onclick=function(){ submitForm('send'); };
   document.getElementById('qf-pv').onclick=previewForm;
-  function repaint(fid){
-    var pos=fid&&document.getElementById(fid)&&document.getElementById(fid).selectionStart;
-    var keep=document.getElementById('qf-body').scrollTop; paintForm(); document.getElementById('qf-body').scrollTop=keep;
-    var f=fid&&document.getElementById(fid); if(f){ f.focus(); try{ if(pos!=null&&f.setSelectionRange) f.setSelectionRange(pos,pos); }catch(x){} }
-  }
-  if(focusSel){ var f=document.getElementById(focusSel); if(f) f.focus(); }
-  body.scrollTop=y;
+  if(focusId){ var f=document.getElementById(focusId); if(f) f.focus(); }
 }
-function liveTotals(){
-  var d=QF.d, T=totalsOf(d);
-  [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot dd'); if(dd.length===4){ dd[0].textContent=money(T.sub); dd[1].textContent=T.disc?'−'+money(T.disc):money(0); dd[2].textContent=money(T.gst); dd[3].textContent=money(T.total); }
-}
-/* checks: drafts need a client and only valid numbers; sending needs everything */
+/* checks: a draft needs a client and only valid numbers; sending needs everything */
 function checkForm(full){
   var d=QF.d, e={}, T=totalsOf(d), filled=d.items.filter(function(x){ return x.svcId; });
   if(d.clientId==null||!formClient()) e.client='Choose the client this quotation is for';
-  if(full||d.date){ if(!d.date) e.date='Enter the quotation date'; }
-  if(full||d.expiry){ if(!d.expiry) e.expiry='Enter the expiry date'; else if(d.date&&d.expiry<d.date) e.expiry='The expiry date must be on or after the quotation date'; }
-  if(full&&!d.accountant) e.accountant='Choose the responsible accountant';
+  else if(full&&!d.onName) e.onName='Choose who the quotation is made out to';
   if(full&&!d.branch) e.branch='Choose the branch';
+  if(full&&!d.accountant) e.accountant='Choose the accountant';
+  if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
+  if(full&&!d.date) e.date='Enter the quotation date';
+  if(full&&!d.due) e.due='Enter the due date'; else if(d.date&&d.due&&d.due<d.date) e.due='The due date must be on or after the quotation date';
   d.items.forEach(function(x,i){
-    if(!x.svcId){ if(full&&d.items.length>1) e['s'+i]='Choose a service, or remove this row'; return; }
+    if(!x.svcId){ if(full&&d.items.length>1) e['s'+i]='Choose an item, or remove this line'; return; }
     var q=num(x.qty), p=num(x.price), s=svcById(x.svcId), min=s?s.price:0;
-    if(!(q>=1)||Math.floor(q)!==q) e['q'+i]='Quantity must be a whole number of 1 or more';
-    else if(x.price===''||!isFinite(p)) e['p'+i]='Enter the unit price';
-    else if(p<min) e['p'+i]='The price can’t be below the minimum of '+money(min)+' set in Settings → Services';
+    if(!(q>0)) e['q'+i]='Quantity must be more than 0';
+    else if(x.price===''||!isFinite(p)) e['p'+i]='Enter the rate';
+    else if(p<min) e['p'+i]='The rate can’t be below the minimum of '+money(min)+' set in Settings → Services';
   });
-  if(full&&!filled.length) e.items='Add at least one service';
-  var dv=num(d.discVal);
-  if(d.discVal!==''){ if(!isFinite(dv)||dv<0) e.disc='Enter a discount of 0 or more'; else if(d.discType==='pct'&&dv>100) e.disc='A percentage discount can’t be more than 100%'; else if(d.discType==='amt'&&dv>T.sub) e.disc='The discount can’t be more than the subtotal of '+money(T.sub); }
-  if(full&&filled.length&&!e.disc&&T.total<=0) e.total='The total must be more than $0.00';
+  if(full&&!filled.length) e.items='Add at least one line';
+  if(full&&filled.length&&T.total<=0) e.total='The total must be more than $0.00';
   return e;
 }
 function submitForm(mode){
@@ -10628,19 +10638,16 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&['draft','sent'].indexOf(q.status)<0){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,branch:d.branch,accountant:d.accountant,notes:d.notes.trim(),
-    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {svcId:x.svcId,name:x.name,desc:x.desc,qty:num(x.qty),price:round2(num(x.price))}; }),
-    discount:d.discVal!==''&&num(d.discVal)>0?{type:d.discType,value:num(d.discVal)}:null,subtotal:T.sub,discountAmt:T.disc,gst:T.gst,amount:T.total,
-    created:d.date?at(d.date):Date.now(),validUntil:d.expiry?new Date(d.expiry+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
+    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
+    customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,amount:T.total,discount:null,discountAmt:0,
+    created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
   if(QF.isNew){
-    if(byId(QF.id)) QF.id=nextQuoteId();                       // someone else took the number meanwhile
+    if(byId(QF.id)) QF.id=nextQuoteId();                       // the number was taken meanwhile
     q={id:QF.id,by:ME.name,status:'draft',history:[]}; for(var k in fields) q[k]=fields[k];
-    log(q,'created',{to:'draft',note:fields.items.length?fields.items.length+' service'+(fields.items.length===1?'':'s')+' · '+money(T.total):'Saved without services'});
+    log(q,'created',{to:'draft',note:fields.items.length?fields.items.length+' line'+(fields.items.length===1?'':'s')+' · '+money(T.total):'Saved without lines'});
     st.list.push(q); QF.wasNew=true;
-  } else {
-    for(var k2 in fields) q[k2]=fields[k2];
-    log(q,'edited',{note:money(T.total)});
-  }
+  } else { for(var k2 in fields) q[k2]=fields[k2]; log(q,'edited',{note:money(T.total)}); }
   if(!QuoteStore.save(st)){ toast('Couldn’t save the quotation. Try again.',true); return null; }
   QF.dirty=false; return q;
 }
@@ -10657,11 +10664,13 @@ function previewForm(){
   var d=QF.d, T=totalsOf(d), c=formClient(), items=d.items.filter(function(x){ return x.svcId; });
   dlg.innerHTML='<div class="modal qf-pvm" role="dialog" aria-modal="true" aria-labelledby="qp-t"><div class="modal-head"><h2 id="qp-t">Preview · '+esc(QF.id)+'</h2><button id="qp-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body"><div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
-      '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+esc(QF.id)+'</dd></div><div><dt>Date</dt><dd>'+(d.date?fmtD(d.date):'—')+'</dd></div><div><dt>Valid until</dt><dd>'+(d.expiry?fmtD(d.expiry):'—')+'</dd></div></dl></div>'+
-      '<p class="qf-doc-to"><span>Prepared for</span><b>'+(c?esc(c.name):'No client chosen yet')+'</b>'+(c&&c.email?esc(c.email):'')+'</p>'+
-      '<table class="qf-doc-t"><thead><tr><th>Service</th><th class="c">Qty</th><th class="r">Unit price</th><th class="r">Amount</th></tr></thead><tbody>'+
-        (items.length?items.map(function(x){ var q=num(x.qty)||0, p=num(x.price)||0; return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="c">'+q+'</td><td class="r">'+money(p)+'</td><td class="r">'+money(q*p)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No services added yet</td></tr>')+
-      '</tbody></table><dl class="qf-tot doc"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+'<div><dt>GST included</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total</dt><dd>'+money(T.total)+'</dd></div></dl></div>'+
+      '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+esc(QF.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+(d.date?fmtD(d.date):'—')+'</dd></div><div><dt>Due date</dt><dd>'+(d.due?fmtD(d.due):'—')+'</dd></div></dl></div>'+
+      '<p class="qf-doc-to"><span>Prepared for</span><b>'+(c?esc(d.onName||c.name):'No client chosen yet')+'</b>'+(c&&d.onName&&d.onName!==c.name?esc(c.name):'')+'</p>'+
+      '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
+        (items.length?items.map(function(x){ var q=num(x.qty)||0, p=num(x.price)||0; return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="c">'+q+'</td><td class="r">'+money(p)+'</td><td class="r">'+money(q*p)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
+      '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
+      (d.customerNotes.trim()?'<p class="qf-doc-n">'+esc(d.customerNotes.trim()).replace(/\n/g,'<br>')+'</p>':'')+
+      (d.terms.trim()?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+esc(d.terms.trim()).replace(/\n/g,'<br>')+'</p></div>':'')+'</div>'+
       '<img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div></div></div>';
   dlg.classList.add('open'); document.getElementById('qp-x').onclick=closeDlg; document.getElementById('qp-x').focus();
 }
@@ -14453,6 +14462,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .lw{background:#E9EBEE;border-radius:12px;padding:14px;overflow:auto;max-height:70vh;margin-bottom:18px}
 .agree{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--slate);margin-top:14px}
 .qv-meta{margin-bottom:18px}
+.qv-note{margin-top:16px;font-size:13.5px;color:var(--slate);line-height:1.55}.qv-terms{margin-top:14px;font-size:12.5px;color:var(--mute);line-height:1.55}.qv-terms b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}.qv-terms p{margin:0}
 .agree input{margin-top:2px;accent-color:var(--orange)}
 .signed{display:flex;gap:10px;align-items:center;background:#ECFDF5;border:1px solid #BBF7D0;color:#047857;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
 .rv dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px}
@@ -14585,8 +14595,12 @@ function paintQuote(){
   app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1><p>'+e(q.id)+' from '+FIRM.name+' · Valid until '+dmyOf(q.validUntil)+'</p></div>'+
     (done?'<div class="signed">'+IC.tick+'<span>You accepted this quotation on '+whenOf(acc?acc.t:Date.now())+'. We’ll be in touch to get started.</span></div>':'')+
     '<div class="card">'+
-      '<dl class="ty-meta qv-meta"><div><dt>Prepared for</dt><dd>'+e(c.name)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Branch</dt><dd>'+e(q.branch)+'</dd></div></dl>'+
+      '<dl class="ty-meta qv-meta"><div><dt>Prepared for</dt><dd>'+e(q.onName||c.name)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Branch</dt><dd>'+e(q.branch)+'</dd></div></dl>'+
       '<table class="svc"><thead><tr><th>Service</th><th>Price (incl. GST)</th></tr></thead><tbody>'+rows+'<tr class="tot"><td>Total</td><td>'+money(q.amount)+'</td></tr></tbody></table>'+
+      (q.customerNotes?'<p class="qv-note">'+e(q.customerNotes).replace(/
+/g,'<br>')+'</p>':'')+
+      (q.terms?'<div class="qv-terms"><b>Terms &amp; Conditions</b><p>'+e(q.terms).replace(/
+/g,'<br>')+'</p></div>':'')+
       (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
         '<label class="agree"><input type="checkbox" id="qa-ok"><span>I accept this quotation and its prices.</span></label><span class="err" id="qa-e" hidden>Tick the box to confirm</span>'+
         '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Accept quotation</button></div>')+

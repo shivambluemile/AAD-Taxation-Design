@@ -10151,8 +10151,8 @@ function summary(list){
 
 /* ---------- filters and sorting ---------- */
 var state={f:blank(),page:1,per:10,sort:{k:'created',d:-1}};
-function blank(){ return {q:'',status:'',qd:'',qdFrom:'',qdTo:'',ex:'',exFrom:'',exTo:'',branch:'',acc:'',by:''}; }
-function anyFilter(f){ return !!(f.q.trim()||f.status||f.qd||f.ex||f.branch||f.acc||f.by); }
+function blank(){ return {q:'',status:'',qd:'',qdFrom:'',qdTo:'',branch:'',acc:''}; }
+function anyFilter(f){ return !!(f.q.trim()||f.status||f.qd||f.branch||f.acc); }
 function quoteRange(k,from,to){
   var n=new Date(), y=n.getFullYear(), m=n.getMonth(), t=isoDay(n);
   if(k==='month') return [y+'-'+pad(m+1)+'-01',t];
@@ -10162,25 +10162,15 @@ function quoteRange(k,from,to){
   if(k==='custom') return [from||'0000-01-01',to||'9999-12-31'];
   return null;
 }
-function expiryRange(k,from,to){
-  var t=isoDay(Date.now());
-  if(k==='7') return [t,isoDay(Date.now()+7*864e5)];
-  if(k==='30') return [t,isoDay(Date.now()+30*864e5)];
-  if(k==='past') return ['0000-01-01',isoDay(Date.now()-864e5)];
-  if(k==='custom') return [from||'0000-01-01',to||'9999-12-31'];
-  return null;
-}
 var SORTS={id:function(q){ return +q.id.replace(/\D/g,''); },client:function(q){ return client(q).name.toLowerCase(); },created:function(q){ return q.created; },expiry:function(q){ return q.validUntil; },
   amount:function(q){ return q.amount; },branch:function(q){ return q.branch.toLowerCase(); },acc:function(q){ return q.accountant.toLowerCase(); },status:function(q){ return STATUS[q.status][0]; },by:function(q){ return String(q.by).toLowerCase(); }};
 function filtered(){
-  var f=state.f, q=f.q.trim().toLowerCase(), qr=quoteRange(f.qd,f.qdFrom,f.qdTo), er=expiryRange(f.ex,f.exFrom,f.exTo), k=SORTS[state.sort.k], d=state.sort.d;
+  var f=state.f, q=f.q.trim().toLowerCase(), qr=quoteRange(f.qd,f.qdFrom,f.qdTo), k=SORTS[state.sort.k], d=state.sort.d;
   return scoped().filter(function(x){
     if(f.status&&x.status!==f.status) return false;
     if(f.branch&&x.branch!==f.branch) return false;
     if(f.acc&&x.accountant!==f.acc) return false;
-    if(f.by&&x.by!==f.by) return false;
     if(qr){ var a=isoDay(x.created); if(a<qr[0]||a>qr[1]) return false; }
-    if(er){ var b=isoDay(x.validUntil); if(b<er[0]||b>er[1]) return false; }
     if(!q) return true; var c=client(x); return (x.id+' '+c.name+' '+c.email).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){ var A=k(a), B=k(b); return A<B?-d:A>B?d:(b.created-a.created); });
 }
@@ -10208,17 +10198,13 @@ function render(){
   var f=state.f, all=scoped(), rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per);
   var h=head()+'<dl class="qt-stats">'+summary(all).map(function(c){ return '<div class="stat" title="'+esc(c[2])+'"><dt>'+esc(c[0])+'</dt><dd>'+c[1]+'</dd></div>'; }).join('')+'</dl>';
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
-  var creators=all.map(function(q){ return q.by; }).filter(function(n,i,a){ return a.indexOf(n)===i; }).sort();
   h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
-    selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
-    selHtml('f-qd','Any quotation date',[['month','Created this month'],['last','Created last month'],['90','Created in the last 90 days'],['fy','Created this financial year'],['custom','Created between…']],f.qd)+
+    selHtml('f-qd','All Dates',[['month','This Month'],['last','Last Month'],['90','Last 90 Days'],['fy','This Financial Year'],['custom','Custom Range']],f.qd)+
     (f.qd==='custom'?rangeInputs('f-qdf','f-qdt',f.qdFrom,f.qdTo,'Quotation date'):'')+
-    selHtml('f-ex','Any expiry date',[['7','Expires in 7 days'],['30','Expires in 30 days'],['past','Already past expiry'],['custom','Expires between…']],f.ex)+
-    (f.ex==='custom'?rangeInputs('f-exf','f-ext',f.exFrom,f.exTo,'Expiry date'):'')+
+    selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     selHtml('f-acc','All Accountants',people(ASSIGNABLE.map(function(s){ return s.name; })),f.acc)+
-    selHtml('f-by','Created by anyone',people(creators),f.by)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
   h+='<div class="card ar-table qt-table"><table><thead><tr>'+th('id','Quotation Number')+th('client','Client')+th('created','Quotation Date')+th('expiry','Expiry Date')+th('amount','Total Amount','r')+
     th('branch','Branch')+th('acc','Assigned Accountant')+th('status','Status')+th('by','Created By')+'<th class="c">Actions</th></tr></thead><tbody>';
@@ -10242,7 +10228,7 @@ function render(){
   content.innerHTML=h; wireHead();
   var qi=document.getElementById('q');
   qi.oninput=function(){ state.f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-status','status'],['f-qd','qd'],['f-qdf','qdFrom'],['f-qdt','qdTo'],['f-ex','ex'],['f-exf','exFrom'],['f-ext','exTo'],['f-branch','branch'],['f-acc','acc'],['f-by','by']].forEach(function(p){
+  [['f-status','status'],['f-qd','qd'],['f-qdf','qdFrom'],['f-qdt','qdTo'],['f-branch','branch'],['f-acc','acc']].forEach(function(p){
     var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
   var clear=function(){ state.f=blank(); state.page=1; render(); };

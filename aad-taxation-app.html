@@ -9890,27 +9890,59 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .drawer .at-tl{padding:6px 0 0 32px}
 .drawer .at-tl:before{left:13px;top:12px}
 .drawer .sect-title{margin-bottom:-6px}
-/* ===== Step 3: Quotation Details: the module's side panel (header, tabs, sections), as in Attendance ===== */
-.ad-hacts .btn-primary{height:34px;padding:0 14px;font-size:12.5px;display:inline-flex;align-items:center}
-.qd-sub{font-size:12.5px;color:var(--mute);margin-top:4px}
-.ad-sec h3 .qd-h3a{margin-left:auto;font-family:'Inter';font-size:12.5px;font-weight:600;color:var(--orange-ink)}
-.ad-sec h3 .qd-h3a:hover{text-decoration:underline;text-underline-offset:2px}
-.qd-dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 20px;margin:0}
-.qd-dl dt{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:4px}
-.qd-dl dd{margin:0;font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
-.qd-dl dd small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
-.qd-dl dd a{color:var(--ink)}.qd-dl dd a:hover{color:var(--orange-ink)}
+/* ===== Step 3: Quotation Details: the same details panel as Clients (header, info lines, text actions, tabs, sections) ===== */
+.qd-drawer{background:#fff}
+.qd-drawer .cl-dhead{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:24px 32px 18px}
+.qd-drawer .dpmain{min-width:0;flex:1}
+.qd-drawer .cl-dhead h2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:'Manrope';font-size:22px;font-weight:800;letter-spacing:-.3px;line-height:1.25;color:var(--ink)}
+.qd-drawer .cl-dhead h2 .state{padding:3px 9px;border-radius:5px;background:#F3F4F6;font-family:'Inter';font-size:12px;font-weight:500;white-space:nowrap}
+.qd-drawer .dmetaline{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:7px}
+.qd-drawer .dc{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--slate);min-width:0}
+.qd-drawer .dci{display:inline-flex;color:var(--faint);flex-shrink:0}.qd-drawer .dci svg{width:14px;height:14px;display:block}
+.qd-drawer .dc a{color:inherit;text-decoration:none}.qd-drawer .dc a:hover{text-decoration:underline}
+.qd-drawer .dc .qd-cl{color:var(--orange-ink);font-weight:700}.qd-drawer .dc .qd-cl:hover{text-decoration:underline;text-underline-offset:2px}
+.qd-drawer .dc small{font-weight:500;color:var(--faint)}
+.qd-drawer .copy{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;color:#A1A1AA}
+.qd-drawer .copy:hover{background:#F1F3F6;color:var(--orange-ink)}.qd-drawer .copy svg{width:12px;height:12px}
+.qd-drawer .dhead-acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.qd-drawer .dhead-acts .btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line);color:var(--slate);border-radius:6px}
+.qd-drawer .dhead-acts .btn-ghost:hover{border-color:var(--orange);color:var(--orange-ink)}
+.qd-drawer .dhead-acts .btn-ghost.danger{color:var(--red)}.qd-drawer .dhead-acts .btn-ghost.danger:hover{border-color:#FECACA;background:#FEF2F2;color:var(--red)}
+.qd-drawer .x{color:var(--mute);width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qd-drawer .x:hover{background:#F2F4F7;color:var(--ink)}
+.qd-drawer .btabs{display:flex;gap:4px;padding:0 32px;border-bottom:1px solid var(--line);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.qd-drawer .btabs button{padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.qd-drawer .btabs button:hover{color:var(--ink)}.qd-drawer .btabs button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}
+.qd-drawer .tab-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;margin-left:7px;border-radius:999px;background:#F3F4F6;color:var(--mute);font-size:11px;font-weight:700}
+.qd-drawer .btabs button.on .tab-n{background:var(--orange-soft);color:var(--orange-ink)}
+.qd-drawer .cl-vbody{flex:1;overflow-y:auto}
+.qd-drawer .vbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 32px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--slate)}
+.qd-drawer .vbar b{color:var(--ink)}
+.qd-drawer .vsec{padding:22px 32px;border-bottom:1px solid var(--line)}.qd-drawer .vsec:last-child{border-bottom:0}
+.qd-drawer .vsec h3{font-family:'Manrope';font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.2px;margin-bottom:14px}
+.qd-drawer .vsec p{font-size:13.5px;color:var(--slate);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.qd-drawer .cl-muted{color:#94A3B8}
+.qd-drawer .fgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 24px;margin:0}
+.qd-drawer .fgrid dt{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:5px}
+.qd-drawer .fgrid dd{margin:0;font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
 .qd-t{width:100%}
 .qd-t thead th{padding:10px 14px}.qd-t tbody td{padding:11px 14px;font-size:13.5px;vertical-align:top}
 .qd-t tbody tr:hover{background:none}
 .qd-t td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .qd-t td b{display:block;font-weight:600;color:var(--ink)}
+.qd-t td small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}
 .qf-tot.qd-tot{width:320px;margin:14px 0 0 auto}
-.qd-txt{margin-top:14px}
-.qd-txt h4{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:6px}
-.qd-txt p{font-size:13.5px;color:var(--slate);line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
-.qd-none{font-size:13.5px;color:var(--faint)}
-@media (max-width:760px){.qd-dl{grid-template-columns:repeat(2,minmax(0,1fr))}.qf-tot.qd-tot{width:100%}.qd-tbl{overflow-x:auto}.qd-t{min-width:520px}}
+.qd-drawer .timeline{position:relative;padding:4px 0 0 30px}
+.qd-drawer .timeline:before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.qd-drawer .tlitem{position:relative;padding:0 0 22px}.qd-drawer .tlitem:last-child{padding-bottom:0}
+.qd-drawer .tlitem .dot{position:absolute;left:-30px;top:1px;width:24px;height:24px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+.qd-drawer .tlitem .dot svg{width:9px;height:9px}
+.qd-drawer .tlitem.bad .dot{background:#FEF2F2;color:var(--red)}
+.qd-drawer .tlttl{font-size:13.5px;font-weight:700;color:var(--ink)}
+.qd-drawer .tlttl span{font-size:12px;font-weight:500;color:var(--faint);margin-left:8px}
+.qd-drawer .tlnote{font-size:12.5px;color:var(--slate);margin-top:3px;overflow-wrap:anywhere}
+.qd-drawer .tlmeta{font-size:12px;color:var(--mute);font-weight:500;margin-top:3px}.qd-drawer .tlmeta b{color:var(--slate);font-weight:700}
+@media (max-width:760px){.qd-drawer .cl-dhead,.qd-drawer .vbar,.qd-drawer .vsec{padding-left:18px;padding-right:18px}.qd-drawer .btabs{padding:0 12px}.qd-drawer .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.qf-tot.qd-tot{width:100%}.qd-tbl{overflow-x:auto}.qd-t{min-width:520px}}
 /* ===== Email + SMS send screen (copied from the Clients module, scoped to .ss) ===== */
 .ss .selbox{position:relative}
 .ss .selbox select{appearance:none;-webkit-appearance:none;width:100%;height:44px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 34px 0 14px;font-size:13.5px;color:var(--ink)}
@@ -11126,12 +11158,12 @@ function openHistory(id){
 }
 
 /* ---------- Step 3: Quotation Details, in the side panel (re-drawn after every change; Send and Edit return to it) ---------- */
-var detailId=null, qdTab='details';
+var detailId=null, qdTab='services';
 function openDetail(id){
   closeMenu(); reload(); var q=byId(id);
   if(!q) return toast('This quotation no longer exists.',true);
   if(!inScope(q)) return toast('You don’t have access to this quotation.',true);
-  detailId=id; qdTab='details'; paintDetail();
+  detailId=id; qdTab='services'; paintDetail();
 }
 function closeDetail(){ detailId=null; closeOv(); }
 function canManage(q){ return isManager()||q.accountant===ME.name||q.by===ME.name; }
@@ -11140,11 +11172,18 @@ function detailActions(q){
   var s=q.status, own=canManage(q), a=[];
   if((s==='draft'||s==='sent')&&own) a.push(['send',s==='sent'?'Send again':'Send','primary']);
   if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale','primary']);
-  if((s==='draft'||s==='sent')&&own) a.push(['edit','Edit',AI.edit]);
-  a.push(['preview','Preview PDF',MI.preview],['pdf','Download PDF',AI.pdf]);
-  if((s==='sent'||s==='accepted')&&own) a.push(['cancel','Cancel quotation',MI.cancel,'danger']);
+  if((s==='draft'||s==='sent')&&own) a.push(['edit','Edit']);
+  a.push(['preview','Preview PDF'],['pdf','Download PDF']);
+  if((s==='sent'||s==='accepted')&&own) a.push(['cancel','Cancel quotation','','danger']);
   return a;
 }
+/* icons for the header's info lines (the Clients panel's set) */
+var QD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {user:v('<circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>'),mail:v('<rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="m4 7 8 6 8-6"/>'),
+    phone:v('<path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/>'),
+    cal:v('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),branch:v('<path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5V14h4v5.5"/>'),
+    staff:v('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/>'),clock:v('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>'}; })();
 function paintDetail(keep){
   if(ov.classList.contains('open')&&!ov.querySelector('.qd-drawer')) return;   // Send or Edit is open on top; the details come back when it closes
   var q=byId(detailId);
@@ -11152,60 +11191,61 @@ function paintDetail(keep){
   var prev=document.getElementById('qd-b'), y=keep&&prev?prev.scrollTop:0;
   var c=client(q), cr=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0], T=savedTotals(q), items=q.items||[];
   var hist=q.history||[], ok=hist.filter(function(e){ return e.ok; });
-  var made=hist.filter(function(e){ return e.type==='created'; })[0];
-  var edits=ok.filter(function(e){ return e.type==='edited'; }), lastEdit=edits[edits.length-1];
   var acts=ok.filter(function(e){ return ['sent','resent','accepted','rejected','cancelled','converted','expired'].indexOf(e.type)>=0; }), lastAct=acts[acts.length-1];
   var when=function(t){ return whenOf(t).replace(' · ',', '); };
-  var dd=function(label,val,sub){ return '<div><dt>'+label+'</dt><dd>'+(val||'<span class="qd-none">—</span>')+(sub?'<small>'+sub+'</small>':'')+'</dd></div>'; };
-  var latest=lastAct?(lastAct.type==='expired'?'Expired on '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+' · '+when(lastAct.t)):'';
-  if(!['details','services','activity'].some(function(k){ return k===qdTab; })) qdTab='details';
+  var tabs=[['services','Services',items.length],['notes','Notes and terms']];
+  tabs.push(['activity','Activities',hist.length]);
+  if(!tabs.some(function(t){ return t[0]===qdTab; })) qdTab='services';
 
-  var head='<div class="ad-head"><div class="ad-tt"><div class="ad-tl"><h2 id="qd-t">'+esc(q.id)+'</h2>'+badge(q.status)+'</div><p class="qd-sub">'+esc(c.name)+' · '+money(T.total)+'</p></div>'+
-    '<div class="ad-hacts">'+detailActions(q).map(function(a){
-      return a[2]==='primary'?'<button class="btn-primary" data-qa="'+a[0]+'">'+esc(a[1])+'</button>'
-        :'<button class="ad-ib'+(a[3]?' '+a[3]:'')+'" data-qa="'+a[0]+'" title="'+esc(a[1])+'" aria-label="'+esc(a[1])+'">'+a[2]+'</button>'; }).join('')+
-      '<button class="ad-ib" id="qd-x" aria-label="Close">'+I.close+'</button></div></div>';
-  var tabs='<div class="btabs" role="tablist" aria-label="Quotation details">'+[['details','Details'],['services','Services and pricing',items.length],['activity','Activity',hist.length]].map(function(t){
+  /* header: everything about the quotation at a glance, each fact once */
+  var dc=function(icon,html){ return html?'<span class="dc"><i class="dci">'+icon+'</i>'+html+'</span>':''; };
+  var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+AI.copy+'</button>'; };
+  var who=cr?'<button class="qd-cl" data-qd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+' <small>(no longer on file)</small>';
+  var latest=lastAct?(lastAct.type==='expired'?'Expired '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+', '+dmyOf(lastAct.t)):'';
+  if(q.invoiceId) latest=(latest?latest+' · ':'')+'Sale <b>'+esc(q.invoiceId)+'</b>';   // the linked sale, once, beside who converted it and when
+  var head='<div class="cl-dhead"><div class="dpmain"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
+      '<div class="dmetaline">'+dc(QD_IC.user,who+(q.onName&&q.onName!==c.name?' <small>for '+esc(q.onName)+'</small>':''))+
+        (c.email?dc(QD_IC.mail,'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)):'')+
+        (c.phone?dc(QD_IC.phone,esc(c.phone)+copy(c.phone)):'')+'</div>'+
+      '<div class="dmetaline">'+dc(QD_IC.cal,dmyOf(q.created)+' <small>to</small> '+dmyOf(q.validUntil))+dc(QD_IC.branch,esc(q.branch))+
+        dc(QD_IC.staff,esc(q.accountant)+(q.accountant2?', '+esc(q.accountant2):''))+(latest?dc(QD_IC.clock,latest):'')+'</div></div>'+
+    '<div class="dhead-acts">'+detailActions(q).map(function(a){ return '<button class="btn-ghost'+(a[3]==='danger'?' danger':'')+'" data-qa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
+      '<button class="x" id="qd-x" aria-label="Close">'+I.close+'</button></div></div>';
+  var tabsH='<div class="btabs" role="tablist" aria-label="Quotation details">'+tabs.map(function(t){
     var on=t[0]===qdTab; return '<button role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-qtab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
 
   var b='';
-  if(qdTab==='details'){
-    b+='<section class="ad-sec"><h3>Overview</h3><dl class="qd-dl">'+
-      dd('Quotation ID',esc(q.id))+dd('Status',badge(q.status),latest)+dd('Quotation date',dmyOf(q.created))+dd('Valid until',dmyOf(q.validUntil))+
-      dd('Created',when(made?made.t:q.created))+dd('Created by',esc(made?made.by:q.by))+
-      (lastEdit?dd('Last updated',when(lastEdit.t))+dd('Last updated by',esc(lastEdit.by)):'')+'</dl></section>';
-    var abn=cr&&cr.abn?(typeof fmtABN==='function'?fmtABN(cr.abn):cr.abn):'';
-    b+='<section class="ad-sec"><h3>Client'+(cr?'<button class="qd-h3a" data-qd="client">View client</button>':'')+'</h3><dl class="qd-dl">'+
-      dd('Client name',esc(c.name),cr?esc(cr.type==='company'?(cr.entity||'Company'):'Individual'):'No longer on file')+
-      dd('Email address',c.email?'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+dd('Phone number',esc(c.phone||''))+(abn?dd('ABN',esc(abn)):'')+'</dl></section>';
-    b+='<section class="ad-sec"><h3>Assignment and additional information</h3><dl class="qd-dl">'+
-      dd('Branch',esc(q.branch))+dd('Accountant',esc(q.accountant))+(q.accountant2?dd('Additional accountant',esc(q.accountant2)):'')+dd('Prepared for',esc(q.onName||c.name))+'</dl>'+
-      '<div class="qd-txt"><h4>Client-facing notes</h4>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<p class="qd-none">No notes for the client</p>')+'</div>'+
-      '<div class="qd-txt"><h4>Terms and conditions</h4>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<p class="qd-none">No terms and conditions</p>')+'</div></section>';
-    if(q.invoiceId){   // only once it has been converted
-      var inv=loadInvoices().list.filter(function(x){ return x.id===q.invoiceId; })[0], cv=ok.filter(function(e){ return e.type==='converted'; }).pop();
-      b+='<section class="ad-sec"><h3>Linked sale</h3><dl class="qd-dl">'+
-        dd('Sale / invoice reference',esc(q.invoiceId))+dd('Converted',cv?when(cv.t):inv?when(inv.at):'')+dd('Converted by',esc(cv?cv.by:inv?inv.by:''))+dd('Amount',money(inv?inv.amount:T.total))+'</dl></section>';
-    }
-  }
   if(qdTab==='services'){
-    var anyDesc=items.some(function(x){ return x.desc; });
-    b+='<section class="ad-sec"><h3>Services and pricing</h3><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th>'+(anyDesc?'<th>Description</th>':'')+'<th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
+    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. Rates include GST.</p></div>'+
+      '<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th><th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
       (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0;
-        return '<tr><td><b>'+esc(x.name)+'</b></td>'+(anyDesc?'<td>'+(x.desc?esc(x.desc):'<span class="qd-none">—</span>')+'</td>':'')+'<td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
-        :'<tr><td colspan="'+(anyDesc?5:4)+'" class="qd-none">No services on this quotation</td></tr>')+
+        return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
+        :'<tr><td colspan="4" class="cl-muted">No services on this quotation</td></tr>')+
       '</tbody></table></div>'+
       '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Total discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+
         '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>';
   }
-  if(qdTab==='activity') b+='<section class="ad-sec"><h3>Activity history</h3>'+histHtml(q)+'</section>';
+  if(qdTab==='notes'){
+    b='<section class="vsec"><h3>Client-facing notes</h3>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<p class="cl-muted">No notes for the client</p>')+'</section>'+
+      '<section class="vsec"><h3>Terms and conditions</h3>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<p class="cl-muted">No terms and conditions</p>')+'</section>';
+  }
+  if(qdTab==='activity'){
+    var list=hist.slice().sort(function(a,z){ return z.t-a.t; });
+    b='<section class="vsec">'+(list.length?'<div class="timeline">'+list.map(function(e){
+      var tr=e.from||e.to?'<span>'+(e.from?esc(STATUS[e.from]?STATUS[e.from][0]:e.from)+' → ':'')+esc(STATUS[e.to]?STATUS[e.to][0]:e.to)+'</span>':'';
+      return '<div class="tlitem'+(e.ok?'':' bad')+'"><span class="dot">'+QD_IC.dot+'</span><div class="tlttl">'+esc((EV[e.type]||[e.type])[0])+tr+'</div>'+
+        (e.note?'<div class="tlnote">'+esc(e.note)+'</div>':'')+'<div class="tlmeta">'+when(e.t)+' · '+(e.by==='System'?'Automatic':'by <b>'+esc(e.by)+'</b>')+'</div></div>'; }).join('')+'</div>'
+      :'<p class="cl-muted">No activity has been recorded for this quotation yet.</p>')+'</section>';
+  }
 
-  ov.innerHTML='<div class="drawer ad qd-drawer" role="dialog" aria-modal="true" aria-labelledby="qd-t">'+head+tabs+'<div class="ad-body" id="qd-b" tabindex="0">'+b+'</div></div>';
+  ov.innerHTML='<div class="drawer qd-drawer" role="dialog" aria-modal="true" aria-labelledby="qd-t">'+head+tabsH+'<div class="cl-vbody" id="qd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   document.getElementById('qd-b').scrollTop=y;
   document.getElementById('qd-x').onclick=closeDetail;
   ov.querySelectorAll('[data-qtab]').forEach(function(t){ t.onclick=function(){ qdTab=t.getAttribute('data-qtab'); paintDetail(); }; });
   ov.querySelectorAll('[data-qa]').forEach(function(x){ x.onclick=function(){ act(x.getAttribute('data-qa'),detailId); }; });
+  ov.querySelectorAll('.qd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
+    try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   var vc=ov.querySelector('[data-qd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+q.clientId); }catch(e){} };
   if(!keep) document.getElementById('qd-x').focus();
 }
@@ -15002,10 +15042,8 @@ function paintQuote(){
     '<div class="card">'+
       '<dl class="ty-meta qv-meta"><div><dt>Prepared for</dt><dd>'+e(q.onName||c.name)+'</dd></div><div><dt>Date</dt><dd>'+dmyOf(q.created)+'</dd></div><div><dt>Branch</dt><dd>'+e(q.branch)+'</dd></div></dl>'+
       '<table class="svc"><thead><tr><th>Service</th><th>Price (incl. GST)</th></tr></thead><tbody>'+rows+'<tr class="tot"><td>Total</td><td>'+money(q.amount)+'</td></tr></tbody></table>'+
-      (q.customerNotes?'<p class="qv-note">'+e(q.customerNotes).replace(/
-/g,'<br>')+'</p>':'')+
-      (q.terms?'<div class="qv-terms"><b>Terms &amp; Conditions</b><p>'+e(q.terms).replace(/
-/g,'<br>')+'</p></div>':'')+
+      (q.customerNotes?'<p class="qv-note">'+e(q.customerNotes).replace(/\n/g,'<br>')+'</p>':'')+
+      (q.terms?'<div class="qv-terms"><b>Terms &amp; Conditions</b><p>'+e(q.terms).replace(/\n/g,'<br>')+'</p></div>':'')+
       (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
         '<label class="agree"><input type="checkbox" id="qa-ok"><span>I accept this quotation and its prices.</span></label><span class="err" id="qa-e" hidden>Tick the box to confirm</span>'+
         '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Accept quotation</button></div>')+

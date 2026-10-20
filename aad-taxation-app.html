@@ -9985,7 +9985,7 @@ table,td,th{font-size:13.5px}
 .qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
 .qt-cn{font-weight:600;color:var(--ink)}
 .qt-st .ar-sub{font-size:11px;max-width:170px;line-height:1.35;margin-top:3px}
-.state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-conv i{background:#10B981}
+.state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-acc i{background:#10B981}.state.q-conv i{background:#8B5CF6}
 .state.q-rej i{background:#FF5966}.state.q-exp i{background:#F59E0B}.state.q-can i{background:#CBD5E1}.state.q-can{color:var(--mute)}
 .qt-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute);border:1px solid transparent}
 .qt-more:hover,.qt-more[aria-expanded=true]{background:#F6F7F9;border-color:var(--line);color:var(--ink)}
@@ -10062,9 +10062,9 @@ var I={
   dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
   sort:'<svg width="10" height="12" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0 9.5 5h-9z" class="up"/><path d="M5 14 .5 9h9z" class="dn"/></svg>'
 };
-var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],converted:['Converted','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
+var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
-  send_failed:['Email not sent',''],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to a sale','Converted by'],expired:['Validity ended','Expired']};
+  send_failed:['Email not sent',''],accepted:['Marked as accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to a sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function esc(s){ return escH(s); }
@@ -10092,7 +10092,7 @@ function inScope(q){ return isManager()||q.accountant===ME.name||q.by===ME.name|
 
 /* ---------- QuoteStore: the one data access point ---------- */
 var QuoteStore={
-  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==3){ var seed=DevData.quotations(); v={v:3,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
+  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==4){ var seed=DevData.quotations(); v={v:4,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
   save:function(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
@@ -10104,7 +10104,7 @@ var DevData={
     var cl=loadClients().filter(function(c){ return c.active!==false; }).slice(0,10), svc=[];
     try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}
     if(!cl.length||!svc.length||!ASSIGNABLE.length) return [];
-    var day=864e5, now=Date.now(), plan=['draft','sent','converted','draft','sent','rejected','sent','expired','cancelled','converted','sent','draft','sent','converted'], out=[];
+    var day=864e5, now=Date.now(), plan=['draft','sent','converted','draft','accepted','rejected','sent','expired','cancelled','converted','sent','draft','accepted','converted'], out=[];
     plan.forEach(function(st,i){
       var c=cl[i%cl.length], who=ASSIGNABLE[i%ASSIGNABLE.length], by=ASSIGNABLE[(i+1)%ASSIGNABLE.length].name, made=now-(42-i*3)*day-(i*37%9)*36e5;
       var items=[svc[i%svc.length]].concat(i%3?[svc[(i*5+2)%svc.length]]:[]).map(function(s){ return {name:s.name,qty:1,price:s.price}; });
@@ -10113,6 +10113,7 @@ var DevData={
       log(q,'created',{by:by,t:made,to:'draft'});
       if(st!=='draft'){
         var sent=made+(1+i%2)*day; setStatus(q,'sent','sent',{by:who.name,t:sent});
+        if(st==='accepted'||st==='converted') setStatus(q,'accepted','accepted',{by:who.name,t:sent+2*day,note:'Client accepted by email'});
         if(st==='rejected') setStatus(q,'rejected','rejected',{by:who.name,t:sent+4*day,note:'Client chose another provider'});
         if(st==='cancelled') setStatus(q,'cancelled','cancelled',{by:ME.name,t:sent+2*day,note:'Duplicate quotation'});
         if(st==='converted'){ q.saleId='S-'+(5001+i); setStatus(q,'converted','converted',{by:ME.name,t:sent+5*day,sale:q.saleId,note:'Sale '+q.saleId}); }
@@ -10142,10 +10143,10 @@ function attrLine(q){
 
 /* ---------- summary: counted over every quotation you can see, not the current filters ---------- */
 function summary(list){
-  var by=function(s){ return list.filter(function(q){ return q.status===s; }); }, open=by('sent');
+  var by=function(s){ return list.filter(function(q){ return q.status===s; }); }, open=by('sent').concat(by('accepted'));
   return [['Total Quotations',list.length,'Every quotation you have access to'],['Draft',by('draft').length,'Created, not sent yet'],
-    ['Sent — Awaiting Response',open.length,'Sent and still within their validity'],['Converted',by('converted').length,'Turned into a sale'],
-    ['Open Quotation Value',money(open.reduce(function(a,q){ return a+q.amount; },0)),'Total of sent quotations awaiting a response. Excludes drafts and converted, rejected, expired and cancelled quotations.']];
+    ['Sent — Awaiting Response',by('sent').length,'Sent, still within their validity, with no answer recorded yet'],['Invoiced',by('converted').length,'Converted into a sale'],
+    ['Open Quotation Value',money(open.reduce(function(a,q){ return a+q.amount; },0)),'Total of sent and accepted quotations not yet invoiced. Excludes drafts and invoiced, rejected, expired and cancelled quotations.']];
 }
 
 /* ---------- filters and sorting ---------- */
@@ -10197,9 +10198,7 @@ function th(k,label,cls){ var on=state.sort.k===k; return '<th'+(cls?' class="'+
 
 /* ---------- the page ---------- */
 function head(){
-  return '<div class="page-head"><div><h1>Quotations'+(st&&st.list.some(function(q){ return q.dev; })?' <span class="qt-dev" title="These quotations are temporary development data, not live business records. They are replaced once the quotations API is connected.">Sample data</span>':'')+'</h1>'+
-    '<p class="page-sub">Manage client quotations and track their progress.</p></div>'+
-    '<div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Create Quotation</button></div></div>';
+  return '<div class="page-head"><h1>Quotations</h1><div class="ph-acts"><button class="btn-primary" id="qt-add">'+I.plus+'Create Quotation</button></div></div>';
 }
 function render(){
   if(loadErr||!st){
@@ -10263,9 +10262,11 @@ function menuFor(q){
   if(s!=='draft') a.push(['pdf','Download PDF']);
   if(s==='draft'&&edit) a.push(['send','Send Quotation']);
   if(s==='sent'&&edit) a.push(['resend','Resend Quotation']);
-  if(s==='sent'&&isManager()) a.push(['convert','Convert to Sale']);
+  if(s==='sent'&&edit) a.push(['accept','Mark as Accepted']);
+  if(s==='sent'&&edit) a.push(['reject','Mark as Rejected']);
+  if((s==='sent'||s==='accepted')&&isManager()) a.push(['convert','Convert to Sale']);
   if(s==='converted'&&q.saleId) a.push(['sale','View Linked Sale']);
-  if(s==='sent'&&isManager()) a.push(['cancel','Cancel Quotation','danger']);
+  if((s==='sent'||s==='accepted')&&isManager()) a.push(['cancel','Cancel Quotation','danger']);
   if(s==='draft'&&(isManager()||q.by===ME.name)) a.push(['delete','Delete Draft','danger']);
   if(s!=='draft') a.push(['history','View Activity History']);
   return a;
@@ -10302,6 +10303,7 @@ function act(k,id){
   reload(); var q=byId(id); if(!q) return toast('This quotation no longer exists.',true);
   if(k==='history') return openHistory(id);
   if(k==='cancel') return confirmCancel(id);
+  if(k==='accept'||k==='reject') return confirmOutcome(id,k==='accept'?'accepted':'rejected');
   if(k==='delete') return confirmDelete(id);
   route(k,q);
 }
@@ -10323,9 +10325,25 @@ function confirmCancel(id){
   document.getElementById('qc-no').onclick=closeDlg;
   document.getElementById('qc-go').onclick=function(){
     var n=document.getElementById('qc-n').value.trim(); if(!n){ document.getElementById('qc-e').classList.add('show'); return; }
-    reload(); var x=byId(id); if(!x||x.status!=='sent'){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
+    reload(); var x=byId(id); if(!x||['sent','accepted'].indexOf(x.status)<0){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
     setStatus(x,'cancelled','cancelled',{note:n}); if(!QuoteStore.save(st)){ return toast('Couldn’t save the change. Try again.',true); }
     closeDlg(); render(); toast(id+' cancelled');
+  };
+}
+/* the client's answer, recorded by staff: Sent → Accepted or Rejected */
+function confirmOutcome(id,to){
+  var q=byId(id), acc=to==='accepted';
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qo-t"><div class="confirm-body"><h3 id="qo-t">Mark '+esc(q.id)+' as '+(acc?'accepted':'rejected')+'?</h3>'+
+    '<p>'+(acc?'Record that <strong>'+esc(client(q).name)+'</strong> accepted this quotation. It can then be converted to a sale.':'Record that <strong>'+esc(client(q).name)+'</strong> turned this quotation down. It can’t be converted afterwards.')+'</p>'+
+    '<label class="flabel" for="qo-n" style="margin-top:12px">'+(acc?'Note <span class="opt">(optional)</span>':'Reason <span class="req-star">*</span>')+'</label><textarea class="ftext" id="qo-n" rows="3" maxlength="300"></textarea><span class="ferr" id="qo-e">Add a reason</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qo-no">Back</button><button class="'+(acc?'btn-primary':'btn-danger')+'" id="qo-go">Mark as '+(acc?'accepted':'rejected')+'</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('qo-n').focus();
+  document.getElementById('qo-no').onclick=closeDlg;
+  document.getElementById('qo-go').onclick=function(){
+    var n=document.getElementById('qo-n').value.trim(); if(!acc&&!n){ document.getElementById('qo-e').classList.add('show'); return; }
+    reload(); var x=byId(id); if(!x||x.status!=='sent'){ closeDlg(); render(); return toast('Only a sent quotation can be marked as '+(acc?'accepted':'rejected')+'.',true); }
+    setStatus(x,to,to,{note:n}); if(!QuoteStore.save(st)) return toast('Couldn’t save the change. Try again.',true);
+    closeDlg(); render(); toast(id+' marked as '+(acc?'accepted':'rejected'));
   };
 }
 function confirmDelete(id){

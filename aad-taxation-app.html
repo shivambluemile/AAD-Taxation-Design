@@ -5606,16 +5606,17 @@ function kycTab(c){
   var banner='<div class="el-bn">'+EL_INFO+'<p>Each KYC verification remains valid for one year from the verification date. New verifications are saved as separate versions, and all previous verification records and their associated documents are retained.</p></div>';
   var st=cur?kycState(cur):'none', exp=cur?kycExpiresAt(cur):0, left=cur?Math.ceil((exp-now)/864e5):0;
   var S={none:['No KYC recorded','Record this client’s identity check to keep them compliant.',null,['add','Record KYC']],
-    valid:['KYC is valid','Valid until '+whenOf(exp)+' · '+left+' day'+(left===1?'':'s')+' left.',['add','Record new KYC'],null],
-    expiring:['KYC expires soon','Expires on '+whenOf(exp)+'. Record a new check before then to stay compliant.',null,['add','Renew KYC']],
-    expired:['KYC expired','Expired on '+whenOf(exp)+'. The client isn’t compliant until a new check is recorded.',null,['add','Renew KYC']]}[st];
+    valid:['KYC is valid',left+' day'+(left===1?'':'s')+' left before this check expires.',['add','Record new KYC'],null],
+    expiring:['KYC expires soon','Record a new check before it expires to stay compliant.',null,['add','Renew KYC']],
+    expired:['KYC expired','The client isn’t compliant until a new check is recorded.',null,['add','Renew KYC']]}[st];   // the expiry date and time are in the check details above
   var tone={none:'',valid:'s-signed',expiring:'s-awaiting',expired:'s-failed'}[st];
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x[1]+'</button>':''; };
   var status='<div class="el-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
     (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
   var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
-      '<span class="el-to">Uploaded by '+esc(cur.by)+' · '+whenOf(kycUploadedAt(cur))+(cur.source?' <i>· '+esc(cur.source)+'</i>':'')+'</span>'+
-      '<span class="el-mt">'+(cur.files||[]).length+' document'+((cur.files||[]).length===1?'':'s')+' <i>·</i> '+(st==='expired'?'Expired ':'Expires ')+whenOf(exp)+(cur.note?' <i>·</i> “'+esc(cur.note)+'”':'')+'</span>'+
+      '<span class="el-to">Uploaded by '+esc(cur.by)+' on '+whenOf(kycUploadedAt(cur)).replace(' · ',' at ')+'</span>'+
+      '<span class="el-to">'+(st==='expired'?'Expired on ':'Expires on ')+whenOf(exp).replace(' · ',' at ')+'</span>'+
+      (cur.note?'<span class="el-to">Note: '+esc(cur.note)+'</span>':'')+
       kycChips(cur.files||[],0)+'</div></div>':'';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown

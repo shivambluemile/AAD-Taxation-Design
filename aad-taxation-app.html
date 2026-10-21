@@ -1467,7 +1467,7 @@ function verTag(v,i){
 function docCard(d){
   /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
-  var sub=[t.cat];
+  var sub=[];
   if(d.no&&!gone) sub.push('No. <em>'+maskNo(d.no)+'</em>');
   if(gone){ sub.push('<em>No active document</em>'); sub.push('Last version expired '+fmtD(d.cur.exp)); }
   else { sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>'); sub.push('Version '+d.ver); }

@@ -11209,7 +11209,16 @@ function totalsOf(d){
   return {sub:sub,gst:d.gst===false?0:round2(sub/11),total:sub};
 }
 /* who the quotation (and later the invoice) is made out to: the client, or for a company one of its directors */
-function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
+/* a company: itself and all its directors; an individual: themselves and every company they're a director of (linked by client record, or by email) */
+function nameOptions(c){
+  if(!c) return []; var o=[[c.name,c.name]], seen={}; seen[c.name]=1;
+  var add=function(n,tag){ n=String(n||'').trim(); if(n&&!seen[n]){ seen[n]=1; o.push([n,n+' · '+tag]); } };
+  if(c.type==='company') (c.directors||[]).forEach(function(x){ add(x.name,'Director'); });
+  else { var em=String(c.email||'').trim().toLowerCase();
+    clients.forEach(function(co){ if(co.type!=='company'||co.active===false) return;
+      if((co.directors||[]).some(function(x){ return String(x.personId)===String(c.id)||(em&&String(x.email||'').trim().toLowerCase()===em); })) add(co.name,'Company'); }); }
+  return o;
+}
 function openForm(id){
   reload(); var q=id?byId(id):null;
   if(id&&!q) return toast('This quotation no longer exists.',true);

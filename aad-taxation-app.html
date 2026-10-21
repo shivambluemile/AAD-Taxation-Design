@@ -13240,15 +13240,16 @@ table,td,th{font-size:13.5px}
 .sl-sf .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}
 .sl-sf .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
 .sl-sf .qf-tot .sl-disc{align-items:center}
-.qf-tot .sl-dctl{display:flex;align-items:center;gap:10px;padding:2px 0 8px}
-.qf-tot .sl-dgrp{flex:1;display:flex;align-items:center;justify-content:flex-start;gap:0;height:38px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.qf-tot .sl-disc dt{display:flex;align-items:center;gap:8px}
+.qf-tot .sl-dctl{display:flex;align-items:center;gap:2px}
+.qf-tot .sl-dgrp{flex:none;width:92px;display:flex;align-items:center;justify-content:flex-start;gap:0;height:30px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}
 .sl-dgrp:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
 .sl-dgrp.bad{border-color:#F3A3A3;background:#FFF7F7}
-.sl-dgrp input{flex:1;min-width:0;height:100%;border:0;background:transparent;padding:0 12px;font-size:14px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.sl-dgrp input{flex:1;min-width:0;height:100%;border:0;background:transparent;padding:0 8px;font-size:13px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
 .sl-dgrp input:focus{outline:none}
-.sl-dgrp select{height:100%;border:0;border-left:1px solid var(--line);background:#F6F7F9;padding:0 12px;font-size:13.5px;font-weight:700;color:var(--slate);cursor:pointer}
+.sl-dgrp select{height:100%;border:0;border-left:1px solid var(--line);background:#F6F7F9;padding:0 4px;font-size:12.5px;font-weight:700;color:var(--slate);cursor:pointer}
 .sl-dgrp select:focus{outline:none;color:var(--orange-ink)}
-.sl-drm{font-size:12.5px;font-weight:600;color:var(--mute);padding:4px 2px}.sl-drm:hover{color:var(--red)}
+.sl-drm{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;color:var(--mute)}.sl-drm svg{width:14px;height:14px}.sl-drm:hover{color:var(--red)}
 .sl-disc dd{display:flex;align-items:center;gap:4px}
 .sl-dinp{width:96px}.sl-dinp .fin{height:34px}
 .sl-seg{display:inline-flex;background:#E9ECF0;padding:2px;border-radius:7px;flex-shrink:0}.sl-seg button{padding:0 10px;height:30px;border-radius:5px;font-size:12.5px;font-weight:700;color:var(--slate)}.sl-seg button.on{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -13863,10 +13864,9 @@ function paintSaleForm(focusId){
           '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
           '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></section>'+
         '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
-          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
-          (d.showDisc?'<div class="sl-dctl"><div class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
-            '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></div>'+
-            '<button type="button" class="sl-drm" id="sf-discrm">Remove</button></div>':'')+
+          '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
+            '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
+            '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+

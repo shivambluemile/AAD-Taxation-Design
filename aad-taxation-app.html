@@ -4040,7 +4040,7 @@ function personMatches(q){
   var dq=q.replace(/\D/g,''), have=form.d.directors;
   var taken=function(p){ return have.some(function(x){ return (p.personId!=null&&x.personId===p.personId)||(p.email&&String(x.email||'').trim().toLowerCase()===p.email.toLowerCase()); }); };
   return peopleIndex().filter(function(p){ if(taken(p)) return false; if((p.name+' '+p.email).toLowerCase().indexOf(q)>=0) return true;
-    return dq.length>=3&&String(p.phone||'').replace(/\D/g,'').indexOf(dq)>=0; }).slice(0,8);
+    return dq.length>=3&&[p.phone,p.abn,p.tfn].some(function(v){ return String(v||'').replace(/\D/g,'').indexOf(dq)>=0; }); }).slice(0,8);
 }
 /* when a company is saved each director becomes (or stays linked to) an individual client, so they can be picked again later */
 function linkDirectorPeople(rec){
@@ -4199,7 +4199,7 @@ function renderForm(){
     h+=full
       ? '<div class="cl-note" role="status">'+I.infoLg+'<span>You’ve added the maximum of '+MAX_DIRECTORS+' directors. Remove a director to add someone else.</span></div>'
       : '<div class="dir-find"><label class="flabel" for="dir-q">'+(n?'Add another director':'Add a director')+'</label>'+
-          '<div class="dir-pick"><span class="ico">'+I.search+'</span><input class="fin sm" id="dir-q" type="search" autocomplete="off" placeholder="Search individuals by name, email or phone" value="'+esc(f.dirQ||'')+'" aria-autocomplete="list" aria-controls="dir-list">'+
+          '<div class="dir-pick"><span class="ico">'+I.search+'</span><input class="fin sm" id="dir-q" type="search" autocomplete="off" placeholder="Search individuals by name, email, phone, ABN or TFN" value="'+esc(f.dirQ||'')+'" aria-autocomplete="list" aria-controls="dir-list">'+
           '<ul class="dir-list" id="dir-list" role="listbox" hidden></ul></div>'+
           '<button type="button" class="linkbtn" id="add-dir">'+I.plus+'Create new individual</button></div>';
     h+='</div>';
@@ -4259,12 +4259,16 @@ function wireForm(){
       d.directors.push({id:null,personId:p.personId,pick:p.personId==null,name:p.name,email:p.email,phone:p.phone,abn:p.abn?fmtABN(p.abn):'',tfn:p.tfn?fmtTFN(p.tfn):'',login:false,lastReset:null});
       f.dirQ=''; delete f.errs.directors; f.dirty=true; repaint('#dir-q'); };
     var create=function(q){ readForm(); if(d.directors.length>=MAX_DIRECTORS) return; var x=blankDirector(); q=String(q||'').trim();
-      if(q){ if(q.indexOf('@')>0) x.email=q; else if(/^[\d\s+()-]{6,}$/.test(q)) x.phone=q; else x.name=q; }
+      if(q){ var dg=q.replace(/\D/g,''), num=/^[\d\s+()-]{6,}$/.test(q);
+        if(q.indexOf('@')>0) x.email=q; else if(num&&dg.length===11&&dg[0]!=='0') x.abn=fmtABN(dg); else if(num&&dg.length===9) x.tfn=fmtTFN(dg); else if(num) x.phone=q; else x.name=q; }
       d.directors.push(x); f.dirQ=''; delete f.errs.directors; f.dirty=true; repaint('#f-dir-'+(d.directors.length-1)+'-'+(x.name?'email':'name'));
       var box=body.querySelector('[data-dir="'+(d.directors.length-1)+'"]'); if(box) box.scrollIntoView({block:'nearest'}); };
+    var hit=function(p){ var n=String(dq.value).replace(/\D/g,''); if(n.length<3) return [];
+      if(String(p.abn||'').replace(/\D/g,'').indexOf(n)>=0) return ['ABN '+fmtABN(p.abn)];
+      if(String(p.tfn||'').replace(/\D/g,'').indexOf(n)>=0) return ['TFN '+maskTFN(p.tfn)]; return []; };
     var list=function(){ var q=dq.value, m=personMatches(q); f.dirQ=q;
       if(!q.trim()){ dl.hidden=true; dl.innerHTML=''; return; }
-      dl.innerHTML=m.map(function(p,i){ return '<li role="option" data-pi="'+i+'"'+(i===0?' class="on"':'')+'><span class="av">'+esc(initials(p.name))+'</span><span class="pm"><b>'+esc(p.name)+'</b><small>'+[p.email,p.phone].filter(Boolean).map(esc).join(' · ')+'</small></span><em>'+esc(p.src)+'</em></li>'; }).join('')+
+      dl.innerHTML=m.map(function(p,i){ return '<li role="option" data-pi="'+i+'"'+(i===0?' class="on"':'')+'><span class="av">'+esc(initials(p.name))+'</span><span class="pm"><b>'+esc(p.name)+'</b><small>'+[p.email,p.phone].concat(hit(p)).filter(Boolean).map(esc).join(' · ')+'</small></span><em>'+esc(p.src)+'</em></li>'; }).join('')+
         (m.length?'':'<li class="none">No one matches “'+esc(q.trim())+'”.</li>')+
         '<li role="option" class="mk'+(m.length?'':' on')+'" data-mk="1">'+I.plus+'Create new individual'+(q.trim()&&q.indexOf('@')<0?' “'+esc(q.trim())+'”':'')+'</li>';
       dl.hidden=false; dl._m=m; };

@@ -5844,6 +5844,19 @@ function annualUpkeep(){
     }
     changed=true;
   }
+  /* sample (prototype only): two more years of James Nguyen's letters, so the history shows several years */
+  if(demo&&!demo.demoLetters2){
+    demo.demoLetters2=true;
+    [[F-2,'Sarah Lee','client-link',4],[F-3,'Alex Ray','manual',9]].forEach(function(o){
+      var y=o[0]; if(ONB.letters.some(function(l){ return l.clientId===3&&letterFy(l)===y; })) return;
+      var cAt=new Date(y,6,2,9,40).getTime(), sAt=cAt+o[3]*day+3*36e5;
+      ONB.letters.push({id:'Ldemo3-'+y,clientId:3,client:snap(demo),token:newToken(),created:cAt,by:o[1],fy:y,signer:{name:demo.name,email:demo.email,role:'client'},
+        services:[{name:'Individual Tax Return',price:220}],status:'signed',signature:{method:'type',text:demo.name,name:demo.name},signedAt:sAt,method:o[2],logged:true,
+        sends:[{at:cAt,by:o[1],channels:['Email'],ok:true,emailTo:demo.email}],
+        audit:[{t:cAt,action:'Sent for signature',by:o[1],from:'pending',to:'sent',note:'Email'},{t:sAt,action:o[2]==='manual'?'Signed manually':'Signed by client',by:o[2]==='manual'?o[1]:demo.name,from:'sent',to:'signed',note:o[2]==='manual'?'Recorded by staff':'Through the signing link'}]});
+    });
+    onbChanged=true; changed=true;
+  }
   CLIENTS.forEach(function(c){
     c.history=c.history||[];
     /* KYC: files from before dated checks become one record; a couple of sample clients get a history to show */

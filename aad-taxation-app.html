@@ -10240,9 +10240,16 @@ table,td,th{font-size:13.5px}
 .qf-list li.on,.qf-list li:hover{background:var(--orange-soft)}.qf-list li.qf-none{cursor:default;font-size:13px;color:var(--mute)}.qf-list li.qf-none:hover{background:none}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer.sf.qf{max-width:min(1040px,96vw)}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
+.qf-ih{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.qf-ih h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}.qf-ih span{font-size:12.5px;color:var(--faint)}
+.qf-thead .r{text-align:right}
+.qf-row .fin.sm,.qf-row .ftext{border-color:#E6E9EE}.qf-row .fin.sm:hover:not(:disabled),.qf-row .ftext:hover{border-color:#CBD2DA}
+.qf-row input[type=number]{text-align:right}
+.qf-row .qf-line{font-weight:700}
 .qf-tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.qf-thead,.qf-row{display:grid;grid-template-columns:150px minmax(0,1.2fr) minmax(0,1.3fr) 76px 120px 92px 30px;gap:10px;align-items:start}
+.qf-thead,.qf-row{display:grid;grid-template-columns:140px minmax(0,1.3fr) minmax(0,1.5fr) 84px 124px 100px 34px;gap:12px;align-items:start}
 .qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line);padding:11px 12px;align-items:center}.qf-thead .r{text-align:right}
 .qf-rows{display:flex;flex-direction:column}
 .qf-row{padding:10px 12px;border-bottom:1px solid #F1F2F4}.qf-row:last-child{border-bottom:0}.qf-row:hover{background:#FCFCFD}
@@ -10749,7 +10756,7 @@ function paintForm(focusId){
         field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
         field('To the name of',true,c?sel('qf-to','toName',names,d.toName,'Addressed to'):noClient,'toName')+
       '</div>'+
-      '<section class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
+      '<section class="qf-items"><div class="qf-ih"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Quantity</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="pill-btn quiet qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
       '<div class="qf-foot">'+
@@ -12555,9 +12562,16 @@ table,td,th{font-size:13.5px}
 .qf-list li.on,.qf-list li:hover{background:var(--orange-soft)}.qf-list li.qf-none{cursor:default;font-size:13px;color:var(--mute)}.qf-list li.qf-none:hover{background:none}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drawer.sf.qf{max-width:min(1040px,96vw)}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
+.qf-ih{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.qf-ih h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}.qf-ih span{font-size:12.5px;color:var(--faint)}
+.qf-thead .r{text-align:right}
+.qf-row .fin.sm,.qf-row .ftext{border-color:#E6E9EE}.qf-row .fin.sm:hover:not(:disabled),.qf-row .ftext:hover{border-color:#CBD2DA}
+.qf-row input[type=number]{text-align:right}
+.qf-row .qf-line{font-weight:700}
 .qf-tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.qf-thead,.qf-row{display:grid;grid-template-columns:150px minmax(0,1.2fr) minmax(0,1.3fr) 76px 120px 92px 30px;gap:10px;align-items:start}
+.qf-thead,.qf-row{display:grid;grid-template-columns:140px minmax(0,1.3fr) minmax(0,1.5fr) 84px 124px 100px 34px;gap:12px;align-items:start}
 .qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line);padding:11px 12px;align-items:center}.qf-thead .r{text-align:right}
 .qf-rows{display:flex;flex-direction:column}
 .qf-row{padding:10px 12px;border-bottom:1px solid #F1F2F4}.qf-row:last-child{border-bottom:0}.qf-row:hover{background:#FCFCFD}
@@ -12591,7 +12605,7 @@ table,td,th{font-size:13.5px}
 .qf-tot .sd-paid dt small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
 /* Add / Edit Sale: the Add Quotation drawer, plus a Fee column, one document and the financial summary */
 .drawer.sl-sf{max-width:min(1040px,96vw)}
-.sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:140px minmax(0,1.1fr) minmax(0,1.3fr) 80px 72px 112px 88px 30px}
+.sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:136px minmax(0,1.3fr) minmax(0,1.5fr) 84px 76px 120px 100px 34px}
 .sl-fee{color:var(--mute);font-weight:500}
 .sl-dates{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .sl-up{border-top:1px solid var(--line);padding-top:16px}
@@ -13135,7 +13149,7 @@ function paintSaleForm(focusId){
         '<div class="sl-dates">'+field('Invoice Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
           field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div>'+
       '</div>'+
-      '<section class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Fee</span><span>Quantity</span><span>Rate</span><span class="r">Amount</span><span></span></div>'+
+      '<section class="qf-items"><div class="qf-ih"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Fee</span><span class="r">Quantity</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="pill-btn quiet qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
       '<section class="sl-up"><span class="flabel">Upload Document</span>'+doc+err('doc')+'</section>'+

@@ -7046,7 +7046,7 @@ function rangeHtml(f){
     if(gi) h+='<hr>';
     g.forEach(function(r){
       var rr=rangeOf(r[0]);
-      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span><small>'+(r[0]==='all'?'':esc(fmtRange(rr[0],rr[1])))+'</small></button>';
+      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span></button>';
     });
   });
   h+='<hr><button type="button" class="ropt'+(f.range==='custom'?' on':'')+'" data-r="custom"><span>Custom Range</span><small>'+(f.range==='custom'?esc(fmtRange(f.from,f.to)):'Pick dates')+'</small></button></div>'+
@@ -10700,6 +10700,8 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:150px}
+.qt-person{display:flex;align-items:center;gap:10px;min-width:0}.qt-pn{min-width:0}
+.cl-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex-shrink:0}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
@@ -10947,6 +10949,11 @@ function summary(list){
 var state={f:blank(),page:1,per:10,sort:{k:'created',d:-1}};
 function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',status:'',range:DEFAULT_RANGE,from:d[0],to:d[1],branch:''}; }
 function anyFilter(f){ return !!(f.q.trim()||f.status||f.range!==DEFAULT_RANGE||f.branch); }
+/* the client's avatar: the same initials and colours as the Clients list */
+var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
+function clAv(c){ var p=String(c.name||'?').trim().split(' ').filter(Boolean), ini=((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(),
+  av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
+  return '<span class="cl-av" style="background:'+av[0]+';color:'+av[1]+'" aria-hidden="true">'+esc(ini)+'</span>'; }
 /* date range: the same control as the Leave module (presets + custom dates), This Month by default */
 var DEFAULT_RANGE='this_month';
 function fmtD(iso){ return iso?iso.split('-').reverse().join('-'):''; }
@@ -10993,7 +11000,7 @@ function rangeHtml(f){
     if(gi) h+='<hr>';
     g.forEach(function(r){
       var rr=rangeOf(r[0]);
-      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span><small>'+(r[0]==='all'?'':esc(fmtRange(rr[0],rr[1])))+'</small></button>';
+      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span></button>';
     });
   });
   h+='<hr><button type="button" class="ropt'+(f.range==='custom'?' on':'')+'" data-r="custom"><span>Custom Range</span><small>'+(f.range==='custom'?esc(fmtRange(f.from,f.to)):'Pick dates')+'</small></button></div>'+
@@ -11091,7 +11098,7 @@ function render(){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
       '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the quotation details"><span class="name">'+esc(q.id)+'</span></button></td>'+
-      '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+'</td>'+
+      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="num r">'+money(q.amount)+'</td>'+
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
@@ -13086,6 +13093,8 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:150px}
+.qt-person{display:flex;align-items:center;gap:10px;min-width:0}.qt-pn{min-width:0}
+.cl-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex-shrink:0}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
@@ -13360,6 +13369,11 @@ var ASSIGNABLE=STAFF.filter(function(s){ return ['Accountant','Bookkeeping','Adm
 function loadClients(){ try{ var v=JSON.parse(localStorage.getItem('aad-clients-v1')||'null'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 
 function isManager(){ return ME.role==='Admin'||ME.role==='Manager'; }
+/* the client's avatar: the same initials and colours as the Clients list */
+var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
+function clAv(c){ var p=String(c.name||'?').trim().split(' ').filter(Boolean), ini=((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(),
+  av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
+  return '<span class="cl-av" style="background:'+av[0]+';color:'+av[1]+'" aria-hidden="true">'+esc(ini)+'</span>'; }
 /* date range: the same control as the Leave module (presets + custom dates), This Month by default */
 var DEFAULT_RANGE='this_month';
 function fmtD(iso){ return iso?iso.split('-').reverse().join('-'):''; }
@@ -13406,7 +13420,7 @@ function rangeHtml(f){
     if(gi) h+='<hr>';
     g.forEach(function(r){
       var rr=rangeOf(r[0]);
-      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span><small>'+(r[0]==='all'?'':esc(fmtRange(rr[0],rr[1])))+'</small></button>';
+      h+='<button type="button" class="ropt'+(f.range===r[0]?' on':'')+'" data-r="'+r[0]+'"><span>'+r[1]+'</span></button>';
     });
   });
   h+='<hr><button type="button" class="ropt'+(f.range==='custom'?' on':'')+'" data-r="custom"><span>Custom Range</span><small>'+(f.range==='custom'?esc(fmtRange(f.from,f.to)):'Pick dates')+'</small></button></div>'+
@@ -13605,7 +13619,7 @@ function render(){
     var c=client(s), ps=payStatus(s), pend=pendingOf(s), dis=s.status==='disabled';
     h+='<tr class="'+(dis?'sl-dis':ps==='overdue'?'sl-over':'')+'">'+
       '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
-      '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</td>'+
+      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-pn"><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</span></div></td>'+
       '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
       '<td class="num r">'+money(s.amount)+'</td>'+
       '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'"'+(ps==='overdue'?' title="Due '+dmyOf(s.due)+'"':'')+'><i></i>'+PAY[ps]+'</span></small>')+'</td>'+

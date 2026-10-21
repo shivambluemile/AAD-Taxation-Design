@@ -10257,9 +10257,11 @@ table,td,th{font-size:13.5px}
 .qf-row.dragging{opacity:.45}
 .qf-row.drop-above{box-shadow:inset 0 2px 0 var(--orange)}.qf-row.drop-below{box-shadow:inset 0 -2px 0 var(--orange)}
 @media (max-width:900px){.qf-grip{display:none}}
-.qf2 .qf-gst{display:inline-flex;background:#E9ECF0;border-radius:8px;padding:2px;flex-shrink:0}
-.qf2 .qf-gst button{height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:700;color:var(--slate);white-space:nowrap}
-.qf2 .qf-gst button.on{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.qf2 .qf-gstt{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--slate);cursor:pointer;flex-shrink:0}
+.qf2 .toggle{width:36px;height:20px;border-radius:999px;background:#D7DBE0;position:relative;flex-shrink:0;transition:background .16s;padding:0;border:0}
+.qf2 .toggle::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .16s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.qf2 .toggle.on{background:var(--orange)}.qf2 .toggle.on::after{transform:translateX(16px)}
+.qf2 .toggle:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
 .qf2 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .qf2 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .qf2 .qf-items{border:0;padding:0}
@@ -10777,8 +10779,6 @@ function paintForm(focusId){
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
-  var days=d.date&&d.due?Math.round((Date.parse(d.due)-Date.parse(d.date))/864e5):null;
-  var dueHint=days==null||days<0?'':'<small class="qf-hint">'+(days===0?'Same day as the quotation date':days+' day'+(days===1?'':'s')+' after the quotation date')+'</small>';
   var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
   var staff=ASSIGNABLE.map(function(s){ return s.name; });
   ov.innerHTML='<div class="drawer sf qf qf2" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
@@ -10792,11 +10792,11 @@ function paintForm(focusId){
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
           field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+
         '<div class="g3">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
-          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>'+dueHint,'due')+'</div></div>')+
+          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+'</div></div>')+
       card('Services','',
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<span class="qf-gst" role="group" aria-label="GST"><button type="button" data-gst="1" class="'+(d.gst===false?'':'on')+'" aria-pressed="'+(d.gst!==false)+'">GST included</button><button type="button" data-gst="0" class="'+(d.gst===false?'on':'')+'" aria-pressed="'+(d.gst===false)+'">No GST</button></span>')+
+        '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<label class="qf-gstt"><span>Include GST</span><button type="button" class="toggle sm'+(d.gst===false?'':' on')+'" data-gstsw role="switch" aria-checked="'+(d.gst!==false)+'" aria-label="Include GST"></button></label>')+
       '<div class="qf-bottom">'+
         '<section class="qf-card qf-notes"><div><label class="flabel" for="qf-cn">Customer notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the quote.</small></div>'+
           '<div><label class="flabel" for="qf-tc">Terms and conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></section>'+
@@ -10854,7 +10854,7 @@ function wireForm(focusId){
   [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-qty')].qty=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); QF.errs={}; touch(); repaint(); }; });
-  [].forEach.call(ov.querySelectorAll('[data-gst]'),function(x){ x.onclick=function(){ var on=x.getAttribute('data-gst')==='1'; if(on===(d.gst!==false)) return; d.gst=on; touch(); repaint(); }; });
+  var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
   /* reorder lines: drag the grip, or focus it and use the arrow keys */
   var moveLine=function(i,j){ if(i===j||j<0||j>=d.items.length) return; var x=d.items.splice(i,1)[0]; d.items.splice(j,0,x);
     Object.keys(QF.errs).forEach(function(k){ if(/^[sqp]\d+$/.test(k)) delete QF.errs[k]; }); touch(); repaint('qf-grip'+j); };
@@ -12633,9 +12633,11 @@ table,td,th{font-size:13.5px}
 .qf-row.dragging{opacity:.45}
 .qf-row.drop-above{box-shadow:inset 0 2px 0 var(--orange)}.qf-row.drop-below{box-shadow:inset 0 -2px 0 var(--orange)}
 @media (max-width:900px){.qf-grip{display:none}}
-.qf2 .qf-gst{display:inline-flex;background:#E9ECF0;border-radius:8px;padding:2px;flex-shrink:0}
-.qf2 .qf-gst button{height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:700;color:var(--slate);white-space:nowrap}
-.qf2 .qf-gst button.on{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.qf2 .qf-gstt{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--slate);cursor:pointer;flex-shrink:0}
+.qf2 .toggle{width:36px;height:20px;border-radius:999px;background:#D7DBE0;position:relative;flex-shrink:0;transition:background .16s;padding:0;border:0}
+.qf2 .toggle::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .16s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.qf2 .toggle.on{background:var(--orange)}.qf2 .toggle.on::after{transform:translateX(16px)}
+.qf2 .toggle:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
 .qf2 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .qf2 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .qf2 .qf-items{border:0;padding:0}
@@ -12682,6 +12684,34 @@ table,td,th{font-size:13.5px}
 .qf-ta{display:block}.qf-ta:not(.open){text-overflow:ellipsis}
 </style>
 <style id="sl-css">
+/* Sales filters: More Filters button, active chips, side panel */
+.sl-fbar{flex-wrap:nowrap}.sl-fbar .search{width:auto;flex:1 1 260px;min-width:220px}.sl-fbar .filters{flex:0 1 auto;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:1100px){.sl-fbar{flex-wrap:wrap}.sl-fbar .search{flex-basis:100%}}
+.rbtn.mf-btn{min-width:0;gap:8px}.rbtn.mf-btn svg{color:#6B7280}
+.mf-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--orange);color:#fff;font-size:11.5px;font-weight:700}
+.mf-chips{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:-4px 0 14px}
+.mf-chip{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 4px 0 12px;border-radius:999px;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:600}
+.mf-chip button{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--orange-ink)}.mf-chip button:hover,.mf-chip button:focus-visible{background:rgba(241,137,52,.18);outline:none}
+.mf-chip button svg{width:11px;height:11px}
+.drawer.mf-panel{max-width:min(440px,100vw)}
+.mf-panel .modal-body{gap:0;padding:0}
+.mf-sec{padding:20px 28px;border-bottom:1px solid var(--line)}.mf-sec:last-child{border-bottom:0}
+.mf-sec h3{font-family:'Manrope';font-size:14.5px;font-weight:800;color:var(--ink);margin:0 0 14px}
+.mf-field{border:0;margin:0 0 16px;padding:0;min-width:0}.mf-field:last-child{margin-bottom:0}
+.mf-field legend{display:flex;align-items:center;justify-content:space-between;width:100%;padding:0;margin-bottom:8px;font-size:12.5px;font-weight:600;color:var(--ink)}
+.mf-sel{font-size:11.5px;font-weight:700;color:var(--orange-ink)}
+.mf-opts{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;padding:4px}
+.mf-opts.scroll{max-height:196px;overflow-y:auto}
+.mf-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;font-size:13.5px;color:var(--ink);cursor:pointer}
+.mf-opt:hover{background:#F6F7F9}.mf-opt input{width:16px;height:16px;accent-color:var(--orange);flex-shrink:0;margin:0}
+.mf-opt:has(input:checked){background:var(--orange-soft)}
+.mf-price{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.mf-price .flabel{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:8px}
+.mf-price .fin{height:42px}
+.mf-sec .ferr{margin-top:8px}
+.mf-foot{position:sticky;bottom:0;background:#fff;flex-shrink:0}
+.mf-foot .btn-ghost[disabled]{opacity:.5;cursor:not-allowed}
+@media (max-width:640px){.filters .rbtn.mf-btn{flex:1 1 auto}.mf-sec{padding:18px 18px}.mf-price{grid-template-columns:1fr}}
 /* Sale Details: the Quotation Details panel, as wide as Add Sale for the sale lines */
 .drawer.sd-drawer{max-width:min(1040px,96vw)}
 .state.s-draft i{background:#94A3B8}.state.s-sent i{background:#3B82F6}.state.s-dis i{background:#CBD5E1}.state.s-dis{color:var(--mute)}.state.s-req i{background:#F59E0B}
@@ -12989,19 +13019,25 @@ function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); 
 
 /* ---------- filters: chosen above the table, applied with Filter ---------- */
 var DEFAULT_RANGE='this_month';
-function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',pay:'',acc:'',branch:'',svc:'',range:DEFAULT_RANGE,from:d[0],to:d[1],ptype:'',status:'',min:'',max:''}; }
+function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',pay:'',acc:[],branch:[],svc:[],range:DEFAULT_RANGE,from:d[0],to:d[1],ptype:[],status:'',min:'',max:''}; }
+/* the filters in the More Filters panel */
+var ADV=['ptype','acc','branch','svc','min','max'];
+function advCount(f){ return f.ptype.length+f.acc.length+f.branch.length+f.svc.length+(f.min!==''?1:0)+(f.max!==''?1:0); }
+function svcOptions(){ var n=[]; try{ n=loadCatalog().services.map(function(x){ return x.name; }); }catch(x){}
+  (st?st.list.filter(inScope):[]).forEach(function(s){ (s.items||[]).forEach(function(x){ if(n.indexOf(x.name)<0) n.push(x.name); }); }); return n.sort(); }
 var state={f:null,applied:null,page:1,per:10,errs:{}};
 function copyF(f){ return JSON.parse(JSON.stringify(f)); }
 function anyFilter(f){ var b=blank(); return Object.keys(b).some(function(k){ return String(f[k])!==String(b[k]); }); }
+var has=function(list,v){ return list.indexOf(v)>=0; };
 function filtered(){
   var f=state.applied, q=f.q.trim().toLowerCase(), bad=Object.keys(state.errs).length, lo=bad||f.min===''?null:+f.min, hi=bad||f.max===''?null:+f.max;
   return st.list.filter(inScope).filter(function(s){
     if(f.status&&s.status!==f.status) return false;
     if(f.pay&&payStatus(s)!==f.pay) return false;
-    if(f.acc&&s.accountant!==f.acc&&s.accountant2!==f.acc) return false;
-    if(f.branch&&s.branch!==f.branch) return false;
-    if(f.svc&&!(s.items||[]).some(function(x){ return x.name===f.svc; })) return false;
-    if(f.ptype&&!(s.payments||[]).some(function(p){ return !p.void&&p.type===f.ptype; })) return false;
+    if(f.acc.length&&!has(f.acc,s.accountant)&&!has(f.acc,s.accountant2)) return false;
+    if(f.branch.length&&!has(f.branch,s.branch)) return false;
+    if(f.svc.length&&!(s.items||[]).some(function(x){ return has(f.svc,x.name); })) return false;
+    if(f.ptype.length&&!(s.payments||[]).some(function(p){ return !p.void&&has(f.ptype,p.type); })) return false;
     if(f.from||f.to){ var d=isoDay(s.date); if(f.from&&d<f.from||f.to&&d>f.to) return false; }
     if(lo!=null&&s.amount<lo||hi!=null&&s.amount>hi) return false;
     if(!q) return true; var c=client(s); return (s.id+' '+c.name+' '+(c.entity||'')).toLowerCase().indexOf(q)>=0;
@@ -13011,7 +13047,7 @@ function checkFilters(f){
   var e={}, lo=f.min===''?null:Number(f.min), hi=f.max===''?null:Number(f.max);
   if(lo!=null&&(isNaN(lo)||lo<0)) e.min='Enter an amount of $0 or more';
   if(hi!=null&&(isNaN(hi)||hi<0)) e.max='Enter an amount of $0 or more';
-  if(!e.min&&!e.max&&lo!=null&&hi!=null&&hi<lo) e.max='To Price can’t be less than From Price';
+  if(!e.min&&!e.max&&lo!=null&&hi!=null&&hi<lo) e.max='Maximum price can’t be less than the minimum price';
   return e;
 }
 
@@ -13024,25 +13060,18 @@ function render(){
     document.getElementById('sl-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
   }
   var f=state.f, e=state.errs, rows=filtered(), live=rows.filter(function(s){ return s.status!=='disabled'; }), page=rows.slice((state.page-1)*state.per,state.page*state.per);
-  var svcNames=[]; try{ svcNames=loadCatalog().services.map(function(x){ return x.name; }); }catch(x){}
-  rows.forEach(function(s){ (s.items||[]).forEach(function(x){ if(svcNames.indexOf(x.name)<0) svcNames.push(x.name); }); });
-  var pp=function(list){ return list.map(function(n){ return [n,n]; }); };
   var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0));
   var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
     '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div></dl>';
-  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
+  h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
     selF('f-pay','Payment Status',Object.keys(PAY).map(function(k){ return [k,PAY[k]]; }),f.pay)+
     selF('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
-    selF('f-ptype','Payment Type',pp(PAY_TYPES),f.ptype)+
-    selF('f-acc','All Accountants',pp(ASSIGNABLE.map(function(x){ return x.name; })),f.acc)+
-    selF('f-branch','All Branches',pp(BRANCHES),f.branch)+
-    selF('f-svc','All Services',pp(svcNames.sort()),f.svc)+
-    '<div class="sl-price"><label class="sr" for="f-min">From Price</label><input class="'+(e.min?'bad':'')+'" id="f-min" inputmode="decimal" placeholder="From Price" value="'+esc(f.min)+'" title="'+esc(e.min||'Lowest sale amount')+'"></div>'+
-    '<div class="sl-price"><label class="sr" for="f-max">To Price</label><input class="'+(e.max?'bad':'')+'" id="f-max" inputmode="decimal" placeholder="To Price" value="'+esc(f.max)+'" title="'+esc(e.max||'Highest sale amount')+'"></div>'+
-    '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>'+
-    (e.min||e.max?'<p class="sl-ferr" role="alert">'+I.warn+esc(e.min||e.max)+'</p>':'');
+    '<button type="button" class="rbtn mf-btn'+(advCount(f)?' set':'')+'" id="f-more" aria-haspopup="dialog">'+I.filter+'<span>More Filters</span>'+(advCount(f)?'<b class="mf-n">'+advCount(f)+'</b>':'')+'</button>'+
+    '</div></div>'+
+    chipsHtml(f);
+  if(state.loading){ content.innerHTML=h+'<div class="card"><div class="empty"><h3>Loading sales…</h3><p>Applying your filters.</p></div></div>'; wireHead(); wireFilters(); return; }
   h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th>Date</th><th>Sale ID</th><th>Client</th><th>Branch</th><th class="r">Sale</th><th class="r">Pending</th><th>Accountant</th><th>Additional Accountant</th><th>Added By</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!st.list.filter(inScope).length) h+='<tr><td colspan="10"><div class="empty"><h3>No sales yet</h3><p>Sales appear here once they’re added, or when a quotation is converted to a sale.</p><button class="btn-primary" id="sl-add2">'+I.plus+'Add Sale</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="sl-clear2">Clear Filter</button></div></td></tr>';
@@ -13071,13 +13100,62 @@ function wireHead(){
 function wireFilters(){
   var f=state.f, qi=document.getElementById('q');
   qi.oninput=function(){ f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-pay','pay'],['f-acc','acc'],['f-branch','branch'],['f-svc','svc'],['f-ptype','ptype'],['f-status','status']].forEach(function(p){ var el=document.getElementById(p[0]); if(el) el.onchange=function(){ f[p[1]]=this.value; state.page=1; render(); }; });
-  ['min','max'].forEach(function(k){ var el=document.getElementById('f-'+k); el.onchange=function(){ f[k]=el.value.trim(); applyFilters(); }; el.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); el.onchange(); } }; });
+  [['f-pay','pay'],['f-status','status']].forEach(function(p){ var el=document.getElementById(p[0]); if(el) el.onchange=function(){ f[p[1]]=this.value; state.page=1; render(); }; });
+  document.getElementById('f-more').onclick=openMoreFilters;
+  [].forEach.call(content.querySelectorAll('[data-chip]'),function(x){ x.onclick=function(){ var k=x.getAttribute('data-chip'), v=x.getAttribute('data-v');
+    if(k==='min'||k==='max') f[k]=''; else f[k]=f[k].filter(function(y){ return y!==v; }); state.errs={}; state.page=1; render(); var n=content.querySelector('[data-chip]')||document.getElementById('f-more'); if(n) n.focus(); }; });
   bindRange();
   var clear=function(){ state.f=blank(); state.applied=state.f; state.errs={}; state.page=1; render(); };
-  document.getElementById('clearf').onclick=clear; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
+  var cf=document.getElementById('clearf'); if(cf) cf.onclick=function(){ clear(); document.getElementById('f-more').focus(); }; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
   var a2=document.getElementById('sl-add2'); if(a2) a2.onclick=function(){ openSaleForm(); };
   [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
+}
+/* the advanced filters in use, one chip per value, each removable */
+function chipsHtml(f){
+  if(!anyFilter(f)) return '';
+  var lab={ptype:'Payment type',acc:'Accountant',branch:'Branch',svc:'Service'}, c=[];
+  ['ptype','acc','branch','svc'].forEach(function(k){ f[k].forEach(function(v){ c.push([k,v,lab[k]+': '+v]); }); });
+  if(f.min!=='') c.push(['min','','Min price: '+money(+f.min)]);
+  if(f.max!=='') c.push(['max','','Max price: '+money(+f.max)]);
+  return '<div class="mf-chips" aria-label="Active filters">'+c.map(function(x){ return '<span class="mf-chip">'+esc(x[2])+'<button type="button" data-chip="'+x[0]+'" data-v="'+esc(x[1])+'" aria-label="Remove '+esc(x[2])+'">'+I.close+'</button></span>'; }).join('')+
+    '<button type="button" class="clearf" id="clearf">'+I.close+'Clear filters</button></div>';
+}
+/* More Filters: a side panel working on a copy, applied only with Apply Filters */
+var MF=null;
+function openMoreFilters(){
+  var f=state.f; MF={ptype:f.ptype.slice(),acc:f.acc.slice(),branch:f.branch.slice(),svc:f.svc.slice(),min:f.min,max:f.max,errs:{}};
+  paintMoreFilters(); var x=document.getElementById('mf-x'); if(x) x.focus();
+}
+function paintMoreFilters(){
+  var d=MF, e=d.errs, n=advCount(d);
+  var opts=function(k,list,label){ return '<fieldset class="mf-field"><legend>'+label+(d[k].length?'<span class="mf-sel">'+d[k].length+' selected</span>':'')+'</legend><div class="mf-opts'+(list.length>6?' scroll':'')+'">'+
+    list.map(function(v){ return '<label class="mf-opt"><input type="checkbox" data-mf="'+k+'" value="'+esc(v)+'"'+(has(d[k],v)?' checked':'')+'><span>'+esc(v)+'</span></label>'; }).join('')+'</div></fieldset>'; };
+  var price=function(k,label,ph){ return '<div><label class="flabel" for="mf-'+k+'">'+label+'</label><div class="qf-price"><span class="qf-cur">$</span><input class="fin plain sm'+(e[k]?' bad':'')+'" id="mf-'+k+'" data-mfp="'+k+'" inputmode="decimal" placeholder="'+ph+'" value="'+esc(d[k])+'"></div></div>'; };
+  ov.innerHTML='<div class="drawer mf-panel" role="dialog" aria-modal="true" aria-labelledby="mf-t">'+
+    '<div class="modal-head"><h2 id="mf-t">More Filters</h2><button id="mf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body mf-body" id="mf-body">'+
+      '<section class="mf-sec"><h3>Payment Details</h3>'+opts('ptype',PAY_TYPES,'Payment Type')+'</section>'+
+      '<section class="mf-sec"><h3>Assignment &amp; Organization</h3>'+opts('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountant')+opts('branch',BRANCHES,'Branch')+'</section>'+
+      '<section class="mf-sec"><h3>Sale Details</h3>'+opts('svc',svcOptions(),'Service')+
+        '<div class="mf-price">'+price('min','Minimum Price','No minimum')+price('max','Maximum Price','No maximum')+'</div>'+
+        (e.min||e.max?'<p class="ferr show" role="alert">'+esc(e.min||e.max)+'</p>':'')+'</section>'+
+    '</div>'+
+    '<div class="modal-foot mf-foot"><button class="btn-ghost" id="mf-cancel">Cancel</button><button class="btn-ghost" id="mf-reset"'+(n?'':' disabled')+'>Reset</button><span class="sp-grow"></span><button class="btn-primary" id="mf-apply">Apply Filters</button></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  [].forEach.call(ov.querySelectorAll('[data-mf]'),function(x){ x.onchange=function(){ var k=x.getAttribute('data-mf'); d[k]=d[k].filter(function(v){ return v!==x.value; }); if(x.checked) d[k].push(x.value);
+    var y=document.getElementById('mf-body').scrollTop; paintMoreFilters(); document.getElementById('mf-body').scrollTop=y; var nx=ov.querySelector('[data-mf="'+k+'"][value="'+CSS.escape(x.value)+'"]'); if(nx) nx.focus(); }; });
+  [].forEach.call(ov.querySelectorAll('[data-mfp]'),function(x){ x.oninput=function(){ d[x.getAttribute('data-mfp')]=x.value.trim(); }; x.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); applyMoreFilters(); } }; });
+  document.getElementById('mf-x').onclick=closeOv; document.getElementById('mf-cancel').onclick=closeOv;
+  document.getElementById('mf-reset').onclick=function(){ ADV.forEach(function(k){ d[k]=k==='min'||k==='max'?'':[]; }); d.errs={}; paintMoreFilters(); document.getElementById('mf-apply').focus(); };
+  document.getElementById('mf-apply').onclick=applyMoreFilters;
+}
+function applyMoreFilters(){
+  var d=MF; d.errs=checkFilters(d);
+  if(Object.keys(d.errs).length){ paintMoreFilters(); var x=ov.querySelector('.mf-price .bad'); if(x){ x.focus(); x.scrollIntoView({block:'center'}); } return; }
+  var f=state.f; ADV.forEach(function(k){ f[k]=Array.isArray(d[k])?d[k].slice():String(d[k]).replace(/[$,\s]/g,''); });
+  MF=null; closeOv(); state.errs={}; state.page=1;
+  state.loading=true; render();                                         // the same moment the API call would take
+  setTimeout(function(){ state.loading=false; render(); var m=document.getElementById('f-more'); if(m) m.focus(); },250);
 }
 function applyFilters(){
   state.errs=checkFilters(state.f); state.page=1; render();
@@ -13225,8 +13303,6 @@ function paintSaleForm(focusId){
       '<button type="button" class="sf-rm" id="sf-docrm" title="Remove" aria-label="Remove '+esc(d.doc.name)+'">'+MI['delete']+'</button></div>'
     :'<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
       '<span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
-  var days=d.date&&d.due?Math.round((Date.parse(d.due)-Date.parse(d.date))/864e5):null;
-  var dueHint=days==null||days<0?'':'<small class="qf-hint">'+(days===0?'Same day as the invoice date':days+' day'+(days===1?'':'s')+' after the invoice date')+'</small>';
   var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
   ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -13238,11 +13314,11 @@ function paintSaleForm(focusId){
           field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
           field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
         '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
-          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>'+dueHint,'due','sf-due')+'</div></div>')+
+          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div></div>')+
       card('Services','',
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<span class="qf-gst" role="group" aria-label="GST"><button type="button" data-gst="1" class="'+(d.gst===false?'':'on')+'" aria-pressed="'+(d.gst!==false)+'">GST included</button><button type="button" data-gst="0" class="'+(d.gst===false?'on':'')+'" aria-pressed="'+(d.gst===false)+'">No GST</button></span>')+
+        '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<label class="qf-gstt"><span>Include GST</span><button type="button" class="toggle sm'+(d.gst===false?'':' on')+'" data-gstsw role="switch" aria-checked="'+(d.gst!==false)+'" aria-label="Include GST"></button></label>')+
       card('Document','',doc+err('doc'))+
       '<div class="qf-bottom">'+
         '<section class="qf-card qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
@@ -13320,7 +13396,7 @@ function wireSaleForm(focusId){
   /* discount: a dollar amount off the sub total, as on quotations */
   var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
   var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
-  [].forEach.call(ov.querySelectorAll('[data-gst]'),function(x){ x.onclick=function(){ var on=x.getAttribute('data-gst')==='1'; if(on===(d.gst!==false)) return; d.gst=on; touch(); repaint(); }; });
+  var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-dt]'),function(x){ x.onclick=function(){ var to=x.getAttribute('data-dt'); if(to===d.discType) return; d.discType=to; d.discount=''; delete SF.errs.discount; touch(); repaint('sf-disc'); }; });
   var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; delete SF.errs.discount; touch(); liveTotals(); };
   /* document: one file, picked or dropped */

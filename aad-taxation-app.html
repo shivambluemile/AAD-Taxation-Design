@@ -2755,6 +2755,30 @@ tbody tr:hover{background:#FCFCFD}
 .ob-tick.on{background:#DCFCE7;color:#15803D}
 .ob-tick.bad{background:#FFE4E6;color:#BE123C}
 .ky-rec{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}.ky-rec.cur{border-color:#E5E7EB}
+/* KYC as a document with versions (the Staff documents card) */
+.ds-item{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.ds-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px}
+.ds-ic{width:36px;height:36px;border-radius:9px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ds-ic svg{width:17px;height:17px}.ds-ic.bad{background:#FEF2F2;color:var(--red)}
+.ds-tt{flex:1;min-width:0}.ds-tt>b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.ds-sub{font-size:12.5px;color:var(--mute);margin-top:2px}.ds-sub em{font-style:normal;font-weight:600;color:var(--ink)}
+.ds-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ds-file{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 4px 0 6px;border:1px solid var(--line-soft);border-radius:8px;background:#FAFBFC;font-size:12px;color:var(--slate);max-width:100%}
+.ds-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.ds-file .x.e-pdf{background:#FDECEC;color:#C2410C}
+.ds-file b,.ds-fname{font-weight:600;color:var(--ink);font-size:inherit;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
+.sdt-ib{width:24px;height:24px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute)}.sdt-ib:hover{background:#F2F4F7;color:var(--ink)}.sdt-ib svg{width:13px;height:13px}
+.ds-by{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:12px;color:var(--faint)}.ds-by b{color:var(--slate);font-weight:600}
+.ds-more{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--orange-ink)}.ds-more:hover{text-decoration:underline}
+.ds-more svg{width:12px;height:12px;transition:transform .15s}.ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.ds-st{flex-shrink:0;padding-top:2px}
+.ds-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}.ds-acts .btn-sm{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.ds-prev{background:#FAFBFC;border-top:1px solid var(--line-soft);padding:4px 16px 6px 64px}
+.ds-pr{padding:10px 0}.ds-pr+.ds-pr{border-top:1px dashed var(--line)}
+.ds-prh{display:flex;align-items:center;gap:8px;font-size:13px}.ds-prh b{font-weight:700;color:var(--ink)}
+.ds-pr .ds-sub{margin-top:3px}.ds-pr .ds-files{margin-top:6px}
+.ds-tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#F1F2F4;color:var(--mute)}.ds-tag.bad{background:#FEF2F2;color:var(--red)}
+.ds-none{font-size:12.5px;margin-top:8px}
+@media (max-width:760px){.ds-row{flex-wrap:wrap}.ds-prev{padding-left:16px}}
 .ky-hist{display:flex;flex-direction:column;gap:10px}.ky-hist .ky-rec{background:#FAFBFC}
 .ky-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.ky-h b{display:block;font-size:14px;color:var(--ink)}.ky-h small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}
 .ky-note{font-size:13px;color:var(--slate);margin-top:8px}.ky-rec .kyc-list{margin-top:12px}
@@ -5500,18 +5524,39 @@ function revokeDialog(c,aid,done){
     logEvent(c,'service','Service revoked',a.name+' · '+n); closeModal(); toast(a.name+' revoked'); done();
   };
 }
+var kycOpen={};                                              // client id -> previous versions shown
+/* a check's files as chips: type, name (opens it), size, download */
+function kycChips(files,vi){
+  if(!files.length) return '<p class="cl-muted ds-none">No files in this check.</p>';
+  var view=canViewKyc();
+  return '<div class="ds-files">'+files.map(function(f,fi){ var e=String(f.name||'').split('.').pop().toLowerCase();
+    return '<span class="ds-file" title="'+esc(f.name)+'"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+
+      (view?'<button class="ds-fname" data-kpv="'+vi+'|'+fi+'" aria-label="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b>'+esc(f.name)+'</b>')+fsize(f.size)+
+      (view?'<button class="sdt-ib" data-kdl="'+vi+'|'+fi+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'')+'</span>'; }).join('')+'</div>';
+}
 function kycTab(c){
-  var recs=kycRecs(c), cur=recs[0];
-  var head=function(r,i){ var st=i===0?kycState(r):'replaced', exp=kycExpiresAt(r), gone=Date.now()>=exp;
-    return '<div class="ky-h"><div><b>KYC checked '+dmyOf(fromIso(r.date))+'</b><small>Uploaded '+whenOf(kycUploadedAt(r))+' by '+esc(r.by)+' · '+(gone?'Expired '+whenOf(exp):'Expires '+whenOf(exp))+(r.source?' · '+esc(r.source):'')+'</small></div>'+
-      pill({valid:['Valid','green'],expiring:['Expiring soon','amber'],expired:['Expired','red'],replaced:['Replaced','grey']},st==='replaced'&&gone?'expired':st)+'</div>'+
-      (r.note?'<p class="ky-note">“'+esc(r.note)+'”</p>':''); };
-  var h='<div class="vbar"><p>'+(cur?(kycState(cur)==='expired'?'<b>KYC expired '+whenOf(kycExpiresAt(cur))+'.</b> Record a new check to keep this client compliant.':'Each KYC check is valid for 365 days from upload. Expired checks are kept.'):'No KYC recorded yet.')+'</p>'+
-    (c._draft?'':'<button class="btn-edit" data-kyc-add>'+I.plus+'Record new KYC</button>')+'</div>';
-  if(cur) h+='<section class="vsec"><div class="vsec-h"><h3>Current KYC</h3></div><div class="ky-rec cur">'+head(cur,0)+kycRows(cur.files||[],{pfx:0,empty:'No files in this check.'})+'</div></section>';
-  if(recs.length>1) h+='<section class="vsec"><div class="vsec-h"><h3>KYC history</h3><span class="cl-muted">Kept for audit</span></div><div class="ky-hist">'+
-    recs.slice(1).map(function(r,i){ return '<div class="ky-rec">'+head(r,i+1)+kycRows(r.files||[],{pfx:i+1,empty:'No files in this check.'})+'</div>'; }).join('')+'</div></section>';
-  if(recs.length) h+='<section class="vsec"><div class="vsec-h"><h3>Audit trail</h3><span class="cl-muted">Uploads, renewals and expiry</span></div>'+kycTrail(c)+'</section>';
+  var recs=kycRecs(c), cur=recs[0], n=recs.length, now=Date.now();
+  if(!cur) return '<div class="vbar"><p>No KYC recorded yet. Each KYC check is valid for 365 days from upload.</p>'+(c._draft?'':'<button class="btn-edit" data-kyc-add>'+I.plus+'Record KYC</button>')+'</div>';
+  var st=kycState(cur), open=!!kycOpen[c.id], prev=n-1;
+  var h='<section class="vsec"><div class="ds-item">'+
+    '<div class="ds-row"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span>'+
+      '<div class="ds-tt"><b>KYC check</b><div class="ds-sub">Checked <em>'+dmyOf(fromIso(cur.date))+'</em> · '+(st==='expired'?'Expired':'Expiry')+': <em>'+whenOf(kycExpiresAt(cur))+'</em> · Version '+n+'</div>'+
+        kycChips(cur.files||[],0)+
+        (cur.note?'<p class="ky-note">“'+esc(cur.note)+'”</p>':'')+
+        '<div class="ds-by"><span>Uploaded by <b>'+esc(cur.by)+'</b> · '+whenOf(kycUploadedAt(cur))+(cur.source?' · '+esc(cur.source):'')+'</span>'+
+          (prev?'<button class="ds-more" data-kyv aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+'</div>'+
+      '</div>'+
+      '<div class="ds-st">'+pill(KYC_STATUS,st)+'</div>'+
+      (c._draft?'':'<div class="ds-acts"><button class="'+(st==='valid'?'btn-ghost':'btn-edit')+' btn-sm" data-kyc-add>'+I.plus+(st==='valid'?'Record new KYC':'Renew KYC')+'</button></div>')+
+    '</div>';
+  if(prev&&open){
+    h+='<div class="ds-prev">'+recs.slice(1).map(function(r,j){ var vi=j+1, exp=kycExpiresAt(r), gone=now>=exp, next=recs[j];   // recs[j] is the version that replaced it
+      var m=['Checked '+dmyOf(fromIso(r.date)),'Uploaded '+whenOf(kycUploadedAt(r))+' by '+esc(r.by),(gone?'Expired ':'Expiry ')+whenOf(exp),'Replaced '+whenOf(kycUploadedAt(next))];
+      return '<div class="ds-pr"><div class="ds-prh"><b>Version '+(n-vi)+'</b>'+(gone?'<span class="ds-tag bad">Expired</span>':'<span class="ds-tag">Replaced</span>')+'</div>'+
+        '<div class="ds-sub">'+m.join(' · ')+'</div>'+(r.note?'<p class="ky-note">“'+esc(r.note)+'”</p>':'')+kycChips(r.files||[],vi)+'</div>'; }).join('')+'</div>';
+  }
+  h+='</div></section>';
+  h+='<section class="vsec"><div class="vsec-h"><h3>Audit trail</h3><span class="cl-muted">Uploads, renewals and expiry · expired checks are kept</span></div>'+kycTrail(c)+'</section>';
   return h;
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
@@ -5625,6 +5670,7 @@ function wireClientTab(c,t,body,repaintTab){
   if(t==='documents'){
     var recs=kycRecs(c), fileOf=function(v){ var p=v.split('|'); var r=recs[+p[0]]; return r&&r.files[+p[1]]; };
     body.querySelectorAll('[data-kyc-add]').forEach(function(b){ b.onclick=function(){ kycDialog(c,repaintTab); }; });
+    body.querySelectorAll('[data-kyv]').forEach(function(b){ b.onclick=function(){ kycOpen[c.id]=!kycOpen[c.id]; repaintTab(); }; });
     body.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kpv); if(f) openKyc(f); }; });
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });
   }
@@ -5668,6 +5714,24 @@ window.addEventListener('storage',function(e){ if(e.key===SVC_KEY) refreshCatalo
 function annualUpkeep(){
   var now=Date.now(), today=isoOf(now), F=fyStart(now), changed=false, onbChanged=false, day=864e5;
   ONB=loadOnb();
+  /* sample (prototype only): James Nguyen shows an expired KYC with an earlier version, and last year's expired engagement letter */
+  var demo=findClient(3);
+  if(demo&&!demo.demoExpired){
+    demo.demoExpired=true; demo.kycRecords=demo.kycRecords||[];
+    var u1=now-760*day-3*36e5, u2=now-395*day+(2*36e5+17*6e4);
+    demo.kycRecords.push(
+      {id:'kd3a',date:isoOf(u1),files:[{name:'passport_james_nguyen.pdf',size:415000,at:u1,by:'Sarah Lee'}],by:'Sarah Lee',at:u1,expiresAt:u1+KYC_DAYS*day,note:'Passport sighted in person',source:'Sample'},
+      {id:'kd3b',date:isoOf(u2),files:[{name:'drivers_licence_front.jpg',size:980000,at:u2,by:'Priya Nair'},{name:'drivers_licence_back.jpg',size:870000,at:u2,by:'Priya Nair'},{name:'medicare_card.pdf',size:210000,at:u2,by:'Priya Nair'}],by:'Priya Nair',at:u2,expiresAt:u2+KYC_DAYS*day,note:'Licence and Medicare card checked',source:'Sample'});
+    if(!ONB.letters.some(function(l){ return l.clientId===3&&letterFy(l)===F-1; })){
+      var cAt=new Date(F-1,6,3,10,15).getTime(), sAt=cAt+2*day+5*36e5;
+      ONB.letters.push({id:'Ldemo3',clientId:3,client:snap(demo),token:newToken(),created:cAt,by:'Sarah Lee',fy:F-1,signer:{name:demo.name,email:demo.email,role:'client'},
+        services:[{name:'Individual Tax Return',price:250}],status:'signed',signature:{method:'type',text:demo.name,name:demo.name},signedAt:sAt,method:'client-link',logged:true,
+        sends:[{at:cAt,by:'Sarah Lee',channels:['Email'],ok:true,emailTo:demo.email}],
+        audit:[{t:cAt,action:'Sent for signature',by:'Sarah Lee',from:'pending',to:'sent',note:'Email'},{t:sAt,action:'Signed by client',by:demo.name,from:'sent',to:'signed',note:'Through the signing link'}]});
+      onbChanged=true;
+    }
+    changed=true;
+  }
   CLIENTS.forEach(function(c){
     c.history=c.history||[];
     /* KYC: files from before dated checks become one record; a couple of sample clients get a history to show */

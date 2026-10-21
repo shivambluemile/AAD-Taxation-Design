@@ -3704,7 +3704,7 @@ function renderList(){
     var chips=svc.slice(0,2).map(function(a){ return '<span class="cl-chip" title="'+esc(a.name)+' · '+money(a.price)+'">'+esc(a.name)+'</span>'; }).join('')+
       (svc.length>2?'<span class="cl-chip more" title="'+esc(svc.slice(2).map(function(a){ return a.name; }).join(', '))+'">+'+(svc.length-2)+'</span>':'');
     var kyc=r?(r.kyc.length?'<span class="ob-tick on" title="KYC documents uploaded by the client">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')
-      :kycDone(c)?'<span class="ob-tick on" title="KYC valid until '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">'+I.tick+'KYC</span>':kycCurrent(c)?'<span class="ob-tick bad" title="KYC expired '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">KYC expired</span>':'<span class="ob-tick" title="No KYC yet">KYC</span>';
+      :kycDone(c)?'<span class="ob-tick on" title="KYC valid until '+whenOf(kycExpiresAt(kycCurrent(c)))+'">'+I.tick+'KYC</span>':kycCurrent(c)?'<span class="ob-tick bad" title="KYC expired '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">KYC expired</span>':'<span class="ob-tick" title="No KYC yet">KYC</span>';
     var letter=(r?r.letter.status==='signed':letterSignedFor(c))?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>';
     var by=r?r.by:((c.history||[])[0]&&c.history[0].by)||'Admin';
     var copy=function(v,what){ return v?'<button class="copy" data-copy="'+esc(v)+'" title="Copy '+what+'" aria-label="Copy '+what+'">'+I.copy+'</button>':''; };
@@ -5128,8 +5128,8 @@ function finalizeClient(o){
     return putKyc(key,x.file,{owner:'client-'+rec.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.kyc.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); });   // rec.kyc is gathered into the first KYC record below
   Promise.all(saves).then(function(){ finish(); },function(){ toast('Some KYC files couldn’t be stored. Upload them again from the client’s record.',true); finish(); });
   function finish(){
-    if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,source:'Add Client'}]; rec.kyc=[];
-      rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+rec.kycRecords[0].files.length+' file'+(rec.kycRecords[0].files.length===1?'':'s'),by:ME}); }
+    if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,source:'Add Client'}]; rec.kyc=[];
+      rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+whenOf(kycExpiresAt(rec.kycRecords[0]))+' · '+rec.kycRecords[0].files.length+' file'+(rec.kycRecords[0].files.length===1?'':'s'),by:ME}); }
     var sg=signer, letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
       status:o.mode==='signed'?'signed':'sent',sends:o.send?[o.send]:[],expires:o.expires||null,audit:[]};
     audit(letter,'Generated',ME,'','pending','Financial year '+fyLabel(letter.fy)+' · expires '+dmyOf(fromIso(fyEnd(letter.fy))));
@@ -5428,11 +5428,11 @@ function completeRequest(r,kycDate,auto){
     active:true,created:now,login:false,lastReset:null,onboardingId:r.id};
   linkDirectorPeople(rec);
   rec.services=r.services.map(function(x){ return assignment(x,'Onboarding request',r.by,now); });
-  rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,source:'Client onboarding link'}]:[];
+  rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,expiresAt:now+KYC_DAYS*864e5,source:'Client onboarding link'}]:[];
   rec.notes=(r.notes||[]).concat([{t:now,by:BY,text:auto?'Created automatically when the client signed the engagement letter and submitted the onboarding form.':'Created from onboarding request '+r.id+'.'}]);
   rec.history=[{t:now,kind:'created',title:'Client created',detail:auto?'Signed and submitted through the onboarding link':'From onboarding request '+r.id,by:BY}];
   rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price)+' (requested by '+r.by+')',by:BY}); });
-  if(rec.kycRecords.length) rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+dmyOf(fromIso(kycExpiry(rec.kycRecords[0].date)))+' · '+r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' from the client',by:BY});
+  if(rec.kycRecords.length) rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+whenOf(kycExpiresAt(rec.kycRecords[0]))+' · '+r.kyc.length+' file'+(r.kyc.length===1?'':'s')+' from the client',by:BY});
   ONB=loadOnb(); var x=reqById(r.id);
   ONB.letters.push({id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:x.token,created:x.created,by:x.by,services:x.services.map(function(s){ return {name:s.name,price:s.price}; }),fy:fyStart(x.letter.signedAt||now),signer:{name:x.letter.signature.name,role:firstSigner(rec).role},status:'signed',signature:x.letter.signature,signedAt:x.letter.signedAt,method:'client',sends:[],audit:[{t:x.letter.signedAt,action:'Signed by client',by:x.letter.signature.name,from:'pending',to:'signed',note:'Through the onboarding link'}]});
   x.clientId=rec.id; var from=x.status; x.status='completed'; audit(x,auto?'Client created automatically':'Approved · client created',BY,from,'completed','Client #'+rec.id);
@@ -5497,16 +5497,28 @@ function revokeDialog(c,aid,done){
 }
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0];
-  var head=function(r,i){ var st=i===0?kycState(r):'replaced', exp=kycExpiry(r.date);
-    return '<div class="ky-h"><div><b>KYC checked '+dmyOf(fromIso(r.date))+'</b><small>'+(st==='expired'||st==='replaced'&&isoOf(Date.now())>exp?'Expired '+dmyOf(fromIso(exp)):'Valid until '+dmyOf(fromIso(exp)))+' · entered by '+esc(r.by)+(r.source?' · '+esc(r.source):'')+'</small></div>'+
-      pill({valid:['Valid','green'],expiring:['Expiring soon','amber'],expired:['Expired','red'],replaced:['Replaced','grey']},st==='replaced'&&isoOf(Date.now())>exp?'expired':st)+'</div>'+
+  var head=function(r,i){ var st=i===0?kycState(r):'replaced', exp=kycExpiresAt(r), gone=Date.now()>=exp;
+    return '<div class="ky-h"><div><b>KYC checked '+dmyOf(fromIso(r.date))+'</b><small>Uploaded '+whenOf(kycUploadedAt(r))+' by '+esc(r.by)+' · '+(gone?'Expired '+whenOf(exp):'Expires '+whenOf(exp))+(r.source?' · '+esc(r.source):'')+'</small></div>'+
+      pill({valid:['Valid','green'],expiring:['Expiring soon','amber'],expired:['Expired','red'],replaced:['Replaced','grey']},st==='replaced'&&gone?'expired':st)+'</div>'+
       (r.note?'<p class="ky-note">“'+esc(r.note)+'”</p>':''); };
-  var h='<div class="vbar"><p>'+(cur?(kycState(cur)==='expired'?'<b>KYC expired.</b> Record a new check to keep this client compliant.':'Each KYC check is valid for one year. A new check never replaces an earlier one.'):'No KYC recorded yet.')+'</p>'+
+  var h='<div class="vbar"><p>'+(cur?(kycState(cur)==='expired'?'<b>KYC expired '+whenOf(kycExpiresAt(cur))+'.</b> Record a new check to keep this client compliant.':'Each KYC check is valid for 365 days from upload. Expired checks are kept.'):'No KYC recorded yet.')+'</p>'+
     (c._draft?'':'<button class="btn-edit" data-kyc-add>'+I.plus+'Record new KYC</button>')+'</div>';
   if(cur) h+='<section class="vsec"><div class="vsec-h"><h3>Current KYC</h3></div><div class="ky-rec cur">'+head(cur,0)+kycRows(cur.files||[],{pfx:0,empty:'No files in this check.'})+'</div></section>';
   if(recs.length>1) h+='<section class="vsec"><div class="vsec-h"><h3>KYC history</h3><span class="cl-muted">Kept for audit</span></div><div class="ky-hist">'+
     recs.slice(1).map(function(r,i){ return '<div class="ky-rec">'+head(r,i+1)+kycRows(r.files||[],{pfx:i+1,empty:'No files in this check.'})+'</div>'; }).join('')+'</div></section>';
+  if(recs.length) h+='<section class="vsec"><div class="vsec-h"><h3>Audit trail</h3><span class="cl-muted">Uploads, renewals and expiry</span></div>'+kycTrail(c)+'</section>';
   return h;
+}
+/* every upload, renewal and expiry, newest first, from the records themselves */
+function kycTrail(c){
+  var ev=[], asc=(c.kycRecords||[]).slice().sort(function(a,b){ return kycUploadedAt(a)-kycUploadedAt(b); }), now=Date.now();
+  asc.forEach(function(r,i){ var n=(r.files||[]).length;
+    ev.push({t:kycUploadedAt(r),title:i?'KYC renewed':'KYC uploaded',note:n+' document'+(n===1?'':'s')+' · checked '+dmyOf(fromIso(r.date))+' · valid until '+whenOf(kycExpiresAt(r))+(r.note?' · “'+r.note+'”':''),by:r.by});
+    if(now>=kycExpiresAt(r)) ev.push({t:kycExpiresAt(r),title:'KYC expired',note:'Check uploaded '+whenOf(kycUploadedAt(r))+' reached 365 days · documents kept',by:'System'});
+  });
+  ev.sort(function(a,b){ return b.t-a.t; });
+  return '<div class="timeline">'+ev.map(function(e){ return '<div class="tlitem"><span class="dot">'+ACT.item+'</span><div class="tlttl">'+esc(e.title)+'</div>'+
+    '<div class="tlmeta">'+esc(e.note)+' · '+whenOf(e.t)+' · '+(e.by==='System'?'Automatic':'by <b>'+esc(e.by)+'</b>')+'</div></div>'; }).join('')+'</div>';
 }
 /* a new KYC check: the date staff verified it, the documents, an optional note */
 function kycDialog(c,done){
@@ -5526,10 +5538,10 @@ function kycDialog(c,done){
     var e=document.getElementById('kd-err'), d=dt.value;
     var m=!d?'Enter the KYC date':d>today?'The KYC date can’t be in the future':!files.length?'Add at least one document':'';
     if(m){ e.innerHTML=I.info+esc(m); e.hidden=false; return; }
-    var now=Date.now(), rec={id:'k'+now.toString(36),date:d,files:[],by:ME,at:now,note:document.getElementById('kd-note').value.trim(),source:'Recorded by staff'};
+    var now=Date.now(), rec={id:'k'+now.toString(36),date:d,files:[],by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:document.getElementById('kd-note').value.trim(),source:'Recorded by staff'};
     Promise.all(files.map(function(x,i){ var key='kyc-c'+c.id+'-'+now+'-'+i;
       return putKyc(key,x.file,{owner:'client-'+c.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.files.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); }))
-    .then(function(){ (c.kycRecords=c.kycRecords||[]).push(rec); logEvent(c,'document','KYC recorded','Checked '+dmyOf(fromIso(d))+' · valid until '+dmyOf(fromIso(kycExpiry(d)))+' · '+rec.files.length+' file'+(rec.files.length===1?'':'s'));
+    .then(function(){ (c.kycRecords=c.kycRecords||[]).push(rec); logEvent(c,'document',(c.kycRecords.length>1?'KYC renewed':'KYC recorded'),'Checked '+dmyOf(fromIso(d))+' · valid until '+whenOf(rec.expiresAt)+' · '+rec.files.length+' file'+(rec.files.length===1?'':'s'));
       closeModal(); toast('KYC saved'); done(); },function(){ toast('The documents couldn’t be stored. Try again.',true); });
   };
 }
@@ -5542,10 +5554,10 @@ function notesTabC(c){
 }
 function engagementTab(c){
   ONB=loadOnb(); var F=fyStart(Date.now()), L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
-  var fyBar='<div class="el-fybar"><b>Financial year '+fyLabel(F)+'</b><span>Letters expire on '+dmyOf(fromIso(fyEnd(F)))+'. Next year’s letter is generated and emailed on 01-07-'+(F+1)+'.</span></div>';
+  var fyBar='<div class="el-fybar"><b>Financial year '+fyLabel(F)+'</b><span>Letters expire at the end of 30-06-'+(F+1)+'. On 01-07-'+(F+1)+' a new letter is generated and emailed for signing. Earlier letters are kept.</span></div>';
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var prev=older.length?'<section class="vsec"><div class="vsec-h"><h3>Earlier letters</h3><span class="cl-muted">Kept for audit</span></div><div class="el-prev">'+older.map(function(l){
-    return '<div class="el-prow"><div><b>FY '+fyLabel(letterFy(l))+'</b><small>'+(l.status==='signed'?'Signed '+dmyOf(l.signedAt)+' by '+esc(l.signature.name):'Never signed')+' · expired '+dmyOf(fromIso(fyEnd(letterFy(l))))+'</small></div>'+pill(LETTER_STATUS,letterState(l))+
+    return '<div class="el-prow"><div><b>FY '+fyLabel(letterFy(l))+'</b><small>'+(l.status==='signed'?'Signed '+dmyOf(l.signedAt)+' by '+esc(l.signature.name):'Never signed')+' · expired '+whenOf(l.expiredAt||letterExpiresAt(l))+'</small></div>'+pill(LETTER_STATUS,letterState(l))+
       '<button class="linkbtn" data-elpdf="'+l.id+'">'+OI.print+'Open</button></div>'; }).join('')+'</div></section>':'';
   var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'; };
   if(c._draft) return fyBar+'<div class="vbar"><p>'+(act.length?'This is a preview of the engagement letter. Finish setup to sign or send it.':'No services assigned yet, so there’s nothing to put in the letter.')+'</p></div>'+
@@ -5663,25 +5675,42 @@ function annualUpkeep(){
       changed=true;
     }
     /* an expired KYC check is noted in the activity once */
-    c.kycRecords.forEach(function(k){ var exp=kycExpiry(k.date); if(today>exp&&!k.expiryLogged){ k.expiryLogged=true; c.history.push({t:fromIso(exp),kind:'document',title:'KYC expired',detail:'Check from '+dmyOf(fromIso(k.date))+' reached one year',by:'System'}); changed=true; } });
+    c.kycRecords.forEach(function(k){
+      if(!k.expiresAt){ k.expiresAt=kycExpiresAt(k); changed=true; }                       // fix each record's expiry moment once
+      if(now>=k.expiresAt&&!k.expiryLogged){ k.expiryLogged=true; k.expiredAt=k.expiresAt;
+        c.history.push({t:k.expiresAt,kind:'document',title:'KYC expired',detail:'Check uploaded '+whenOf(kycUploadedAt(k))+' · expired '+whenOf(k.expiresAt)+' (365 days) · documents kept',by:'System'}); changed=true; } });
     /* letters from finished financial years expire on 30 June and stay on file */
     var mine=ONB.letters.filter(function(l){ return l.clientId===c.id; });
-    mine.forEach(function(l){ if(letterFy(l)<F&&!l.expiryLogged){ l.expiryLogged=true; audit(l,'Expired','System',l.status,'expired','Financial year '+fyLabel(letterFy(l))+' ended '+dmyOf(fromIso(fyEnd(letterFy(l)))));
-      c.history.push({t:fromIso(fyEnd(letterFy(l))),kind:'letter',title:'Engagement letter expired',detail:'FY '+fyLabel(letterFy(l)),by:'System'}); changed=true; onbChanged=true; } });
+    mine.forEach(function(l){ if(letterFy(l)<F&&!l.expiryLogged){ l.expiryLogged=true; l.expiredAt=letterExpiresAt(l);
+      audit(l,'Expired','System',l.status,'expired','Financial year '+fyLabel(letterFy(l))+' ended '+whenOf(l.expiredAt)+' · letter kept on file');
+      c.history.push({t:l.expiredAt,kind:'letter',title:'Engagement letter expired',detail:'FY '+fyLabel(letterFy(l))+' · '+whenOf(l.expiredAt),by:'System'}); changed=true; onbChanged=true; } });
     /* 1 July: a new letter for the new financial year, emailed to the signing director (or the client) */
     var act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,letterFor(c.id));
     if(c.active&&mine.length&&act.length&&sg.email&&!mine.some(function(l){ return letterFy(l)===F; })){
-      var L={id:'L'+now.toString(36)+c.id,clientId:c.id,client:snap(c),token:newToken(),created:now,by:ME,fy:F,signer:{name:sg.name,email:sg.email,role:sg.role},
-        services:act.map(function(a){ return {name:a.name,price:a.price}; }),status:'sent',expires:now+LINK_DAYS*day,
-        sends:[{at:now,by:'System',channels:['Email'],ok:true,emailTo:sg.email,auto:true}],audit:[]};
-      audit(L,'Generated for the new financial year','System','','pending','FY '+fyLabel(F)+' · due 01-07-'+F+' · expires '+dmyOf(fromIso(fyEnd(F))));
-      audit(L,'Emailed automatically','System','pending','sent','To '+sg.name+' ('+sg.email+')');
-      ONB.letters.push(L); onbChanged=true;
-      c.history.push({t:now,kind:'letter',title:'New engagement letter emailed',detail:'FY '+fyLabel(F)+' · to '+sg.name+' ('+sg.role+')',by:'System'}); changed=true;
+      var L={id:'L'+now.toString(36)+c.id,clientId:c.id,client:snap(c),token:newToken(),created:now,by:'System',fy:F,signer:{name:sg.name,email:sg.email,role:sg.role},
+        services:act.map(function(a){ return {name:a.name,price:a.price}; }),status:'pending',expires:now+LINK_DAYS*day,sends:[],audit:[]};
+      audit(L,'Generated for the new financial year','System','','pending','FY '+fyLabel(F)+' · from 01-07-'+F+' · expires '+whenOf(letterExpiresAt(L)));
+      ONB.letters.push(L); onbChanged=true; mailNewYearLetter(c,L,sg);
+      c.history.push({t:now,kind:'letter',title:'New engagement letter generated',detail:'FY '+fyLabel(F)+' · emailing '+sg.name+' ('+sg.role+')',by:'System'}); changed=true;
     }
   });
   if(onbChanged) persistOnb();
   if(changed) saveClients();
+}
+/* 1 July: the new year's letter is emailed to the signer through the email service; the result is recorded either way */
+function mailNewYearLetter(c,L,sg){
+  var sub='Your engagement letter for '+fyLabel(L.fy)+' · AAD Taxation';
+  var body='Hi '+sg.name+',\n\nA new financial year has started. Please review and sign your engagement letter for '+fyLabel(L.fy)+' (1 July '+L.fy+' to 30 June '+(L.fy+1)+'):\n'+portalLink('sign',L.token)+
+    '\n\nThe link is valid until '+dmyOf(L.expires)+'.\n\nKind regards,\nAAD Taxation';
+  deliver({email:{to:sg.email,subject:sub,body:body}}).then(function(r){
+    ONB=loadOnb(); var x=ONB.letters.filter(function(l){ return l.id===L.id; })[0]; if(!x||x.status==='signed') return;
+    var send={at:Date.now(),by:'System',channels:['Email'],ok:!!r.ok,emailTo:sg.email,auto:true}; if(!r.ok) send.error=r.error; x.sends.push(send);
+    var from=x.status; x.status=r.ok?'sent':'failed';
+    audit(x,r.ok?'Emailed automatically':'Automatic email failed','System',from,x.status,r.ok?'To '+sg.name+' ('+sg.email+') · new financial year':r.error);
+    persistOnb(); var cc=findClient(c.id);
+    if(cc){ (cc.history=cc.history||[]).push({t:send.at,kind:'letter',title:r.ok?'New engagement letter emailed':'New engagement letter not delivered',detail:'FY '+fyLabel(x.fy)+' · '+(r.ok?'to '+sg.name+' ('+sg.email+')':r.error),by:'System'}); saveClients(); }
+    if(detailState.id===c.id&&detailState.tab==='engagement'&&document.getElementById('cdb')) openDetail(c.id,true,'engagement');
+  });
 }
 function seedOnboarding(){
   if(localStorage.getItem(ONB_KEY)) return;
@@ -19030,12 +19059,17 @@ function fyStart(t){ var d=new Date(t); return d.getMonth()>=6?d.getFullYear():d
 function fyLabel(y){ return y+'–'+String(y+1).slice(2); }
 function fyEnd(y){ return (y+1)+'-06-30'; }
 function letterFy(L){ return L.fy!=null?L.fy:fyStart(L.created); }
-function letterExpired(L){ return isoOf(Date.now())>fyEnd(letterFy(L)); }
+function letterExpiresAt(L){ var y=letterFy(L); return new Date(y+1,5,30,23,59,59,999).getTime(); }   // 30 June, 11:59 PM
+function letterExpired(L){ return Date.now()>letterExpiresAt(L); }
 function letterState(L){ return letterExpired(L)?'expired':L.status; }
-/* KYC is valid for one year from the date staff enter */
+/* KYC is valid for exactly 365 days from when its documents were uploaded: counted in days, not as a calendar year,
+   so a 29 February in between never adds a day. The exact expiry moment is stored on the record. */
 var KYC_STATUS = { valid:['Valid','green'], expiring:['Expiring soon','amber'], expired:['Expired','red'] };
-function kycExpiry(date){ var p=String(date).split('-'); return isoOf(new Date(+p[0]+1,+p[1]-1,+p[2]).getTime()); }
-function kycState(rec){ var today=isoOf(Date.now()), exp=kycExpiry(rec.date); if(today>exp) return 'expired'; return (fromIso(exp)-fromIso(today))/864e5<=30?'expiring':'valid'; }
+var KYC_DAYS=365;
+function kycUploadedAt(rec){ return rec.at||fromIso(rec.date); }
+function kycExpiresAt(rec){ return rec.expiresAt||(kycUploadedAt(rec)+KYC_DAYS*864e5); }
+function kycExpiry(x){ return isoOf(typeof x==='object'&&x?kycExpiresAt(x):fromIso(x)+KYC_DAYS*864e5); }   // a record, or (older callers) an upload date
+function kycState(rec){ var now=Date.now(), exp=kycExpiresAt(rec); if(now>=exp) return 'expired'; return (exp-now)/864e5<=30?'expiring':'valid'; }
 function pill(map,k){ var s=map[k]||[k,'grey']; return '<span class="ob-pill '+s[1]+'"><i></i>'+s[0]+'</span>'; }
 
 /* ---------- store ---------- */

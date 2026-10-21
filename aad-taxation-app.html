@@ -995,8 +995,8 @@ td[data-comp] .state{white-space:nowrap}
 .ds-vg{padding-top:10px}.ds-vg:first-child{padding-top:2px}
 .ds-vh{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}.ds-vh b{font-size:13px;color:var(--ink)}.ds-vh span{font-size:12px;color:var(--faint)}
 .ds-vrow{padding:9px 12px;border:1px solid var(--line-soft,#F1F2F4);border-radius:10px;background:#fff}
-.ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;color:var(--mute)}.ds-vi b{color:var(--ink);font-weight:600}
-.ds-vrow .ds-files{margin-top:8px}
+.ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px;font-size:12px;color:var(--faint)}
+.ds-vrow .ds-files{margin-top:0}
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1467,20 +1467,17 @@ function verTag(v,i){
 function docCard(d){
   /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
-  var sub=[];
-  if(d.no&&!gone) sub.push('No. <em>'+maskNo(d.no)+'</em>');
-  if(gone){ sub.push('<em>No active document</em>'); sub.push('Last version expired '+fmtD(d.cur.exp)); }
-  else { sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>'); sub.push('Version '+d.ver); }
+  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
   var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
       '<span class="ds-ic">'+I.file+'</span>'+
-      '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
-        (gone?'':fileChips(d,t,0,d.cur.files))+
-        '<div class="ds-by">'+(gone?'':'<span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
-          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'<span>No previous versions</span>')+
+      '<div class="ds-tt"><b>'+t.name+'</b>'+
+        (gone?'<div class="ds-sub">No active document</div>':fileChips(d,t,0,d.cur.files))+
+        '<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+'</span>')+
+          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'')+
         '</div>'+
       '</div>'+
-      '<div class="ds-st">'+stDot(st,stLabel(d))+'</div>'+
+      '<div class="ds-st"'+(exp?' title="'+(gone?'Expired ':'Expires ')+exp+'"':'')+'>'+stDot(st,stLabel(d))+'</div>'+
       '<div class="ds-acts">'+
         '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+(st==='expired'||st==='soon'?'Renew':'Replace')+'</button>'+
         '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete document" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+
@@ -1489,11 +1486,10 @@ function docCard(d){
   if(prev&&open){
     h+='<div class="ds-prev">'+hist.map(function(v,j){
       var vi=j+first, m=[];   // one block per version: its details, then its files
-      m.push('<span>Uploaded <b>'+fmtD(v.on)+' · '+fmtT(v.on)+'</b> by '+esc(v.by)+'</span>');
-      if(t.exp) m.push('<span>'+(v.exp&&daysTo(v.exp)<0?'Expired ':'Expiry ')+(v.exp?fmtD(v.exp):'--')+'</span>');
-      if(v.no&&v.no!==d.no) m.push('<span>No. '+maskNo(v.no)+'</span>');
-      return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b><span>'+v.files.length+' file'+(v.files.length===1?'':'s')+'</span></div>'+
-        '<div class="ds-vrow"><div class="ds-vi">'+m.join('')+'</div>'+fileChips(d,t,vi,v.files)+'</div></div>';
+      m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+'</span>');
+      if(t.exp&&v.exp) m.push('<span>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
+      return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b></div>'+
+        '<div class="ds-vrow">'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div></div>';
     }).join('')+'</div>';   // the 5-versions rule is in the red note above
   }
   return h+'</div>';
@@ -2855,8 +2851,9 @@ tbody tr:hover{background:#FCFCFD}
 /* Engagement letter: info banner, one card (header, document, status and next step, previous letters) */
 .el-main{display:flex;flex-direction:column;gap:12px}
 .el-dt .ds-files{margin-top:6px}
-.ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:4px}
-.ky-lines{flex-direction:column;gap:2px}
+.ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:0}
+.ky-lines{flex-direction:column;gap:2px;flex-basis:100%;margin-top:6px;font-size:12px;color:var(--faint)}
+.ky-sm{font-size:12px;color:var(--faint)}.el-dt .ds-files+.ky-sm{margin-top:4px}
 .wz-kycn{margin-top:14px}
 .el-bn{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
 .el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
@@ -5699,17 +5696,17 @@ function kycTab(c){
   var status='<div class="el-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
     (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
   var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
-      '<span class="el-to">Uploaded by '+esc(cur.by)+' on '+whenOf(kycUploadedAt(cur)).replace(' · ',' at ')+'</span>'+
-      (cur.note?'<span class="el-to">Note: '+esc(cur.note)+'</span>':'')+
-      kycChips(cur.files||[],0)+'</div></div>':'';
+      kycChips(cur.files||[],0)+
+      '<span class="ky-sm">Uploaded by '+esc(cur.by)+' · '+dmyOf(kycUploadedAt(cur))+'</span>'+
+      (cur.note?'<span class="ky-sm">Note: '+esc(cur.note)+'</span>':'')+'</div></div>':'';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown
   var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
-      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow"><div class="el-hi ky-lines">'+
-        '<span>Uploaded on '+whenOf(kycUploadedAt(r)).replace(' · ',' at ')+' by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' on '+dmyOf(ex)+'</span>'+
-        (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div>'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');   // one detail per line
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'<div class="el-hi ky-lines">'+
+        '<span>Uploaded by '+esc(r.by)+' · '+dmyOf(kycUploadedAt(r))+'</span><span>'+(gone?'Expired':'Expires')+' '+dmyOf(ex)+'</span>'+
+        (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div></div></div>'; }).join('')+'</div>':'');   // files first, then the details in small text
   var card='<article class="el-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
     doc+status+hist+'</article>';

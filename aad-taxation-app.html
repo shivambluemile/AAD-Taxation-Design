@@ -12941,6 +12941,8 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 @media (max-width:600px){.ss-chs{grid-template-columns:1fr}.ss-tpl{max-width:55%}}
 .ss .selbox select{background:#fff;border:1px solid var(--line)}
 .ss .selbox select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+
+.sl-table thead th.sl-wrap{white-space:normal;width:110px;line-height:1.3}
 </style>
 <style id="aad-unify">
 /* ---------- one type system for every module ---------- */
@@ -13588,18 +13590,18 @@ function render(){
     '</div></div>'+
     chipsHtml(f);
   if(state.loading){ content.innerHTML=h+'<div class="card"><div class="empty"><h3>Loading sales…</h3><p>Applying your filters.</p></div></div>'; wireHead(); wireFilters(); return; }
-  h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th>Date</th><th>Sale ID</th><th>Client</th><th>Branch</th><th class="r">Sale</th><th class="r">Pending</th><th>Accountant</th><th>Additional Accountant</th><th>Added By</th><th class="c">Actions</th></tr></thead><tbody>';
+  h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th>Sale ID</th><th>Client</th><th>Date</th><th class="r">Sale</th><th class="r">Pending</th><th>Branch</th><th>Accountant</th><th class="sl-wrap">Additional Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!st.list.filter(inScope).length) h+='<tr><td colspan="10"><div class="empty"><h3>No sales yet</h3><p>Sales appear here once they’re added, or when a quotation is converted to a sale.</p><button class="btn-primary" id="sl-add2">'+I.plus+'Add Sale</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="sl-clear2">Clear Filter</button></div></td></tr>';
   page.forEach(function(s){
     var c=client(s), ps=payStatus(s), pend=pendingOf(s), dis=s.status==='disabled';
     h+='<tr class="'+(dis?'sl-dis':ps==='overdue'?'sl-over':'')+'">'+
-      '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
       '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
       '<td><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</td>'+
-      '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
+      '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
       '<td class="num r">'+money(s.amount)+'</td>'+
       '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'"'+(ps==='overdue'?' title="Due '+dmyOf(s.due)+'"':'')+'><i></i>'+PAY[ps]+'</span></small>')+'</td>'+
+      '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant)+'">'+esc(s.accountant||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant2)+'">'+(s.accountant2?esc(s.accountant2):'<span class="ar-dash">—</span>')+'</span></td>'+
       '<td><div class="qt-meta">'+whenOf(s.at||s.date).replace(' · ',', ')+'<span class="qt-clip" title="'+esc(s.by)+'">by '+esc(s.by)+'</span></div></td>'+
@@ -14216,7 +14218,7 @@ function paintDetail(keep){
         (cr&&cr.phone?dc(SD_IC.phone,esc(cr.phone)+copy(cr.phone)):'')+'</div>'+
       '<div class="dmetaline">'+dc(SD_IC.cal,dmyOf(s.date)+' <small>due</small> '+dmyOf(s.due),'Invoice date and due date')+dc(SD_IC.branch,esc(s.branch||''),'Branch')+
         dc(SD_IC.staff,esc(s.accountant||'')+(s.accountant2?' <small>with</small> '+esc(s.accountant2):''),'Staff and additional accountant')+
-        dc(SD_IC.clock,'Added by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+'</div></div>'+
+        dc(SD_IC.clock,'Created by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+'</div></div>'+
     '<div class="dhead-acts">'+detailActions(s).map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
       '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
@@ -14334,8 +14336,8 @@ function printPage(title,inner,extraCss){
 function printInvoice(s){ return printPage('Invoice '+s.id+' · '+FIRM.name,invoiceHtml(s)); }
 
 /* ---------- exports: the sales matching the applied filters ---------- */
-function exportRows(){ return filtered().map(function(s){ var c=client(s); return [dmyOf(s.date),s.id,c.name,s.branch||'',s.amount.toFixed(2),paidOf(s).toFixed(2),pendingOf(s).toFixed(2),s.status==='disabled'?'':PAY[payStatus(s)],STATUS[s.status][0],s.accountant||'',s.accountant2||'',s.by||'',dmyOf(s.due)]; }); }
-var EXPORT_HEAD=['Date','Sale ID','Client','Branch','Sale','Paid','Pending','Payment Status','Status','Accountant','Additional Accountant','Added By','Due Date'];
+function exportRows(){ return filtered().map(function(s){ var c=client(s); return [s.id,c.name,dmyOf(s.date),s.amount.toFixed(2),paidOf(s).toFixed(2),pendingOf(s).toFixed(2),s.status==='disabled'?'':PAY[payStatus(s)],STATUS[s.status][0],s.branch||'',s.accountant||'',s.accountant2||'',s.by||'',dmyOf(s.due)]; }); }
+var EXPORT_HEAD=['Sale ID','Client','Date','Sale','Paid','Pending','Payment Status','Status','Branch','Accountant','Additional Accountant','Created By','Due Date'];
 function exportCsv(){
   var rows=exportRows(); if(!rows.length) return toast('There are no sales to export with these filters.',true);
   var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
@@ -14351,8 +14353,8 @@ function exportPdf(){
   var f=state.applied, live=list.filter(function(s){ return s.status!=='disabled'; });
   var tbl='<div class="ex"><h1>Sales</h1><p>'+escH(f.range==='custom'||f.from||f.to?fmtRange(f.from,f.to):'All dates')+' · '+list.length+' sale'+(list.length===1?'':'s')+' · exported '+whenOf(Date.now())+' by '+escH(ME.name)+'</p>'+
     '<dl><div><dt>Sales Amount</dt><dd>'+money(live.reduce(function(a,s){ return a+s.amount; },0))+'</dd></div><div><dt>Payment Received</dt><dd>'+money(list.reduce(function(a,s){ return a+receivedOf(s); },0))+'</dd></div></dl>'+
-    '<table><thead><tr>'+['Date','Sale ID','Client','Branch','Sale','Pending','Accountant','Additional Accountant','Added By'].map(function(x){ return '<th>'+x+'</th>'; }).join('')+'</tr></thead><tbody>'+
-    list.map(function(s){ return '<tr><td>'+dmyOf(s.date)+'</td><td>'+escH(s.id)+'</td><td>'+escH(client(s).name)+'</td><td>'+escH(s.branch||'')+'</td><td class="r">'+money(s.amount)+'</td><td class="r">'+(s.status==='disabled'?'Disabled':money(pendingOf(s)))+'</td><td>'+escH(s.accountant||'')+'</td><td>'+escH(s.accountant2||'—')+'</td><td>'+escH(s.by||'')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+    '<table><thead><tr>'+['Sale ID','Client','Date','Sale','Pending','Branch','Accountant','Additional Accountant','Created By'].map(function(x){ return '<th>'+x+'</th>'; }).join('')+'</tr></thead><tbody>'+
+    list.map(function(s){ return '<tr><td>'+escH(s.id)+'</td><td>'+escH(client(s).name)+'</td><td>'+dmyOf(s.date)+'</td><td class="r">'+money(s.amount)+'</td><td class="r">'+(s.status==='disabled'?'Disabled':money(pendingOf(s)))+'</td><td>'+escH(s.branch||'')+'</td><td>'+escH(s.accountant||'')+'</td><td>'+escH(s.accountant2||'—')+'</td><td>'+escH(s.by||'')+'</td></tr>'; }).join('')+'</tbody></table></div>';
   var css='.ex{background:#fff;max-width:1100px;margin:0 auto;padding:28px 32px;font-size:12px;color:#111}.ex h1{font-family:Manrope;font-size:22px;margin:0 0 4px}.ex p{color:#555;margin:0 0 14px}'+
     '.ex dl{display:flex;gap:28px;margin:0 0 16px}.ex dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#666}.ex dd{margin:2px 0 0;font-family:Manrope;font-size:17px;font-weight:800}'+
     '.ex table{width:100%;border-collapse:collapse}.ex th{background:#3A3F44;color:#fff;text-align:left;padding:7px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}.ex td{padding:7px 8px;border-bottom:1px solid #E5E7EB}.ex .r{text-align:right}'+

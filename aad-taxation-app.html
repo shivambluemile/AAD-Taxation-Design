@@ -10700,8 +10700,8 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:150px}
-.qt-person{display:flex;align-items:center;gap:10px;min-width:0}.qt-pn{min-width:0}
-.cl-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex-shrink:0}
+.qt-person{display:flex;align-items:center;gap:11px;min-width:0}.qt-pn{min-width:0}.qt-person .qt-clip.qt-cname{max-width:92px}
+.cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
@@ -13125,8 +13125,8 @@ table,td,th{font-size:13.5px}
 .qt-menu button.danger,.qt-menu button.danger svg{color:#BE123C}.qt-menu button.danger:hover,.qt-menu button.danger:focus-visible{background:#FEF2F2}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:150px}
-.qt-person{display:flex;align-items:center;gap:10px;min-width:0}.qt-pn{min-width:0}
-.cl-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;flex-shrink:0}
+.qt-person{display:flex;align-items:center;gap:11px;min-width:0}.qt-pn{min-width:0}.qt-person .qt-clip.qt-cname{max-width:92px}
+.cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}
 .qs-fail{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 13px;background:#FEF0F0;color:#9F1239;font-size:13px;line-height:1.5}.qs-fail svg{flex-shrink:0;margin-top:2px}
@@ -13305,7 +13305,7 @@ table,td,th{font-size:13.5px}
 .qf-tot .sl-pendrow{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px;font-weight:600}.qf-tot .sl-pendrow dt{color:var(--ink)}
 @media (max-width:900px){.sl-sf .qf-row{grid-template-columns:1fr 1fr}.sl-sf .sl-fee{justify-content:flex-start}}
 /* Sales uses the shared list styles (filter bar, stats, table, ⋮ menu); only what's specific to sales is here */
-.sl-stats{grid-template-columns:repeat(2,minmax(0,240px))}
+.sl-stats{grid-template-columns:repeat(3,minmax(0,240px))}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
@@ -13532,6 +13532,22 @@ var SaleStore={
   save:function(v){ try{ localStorage.setItem(INV_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 function log(s,type,o){ o=o||{}; var e={type:type,by:o.by||ME.name,t:o.t||Date.now(),note:o.note||'',ok:o.ok!==false}; if(o.to) e.to=o.to; (s.history=s.history||[]).push(e); }
+/* ---------- client credit: one ledger per browser (aad-client-credit-v1); a client's balance is the sum of its entries.
+   Credit used on a sale is a "Client Credit" payment on that sale plus a minus entry here. ---------- */
+var CR_KEY='aad-client-credit-v1';
+function loadCredit(){ var v=null; try{ v=JSON.parse(localStorage.getItem(CR_KEY)||'null'); }catch(e){ v=null; }
+  if(!v||!Array.isArray(v.list)) v={list:[]};
+  if(!v.seeded){                                                       // DEVELOPMENT DATA (temporary): credit for two sample clients. Remove when the API is connected.
+    var cl=loadClients().filter(function(c){ return c.active!==false; });
+    if(cl.length){ [[0,150],[1,80]].forEach(function(p){ if(cl[p[0]]) v.list.push({clientId:cl[p[0]].id,amount:p[1],at:Date.now()-20*DAY,by:'Admin',note:'Overpayment on an earlier invoice',dev:true}); });
+      v.seeded=true; saveCredit(v); } }
+  return v; }
+function saveCredit(v){ try{ localStorage.setItem(CR_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function creditOf(cid){ return cid==null?0:Math.max(0,r2(loadCredit().list.filter(function(x){ return String(x.clientId)===String(cid); }).reduce(function(a,x){ return a+x.amount; },0))); }
+/* take credit off the client's balance; false when there isn't enough or it can't be saved */
+function spendCredit(cid,amt,saleId){ var v=loadCredit(); if(r2(amt)>creditOf(cid)) return false;
+  v.list.push({clientId:cid,amount:-r2(amt),at:Date.now(),by:ME.name,saleId:saleId,note:'Applied to '+saleId}); return saveCredit(v); }
+function unspendCredit(saleId){ var v=loadCredit(); for(var i=v.list.length-1;i>=0;i--) if(v.list[i].saleId===saleId&&v.list[i].amount<0){ v.list.splice(i,1); break; } saveCredit(v); }
 function quotes(){ try{ var v=JSON.parse(localStorage.getItem('aad-quotations-v1')||'null'); return v&&Array.isArray(v.list)?v:null; }catch(e){ return null; } }
 /* sales converted from a quotation carry only the basics; the rest is filled in from the quotation once */
 function normalise(s){
@@ -13632,9 +13648,10 @@ function render(){
     document.getElementById('sl-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
   }
   var f=state.f, e=state.errs, rows=filtered(), live=rows.filter(function(s){ return s.status!=='disabled'; }), page=rows.slice((state.page-1)*state.per,state.page*state.per);
-  var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0));
+  var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0)), owed=r2(live.reduce(function(a,s){ return a+pendingOf(s); },0));
   var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
-    '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div></dl>';
+    '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div>'+
+    '<div class="stat" title="Still owed on the sales below, after payments and client credit"><dt>Pending Amount</dt><dd>'+money(owed)+'</dd></div></dl>';
   h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
@@ -13653,7 +13670,7 @@ function render(){
       '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
       '<td><div class="qt-person">'+clAv(c)+'<span class="qt-pn"><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</span></div></td>'+
       '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
-      '<td class="num r">'+money(s.amount)+'</td>'+
+      '<td class="num r">'+money(s.amount)+(dis?'':'<small class="ar-sub">Paid '+money(paidOf(s))+'</small>')+'</td>'+
       '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'"'+(ps==='overdue'?' title="Due '+dmyOf(s.due)+'"':'')+'><i></i>'+PAY[ps]+'</span></small>')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant)+'">'+esc(s.accountant||'—')+'</span></td>'+
@@ -13843,7 +13860,8 @@ function saleTotals(d,paid){
   var sub=r2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
   var v=d.showDisc?num(d.discount):0; if(!(v>0)) v=0;
   var disc=d.discType==='%'?sub*Math.min(v,100)/100:v; disc=Math.min(disc,sub);
-  var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:d.gst===false?0:r2(total/11),total:total,pending:Math.max(0,r2(total-(paid||0)))};
+  var cr=d.useCredit?num(d.credit):0; if(!(cr>0)) cr=0;
+  var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:d.gst===false?0:r2(total/11),total:total,credit:r2(cr),pending:Math.max(0,r2(total-(paid||0)-cr))};
 }
 function formClient(){ return SF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(SF.d.clientId); })[0]:null; }
 function openSaleForm(id){
@@ -13858,6 +13876,7 @@ function openSaleForm(id){
       showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||'',gst:s.gstMode!=='none'
     }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
       items:[blankLine()],gst:true,showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
+  SF.d.useCredit=false; SF.d.credit='';
   paintSaleForm();
 }
 function clientMatches(q){
@@ -13934,6 +13953,11 @@ function paintSaleForm(focusId){
             '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+          (function(){ var bal=c?creditOf(c.id):0; if(!bal&&!d.useCredit) return '';
+            return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" aria-label="Client credit to apply, up to '+money(bal)+'"></span>'+
+              '<button type="button" class="sl-drm" id="sf-crrm" title="Don’t apply credit" aria-label="Don’t apply credit">'+I.close+'</button></span>':'')+'</dt>'+
+              '<dd>'+(d.useCredit?'−'+money(T.credit):'<button type="button" class="linkbtn" id="sf-cradd">'+I.plus+'Apply '+money(bal)+' credit</button>')+'</dd></div>'+
+              (e.credit?'<p class="ferr show sl-derr sl-crerr">'+esc(e.credit)+'</p>':''); })()+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
@@ -13944,7 +13968,8 @@ function paintSaleForm(focusId){
 function liveTotals(){
   var d=SF.d, T=saleTotals(d,SF.paid);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total),money(T.pending)];
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total)];
+  if(ov.querySelector('.sl-crrow')) vals.push(d.useCredit?'−'+money(T.credit):null); vals.push(money(T.pending));
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
 }
 function wireSaleForm(focusId){
@@ -13963,8 +13988,12 @@ function wireSaleForm(focusId){
       if(ev.key==='Enter'&&i>=0){ ev.preventDefault(); choose(it[i].getAttribute('data-cid')); } };
     list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
   }
-  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; SF.pick=''; delete SF.errs.client; delete SF.errs.onName; touch(); repaint('sf-on'); }
-  var chg=document.getElementById('sf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; touch(); repaint('sf-q'); };
+  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.useCredit=false; d.credit=''; delete SF.errs.credit; SF.pick=''; delete SF.errs.client; delete SF.errs.onName; touch(); repaint('sf-on'); }
+  var chg=document.getElementById('sf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint('sf-q'); };
+  var ca=document.getElementById('sf-cradd'); if(ca) ca.onclick=function(){ var c=formClient(), T=saleTotals(d,SF.paid), owed=Math.max(0,r2(T.total-SF.paid));
+    d.useCredit=true; d.credit=Math.min(creditOf(c&&c.id),owed||creditOf(c&&c.id)).toFixed(2); touch(); repaint('sf-cr'); };
+  var crm=document.getElementById('sf-crrm'); if(crm) crm.onclick=function(){ d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint(); };
+  var ci=document.getElementById('sf-cr'); if(ci) ci.oninput=function(){ d.credit=ci.value; if(SF.errs.credit){ delete SF.errs.credit; var g=ci.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-crerr'); if(er) er.remove(); } touch(); liveTotals(); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
     var v=x.svcId?svcById(x.svcId):null; if(v&&x.cat&&(v.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }
     touch(); repaint('sf-s'+i); }; });
@@ -14039,6 +14068,10 @@ function checkSale(){
     else if(!isP&&dv>T.sub) e.discount='The discount can’t be more than the sub total'; }
   if(filled.length&&T.total<=0&&!e.discount) e.total='The total must be more than $0.00';
   if(SF.paid>0&&T.total<SF.paid) e.total='The total can’t be less than the '+money(SF.paid)+' already paid';
+  if(d.useCredit&&!e.total){ var cv=num(d.credit), bal=creditOf(d.clientId), owed=Math.max(0,r2(T.total-SF.paid));
+    if(d.credit===''||!isFinite(cv)||cv<=0) e.credit='Enter the credit to apply, or remove it';
+    else if(r2(cv)>bal) e.credit='The client has only '+money(bal)+' credit';
+    else if(r2(cv)>owed) e.credit='That’s more than the '+money(owed)+' owed on this sale'; }
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
   return e;
 }
@@ -14067,8 +14100,14 @@ function submitSale(){
       if(s.editRequest&&s.editRequest.status==='approved'&&s.editRequest.by===ME.name) s.editRequest.status='used';   // an approved request covers one edit
       log(s,'edited',{note:was===money(T.total)?money(T.total):was+' → '+money(T.total)});
     }
-    if(!save()) return fail('Couldn’t save the sale. Nothing was changed.');
-    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); toast(isNew?'Sale '+id+' added':'Sale '+id+' updated');
+    var cr=T.credit;
+    if(cr>0){
+      if(!spendCredit(c.id,cr,s.id)){ reload(); return fail('The client’s credit changed meanwhile. Check the amount and try again.'); }
+      s.payments.push({id:'P'+Date.now().toString(36),amount:cr,type:'Client Credit',at:Date.now(),by:ME.name,ref:''});
+      log(s,'payment',{note:money(cr)+' · Client Credit'+(pendingOf(s)<=0?' · paid in full':' · '+money(pendingOf(s))+' still owed')});
+    }
+    if(!save()){ if(cr>0) unspendCredit(s.id); reload(); return fail('Couldn’t save the sale. Nothing was changed.'); }
+    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); toast((isNew?'Sale '+id+' added':'Sale '+id+' updated')+(cr>0?' · '+money(cr)+' credit applied':''));
   },function(){ fail('The document couldn’t be stored. Try again, or remove it.'); });
 }
 /* documents are kept in this browser's private storage (IndexedDB) next to the sale */
@@ -14103,7 +14142,7 @@ function addPayment(s){
   modal('<div class="confirm-body"><h3 id="m-t">Add payment · '+esc(s.id)+'</h3><p><strong>'+esc(client(s).name)+'</strong> owes <strong>'+money(pend)+'</strong> of '+money(s.amount)+'.</p>'+
     '<div class="sl-form"><div><label class="flabel" for="p-amt">Amount <span class="req-star">*</span></label><input class="fin plain" id="p-amt" inputmode="decimal" value="'+pend.toFixed(2)+'"><span class="ferr" id="p-amt-e"></span></div>'+
       '<div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div>'+
-      '<div><label class="flabel" for="p-type">Payment type <span class="req-star">*</span></label><div class="sel"><select id="p-type">'+PAY_TYPES.map(function(t){ return '<option>'+t+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="flabel" for="p-type">Payment type <span class="req-star">*</span></label><div class="sel"><select id="p-type">'+PAY_TYPES.map(function(t){ var b=t==='Client Credit'?creditOf(s.clientId):null; return '<option value="'+t+'"'+(b===0?' disabled':'')+'>'+t+(b!=null?' ('+money(b)+' available)':'')+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Record payment</button></div>');
   document.getElementById('m-no').onclick=closeDlg;
@@ -14117,8 +14156,10 @@ function addPayment(s){
     if(r2(amt)>owed) return fieldErr('p-amt-e','That’s more than the '+money(owed)+' still owed');
     if(!d||d>today) return fieldErr('p-date-e','Choose a date that isn’t in the future');
     if(d<isoDay(x.date)) return fieldErr('p-date-e','The payment can’t be before the sale date');
+    if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit');
     paying=true; go.disabled=true;
     try{
+      if(type==='Client Credit'&&!spendCredit(x.clientId,amt,x.id)){ closeDlg(); return toast('The client’s credit couldn’t be used. Nothing was changed.',true); }
       var t=d===today?Date.now():new Date(d+'T12:00:00').getTime();
       x.payments.push({id:'P'+Date.now().toString(36),amount:r2(amt),type:type,at:t,by:ME.name,ref:ref});
       log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});

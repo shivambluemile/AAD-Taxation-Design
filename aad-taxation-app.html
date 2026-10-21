@@ -1462,7 +1462,7 @@ function docCard(d){
       '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
         fileChips(d,t,0,d.cur.files)+
-        '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+'</span>'+
+        '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>'+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
         '</div>'+
       '</div>'+
@@ -1477,7 +1477,7 @@ function docCard(d){
       var vi=j+1, m=[];
       if(v.no) m.push('No. '+maskNo(v.no));
       if(t.exp) m.push('Expiry '+(v.exp?fmtD(v.exp):'--'));
-      m.push('Uploaded '+fmtD(v.on)+' by '+esc(v.by));
+      m.push('Uploaded '+fmtD(v.on)+', '+fmtT(v.on)+' by '+esc(v.by));
       if(v.rOn) m.push('Replaced '+fmtD(v.rOn));
       return '<div class="ds-pr"><div class="ds-prh"><b>Version '+v.ver+'</b>'+verTag(v,vi)+'</div>'+
         '<div class="ds-sub">'+m.join(' · ')+'</div>'+

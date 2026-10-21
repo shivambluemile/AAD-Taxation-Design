@@ -2861,6 +2861,7 @@ tbody tr:hover{background:#FCFCFD}
 .el-dt .ds-files{margin-top:6px}
 .ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:4px}
 .ky-lines{flex-direction:column;gap:2px}
+.wz-kycn{margin-top:14px}
 .el-bn{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
 .el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
 .el-none{margin:0;font-size:13px;color:var(--mute)}
@@ -3652,7 +3653,7 @@ function wizDraftToClient(w){
     services:chosen(w.services||[]).map(function(x){ return assignment(x,'Add Client (draft)',w.by||ME,now); }),
     notes:(w.note&&w.note.trim())?[{t:now,by:w.by||ME,text:w.note.trim()}]:[],kyc:[],kycRecords:[],history:[],created:w.created||now};
   var files=(w.files||[]).map(function(f){ return {key:f.key,name:f.name,type:f.type,size:f.size,at:f.at||now,by:f.by||w.by||ME}; });
-  if(files.length) c.kycRecords=[{id:'k'+String(w.id),date:w.kycDate||isoOf(now),files:files,by:w.by||ME,at:now,source:'Add Client (draft)'}];
+  if(files.length) c.kycRecords=[{id:'k'+String(w.id),date:w.kycDate||isoOf(now),files:files,by:w.by||ME,at:now,note:String(w.kycNote||'').trim(),source:'Add Client (draft)'}];
   return c;
 }
 function openWizDraftDetail(id){
@@ -4989,11 +4990,11 @@ var wiz=null;
 var WZ=[['Client details'],['Services & KYC'],['Engagement letter']];
 function openWizard(draftId){
   startForm(null); form.fromDetail=false;
-  wiz={step:1,services:[],files:[],note:'',kycDate:isoOf(Date.now()),reviewed:false,svcErr:{},signerIdx:null,method:null,channels:{email:true,sms:false},sigDate:isoOf(Date.now()),preview:false,errs:{},busy:false};
+  wiz={step:1,services:[],files:[],note:'',kycNote:'',kycDate:isoOf(Date.now()),reviewed:false,svcErr:{},signerIdx:null,method:null,channels:{email:true,sms:false},sigDate:isoOf(Date.now()),preview:false,errs:{},busy:false};
   var dr=draftId?loadWzDrafts().filter(function(x){ return x.id===draftId; })[0]:null;
   if(dr){
     form.d=JSON.parse(JSON.stringify(dr.d));
-    ['step','services','note','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
+    ['step','services','note','kycNote','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
     wiz.files=(dr.files||[]).slice(); wiz.draftId=dr.id; wiz.token=dr.token;
   }
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
@@ -5058,7 +5059,7 @@ function storeDraft(){
     var key='kyc-'+id+'-'+now+'-'+i; return putKyc(key,x.file,{owner:'draft-'+id,name:x.name,type:x.type,size:x.size,at:x.at||now,by:x.by||ME}).then(function(){ x.key=key; }); });
   return Promise.all(puts).then(function(){
     var list=loadWzDrafts(), old=list.filter(function(x){ return x.id===id; })[0];
-    var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,kycDate:wiz.kycDate,
+    var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,kycNote:wiz.kycNote||'',kycDate:wiz.kycDate,
       files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,sig:wiz.sig||null,sigAt:wiz.sigAt||null,token:wiz.token||null};
     list=list.filter(function(x){ return x.id!==id; }); list.unshift(rec);
     form.dirty=false;
@@ -5084,8 +5085,10 @@ function paintKyc(){
   sec.innerHTML='<h3 class="wz-h">KYC</h3>'+
     '<div class="grid2 wz-kycd"><div><label class="flabel" for="wz-kycdate">Verified on'+(wiz.files.length?' <span class="req">*</span>':'')+'</label><input class="fin sm'+(wiz.kycErr?' bad':'')+'" type="date" id="wz-kycdate" value="'+esc(wiz.kycDate)+'" max="'+today+'">'+
       (wiz.kycErr?'<span class="cl-err">'+I.info+esc(wiz.kycErr)+'</span>':'')+'</div><div></div></div>'+
-    '<span class="flabel">Documents</span>'+dropZone('wz-kyc')+(wiz.files.length?kycRows(wiz.files,{remove:true}):'');
+    '<span class="flabel">Documents</span>'+dropZone('wz-kyc')+(wiz.files.length?kycRows(wiz.files,{remove:true}):'')+
+    '<div class="wz-kycn"><label class="flabel" for="wz-kycnote">KYC note</label><textarea class="ftext" id="wz-kycnote" rows="2" maxlength="500" placeholder="e.g. Passport and driver licence sighted">'+esc(wiz.kycNote||'')+'</textarea></div>';   // shown on the KYC check, like Record new KYC
   var kd=document.getElementById('wz-kycdate'); kd.oninput=function(){ wiz.kycDate=kd.value; wiz.kycErr=''; form.dirty=true; };
+  var kn=document.getElementById('wz-kycnote'); kn.oninput=function(){ wiz.kycNote=kn.value; form.dirty=true; };
   wireDrop('wz-kyc',function(list){ acceptFiles(list).forEach(function(f){ wiz.files.push({file:f,name:f.name,type:f.type,size:f.size,at:Date.now(),by:ME}); }); form.dirty=true; paintKyc(); });
   sec.querySelectorAll('[data-krm]').forEach(function(b){ b.onclick=function(){ wiz.files.splice(+b.dataset.krm,1); form.dirty=true; paintKyc(); }; });
   sec.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ openKyc(wiz.files[+b.dataset.kpv]); }; });
@@ -5224,7 +5227,7 @@ function finalizeClient(o){
     return putKyc(key,x.file,{owner:'client-'+rec.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.kyc.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); });   // rec.kyc is gathered into the first KYC record below
   Promise.all(saves).then(function(){ finish(); },function(){ toast('Some KYC files couldn’t be stored. Upload them again from the client’s record.',true); finish(); });
   function finish(){
-    if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,source:'Add Client'}]; rec.kyc=[];
+    if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:String(wiz.kycNote||'').trim(),source:'Add Client'}]; rec.kyc=[];
       rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+whenOf(kycExpiresAt(rec.kycRecords[0]))+' · '+rec.kycRecords[0].files.length+' file'+(rec.kycRecords[0].files.length===1?'':'s'),by:ME}); }
     var sg=signer, letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
       status:o.mode==='signed'?'signed':'sent',sends:o.send?[o.send]:[],expires:o.expires||null,audit:[]};

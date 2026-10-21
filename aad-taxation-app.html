@@ -2737,6 +2737,7 @@ tbody tr:hover{background:#FCFCFD}
 .dir-head .dnum{width:26px;height:26px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .dir-head b{font-size:14px;font-weight:600}
 .dir-acts{margin-left:auto;display:flex;align-items:center;gap:14px}
+.dir-rm{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute);border:1px solid var(--line);background:#fff;flex-shrink:0}.dir-rm:hover,.dir-rm:focus-visible{color:var(--red);border-color:#FECACA;background:#FEF2F2;outline:none}
 .dir-body{padding:16px}
 .copychk{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink)}
 .copychk input,.el-review input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1.5px solid #CBD5E1;border-radius:5px;background:#fff;display:inline-grid;place-content:center;cursor:pointer;flex-shrink:0;margin:0}
@@ -4176,7 +4177,7 @@ function renderForm(){
         h+='<div class="dir dir-linked" data-dir="'+i+'"><div class="dir-head"><span class="dnum">'+(i+1)+'</span>'+
            '<div class="dir-who"><b>'+esc(x.name)+'</b><small>'+[x.email,x.phone].filter(Boolean).map(esc).join(' · ')+'</small></div>'+
            '<span class="dir-acts">'+(saved&&x.login?'<button class="linkbtn" data-reset="'+i+'">'+I.key+'Reset password</button>':'')+
-             '<button class="linkbtn danger" data-remove="'+i+'"'+(n<=1?' disabled title="A company needs at least one director"':'')+'>'+I.trash+'Remove</button></span></div>'+
+             '<button type="button" class="dir-rm" data-remove="'+i+'" title="Remove director" aria-label="Remove '+esc(x.name||'director '+(i+1))+'">'+I.trash+'</button></span></div>'+
            (saved?'<div class="dir-body dir-lb">'+loginState(x)+'</div>':'')+'</div>';
         return;
       }
@@ -4184,7 +4185,7 @@ function renderForm(){
          '<b>'+(x.id==null?'New individual':'Director '+(i+1))+'</b>'+
          '<span class="dir-acts">'+
            (saved&&x.login?'<button class="linkbtn" data-reset="'+i+'">'+I.key+'Reset password</button>':'')+
-           '<button class="linkbtn danger" data-remove="'+i+'"'+(n<=1?' disabled title="A company needs at least one director"':'')+'>'+I.trash+'Remove</button>'+
+           '<button type="button" class="dir-rm" data-remove="'+i+'" title="Remove director" aria-label="Remove '+esc(x.name||'director '+(i+1))+'">'+I.trash+'</button>'+
          '</span></div><div class="dir-body">'+
            field('dir.'+i+'.name','Full name',x.name,{req:true,ph:'e.g. Michael Harrington',max:80,auto:'off'})+
            '<div class="grid2">'+

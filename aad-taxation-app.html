@@ -2875,7 +2875,7 @@ tbody tr:hover{background:#FCFCFD}
 .el-menu[hidden]{display:none}
 .el-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--ink);white-space:nowrap}.el-menu button:hover,.el-menu button:focus-visible{background:var(--orange-soft);color:var(--orange-ink);outline:none}
 .el-hrw{width:100%;display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line-soft);background:none;text-align:left;border-radius:0 0 12px 12px}
-.el-hrw:hover:not([disabled]){background:#FAFBFC}.el-hrw[aria-expanded="true"]{border-radius:0}
+.el-hrw.open{border-radius:0}
 .el-hic{display:flex;color:var(--mute)}.el-hrw b{font-size:13.5px;color:var(--ink)}
 .el-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700}
 .el-chev{margin-left:auto;display:flex;color:var(--mute)}.el-chev svg{width:14px;height:14px;transition:transform .15s}.el-hrw[aria-expanded="true"] .el-chev svg{transform:rotate(180deg)}
@@ -5611,9 +5611,9 @@ function kycTab(c){
       '<span class="el-mt">'+(cur.files||[]).length+' document'+((cur.files||[]).length===1?'':'s')+' <i>·</i> '+(st==='expired'?'Expired ':'Expires ')+whenOf(exp)+(cur.note?' <i>·</i> “'+esc(cur.note)+'”':'')+'</span>'+
       kycChips(cur.files||[],0)+'</div></div>':'';
   /* previous checks, newest first, collapsed */
-  var older=recs.slice(1), open=!!kycOpen[c.id]&&older.length>0;
-  var hist='<button type="button" class="el-hrw" data-kyv aria-expanded="'+open+'"'+(older.length?'':' disabled')+'><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
-      (older.length?'<span class="el-chev">'+I.chev+'</span>':'<span class="el-hnone">None yet</span>')+'</button>'+
+  var older=recs.slice(1), open=older.length>0;                  // always shown
+  var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
       return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+'</b><span>verified '+dmyOf(fromIso(r.date))+'</span></div><div class="el-hrow ky-hrow"><div class="el-hi">'+
         '<span>Uploaded <b>'+whenOf(kycUploadedAt(r))+'</b> by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' '+whenOf(ex)+'</span><span>Replaced '+whenOf(kycUploadedAt(next))+'</span>'+
@@ -5713,9 +5713,9 @@ function engagementTab(c){
   /* previous letters: newest year first, collapsed */
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var years=[]; older.forEach(function(l){ var y=letterFy(l); if(years.indexOf(y)<0) years.push(y); });
-  var open=!!elOpen[c.id]&&older.length>0;
-  var hist='<button type="button" class="el-hrw" data-elh aria-expanded="'+open+'"'+(older.length?'':' disabled')+'><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
-      (older.length?'<span class="el-chev">'+I.chev+'</span>':'<span class="el-hnone">None yet</span>')+'</button>'+
+  var open=older.length>0;                                        // always shown
+  var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+years.map(function(y){
       return '<div class="el-yg"><div class="el-yh"><b>FY '+fyLabel(y)+'</b><span>01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+older.filter(function(l){ return letterFy(l)===y; }).map(function(l){
         var exp=l.expiredAt||letterExpiresAt(l), s=elState(l);

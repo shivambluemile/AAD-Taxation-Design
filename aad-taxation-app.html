@@ -1565,7 +1565,7 @@ function openUpd(k){
 function paintUpd(){
   var docs=storeOf(detailStaff.id).docs, k=updMode.k, t=k?typeOf(k):null, d=k?findDoc(k):null, st=d?stOf(d):null;
   document.getElementById('upd-title').innerHTML = d
-    ? (st==='expired'?'Renew ':'Replace ')+t.name+'<p>Upload the new version'+(t.exp?' and set its expiry date':'')+'.</p>'
+    ? (st==='expired'?'Renew ':'Replace ')+t.name
     : 'Upload document<p>Add a new document to '+esc(detailStaff.n)+'’s profile.</p>';
   var h='';
   if(!updMode.fixed){
@@ -1588,7 +1588,7 @@ function paintUpd(){
     '</div>';
   }
   if(t){
-    h+='<div class="up-sec"><span class="up-lbl">'+(d?'New file':'File')+(t.slots.length>1?'s':'')+' <span class="req">*</span></span>'+
+    h+='<div class="up-sec">'+(d?'':'<span class="up-lbl">File'+(t.slots.length>1?'s':'')+' <span class="req">*</span></span>')+
       '<div class="up-drops'+(t.slots.length>1?' two':'')+'">'+t.slots.map(function(sl){
         var p=pend[sl.id], cap=t.slots.length>1?'<span class="up-side">'+sl.label+'</span>':'';
         if(p) return '<div>'+cap+'<div class="up-picked">'+extTag(p.n)+
@@ -1598,10 +1598,10 @@ function paintUpd(){
           '<input type="file" data-pick="'+sl.id+'" accept=".png,.jpg,.jpeg,.pdf" hidden>'+
           '<span class="up-ic">'+I.upcl+'</span>'+
           '<span class="up-t"><b>Click to upload</b> or drag and drop</span>'+
-          '<span class="up-s">PDF, JPG or PNG · up to 10 MB</span></label></div>';
+          '<span class="up-s">PDF, JPG or PNG</span></label></div>';
       }).join('')+'</div><div class="sd-ferr" id="err-files">Add '+(t.slots.length>1?'a file for each side':'a file')+' to continue</div></div>';
     if(t.exp){
-      h+='<div class="up-sec"><label class="up-lbl" for="upd-exp">'+(d?'New expiry date':'Expiry date')+' <span class="req">*</span></label>'+
+      h+='<div class="up-sec"><label class="up-lbl" for="upd-exp">Expiry date <span class="req">*</span></label>'+
         '<div class="up-exprow"><input type="date" id="upd-exp" class="up-in" min="'+isoD(dayOff(1))+'" value="'+esc(updExp)+'">'+
         '<div class="up-prev" id="upd-prev"></div></div>'+
         '<div class="sd-ferr" id="err-exp"></div></div>';
@@ -1615,7 +1615,7 @@ function paintUpd(){
 function paintPrev(){
   var el=document.getElementById('upd-prev'); if(!el||!updMode.k) return;
   var exp=fromISO(updExp);
-  if(!exp){ el.innerHTML='<span class="up-prev-e">Use the date printed on the new document.</span>'; return; }
+  if(!exp){ el.innerHTML=''; return; }
   var st=stAt(updMode.k,exp);
   el.innerHTML='<span class="up-prev-l">New status</span>'+badge(st)+'<span class="up-prev-e">'+(st==='expired'?'date has passed':'expires '+rel(daysTo(exp)))+'</span>';
 }

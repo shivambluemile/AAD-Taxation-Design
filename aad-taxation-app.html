@@ -10241,6 +10241,32 @@ table,td,th{font-size:13.5px}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drawer.sf.qf{max-width:min(1040px,96vw)}
+/* Add / Edit form as cards (Add Quotation design), shared by Add Sale */
+.drawer.qf2 .modal-head{align-items:flex-start;padding:22px 32px 18px}
+.qf2 .qf-sub{font-size:13px;color:var(--mute);margin-top:4px}
+.qf2 .modal-body{background:#F7F8FA;gap:16px;padding:24px 32px}
+.qf2 .qf-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-width:0}
+.qf2 .qf-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.qf2 .qf-ch h3,.qf2 .qf-sum h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}
+.qf2 .qf-ch p{font-size:12.5px;color:var(--mute);margin:3px 0 0}
+.qf2 .qf-pill{font-size:11.5px;font-weight:700;color:var(--orange-ink);background:var(--orange-soft);border-radius:999px;padding:4px 11px;white-space:nowrap}
+.qf2 .flabel{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.qf2 .stack{display:flex;flex-direction:column;gap:16px}
+.qf2 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.qf2 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.qf2 .qf-items{border:0;padding:0}
+.qf2 .qf-tbl{border:0;border-radius:0;overflow:visible;background:none}
+.qf2 .qf-thead{background:none;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:#475569;padding:0 0 10px;border-bottom:1px solid var(--line)}
+.qf2 .qf-row{padding:12px 0;border-bottom:1px solid #F1F2F4}.qf2 .qf-row:hover{background:none}
+.qf2 button.qf-add{margin-top:14px;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border:1.5px dashed #F2B98A;border-radius:10px;background:#fff;color:var(--orange-ink);font-size:13px;font-weight:700}
+.qf2 button.qf-add:hover:not([disabled]){background:var(--orange-soft)}.qf2 button.qf-add[disabled]{opacity:.5;cursor:not-allowed}
+.qf2 .qf-bottom{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.qf2 .qf-notes{display:flex;flex-direction:column;gap:16px}
+.qf2 .qf-sum .qf-tot{margin:12px 0 0;background:none;border:0;padding:0}
+.qf2 .qf-sum .qf-tot .t{align-items:center;margin-top:8px;padding-top:12px}
+.qf2 .qf-sum .qf-tot .t dd{font-size:22px;color:var(--orange-ink)}
+.qf2 .modal-foot{justify-content:flex-end}
+@media (max-width:900px){.qf2 .g2,.qf2 .g3,.qf2 .qf-bottom{grid-template-columns:1fr}.qf2 .modal-body{padding:18px}}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
 .qf-ih{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .qf-ih h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}.qf-ih span{font-size:12.5px;color:var(--faint)}
@@ -10743,29 +10769,33 @@ function paintForm(focusId){
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
-  ov.innerHTML='<div class="drawer sf qf" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
-    '<div class="modal-head"><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation')+'</h2><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
+  var days=d.date&&d.due?Math.round((Date.parse(d.due)-Date.parse(d.date))/864e5):null;
+  var dueHint=days==null||days<0?'':'<small class="qf-hint">'+(days===0?'Same day as the quotation date':days+' day'+(days===1?'':'s')+' after the quotation date')+'</small>';
+  var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
+  var staff=ASSIGNABLE.map(function(s){ return s.name; });
+  ov.innerHTML='<div class="drawer sf qf qf2" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
+    '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2><p class="qf-sub">'+(QF.isNew?'Fill in the client and services to prepare a quote.':'Change the details, then save or send it again.')+'</p></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
-      '<div class="qf-grid">'+
-        field('Select Client',true,clientField,'client')+
-        field('Select Branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
-        field('Select Accountant',true,sel('qf-acc','accountant',ASSIGNABLE.map(function(s){ return s.name; }),d.accountant,'Select'),'accountant')+
-        field('Additional Accountant',false,sel('qf-acc2','accountant2',ASSIGNABLE.map(function(s){ return s.name; }).filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+
-        field('Quotation Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
-        field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+
-        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
-        field('To the name of',true,c?sel('qf-to','toName',names,d.toName,'Addressed to'):noClient,'toName')+
-      '</div>'+
-      '<section class="qf-items"><div class="qf-ih"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Quantity</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
+      card('Client','Who is this quotation for?','<div class="stack">'+field('Select client',true,clientField,'client')+
+        '<div class="g2">'+field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
+          field('To the name of',true,c?sel('qf-to','toName',names,d.toName,'Addressed to'):noClient,'toName')+'</div></div>')+
+      card('Assignment and dates','Branch, responsible accountants and when the quote is due.','<div class="stack"><div class="g3">'+
+          field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
+          field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
+          field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+
+        '<div class="g3">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
+          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>'+dueHint,'due')+'</div></div>')+
+      card('Services','Add the items you are quoting for.',
+        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="pill-btn quiet qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
-      '<div class="qf-foot">'+
-        '<div class="qf-notes"><div><label class="flabel" for="qf-cn">Customer Notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="2" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Will be displayed on the quote</small></div>'+
-          '<div><label class="flabel" for="qf-tc">Terms &amp; Conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="3" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></div>'+
-        '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
+        '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<span class="qf-pill">Rates include GST</span>')+
+      '<div class="qf-bottom">'+
+        '<section class="qf-card qf-notes"><div><label class="flabel" for="qf-cn">Customer notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the quote.</small></div>'+
+          '<div><label class="flabel" for="qf-tc">Terms and conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></section>'+
+        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (included)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as Draft</button><button class="btn-primary" id="qf-send">Save &amp; Send</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Save &amp; Send</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
 }
@@ -12563,6 +12593,32 @@ table,td,th{font-size:13.5px}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drawer.sf.qf{max-width:min(1040px,96vw)}
+/* Add / Edit form as cards (Add Quotation design), shared by Add Sale */
+.drawer.qf2 .modal-head{align-items:flex-start;padding:22px 32px 18px}
+.qf2 .qf-sub{font-size:13px;color:var(--mute);margin-top:4px}
+.qf2 .modal-body{background:#F7F8FA;gap:16px;padding:24px 32px}
+.qf2 .qf-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-width:0}
+.qf2 .qf-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.qf2 .qf-ch h3,.qf2 .qf-sum h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}
+.qf2 .qf-ch p{font-size:12.5px;color:var(--mute);margin:3px 0 0}
+.qf2 .qf-pill{font-size:11.5px;font-weight:700;color:var(--orange-ink);background:var(--orange-soft);border-radius:999px;padding:4px 11px;white-space:nowrap}
+.qf2 .flabel{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:7px}
+.qf2 .stack{display:flex;flex-direction:column;gap:16px}
+.qf2 .g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.qf2 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.qf2 .qf-items{border:0;padding:0}
+.qf2 .qf-tbl{border:0;border-radius:0;overflow:visible;background:none}
+.qf2 .qf-thead{background:none;text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:600;color:#475569;padding:0 0 10px;border-bottom:1px solid var(--line)}
+.qf2 .qf-row{padding:12px 0;border-bottom:1px solid #F1F2F4}.qf2 .qf-row:hover{background:none}
+.qf2 button.qf-add{margin-top:14px;display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 16px;border:1.5px dashed #F2B98A;border-radius:10px;background:#fff;color:var(--orange-ink);font-size:13px;font-weight:700}
+.qf2 button.qf-add:hover:not([disabled]){background:var(--orange-soft)}.qf2 button.qf-add[disabled]{opacity:.5;cursor:not-allowed}
+.qf2 .qf-bottom{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+.qf2 .qf-notes{display:flex;flex-direction:column;gap:16px}
+.qf2 .qf-sum .qf-tot{margin:12px 0 0;background:none;border:0;padding:0}
+.qf2 .qf-sum .qf-tot .t{align-items:center;margin-top:8px;padding-top:12px}
+.qf2 .qf-sum .qf-tot .t dd{font-size:22px;color:var(--orange-ink)}
+.qf2 .modal-foot{justify-content:flex-end}
+@media (max-width:900px){.qf2 .g2,.qf2 .g3,.qf2 .qf-bottom{grid-template-columns:1fr}.qf2 .modal-body{padding:18px}}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
 .qf-ih{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .qf-ih h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}.qf-ih span{font-size:12.5px;color:var(--faint)}
@@ -13137,35 +13193,38 @@ function paintSaleForm(focusId){
       '<button type="button" class="sf-rm" id="sf-docrm" title="Remove" aria-label="Remove '+esc(d.doc.name)+'">'+MI['delete']+'</button></div>'
     :'<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
       '<span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
-  ov.innerHTML='<div class="drawer sf qf sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
-    '<div class="modal-head"><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
+  var days=d.date&&d.due?Math.round((Date.parse(d.due)-Date.parse(d.date))/864e5):null;
+  var dueHint=days==null||days<0?'':'<small class="qf-hint">'+(days===0?'Same day as the invoice date':days+' day'+(days===1?'':'s')+' after the invoice date')+'</small>';
+  var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
+  ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
+    '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2><p class="qf-sub">'+(SF.isNew?'Fill in the client and services to raise the invoice.':'Change the details, then save the sale.')+'</p></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="sf-body">'+
-      '<div class="qf-grid">'+
-        field('Select Client',true,clientField,'client')+
-        field('On the Name Of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+
-        field('Select Branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
-        field('Select Staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
-        field('Additional Accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+
-        '<div class="sl-dates">'+field('Invoice Date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
-          field('Due Date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div>'+
-      '</div>'+
-      '<section class="qf-items"><div class="qf-ih"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item Details</span><span>Description</span><span class="r">Fee</span><span class="r">Quantity</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
+      card('Client','Who is this sale for?','<div class="stack">'+field('Select client',true,clientField,'client')+
+        '<div class="g2">'+field('On the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div></div>')+
+      card('Assignment and dates','Branch, responsible staff and when the invoice is due.','<div class="stack"><div class="g3">'+
+          field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
+          field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
+          field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
+        '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
+          field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>'+dueHint,'due','sf-due')+'</div></div>')+
+      card('Services','Add the items you are invoicing for.',
+        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="pill-btn quiet qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></section>'+
-      '<section class="sl-up"><span class="flabel">Upload Document</span>'+doc+err('doc')+'</section>'+
-      '<div class="qf-foot">'+
-        '<div class="qf-notes"><div><label class="flabel" for="sf-cn">Customer Notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="2" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Will be displayed on the invoice</small></div>'+
-          '<div><label class="flabel" for="sf-tc">Terms &amp; Conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="3" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
-          '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></div>'+
-        '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+
+        '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<span class="qf-pill">Rates include GST</span>')+
+      card('Document','Attach a supporting file, if there is one.',doc+err('doc'))+
+      '<div class="qf-bottom">'+
+        '<section class="qf-card qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
+          '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
+          '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></section>'+
+        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
           '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'<span class="seg sl-seg" role="group" aria-label="Discount type"><button type="button" data-dt="$" class="'+(d.discType==='%'?'':'on')+'" aria-pressed="'+!(d.discType==='%')+'">$</button><button type="button" data-dt="%" class="'+(d.discType==='%'?'on':'')+'" aria-pressed="'+(d.discType==='%')+'">%</button></span>'+
             '<span class="qf-price sl-dinp'+(d.discType==='%'?' pct':'')+'"><span class="qf-cur">'+(d.discType==='%'?'%':'$')+'</span><input class="fin plain sm'+(e.discount?' bad':'')+'" id="sf-disc" type="number" min="0"'+(d.discType==='%'?' max="100" step="0.1"':' step="0.01"')+' inputmode="decimal" value="'+esc(d.discount)+'" aria-label="Discount '+(d.discType==='%'?'percentage':'in dollars')+'"></span>'+
             '<button type="button" class="act" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button>'
             :'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add Discount</button>')+'</dd></div>'+
           (d.showDisc&&d.discType==='%'?'<p class="sl-damt">−<span id="sf-damt">'+money(T.disc)+'</span> off the sub total</p>':'')+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
-          '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
-          '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+money(T.pending)+'</dd></div></dl>'+
+          '<div><dt>GST (included)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+          '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-go">Submit</button></div></div>';

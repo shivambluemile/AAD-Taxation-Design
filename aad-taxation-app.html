@@ -1478,7 +1478,6 @@ function docCard(d){
         (gone?'':fileChips(d,t,0,d.cur.files))+
         '<div class="ds-by">'+(gone?'':'<span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'<span>No previous versions</span>')+
-          '<span class="ds-cap'+(vs.length>=KEEP_VERSIONS?' full':'')+'" title="Only the 5 most recent versions are kept">'+vs.length+' of '+KEEP_VERSIONS+' versions kept</span>'+
         '</div>'+
       '</div>'+
       '<div class="ds-st">'+stDot(st,stLabel(d))+'</div>'+

@@ -10352,6 +10352,12 @@ var QuoteStore={
   save:function(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
+/* what can be done to a quotation: anything not yet invoiced (or cancelled) can be edited; drafts never sent can be deleted;
+   sent and accepted ones can be cancelled; invoiced ones are locked */
+var EDITABLE=['draft','sent','accepted','rejected','expired'];
+function canEdit(q){ return EDITABLE.indexOf(q.status)>=0&&!q.invoiceId&&(isManager()||q.accountant===ME.name||q.by===ME.name); }
+function canDelete(q){ return q.status==='draft'&&!q.invoiceId&&!(q.history||[]).some(function(e){ return e.type==='sent'&&e.ok; })&&(isManager()||q.by===ME.name); }
+function canCancel(q){ return (q.status==='sent'||q.status==='accepted')&&!q.invoiceId&&(isManager()||q.accountant===ME.name||q.by===ME.name); }
 function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to; log(q,type,o); }
 
 /* ---------- DEVELOPMENT DATA (temporary): sample quotations for the clients in this browser. Remove when the API is connected. ---------- */
@@ -10606,12 +10612,14 @@ var AI=(function(){ var s=function(p){ return '<svg width="14" height="14" viewB
     convert:s('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/>')}; })();
 /* the four actions, each only where it applies */
 function menuFor(q){
-  var s=q.status, edit=isManager()||q.accountant===ME.name||q.by===ME.name, a=[];
-  if((s==='draft'||s==='sent')&&edit) a.push(['edit','Edit']);
+  var s=q.status, edit=isManager()||q.accountant===ME.name||q.by===ME.name, a=[], risky=[];
+  if(canEdit(q)) a.push(['edit','Edit']);
   if((s==='draft'||s==='sent')&&edit) a.push(['send',s==='sent'?'Send again':'Send']);
   a.push(['pdf','Download PDF']);
-  if(s==='accepted'&&isManager()) a.push(['convert','Convert to sale']);
-  return [a];
+  if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale']);
+  if(canCancel(q)) risky.push(['cancel','Cancel quotation','danger']);
+  if(canDelete(q)) risky.push(['delete','Delete draft','danger']);
+  return risky.length?[a,risky]:[a];
 }
 /* screens built in later steps: each action goes through route(), the one hand-off point */
 var NEXT={create:['Add Quotation','Step 2'],edit:['Edit Quotation','Step 2'],view:['Quotation Details','Step 3'],preview:['Quotation Preview','a later step'],pdf:['Quotation PDF','a later step'],
@@ -10676,7 +10684,11 @@ function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&
 function openForm(id){
   reload(); var q=id?byId(id):null;
   if(id&&!q) return toast('This quotation no longer exists.',true);
-  if(q&&['draft','sent'].indexOf(q.status)<0) return toast('Only draft and sent quotations can be edited.',true);
+  if(q&&(q.status==='converted'||q.invoiceId)) return toast(q.id+' is invoiced'+(q.invoiceId?' ('+q.invoiceId+')':'')+', so it’s locked. Change the sale instead.',true);
+  if(q&&q.status==='cancelled') return toast(q.id+' is cancelled and can’t be edited.',true);
+  if(q&&!canEdit(q)) return toast('You can only edit quotations you created or are assigned to.',true);
+  if(q&&['accepted','rejected','expired'].indexOf(q.status)>=0&&!openForm.ok){ return confirmReopen(q); }
+  openForm.ok=false;
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
       clientId:q.clientId,onName:q.onName||q.clientName||'',toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
@@ -10686,6 +10698,16 @@ function openForm(id){
     }:{clientId:null,onName:'',toName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:''}};
   paintForm();
+}
+/* editing a quotation the client has answered (or that expired) puts it back to Draft, to be sent again */
+function confirmReopen(q){
+  var was=STATUS[q.status][0].toLowerCase(), signed=q.status==='accepted'&&q.signature;
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qr-t"><div class="confirm-body"><h3 id="qr-t">Edit '+esc(q.id)+'?</h3>'+
+    '<p>This quotation is '+was+'. Saving your changes puts it back to <strong>Draft</strong>'+(signed?' and removes the client’s signature':'')+', so you’ll need to send it to <strong>'+esc(client(q).name)+'</strong> again.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qr-no">Cancel</button><button class="btn-primary" id="qr-go">Edit quotation</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('qr-go').focus();
+  document.getElementById('qr-no').onclick=closeDlg;
+  document.getElementById('qr-go').onclick=function(){ closeDlg(); openForm.ok=true; openForm(q.id); };
 }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
 function paintForm(focusId){
@@ -10826,7 +10848,7 @@ function submitForm(mode){
 function saveForm(){
   reload(); var d=QF.d, T=totalsOf(d), c=formClient(), q=QF.isNew?null:byId(QF.id);
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
-  if(q&&['draft','sent'].indexOf(q.status)<0){ toast('This quotation can no longer be edited.',true); return null; }
+  if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
   var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:d.toName||d.onName||c.name,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
@@ -10837,7 +10859,13 @@ function saveForm(){
     q={id:QF.id,by:ME.name,status:'draft',history:[]}; for(var k in fields) q[k]=fields[k];
     log(q,'created',{to:'draft',note:fields.items.length?fields.items.length+' line'+(fields.items.length===1?'':'s')+' · '+money(T.total):'Saved without lines'});
     st.list.push(q); QF.wasNew=true;
-  } else { for(var k2 in fields) q[k2]=fields[k2]; log(q,'edited',{note:money(T.total)}); }
+  } else {
+    for(var k2 in fields) q[k2]=fields[k2];
+    if(['accepted','rejected','expired'].indexOf(q.status)>=0){            // back to draft: the old answer and the old link no longer apply
+      var had=!!q.signature; delete q.signature; delete q.signedBy; delete q.signedAt; delete q.token;
+      setStatus(q,'draft','edited',{note:money(T.total)+(had?' · client’s signature removed':'')+' · to be sent again'});
+    } else log(q,'edited',{note:money(T.total)});
+  }
   if(!QuoteStore.save(st)){ toast('Couldn’t save the quotation. Try again.',true); return null; }
   QF.dirty=false; return q;
 }
@@ -11125,7 +11153,7 @@ function confirmCancel(id){
   document.getElementById('qc-no').onclick=closeDlg;
   document.getElementById('qc-go').onclick=function(){
     var n=document.getElementById('qc-n').value.trim(); if(!n){ document.getElementById('qc-e').classList.add('show'); return; }
-    reload(); var x=byId(id); if(!x||['sent','accepted'].indexOf(x.status)<0){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
+    reload(); var x=byId(id); if(!x||!canCancel(x)){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
     setStatus(x,'cancelled','cancelled',{note:n}); if(!QuoteStore.save(st)){ return toast('Couldn’t save the change. Try again.',true); }
     closeDlg(); render(); toast(id+' cancelled');
   };
@@ -11148,15 +11176,15 @@ function confirmOutcome(id,to){
 }
 function confirmDelete(id){
   var q=byId(id);
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qd-t"><div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="qd-t">Delete draft '+esc(q.id)+'?</h3>'+
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qdl-t"><div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="qdl-t">Delete draft '+esc(q.id)+'?</h3>'+
     '<p>The draft for <strong>'+esc(client(q).name)+'</strong> is removed for good. This can’t be undone.</p></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="qd-no">Cancel</button><button class="btn-danger" id="qd-go">Delete draft</button></div></div>';
   dlg.classList.add('open');
   document.getElementById('qd-no').onclick=closeDlg;
   document.getElementById('qd-go').onclick=function(){
-    reload(); var x=byId(id); if(!x||x.status!=='draft'){ closeDlg(); render(); return toast('Only a draft can be deleted.',true); }
+    reload(); var x=byId(id); if(!x||!canDelete(x)){ closeDlg(); render(); return toast('Only a draft that was never sent can be deleted.',true); }
     st.list=st.list.filter(function(y){ return y.id!==id; }); if(!QuoteStore.save(st)){ return toast('Couldn’t delete the draft. Try again.',true); }
-    closeDlg(); render(); toast('Draft '+id+' deleted');
+    closeDlg(); if(detailId===id){ detailId=null; closeOv(); } render(); toast('Draft '+id+' deleted');
   };
 }
 
@@ -11211,9 +11239,10 @@ function detailActions(q){
   var s=q.status, own=canManage(q), main=null, more=[];
   if((s==='draft'||s==='sent')&&own) main=['send',s==='sent'?'Send again':'Send'];
   if(s==='accepted'&&isManager()&&!q.invoiceId) main=['convert','Convert to sale'];
-  if((s==='draft'||s==='sent')&&own) more.push(['edit','Edit quotation',AI.edit]);
+  if(canEdit(q)) more.push(['edit','Edit quotation',AI.edit]);
   if(q.token&&s!=='draft') more.push(['link','Client link',AI.copy]);
-  if((s==='sent'||s==='accepted')&&own) more.push(['cancel','Cancel quotation',QD_IC.ban,'danger']);
+  if(canCancel(q)) more.push(['cancel','Cancel quotation',QD_IC.ban,'danger']);
+  if(canDelete(q)) more.push(['delete','Delete draft',AI.bin,'danger']);
   return {main:main,more:more};
 }
 /* icons for the header's info lines (the Clients panel's set) */

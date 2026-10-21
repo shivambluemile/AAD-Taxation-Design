@@ -2860,6 +2860,7 @@ tbody tr:hover{background:#FCFCFD}
 .el-main{display:flex;flex-direction:column;gap:12px}
 .el-dt .ds-files{margin-top:6px}
 .ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:4px}
+.ky-lines{flex-direction:column;gap:2px}
 .el-bn{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
 .el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
 .el-none{margin:0;font-size:13px;color:var(--mute)}
@@ -5606,16 +5607,15 @@ function kycTab(c){
   var banner='<div class="el-bn">'+EL_INFO+'<p>Each KYC verification remains valid for one year from the verification date. New verifications are saved as separate versions, and all previous verification records and their associated documents are retained.</p></div>';
   var st=cur?kycState(cur):'none', exp=cur?kycExpiresAt(cur):0, left=cur?Math.ceil((exp-now)/864e5):0;
   var S={none:['No KYC recorded','Record this client’s identity check to keep them compliant.',null,['add','Record KYC']],
-    valid:['KYC is valid',left+' day'+(left===1?'':'s')+' left before this check expires.',['add','Record new KYC'],null],
-    expiring:['KYC expires soon','Record a new check before it expires to stay compliant.',null,['add','Renew KYC']],
-    expired:['KYC expired','The client isn’t compliant until a new check is recorded.',null,['add','Renew KYC']]}[st];   // the expiry date and time are in the check details above
+    valid:['This KYC check is valid','Expires on '+whenOf(exp).replace(' · ',' at '),['add','Record new KYC'],null],
+    expiring:['This KYC check expires soon','Expires on '+whenOf(exp).replace(' · ',' at '),null,['add','Renew KYC']],
+    expired:['This KYC check has expired','Expired on '+whenOf(exp).replace(' · ',' at '),null,['add','Renew KYC']]}[st];   // the expiry lives here, not in the check details
   var tone={none:'',valid:'s-signed',expiring:'s-awaiting',expired:'s-failed'}[st];
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x[1]+'</button>':''; };
   var status='<div class="el-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
     (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
   var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
       '<span class="el-to">Uploaded by '+esc(cur.by)+' on '+whenOf(kycUploadedAt(cur)).replace(' · ',' at ')+'</span>'+
-      '<span class="el-to">'+(st==='expired'?'Expired on ':'Expires on ')+whenOf(exp).replace(' · ',' at ')+'</span>'+
       (cur.note?'<span class="el-to">Note: '+esc(cur.note)+'</span>':'')+
       kycChips(cur.files||[],0)+'</div></div>':'';
   /* previous checks, newest first, collapsed */
@@ -5623,9 +5623,9 @@ function kycTab(c){
   var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
-      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+'</b><span>verified '+dmyOf(fromIso(r.date))+'</span></div><div class="el-hrow ky-hrow"><div class="el-hi">'+
-        '<span>Uploaded <b>'+whenOf(kycUploadedAt(r))+'</b> by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' '+whenOf(ex)+'</span><span>Replaced '+whenOf(kycUploadedAt(next))+'</span>'+
-        (r.note?'<span>“'+esc(r.note)+'”</span>':'')+'</div>'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow"><div class="el-hi ky-lines">'+
+        '<span>Uploaded on '+whenOf(kycUploadedAt(r)).replace(' · ',' at ')+' by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' on '+dmyOf(ex)+'</span>'+
+        (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div>'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');   // one detail per line
   var card='<article class="el-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
     doc+status+hist+'</article>';

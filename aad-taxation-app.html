@@ -13190,11 +13190,9 @@ table,td,th{font-size:13.5px}
 .mf-chip button{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--orange-ink)}.mf-chip button:hover,.mf-chip button:focus-visible{background:rgba(241,137,52,.18);outline:none}
 .mf-chip button svg{width:11px;height:11px}
 .drawer.mf-panel{max-width:min(420px,100vw)}.drawer.mf-panel.swap{animation:none}
-.mf-panel .modal-head{align-items:flex-start}
-.mf-sub{margin:3px 0 0;font-size:12.5px;color:var(--mute)}
+.mf-panel .modal-head{align-items:center}
 .mf-panel .modal-body{gap:0;padding:0}
-.mf-sec{padding:18px 24px;display:flex;flex-direction:column;gap:16px}.mf-sec+.mf-sec{border-top:1px solid var(--line-soft)}
-.mf-sec h3{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#94A3B8;margin:0}
+.mf-sec{padding:20px 24px;display:flex;flex-direction:column;gap:18px}
 .mf-f{display:flex;flex-direction:column;gap:8px;min-width:0}
 .mf-lh{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;font-weight:600;color:var(--ink)}
 .mf-clr{font-size:12px;font-weight:600;color:var(--orange-ink);padding:0}.mf-clr:hover{text-decoration:underline}
@@ -13216,8 +13214,17 @@ table,td,th{font-size:13.5px}
 .mf-picked{display:flex;flex-wrap:wrap;gap:6px}
 .mf-pk{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 4px 0 10px;border-radius:999px;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:600}
 .mf-pk button{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--orange-ink)}.mf-pk button:hover{background:rgba(241,137,52,.18)}.mf-pk svg{width:10px;height:10px}
-.mf-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}.mf-to{font-size:12.5px;color:var(--faint)}
-.mf-range .fin{height:40px}
+.mf-rv{font-size:13px;font-weight:600;color:var(--orange-ink);font-variant-numeric:tabular-nums}
+.mf-sl{position:relative;height:24px;margin:2px 0}
+.mf-tr{position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:linear-gradient(to right,#E5E8EC var(--a),var(--orange) var(--a),var(--orange) var(--b),#E5E8EC var(--b))}
+.mf-sl input{position:absolute;inset:0;width:100%;height:100%;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+.mf-sl input:focus{outline:none}
+.mf-sl input::-webkit-slider-runnable-track{background:none;border:0}
+.mf-sl input::-moz-range-track{background:none;border:0}
+.mf-sl input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--orange);box-shadow:0 1px 3px rgba(15,23,42,.2);cursor:grab}
+.mf-sl input::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--orange);box-shadow:0 1px 3px rgba(15,23,42,.2);cursor:grab}
+.mf-sl input:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px rgba(241,137,52,.2)}
+.mf-sl input:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px rgba(241,137,52,.2)}
 .mf-sec .ferr{margin:0}
 .mf-foot{position:sticky;bottom:0;background:#fff;flex-shrink:0}
 .mf-foot .btn-ghost[disabled]{opacity:.45;cursor:not-allowed}
@@ -13659,16 +13666,23 @@ function paintMoreFilters(focusSel){
       (isOpen?'<div class="mf-drop"><div class="mf-dsearch">'+I.search+'<input type="search" id="mf-q-'+k+'" data-mfq="'+k+'" placeholder="Search '+label.toLowerCase()+'" value="'+esc(q)+'" autocomplete="off"></div>'+
         '<div class="mf-dlist">'+(shown.length?shown.map(function(v){ return '<label class="mf-dopt"><input type="checkbox" data-mf="'+k+'" value="'+esc(v)+'"'+(has(sel,v)?' checked':'')+'><span>'+esc(v)+'</span></label>'; }).join(''):'<p class="mf-dnone">No '+label.toLowerCase()+' match “'+esc(q)+'”</p>')+'</div></div>':'')+
       '</div>'; };
-  var price=function(k,ph){ return '<div class="qf-price"><span class="qf-cur">$</span><input class="fin plain sm'+(e[k]?' bad':'')+'" id="mf-'+k+'" data-mfp="'+k+'" inputmode="decimal" placeholder="'+ph+'" value="'+esc(d[k])+'" aria-label="'+(k==='min'?'Minimum':'Maximum')+' price"></div>'; };
+  /* the amount slider runs from $0 to the largest sale, rounded up; an end left at its limit means no limit */
+  var top=Math.max(100,Math.ceil(st.list.reduce(function(a,s){ return Math.max(a,s.amount||0); },0)/100)*100), step=top>10000?50:10;
+  var clamp=function(v,dflt){ v=v===''?dflt:Number(v); return isNaN(v)?dflt:Math.min(top,Math.max(0,v)); };
+  var lo=clamp(d.min,0), hi=clamp(d.max,top), pct=function(v){ return v/top*100; };
+  var whole=function(v){ return '$'+Math.round(v).toLocaleString('en-AU'); };
+  var rangeText=function(a,b){ return a<=0&&b>=top?'Any amount':whole(a)+' – '+whole(b)+(b>=top?'+':''); };
   var y=document.getElementById('mf-body'), keep=y?y.scrollTop:0, again=!!ov.querySelector('.mf-panel');   // redraws don't slide in again
   ov.innerHTML='<div class="drawer mf-panel'+(again?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="mf-t">'+
-    '<div class="modal-head"><div><h2 id="mf-t">More Filters</h2><p class="mf-sub">'+(n?n+' filter'+(n===1?'':'s')+' selected':'Narrow the sales list')+'</p></div><button id="mf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-head"><h2 id="mf-t">More Filters</h2><button id="mf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body mf-body" id="mf-body">'+
-      '<section class="mf-sec"><h3>Payment details</h3>'+chips('ptype',PAY_TYPES,'Payment type')+'</section>'+
-      '<section class="mf-sec"><h3>Assignment &amp; organisation</h3>'+combo('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountants','All accountants')+combo('branch',BRANCHES,'Branches','All branches')+'</section>'+
-      '<section class="mf-sec"><h3>Sale details</h3>'+combo('svc',svcOptions(),'Services','All services')+
-        '<div class="mf-f"><div class="mf-lh"><span>Sale amount</span></div><div class="mf-range">'+price('min','Min')+'<span class="mf-to">to</span>'+price('max','Max')+'</div>'+
-        (e.min||e.max?'<p class="ferr show" role="alert">'+esc(e.min||e.max)+'</p>':'')+'</div></section>'+
+      '<section class="mf-sec">'+chips('ptype',PAY_TYPES,'Payment type')+
+        combo('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountants','All accountants')+combo('branch',BRANCHES,'Branches','All branches')+
+        combo('svc',svcOptions(),'Services','All services')+
+        '<div class="mf-f"><div class="mf-lh"><span>Sale amount</span><span class="mf-rv" id="mf-rv">'+rangeText(lo,hi)+'</span></div>'+
+        '<div class="mf-sl" id="mf-sl" style="--a:'+pct(lo)+'%;--b:'+pct(hi)+'%"><div class="mf-tr"></div>'+
+          '<input type="range" id="mf-lo" min="0" max="'+top+'" step="'+step+'" value="'+lo+'" aria-label="Minimum sale amount">'+
+          '<input type="range" id="mf-hi" min="0" max="'+top+'" step="'+step+'" value="'+hi+'" aria-label="Maximum sale amount"></div></div></section>'+
     '</div>'+
     '<div class="modal-foot mf-foot"><button class="btn-ghost" id="mf-reset"'+(n?'':' disabled')+'>Reset</button><span class="sp-grow"></span><button class="btn-ghost" id="mf-cancel">Cancel</button><button class="btn-primary" id="mf-apply">Apply Filters</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
@@ -13682,7 +13696,14 @@ function paintMoreFilters(focusSel){
     x.onkeydown=function(ev){ if(ev.key==='Escape'){ ev.stopPropagation(); ev.preventDefault(); var k=x.getAttribute('data-mfq'); d.open=''; redraw('[data-mfo="'+k+'"]'); } }; });
   [].forEach.call(ov.querySelectorAll('[data-mf]'),function(x){ x.onchange=function(){ var k=x.getAttribute('data-mf'); toggle(k,x.value); redraw('[data-mf="'+k+'"][value="'+CSS.escape(x.value)+'"]'); }; });
   [].forEach.call(ov.querySelectorAll('[data-mfrm]'),function(x){ x.onclick=function(){ var k=x.getAttribute('data-mfrm'); toggle(k,x.getAttribute('data-v')); redraw('[data-mfo="'+k+'"]'); }; });
-  [].forEach.call(ov.querySelectorAll('[data-mfp]'),function(x){ x.oninput=function(){ d[x.getAttribute('data-mfp')]=x.value.trim(); }; x.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); applyMoreFilters(); } }; });
+  var sLo=document.getElementById('mf-lo'), sHi=document.getElementById('mf-hi'), sl=document.getElementById('mf-sl'), rv=document.getElementById('mf-rv');
+  var slide=function(which){ var a=+sLo.value, b=+sHi.value;
+    if(a>b){ if(which==='lo') sLo.value=a=b; else sHi.value=b=a; }
+    d.min=a>0?String(a):''; d.max=b<top?String(b):''; d.errs={};
+    sl.style.setProperty('--a',pct(a)+'%'); sl.style.setProperty('--b',pct(b)+'%'); rv.textContent=rangeText(a,b);
+    sLo.style.zIndex=a>=top-step?3:'';                                  // a low thumb pushed to the end stays grabbable
+  };
+  sLo.oninput=function(){ slide('lo'); }; sHi.oninput=function(){ slide('hi'); };
   document.getElementById('mf-x').onclick=closeOv; document.getElementById('mf-cancel').onclick=closeOv;
   document.getElementById('mf-reset').onclick=function(){ ADV.forEach(function(k){ d[k]=k==='min'||k==='max'?'':[]; }); d.errs={}; d.open=''; d.q={}; redraw('#mf-apply'); };
   document.getElementById('mf-apply').onclick=applyMoreFilters;
@@ -13690,7 +13711,7 @@ function paintMoreFilters(focusSel){
 }
 function applyMoreFilters(){
   var d=MF; d.errs=checkFilters(d);
-  if(Object.keys(d.errs).length){ paintMoreFilters(); var x=ov.querySelector('.mf-range .bad'); if(x){ x.focus(); x.scrollIntoView({block:'center'}); } return; }
+  if(Object.keys(d.errs).length){ paintMoreFilters(); return; }
   var f=state.f; ADV.forEach(function(k){ f[k]=Array.isArray(d[k])?d[k].slice():String(d[k]).replace(/[$,\s]/g,''); });
   MF=null; closeOv(); state.errs={}; state.page=1;
   state.loading=true; render();                                         // the same moment the API call would take

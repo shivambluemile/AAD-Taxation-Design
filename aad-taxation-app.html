@@ -3727,6 +3727,14 @@ var WZD_KEY='aad-add-client-drafts';
 function loadWzDrafts(){ try{ var v=JSON.parse(localStorage.getItem(WZD_KEY)||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
 function saveWzDrafts(v){ try{ localStorage.setItem(WZD_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 function openDraftRow(id){ if(String(id).indexOf('wd')===0) openWizDraftDetail(id); else openRequestDetail(id); }
+/* Edit on a draft row: an unfinished Add Client carries on where it stopped; a request the client hasn't filled in yet opens its
+   client details and services to change; once the client has submitted, their answers are reviewed in the request itself */
+function editDraft(id){
+  if(String(id).indexOf('wd')===0) return openWizard(id);
+  ONB=loadOnb(); var r=reqById(id); if(!r) return renderList();
+  if(r.status==='draft'||r.status==='info') return openRequest(id);
+  openRequestDetail(id);
+}
 var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 function clIni(n){ var p=String(n||'?').trim().split(' ').filter(Boolean); return ((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(); }
 var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review',wiz1:'Add Client · step 1 of 3',wiz2:'Add Client · step 2 of 3',wiz3:'Add Client · step 3 of 3'};
@@ -3804,7 +3812,7 @@ function renderList(){
       '<td><span class="ob-ticks">'+kyc+letter+'</span></td>'+
       '<td>'+(r?'<span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small>':'<span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span>')+'</td>'+
       '<td><div class="cl-meta">'+whenOf(c.created||Date.now()).replace(' · ',', ')+'<span>by '+esc(by)+'</span></div></td>'+
-      '<td><span class="acts">'+(r?'':'<button class="act" data-edit="'+c.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>')+'</span></td></tr>';
+      '<td><span class="acts">'+(r?'<button class="act" data-dedit="'+r.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>':'<button class="act" data-edit="'+c.id+'" title="Edit" aria-label="Edit '+esc(c.name)+'">'+I.edit+'</button>')+'</span></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;
@@ -3822,6 +3830,7 @@ function renderList(){
   content.querySelectorAll('.pager button[data-p]').forEach(function(b){ b.onclick=function(){ state.page=+b.dataset.p; renderList(); window.scrollTo(0,0); }; });
   content.querySelectorAll('[data-view]').forEach(function(b){ b.onclick=function(){ go('/clients/'+b.dataset.view); }; });
   content.querySelectorAll('[data-rq]').forEach(function(b){ b.onclick=function(){ openDraftRow(b.dataset.rq); }; });
+  content.querySelectorAll('[data-dedit]').forEach(function(b){ b.onclick=function(){ editDraft(b.dataset.dedit); }; });
   content.querySelectorAll('[data-edit]').forEach(function(b){ b.onclick=function(){ openForm(+b.dataset.edit); }; });
   wireCopy(content);
   wireViews();
@@ -5244,17 +5253,21 @@ function finalizeClient(o){
    Request Client: details + services → send → Draft record with a secure link
 ========================================================= */
 var rq=null;
-function openRequest(){
-  rq={type:'individual',name:'',email:'',phone:'',services:[],errs:{},step:1};
+function openRequest(editId){
+  var er=editId?reqById(editId):null;
+  rq=er?{type:er.type,name:er.name,email:er.email,phone:er.phone,services:(er.services||[]).map(function(x){ return {svcId:x.svcId,name:x.name,price:String(x.price),adminPrice:x.adminPrice!=null?x.adminPrice:x.price}; }),errs:{},step:1,editId:er.id}
+    :{type:'individual',name:'',email:'',phone:'',services:[],errs:{},step:1};
+  rq.orig=rqSnap();
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="rq-t">'+
-    '<div class="modal-head wz-head"><div><h2 id="rq-t">Request Client</h2></div><button id="rq-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-head wz-head"><div><h2 id="rq-t">'+(er?'Edit request · '+esc(er.name):'Request Client')+'</h2></div><button id="rq-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="rqb"></div><div class="modal-foot" id="rq-foot"></div></div>');
   overlay._guard=leaveRequest; document.getElementById('rq-x').onclick=leaveRequest;
   rqPaint();
 }
+function rqSnap(){ return JSON.stringify([rq.type,rq.name,rq.email,rq.phone,chosen(rq.services).map(function(x){ return [x.svcId,String(x.price)]; })]); }
 function leaveRequest(){
   if(rq&&rq.step===1) rqRead();
-  var dirty=rq&&rq.step<3&&(rq.name||rq.email||rq.phone||chosen(rq.services).length);
+  var dirty=rq&&rq.step<3&&(rq.editId?rqSnap()!==rq.orig:(rq.name||rq.email||rq.phone||chosen(rq.services).length));
   var done=function(){ rq=null; closeDrawer(); };
   if(!dirty) done(); else confirmLeave(done);
 }
@@ -5281,7 +5294,7 @@ function rqPaint(){
     body.innerHTML='<section class="wz-sec rq-one">'+
       '<div class="seg-wrap"><p>Is this client a person or a business?</p><div class="seg" role="radiogroup" aria-label="Client type">'+[['individual','Individual'],['company','Company']].map(function(t){ var on=rq.type===t[0]; return '<button role="radio" aria-checked="'+on+'" class="'+(on?'on':'')+'" data-rqt="'+t[0]+'">'+t[1]+'</button>'; }).join('')+'</div></div>'+
       '<div class="grid2" style="margin-top:16px">'+f('name',co?'Company name':'Client name',{span:true,ph:co?'e.g. Bright Spark Electrical Pty Ltd':'e.g. Liam Carter'})+f('email','Email address',{type:'email',ph:'client@example.com'})+f('phone','Mobile number',{ph:'04XX XXX XXX'})+'</div><div id="rq-sp" class="rq-sp"></div></section>';
-    foot.innerHTML='<button class="btn-ghost" id="rq-back">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="rq-next">Next</button>';
+    foot.innerHTML='<button class="btn-ghost" id="rq-back">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="rq-next">'+(rq.editId?'Save changes':'Next')+'</button>';
     body.querySelectorAll('[data-rqt]').forEach(function(b){ b.onclick=function(){ rqRead(); rq.type=b.dataset.rqt; rqPaint(); }; });
     mountSvcPicker(document.getElementById('rq-sp'),rq.services,rq.errs);
     document.getElementById('rq-back').onclick=leaveRequest;
@@ -5293,12 +5306,13 @@ function rqPaint(){
       var em=rq.email.trim().toLowerCase();
       if(!er.email){
         var cl=CLIENTS.filter(function(c){ return c.email.toLowerCase()===em; })[0]; if(cl) er.email='Already a client: '+cl.name;
-        var open=ONB.requests.filter(function(r){ return r.email===em && ['draft','submitted','review','info'].indexOf(r.status)>=0; })[0];
+        var open=ONB.requests.filter(function(r){ return r.email===em && r.id!==rq.editId && ['draft','submitted','review','info'].indexOf(r.status)>=0; })[0];
         if(open) er.email='There’s already an open request for this email. Open it from Onboarding requests and resend it instead.';
       }
       var se=svcErrs(rq.services); for(var k in se) er[k]=se[k];
       rq.errs=er;
       if(Object.keys(er).length){ rqPaint(); var b=body.querySelector('.bad'); if(b) b.focus(); toast('Please fix the highlighted fields',true); return; }
+      if(rq.editId) return saveRequestEdit();
       rq.step=2; rqPaint();
     };
   }
@@ -5324,6 +5338,16 @@ function rqPaint(){
         if(send.ok){ rq.step=3; rq.id=r.id; rqDone(r); }
       }});
   }
+}
+function saveRequestEdit(){
+  ONB=loadOnb(); var r=reqById(rq.editId);
+  if(!r||(r.status!=='draft'&&r.status!=='info')){ rq=null; closeDrawer(); renderListKeep(); return toast('The client has already submitted this request, so it can’t be edited here.',true); }
+  if(rqSnap()===rq.orig){ rq=null; closeDrawer(); return; }
+  var em=rq.email.trim().toLowerCase(), moved=em!==r.email, services=chosen(rq.services).map(function(x){ return {svcId:x.svcId,name:x.name,price:cleanPrice(x.price),adminPrice:x.adminPrice}; });
+  r.type=rq.type; r.entity=rq.type==='company'?'Company':'Individual'; r.name=rq.name.trim(); r.email=em; r.phone=fmtPhone(rq.phone); r.services=services;
+  audit(r,'Request edited',ME,r.status,r.status,services.length+' service'+(services.length===1?'':'s')+' · '+money(totalOf(services))+(moved?' · email changed':''));
+  persistOnb(); rq=null; closeDrawer(); renderListKeep();
+  toast(moved?'Request updated. Resend it so the client gets the link at the new email.':'Request updated');
 }
 function rqDone(r){
   var body=document.getElementById('rqb'), foot=document.getElementById('rq-foot'), link=portalLink('onboard',r.token);

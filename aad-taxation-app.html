@@ -1588,11 +1588,6 @@ function paintUpd(){
     '</div>';
   }
   if(t){
-    if(t.num){
-      h+='<div class="up-sec"><label class="up-lbl" for="upd-no">Document number <span class="up-opt">(optional)</span></label>'+
-        '<input id="upd-no" class="up-in" autocomplete="off" placeholder="e.g. 12345678" value="'+esc(updNo)+'">'+
-        '<div class="up-hint">'+(d?'Change it if the new document has a different number. ':'')+'Only the last 4 characters are shown on the profile.</div></div>';
-    }
     h+='<div class="up-sec"><span class="up-lbl">'+(d?'New file':'File')+(t.slots.length>1?'s':'')+' <span class="req">*</span></span>'+
       '<div class="up-drops'+(t.slots.length>1?' two':'')+'">'+t.slots.map(function(sl){
         var p=pend[sl.id], cap=t.slots.length>1?'<span class="up-side">'+sl.label+'</span>':'';
@@ -13662,7 +13657,7 @@ function paintMoreFilters(focusSel){
     '<div class="modal-head"><div><h2 id="mf-t">More Filters</h2><p class="mf-sub">'+(n?n+' filter'+(n===1?'':'s')+' selected':'Narrow the sales list')+'</p></div><button id="mf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body mf-body" id="mf-body">'+
       '<section class="mf-sec"><h3>Payment details</h3>'+chips('ptype',PAY_TYPES,'Payment type')+'</section>'+
-      '<section class="mf-sec"><h3>Assignment &amp; organisation</h3>'+chips('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountant')+combo('branch',BRANCHES,'Branches','All branches')+'</section>'+
+      '<section class="mf-sec"><h3>Assignment &amp; organisation</h3>'+combo('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountants','All accountants')+combo('branch',BRANCHES,'Branches','All branches')+'</section>'+
       '<section class="mf-sec"><h3>Sale details</h3>'+combo('svc',svcOptions(),'Services','All services')+
         '<div class="mf-f"><div class="mf-lh"><span>Sale amount</span></div><div class="mf-range">'+price('min','Min')+'<span class="mf-to">to</span>'+price('max','Max')+'</div>'+
         (e.min||e.max?'<p class="ferr show" role="alert">'+esc(e.min||e.max)+'</p>':'')+'</div></section>'+

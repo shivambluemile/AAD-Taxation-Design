@@ -17393,15 +17393,18 @@ function paintQuote(){
   var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
   var done=q.status==='accepted'||q.status==='converted';
   if(done&&!qShowDoc) return quoteWelcome(q,c,who,doc,acc);
-  app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1><p>'+e(q.id)+' from '+FIRM.name+' · Valid until '+dmyOf(q.validUntil)+'</p></div>'+
-    '<div class="card"><div class="qv-top"><h2>Quotation '+e(q.id)+'</h2><span class="qv-acts">'+(done?'<button class="btn sec" id="qa-back">Back</button>':'')+'<button class="btn sec" id="qa-pdf">Download PDF</button></span></div>'+
+  /* every action sits at the bottom of the page, under the document */
+  var pdfBtn='<button class="btn sec" id="qa-pdf">Download PDF</button>';
+  app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1></div>'+
+    '<div class="card">'+
       '<div class="lw qv-doc">'+quoteDocHtml(doc)+'</div>'+
-      (done?'':expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>':
+      (done?'<div class="foot"><button class="btn sec" id="qa-back">Back</button><span class="grow"></span>'+pdfBtn+'</div>':
+       expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot"><span class="grow"></span>'+pdfBtn+'</div>':
         '<h2>Sign to accept</h2><p class="sub">Read the quotation above, then sign below to accept it.</p>'+
         '<label class="l" for="qa-n">Your full name <span class="req">*</span></label><input class="in" id="qa-n" value="'+e(who)+'" maxlength="80">'+
         '<div id="qa-pad" style="margin-top:16px"></div>'+
         '<label class="agree"><input type="checkbox" id="qa-ok"><span>I have read this quotation and accept its services, prices and terms.</span></label><span class="err" id="qa-e" hidden></span>'+
-        '<div class="foot"><span class="grow"></span><button class="btn pri" id="qa-go">Sign and accept</button></div>')+
+        '<div class="foot">'+pdfBtn+'<span class="grow"></span><button class="btn pri" id="qa-go">Sign and accept</button></div>')+
     '</div>';
   document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var bk=document.getElementById('qa-back'); if(bk) bk.onclick=function(){ qShowDoc=false; paintQuote(); window.scrollTo(0,0); };

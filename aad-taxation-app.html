@@ -1492,7 +1492,6 @@ function docCard(d){
       var vi=j+first, m=[];   // one block per version: its details, then its files
       m.push('<span>Uploaded <b>'+fmtD(v.on)+' · '+fmtT(v.on)+'</b> by '+esc(v.by)+'</span>');
       if(t.exp) m.push('<span>'+(v.exp&&daysTo(v.exp)<0?'Expired ':'Expiry ')+(v.exp?fmtD(v.exp):'--')+'</span>');
-      if(v.rOn) m.push('<span>Replaced '+fmtD(v.rOn)+(v.rBy?' by '+esc(v.rBy):'')+'</span>');
       if(v.no&&v.no!==d.no) m.push('<span>No. '+maskNo(v.no)+'</span>');
       return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b><span>'+v.files.length+' file'+(v.files.length===1?'':'s')+'</span></div>'+
         '<div class="ds-vrow"><div class="ds-vi">'+m.join('')+'</div>'+fileChips(d,t,vi,v.files)+'</div></div>';

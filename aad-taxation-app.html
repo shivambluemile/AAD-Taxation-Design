@@ -3716,7 +3716,7 @@ function draftRows(){
   return ONB.requests.filter(function(r){ return ['completed','rejected'].indexOf(r.status)<0; }).map(function(r){
     var f=r.form||{}, co=r.type==='company';
     return {draft:true,r:r,id:r.id,name:f.name||r.name,email:f.email||r.email,phone:f.phone||r.phone,type:r.type,entity:co?(f.entity||'Company'):'Individual',abn:f.abn||'',created:r.created};
-  }).concat(loadWzDrafts().map(function(w){
+  }).concat(loadWzDrafts().filter(function(w){ return w.clientId==null||!CLIENTS.some(function(c){ return c.id===w.clientId; }); }).map(function(w){
     var d=w.d||{}, co=d.type==='company';
     var r={id:w.id,wiz:true,services:chosen(w.services||[]).map(function(x){ return {name:x.name,price:cleanPrice(x.price)}; }),kyc:w.files||[],letter:{status:'pending'},status:'wiz'+(w.step||1),by:w.by};
     return {draft:true,r:r,id:w.id,name:String(d.name||'').trim()||'Unnamed client',email:d.email||'',phone:d.phone||'',type:d.type,entity:co?(d.entity||'Company'):'Individual',abn:d.abn||'',created:w.updated||w.created};
@@ -3737,7 +3737,7 @@ function editDraft(id){
 }
 var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 function clIni(n){ var p=String(n||'?').trim().split(' ').filter(Boolean); return ((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(); }
-var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review',wiz1:'Add Client · step 1 of 3',wiz2:'Add Client · step 2 of 3',wiz3:'Add Client · step 3 of 3'};
+var DRAFT_STAGE={draft:'Waiting for client',info:'Needs information',submitted:'Ready to review',review:'Under review'};
 function filtered(){
   var q=state.q.trim().toLowerCase(), qd=digits(q);
   var drafts=draftRows().filter(function(d){
@@ -4170,6 +4170,7 @@ function formBody(){ return document.getElementById('cfb'); }
 // fromDetail: opened from the details panel, so Cancel and Save go back to it
 function openForm(id,scrollTo,fromDetail){
   if(id==null) return openWizard();               // adding a client is the four-step onboarding
+  var wd=loadWzDrafts().filter(function(w){ return w.clientId===id; })[0]; if(wd) return openWizard(wd.id);   // saved on step 1 of Add Client: carry on there
   startForm(id); form.scrollTo=scrollTo||null; form.fromDetail=!!fromDetail;
   var editing=id!=null;
   showDrawer(
@@ -4998,6 +4999,7 @@ function openWizard(draftId){
     form.d=JSON.parse(JSON.stringify(dr.d));
     ['step','services','note','kycNote','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
     wiz.files=(dr.files||[]).slice(); wiz.draftId=dr.id; wiz.token=dr.token;
+    if(dr.clientId!=null&&CLIENTS.some(function(c){ return c.id===dr.clientId; })){ wiz.clientId=dr.clientId; form.id=dr.clientId; }   // saved on step 1: checks treat it as this client, not a duplicate
   }
   showDrawer('<div class="drawer wz" role="dialog" aria-modal="true" aria-labelledby="cf-t">'+
     '<div class="modal-head wz-head"><div><h2 id="cf-t">Add Client</h2><ol class="wz-steps" id="wz-steps" hidden></ol></div><button id="cf-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -5045,13 +5047,34 @@ function wzCheck(partial){
   return true;
 }
 function wzSave(close){
-  if(!wzCheck(close)) return;
+  if(!wzCheck(close&&!(wiz.step===1&&wiz.clientId!=null))) return;      // once the client is saved, its details (step 1) must stay complete
   if(!String(form.d.name||'').trim()){ toast('Enter the client’s name before saving',true); return; }
+  if(wiz.step===1&&(!close||wiz.clientId!=null)){ wzSaveClient(); refreshList(); }
   storeDraft().then(function(ok){
     if(!ok){ toast('Couldn’t save this draft in the browser. Try again.',true); return; }
-    if(close){ var n=String(form.d.name||'').trim(); form=null; wiz=null; closeDrawer(); refreshList(); toast(n+' saved as a draft'); return; }
+    if(close){ var n=String(form.d.name||'').trim(), kept=wiz.clientId!=null; form=null; wiz=null; closeDrawer(); refreshList(); toast(kept?n+' saved. Open Edit to carry on with Add Client.':n+' saved as a draft'); return; }
     wiz.step++; wzPaint();
   });
+}
+/* step 1 Save & Next: the client becomes a real client now (Active, in the list with the others); later saves and the last step update
+   this same record, never a second one. New directors become individual clients, matched by person or email so nobody is added twice */
+function wzSaveClient(){
+  var d=form.d, co=d.type==='company', t=function(v){ return String(v||'').trim(); }, now=Date.now();
+  var old=wiz.clientId!=null?CLIENTS.filter(function(c){ return c.id===wiz.clientId; })[0]:null;
+  var rec=old||{id:clientSeq++,created:now,services:[],kyc:[],kycRecords:[],notes:[],login:false,lastReset:null,
+    history:[{t:now,kind:'created',title:'Client created',detail:(co?d.entity:'Individual')+' client added',by:ME}]};
+  var prev={}; (old&&old.directors||[]).forEach(function(x){ prev[x.id]=x; });
+  rec.type=d.type; rec.entity=co?d.entity:'Individual'; rec.name=t(d.name); rec.email=t(d.email).toLowerCase(); rec.phone=fmtPhone(d.phone);
+  rec.abn=numText(d.abn); rec.tfn=numText(d.tfn); rec.acn=co?numText(d.acn):''; rec.commEmail=t(d.commEmail).toLowerCase(); rec.commPhone=t(d.commPhone)?fmtPhone(d.commPhone):'';
+  rec.address={street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'}; rec.active=true;
+  rec.directors=co?d.directors.map(function(x){ var base=x.id!=null&&prev[x.id]?prev[x.id]:{id:dirSeq++,login:false,lastReset:null}, out={};
+    for(var k in base) out[k]=base[k];
+    out.name=t(x.name); out.email=t(x.email).toLowerCase(); out.phone=fmtPhone(x.phone); out.abn=numText(x.abn); out.tfn=numText(x.tfn); out.personId=x.personId!=null?x.personId:null; return out; }):[];
+  linkDirectorPeople(rec);
+  if(co) d.directors.forEach(function(x,i){ x.id=rec.directors[i].id; x.personId=rec.directors[i].personId; delete x.pick; });   // the next save updates these, not adds them again
+  if(!old) CLIENTS.unshift(rec);
+  wiz.clientId=rec.id; form.id=rec.id;
+  saveClients();
 }
 /* saves the wizard as a Draft row; KYC files go to private file storage, the draft keeps references */
 function storeDraft(){
@@ -5062,7 +5085,7 @@ function storeDraft(){
   return Promise.all(puts).then(function(){
     var list=loadWzDrafts(), old=list.filter(function(x){ return x.id===id; })[0];
     var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,kycNote:wiz.kycNote||'',kycDate:wiz.kycDate,
-      files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,sig:wiz.sig||null,sigAt:wiz.sigAt||null,token:wiz.token||null};
+      files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,sig:wiz.sig||null,sigAt:wiz.sigAt||null,token:wiz.token||null,clientId:wiz.clientId!=null?wiz.clientId:null};
     list=list.filter(function(x){ return x.id!==id; }); list.unshift(rec);
     form.dirty=false;
     return saveWzDrafts(list);
@@ -5214,12 +5237,13 @@ function finalizeClient(o){
   var rec={type:d.type,entity:co?d.entity:'Individual',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(),commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},active:true,
-    directors:co?d.directors.map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn),personId:x.personId!=null?x.personId:null}; }):[]};
-  rec.id=clientSeq++; rec.created=now;
+    directors:co?d.directors.map(function(x){ return {id:x.id!=null?x.id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn),personId:x.personId!=null?x.personId:null}; }):[]};
+  var old=wiz.clientId!=null?CLIENTS.filter(function(c){ return c.id===wiz.clientId; })[0]:null;   // saved on step 1
+  rec.id=old?old.id:clientSeq++; rec.created=old?old.created:now; if(old){ rec.login=old.login; rec.lastReset=old.lastReset; }
   linkDirectorPeople(rec);
   rec.services=wiz.services.map(function(x){ return assignment(x,'Add Client',ME,now); });
-  rec.kyc=[]; rec.kycRecords=[]; rec.notes=wiz.note.trim()?[{t:now,by:ME,text:wiz.note.trim()}]:[];
-  rec.history=[{t:now,kind:'created',title:'Client created',detail:(co?rec.entity:'Individual')+' client added',by:ME}];
+  rec.kyc=[]; rec.kycRecords=old?(old.kycRecords||[]).slice():[]; rec.notes=(old?(old.notes||[]).slice():[]).concat(wiz.note.trim()?[{t:now,by:ME,text:wiz.note.trim()}]:[]);
+  rec.history=old?(old.history||[]).slice():[{t:now,kind:'created',title:'Client created',detail:(co?rec.entity:'Individual')+' client added',by:ME}];
   rec.services.forEach(function(a){ rec.history.push({t:now,kind:'service',title:'Service assigned',detail:a.name+' · '+money(a.price),by:ME}); });
   if(rec.notes.length) rec.history.push({t:now,kind:'note',title:'Note added',detail:'',by:ME});
   // KYC files go to private storage first; the client only references what was stored
@@ -5229,8 +5253,8 @@ function finalizeClient(o){
     return putKyc(key,x.file,{owner:'client-'+rec.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.kyc.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); });   // rec.kyc is gathered into the first KYC record below
   Promise.all(saves).then(function(){ finish(); },function(){ toast('Some KYC files couldn’t be stored. Upload them again from the client’s record.',true); finish(); });
   function finish(){
-    if(rec.kyc.length){ rec.kycRecords=[{id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:String(wiz.kycNote||'').trim(),source:'Add Client'}]; rec.kyc=[];
-      rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(rec.kycRecords[0].date))+' · valid until '+whenOf(kycExpiresAt(rec.kycRecords[0]))+' · '+rec.kycRecords[0].files.length+' file'+(rec.kycRecords[0].files.length===1?'':'s'),by:ME}); }
+    if(rec.kyc.length){ var kr={id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:String(wiz.kycNote||'').trim(),source:'Add Client'}; rec.kycRecords.unshift(kr); rec.kyc=[];
+      rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(kr.date))+' · valid until '+whenOf(kycExpiresAt(kr))+' · '+kr.files.length+' file'+(kr.files.length===1?'':'s'),by:ME}); }
     var sg=signer, letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
       status:o.mode==='signed'?'signed':'sent',sends:o.send?[o.send]:[],expires:o.expires||null,audit:[]};
     audit(letter,'Generated',ME,'','pending','Financial year '+fyLabel(letter.fy)+' · expires '+dmyOf(fromIso(fyEnd(letter.fy))));
@@ -5242,7 +5266,7 @@ function finalizeClient(o){
       rec.history.push({t:now,kind:'letter',title:'Engagement letter sent for signature',detail:o.send.channels.join(' + ')+' · to '+sg.name,by:ME}); }
     dropDraft(draftId);
     ONB.letters.push(letter); persistOnb();
-    CLIENTS.unshift(rec); saveClients();
+    var at=old?CLIENTS.indexOf(old):-1; if(at>=0) CLIENTS[at]=rec; else CLIENTS.unshift(rec); saveClients();
     form=null; wiz=null; refreshList();
     toast(o.mode==='signed'?'Client added with a signed engagement letter':'Client added · engagement letter sent for signature');
     setHash('#/clients/'+rec.id); currentHash=location.hash; openDetail(rec.id,true,'services');

@@ -937,7 +937,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-more svg{transition:transform .15s}
 .ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
 .ds-st{width:150px;flex-shrink:0;padding-top:2px}
-.ds-exp{display:block;margin:3px 0 0 14px;font-size:12px;color:var(--faint)}
+.ds-exp{display:block;margin:3px 0 0 14px;font-size:12px;color:var(--faint);white-space:nowrap}
 .ds-st .state{white-space:nowrap}
 .ds-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .ds-acts .btn.xs{height:32px;padding:0 12px;font-size:12.5px;gap:6px}
@@ -1437,8 +1437,8 @@ I.srch='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="curr
 function versionsOf(d){ return [{ver:d.ver,no:d.no,files:d.cur.files,exp:d.cur.exp,on:d.cur.on,by:d.cur.by,cur:true}].concat(d.hist); }
 function stLabel(d){
   var st=stOf(d);
-  if(st==='expired') return 'Expired '+rel(daysTo(d.cur.exp));
-  if(st==='soon') return 'Expires '+rel(daysTo(d.cur.exp));
+  if(st==='expired') return 'Expired';
+  if(st==='soon') return 'Expiring soon';
   return st==='none'?'No expiry':'Valid';
 }
 function stDot(st,label){ var k={valid:'',none:' na',soon:' soon',expired:' no'}[st]; return '<span class="state'+k+'"><i></i>'+esc(label)+'</span>'; }

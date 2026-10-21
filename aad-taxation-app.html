@@ -9938,6 +9938,35 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .qd-two{grid-template-columns:repeat(2,minmax(0,1fr))}.qd-drawer .qd-two p{margin:0;color:var(--ink)}
 .qd-drawer .qd-sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}.qd-drawer .qd-sh h3{margin:0}.qd-drawer .qd-sh span{font-size:12.5px;color:var(--faint)}
 @media (max-width:760px){.qd-drawer .qd-head{flex-wrap:wrap;padding-left:18px;padding-right:18px}.qd-drawer .qd-info{grid-template-columns:repeat(2,minmax(0,1fr))}.qd-drawer .qd-two{grid-template-columns:1fr}}
+/* Quotation Details · Overview: the document with a side panel */
+.drawer.qd-drawer.qd-wide{max-width:min(1080px,96vw)}
+.qd-drawer .qd-head .btn-primary.qd-main{height:34px;padding:0 16px;font-size:13px}
+.qd-drawer .dhead-acts .btn-ghost svg{flex-shrink:0}
+.qd-drawer .dhead-acts .qd-more{width:34px;height:34px;padding:0;justify-content:center}
+.qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#F7F8FA;min-height:100%}
+.qd-paper{background:#E9EBEE;border-radius:12px;padding:20px;min-width:0}
+.qd-paper .qf-doc{max-width:760px;margin:0 auto}
+.qd-side{display:flex;flex-direction:column;gap:14px;position:sticky;top:24px}
+.qd-grp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.qd-grp h4{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin:0 0 12px}
+.qd-grp dl{margin:0;display:flex;flex-direction:column;gap:12px}
+.qd-grp dt{font-size:12px;color:var(--mute);margin-bottom:2px}
+.qd-grp dd{margin:0;font-size:13.5px;font-weight:600;color:var(--ink);min-width:0;overflow-wrap:anywhere}
+.qd-grp dd a{color:var(--ink);text-decoration:none}.qd-grp dd a:hover{color:var(--orange-ink);text-decoration:underline}
+.qd-link{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--orange-ink);padding:0}.qd-link:hover{text-decoration:underline;text-underline-offset:2px}
+.qd-gone{margin:12px 0 0;font-size:12.5px}
+.qd-steps{list-style:none;margin:0;padding:0;border:0;border-radius:0;background:none}
+.qd-steps .rq-st{display:flex;gap:12px;align-items:flex-start;padding:0 0 14px;position:relative}
+.qd-steps .rq-st:last-child{padding-bottom:0}
+.qd-steps .rq-st:not(:last-child):after{content:"";position:absolute;left:10px;top:24px;bottom:2px;width:2px;background:var(--line)}
+.qd-steps .rq-st i{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid #D6DBE1;background:#fff;color:#fff}
+.qd-steps .rq-st i svg{width:11px;height:11px}
+.qd-steps .rq-st.done i{background:#10B981;border-color:#10B981}
+.qd-steps .rq-st.bad i{background:#FEF2F2;border-color:#FCA5A5;color:#DC2626}
+.qd-steps .rq-st div{display:flex;flex-direction:column;gap:2px;min-width:0;padding-top:1px}
+.qd-steps .rq-st b{font-size:13px;font-weight:700;color:var(--ink)}.qd-steps .rq-st.todo b{color:var(--slate);font-weight:600}
+.qd-steps .rq-st small{font-size:12px;color:var(--mute);line-height:1.45}
+@media (max-width:900px){.qd-ov{grid-template-columns:1fr;padding:18px}.qd-side{position:static}}
 .qd-t{width:100%}
 .qd-t thead th{padding:10px 14px}.qd-t tbody td{padding:11px 14px;font-size:13.5px;vertical-align:top}
 .qd-t tbody tr:hover{background:none}
@@ -11177,14 +11206,13 @@ function showClientLink(q){
 function canManage(q){ return isManager()||q.accountant===ME.name||q.by===ME.name; }
 /* the header actions: only what the status allows and the user may do (the same rules as the list menu) */
 function detailActions(q){
-  var s=q.status, own=canManage(q), a=[];
-  if((s==='draft'||s==='sent')&&own) a.push(['send',s==='sent'?'Send again':'Send','primary']);
-  if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale','primary']);
-  if((s==='draft'||s==='sent')&&own) a.push(['edit','Edit']);
-  if(q.token&&s!=='draft') a.push(['link','Client link']);
-  a.push(['preview','Preview PDF'],['pdf','Download PDF']);
-  if((s==='sent'||s==='accepted')&&own) a.push(['cancel','Cancel quotation','','danger']);
-  return a;
+  var s=q.status, own=canManage(q), main=null, more=[];
+  if((s==='draft'||s==='sent')&&own) main=['send',s==='sent'?'Send again':'Send'];
+  if(s==='accepted'&&isManager()&&!q.invoiceId) main=['convert','Convert to sale'];
+  if((s==='draft'||s==='sent')&&own) more.push(['edit','Edit quotation',AI.edit]);
+  if(q.token&&s!=='draft') more.push(['link','Client link',AI.copy]);
+  if((s==='sent'||s==='accepted')&&own) more.push(['cancel','Cancel quotation',QD_IC.ban,'danger']);
+  return {main:main,more:more};
 }
 /* icons for the header's info lines (the Clients panel's set) */
 var QD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
@@ -11192,7 +11220,10 @@ var QD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill=
     phone:v('<path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/>'),
     cal:v('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),branch:v('<path d="M4 10.5 12 4l8 6.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5V14h4v5.5"/>'),
     staff:v('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/>'),clock:v('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
-    dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>'}; })();
+    dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>',
+    ban:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>',
+    tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+    x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>'}; })();
 function paintDetail(keep){
   if(ov.classList.contains('open')&&!ov.querySelector('.qd-drawer')) return;   // Send or Edit is open on top; the details come back when it closes
   var q=byId(detailId);
@@ -11205,42 +11236,40 @@ function paintDetail(keep){
   var tabs=[['overview','Overview'],['activity','Activities',hist.length]];
   if(!tabs.some(function(t){ return t[0]===qdTab; })) qdTab='overview';
 
-  /* header: the quotation number, its status and what can be done with it, on one line */
-  var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+AI.copy+'</button>'; };
+  /* header: the number and status, the one next step, the PDF, and everything else in a menu */
+  var A=detailActions(q);
   var head='<div class="cl-dhead qd-head"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
-    '<div class="dhead-acts">'+detailActions(q).map(function(a){ return '<button class="btn-ghost'+(a[3]==='danger'?' danger':'')+'" data-qa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
+    '<div class="dhead-acts">'+(A.main?'<button class="btn-primary qd-main" data-qa="'+A.main[0]+'">'+esc(A.main[1])+'</button>':'')+
+      '<button class="btn-ghost" data-qa="pdf">'+AI.pdf+'Download PDF</button>'+
+      (A.more.length?'<button class="btn-ghost qd-more" id="qd-more" data-menu="qd" aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+I.dots+'</button>':'')+
       '<button class="x" id="qd-x" aria-label="Close">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Quotation details">'+tabs.map(function(t){
     var on=t[0]===qdTab; return '<button role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-qtab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
 
   var b='';
   if(qdTab==='overview'){
-    var fv=function(label,html){ return '<div><dt>'+label+'</dt><dd>'+(html||'<span class="cl-muted">—</span>')+'</dd></div>'; };
-    var made=hist.filter(function(e){ return e.type==='created'; })[0];
-    var latest=lastAct?(lastAct.type==='expired'?'Expired on '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+'<small>'+when(lastAct.t)+'</small>'):'';
-    var who=cr?'<button class="qd-cl" data-qd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+' <small>No longer on file</small>';
-    b='<section class="vsec"><h3>Quotation details</h3><dl class="fgrid qd-info">'+
-        fv('Client',who)+
-        fv('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
-        fv('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+
-        (q.onName&&q.onName!==c.name?fv('On the name of',esc(q.onName)):'')+
-        (q.toName&&q.toName!==(q.onName||c.name)?fv('Attention',esc(q.toName)):'')+
-        fv('Quotation date',dmyOf(q.created))+fv('Valid until',dmyOf(q.validUntil))+fv('Branch',esc(q.branch||''))+
-        fv('Accountant',esc(q.accountant||''))+fv('Additional accountant',q.accountant2?esc(q.accountant2):'')+
-        fv('Created by',esc(q.by||(made&&made.by)||'')+'<small>'+when(made?made.t:q.created)+'</small>')+
-        (latest?fv('Last update',latest):'')+
-        (q.invoiceId?fv('Sale',esc(q.invoiceId)):'')+(q.fromSale?fv('Created from sale',esc(q.fromSale)):'')+
-      '</dl></section>'+
-      '<section class="vsec"><div class="qd-sh"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th><th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
-      (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0;
-        return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
-        :'<tr><td colspan="4" class="cl-muted">No services on this quotation</td></tr>')+
-      '</tbody></table></div>'+
-      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+
-        '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
-      '<section class="vsec"><h3>Notes and terms</h3><dl class="fgrid qd-two">'+
-        '<div><dt>Customer notes</dt><dd>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<span class="cl-muted">No notes for the client</span>')+'</dd></div>'+
-        '<div><dt>Terms and conditions</dt><dd>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<span class="cl-muted">No terms and conditions</span>')+'</dd></div></dl></section>';
+    /* the quotation itself, signed when the client has signed it; beside it only what the document doesn't say */
+    var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+AI.copy+'</button>'; };
+    var row=function(label,html){ return '<div><dt>'+label+'</dt><dd>'+(html||'<span class="cl-muted">—</span>')+'</dd></div>'; };
+    var ev=function(types){ var l=ok.filter(function(e){ return types.indexOf(e.type)>=0; }); return l[l.length-1]; };
+    var by=function(e){ return e.by==='System'?'Automatically':'by '+esc(e.by); };
+    var step=function(cls,label,sub){ return '<li class="rq-st '+cls+'"><i>'+(cls==='done'?QD_IC.tick:cls==='bad'?QD_IC.x:'')+'</i><div><b>'+label+'</b><small>'+sub+'</small></div></li>'; };
+    var made=ev(['created'])||hist[0], sent=ev(['sent','resent']), out=ev(['accepted','rejected','cancelled','expired']), conv=ev(['converted']);
+    var outLbl={accepted:'Accepted',rejected:'Rejected',cancelled:'Cancelled',expired:'Expired'};
+    var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):when(q.created))+(q.fromSale?'<br>From sale '+esc(q.fromSale):''))+
+      step(sent?'done':'todo',sent?(sent.type==='resent'?'Sent again':'Sent'):'Not sent yet',sent?by(sent)+'<br>'+when(sent.t):'Send it to the client')+
+      (out?step(out.type==='accepted'?'done':'bad',outLbl[out.type],by(out)+'<br>'+when(out.t)):step('todo','Client response',sent?'Awaiting the client':'—'))+
+      (out&&out.type!=='accepted'?'':step(conv?'done':'todo',conv?'Invoiced':'Not invoiced',conv?'Sale '+esc(q.invoiceId)+' · '+by(conv)+'<br>'+when(conv.t):'Converted to a sale once accepted'));
+    b='<div class="qd-ov"><div class="qd-paper">'+quoteDocHtml(docOf(q))+'</div>'+
+      '<aside class="qd-side">'+
+        '<section class="qd-grp"><h4>Client</h4><dl>'+
+          row('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
+          row('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+'</dl>'+
+          (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
+        '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+row('Accountant',esc(q.accountant||''))+
+          (q.accountant2?row('Additional accountant',esc(q.accountant2)):'')+'</dl></section>'+
+        '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
+      '</aside></div>';
   }
   if(qdTab==='activity'){
     var list=hist.slice().sort(function(a,z){ return z.t-a.t; });
@@ -11251,12 +11280,25 @@ function paintDetail(keep){
       :'<p class="cl-muted">No activity has been recorded for this quotation yet.</p>')+'</section>';
   }
 
-  ov.innerHTML='<div class="drawer qd-drawer" role="dialog" aria-modal="true" aria-labelledby="qd-t">'+head+tabsH+'<div class="cl-vbody" id="qd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
+  ov.innerHTML='<div class="drawer qd-drawer qd-wide" role="dialog" aria-modal="true" aria-labelledby="qd-t">'+head+tabsH+'<div class="cl-vbody" id="qd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   document.getElementById('qd-b').scrollTop=y;
   document.getElementById('qd-x').onclick=closeDetail;
   ov.querySelectorAll('[data-qtab]').forEach(function(t){ t.onclick=function(){ qdTab=t.getAttribute('data-qtab'); paintDetail(); }; });
   ov.querySelectorAll('[data-qa]').forEach(function(x){ x.onclick=function(){ act(x.getAttribute('data-qa'),detailId); }; });
+  var mb=document.getElementById('qd-more');
+  if(mb) mb.onclick=function(){
+    if(menuEl&&menuEl.dataset.q==='qd'){ closeMenu(); mb.setAttribute('aria-expanded','false'); return; } closeMenu();
+    menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.q='qd';
+    menuEl.innerHTML=A.more.map(function(m,i){ return (m[3]&&i?'<hr role="separator">':'')+'<button role="menuitem" data-mi="'+m[0]+'"'+(m[3]?' class="'+m[3]+'"':'')+'>'+m[2]+'<span>'+esc(m[1])+'</span></button>'; }).join('');
+    document.body.appendChild(menuEl);
+    var r=mb.getBoundingClientRect(); menuEl.style.top=(r.bottom+4)+'px'; menuEl.style.left=Math.max(8,r.right-menuEl.offsetWidth)+'px';
+    mb.setAttribute('aria-expanded','true'); menuEl.querySelector('button').focus();
+    [].forEach.call(menuEl.querySelectorAll('[data-mi]'),function(x){ x.onclick=function(){ var k=x.getAttribute('data-mi'); closeMenu(); act(k,detailId); }; });
+    menuEl.onkeydown=function(e){ var it=[].slice.call(menuEl.querySelectorAll('button')), i=it.indexOf(document.activeElement);
+      if(e.key==='ArrowDown'){ e.preventDefault(); it[(i+1)%it.length].focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); it[(i-1+it.length)%it.length].focus(); } };
+  };
+  var qb=document.getElementById('qd-b'); if(qb) qb.addEventListener('scroll',closeMenu);
   ov.querySelectorAll('.qd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   var vc=ov.querySelector('[data-qd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+q.clientId); }catch(e){} };

@@ -13214,7 +13214,6 @@ table,td,th{font-size:13.5px}
 .mf-picked{display:flex;flex-wrap:wrap;gap:6px}
 .mf-pk{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 4px 0 10px;border-radius:999px;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:600}
 .mf-pk button{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--orange-ink)}.mf-pk button:hover{background:rgba(241,137,52,.18)}.mf-pk svg{width:10px;height:10px}
-.mf-rv{font-size:13px;font-weight:600;color:var(--orange-ink);font-variant-numeric:tabular-nums}
 .mf-sl{position:relative;height:24px;margin:2px 0}
 .mf-tr{position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:linear-gradient(to right,#E5E8EC var(--a),var(--orange) var(--a),var(--orange) var(--b),#E5E8EC var(--b))}
 .mf-sl input{position:absolute;inset:0;width:100%;height:100%;margin:0;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
@@ -13671,7 +13670,6 @@ function paintMoreFilters(focusSel){
   var clamp=function(v,dflt){ v=v===''?dflt:Number(v); return isNaN(v)?dflt:Math.min(top,Math.max(0,v)); };
   var lo=clamp(d.min,0), hi=clamp(d.max,top), pct=function(v){ return v/top*100; };
   var whole=function(v){ return '$'+Math.round(v).toLocaleString('en-AU'); };
-  var rangeText=function(a,b){ return a<=0&&b>=top?'Any amount':whole(a)+' – '+whole(b)+(b>=top?'+':''); };
   var y=document.getElementById('mf-body'), keep=y?y.scrollTop:0, again=!!ov.querySelector('.mf-panel');   // redraws don't slide in again
   ov.innerHTML='<div class="drawer mf-panel'+(again?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="mf-t">'+
     '<div class="modal-head"><h2 id="mf-t">More Filters</h2><button id="mf-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -13679,10 +13677,10 @@ function paintMoreFilters(focusSel){
       '<section class="mf-sec">'+chips('ptype',PAY_TYPES,'Payment type')+
         combo('acc',ASSIGNABLE.map(function(x){ return x.name; }),'Accountants','All accountants')+combo('branch',BRANCHES,'Branches','All branches')+
         combo('svc',svcOptions(),'Services','All services')+
-        '<div class="mf-f"><div class="mf-lh"><span>Sale amount</span><span class="mf-rv" id="mf-rv">'+rangeText(lo,hi)+'</span></div>'+
+        '<div class="mf-f"><div class="mf-lh"><span>Sale amount</span></div>'+
         '<div class="mf-sl" id="mf-sl" style="--a:'+pct(lo)+'%;--b:'+pct(hi)+'%"><div class="mf-tr"></div>'+
-          '<input type="range" id="mf-lo" min="0" max="'+top+'" step="'+step+'" value="'+lo+'" aria-label="Minimum sale amount">'+
-          '<input type="range" id="mf-hi" min="0" max="'+top+'" step="'+step+'" value="'+hi+'" aria-label="Maximum sale amount"></div></div></section>'+
+          '<input type="range" id="mf-lo" min="0" max="'+top+'" step="'+step+'" value="'+lo+'" aria-label="Minimum sale amount" aria-valuetext="'+whole(lo)+'">'+
+          '<input type="range" id="mf-hi" min="0" max="'+top+'" step="'+step+'" value="'+hi+'" aria-label="Maximum sale amount" aria-valuetext="'+whole(hi)+(hi>=top?'+':'')+'"></div></div></section>'+
     '</div>'+
     '<div class="modal-foot mf-foot"><button class="btn-ghost" id="mf-reset"'+(n?'':' disabled')+'>Reset</button><span class="sp-grow"></span><button class="btn-ghost" id="mf-cancel">Cancel</button><button class="btn-primary" id="mf-apply">Apply Filters</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
@@ -13696,11 +13694,11 @@ function paintMoreFilters(focusSel){
     x.onkeydown=function(ev){ if(ev.key==='Escape'){ ev.stopPropagation(); ev.preventDefault(); var k=x.getAttribute('data-mfq'); d.open=''; redraw('[data-mfo="'+k+'"]'); } }; });
   [].forEach.call(ov.querySelectorAll('[data-mf]'),function(x){ x.onchange=function(){ var k=x.getAttribute('data-mf'); toggle(k,x.value); redraw('[data-mf="'+k+'"][value="'+CSS.escape(x.value)+'"]'); }; });
   [].forEach.call(ov.querySelectorAll('[data-mfrm]'),function(x){ x.onclick=function(){ var k=x.getAttribute('data-mfrm'); toggle(k,x.getAttribute('data-v')); redraw('[data-mfo="'+k+'"]'); }; });
-  var sLo=document.getElementById('mf-lo'), sHi=document.getElementById('mf-hi'), sl=document.getElementById('mf-sl'), rv=document.getElementById('mf-rv');
+  var sLo=document.getElementById('mf-lo'), sHi=document.getElementById('mf-hi'), sl=document.getElementById('mf-sl');
   var slide=function(which){ var a=+sLo.value, b=+sHi.value;
     if(a>b){ if(which==='lo') sLo.value=a=b; else sHi.value=b=a; }
     d.min=a>0?String(a):''; d.max=b<top?String(b):''; d.errs={};
-    sl.style.setProperty('--a',pct(a)+'%'); sl.style.setProperty('--b',pct(b)+'%'); rv.textContent=rangeText(a,b);
+    sl.style.setProperty('--a',pct(a)+'%'); sl.style.setProperty('--b',pct(b)+'%'); sLo.setAttribute('aria-valuetext',whole(a)); sHi.setAttribute('aria-valuetext',whole(b)+(b>=top?'+':''));
     sLo.style.zIndex=a>=top-step?3:'';                                  // a low thumb pushed to the end stays grabbable
   };
   sLo.oninput=function(){ slide('lo'); }; sHi.oninput=function(){ slide('hi'); };

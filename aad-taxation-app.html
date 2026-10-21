@@ -12729,7 +12729,16 @@ table,td,th{font-size:13.5px}
 .sl-up{border-top:1px solid var(--line);padding-top:16px}
 .sl-sf .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}
 .sl-sf .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
-.sl-sf .qf-tot .sl-disc{align-items:center;min-height:32px}
+.sl-sf .qf-tot .sl-disc{align-items:center}
+.qf-tot .sl-dctl{display:flex;align-items:center;gap:10px;padding:2px 0 8px}
+.qf-tot .sl-dgrp{flex:1;display:flex;align-items:center;justify-content:flex-start;gap:0;height:38px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.sl-dgrp:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.sl-dgrp.bad{border-color:#F3A3A3;background:#FFF7F7}
+.sl-dgrp input{flex:1;min-width:0;height:100%;border:0;background:transparent;padding:0 12px;font-size:14px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.sl-dgrp input:focus{outline:none}
+.sl-dgrp select{height:100%;border:0;border-left:1px solid var(--line);background:#F6F7F9;padding:0 12px;font-size:13.5px;font-weight:700;color:var(--slate);cursor:pointer}
+.sl-dgrp select:focus{outline:none;color:var(--orange-ink)}
+.sl-drm{font-size:12.5px;font-weight:600;color:var(--mute);padding:4px 2px}.sl-drm:hover{color:var(--red)}
 .sl-disc dd{display:flex;align-items:center;gap:4px}
 .sl-dinp{width:96px}.sl-dinp .fin{height:34px}
 .sl-seg{display:inline-flex;background:#E9ECF0;padding:2px;border-radius:7px;flex-shrink:0}.sl-seg button{padding:0 10px;height:30px;border-radius:5px;font-size:12.5px;font-weight:700;color:var(--slate)}.sl-seg button.on{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -13325,11 +13334,10 @@ function paintSaleForm(focusId){
           '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
           '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></section>'+
         '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
-          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'<span class="seg sl-seg" role="group" aria-label="Discount type"><button type="button" data-dt="$" class="'+(d.discType==='%'?'':'on')+'" aria-pressed="'+!(d.discType==='%')+'">$</button><button type="button" data-dt="%" class="'+(d.discType==='%'?'on':'')+'" aria-pressed="'+(d.discType==='%')+'">%</button></span>'+
-            '<span class="qf-price sl-dinp'+(d.discType==='%'?' pct':'')+'"><span class="qf-cur">'+(d.discType==='%'?'%':'$')+'</span><input class="fin plain sm'+(e.discount?' bad':'')+'" id="sf-disc" type="number" min="0"'+(d.discType==='%'?' max="100" step="0.1"':' step="0.01"')+' inputmode="decimal" value="'+esc(d.discount)+'" aria-label="Discount '+(d.discType==='%'?'percentage':'in dollars')+'"></span>'+
-            '<button type="button" class="act" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button>'
-            :'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add Discount</button>')+'</dd></div>'+
-          (d.showDisc&&d.discType==='%'?'<p class="sl-damt">−<span id="sf-damt">'+money(T.disc)+'</span> off the sub total</p>':'')+
+          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
+          (d.showDisc?'<div class="sl-dctl"><div class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
+            '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></div>'+
+            '<button type="button" class="sl-drm" id="sf-discrm">Remove</button></div>':'')+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
@@ -13342,9 +13350,8 @@ function paintSaleForm(focusId){
 function liveTotals(){
   var d=SF.d, T=saleTotals(d,SF.paid);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),null,d.gst===false?'Not applied':money(T.gst),money(T.total),money(T.pending)];
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total),money(T.pending)];
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
-  var da=document.getElementById('sf-damt'); if(da) da.textContent=money(T.disc);
 }
 function wireSaleForm(focusId){
   var d=SF.d, touch=function(){ SF.dirty=true; };
@@ -13397,8 +13404,8 @@ function wireSaleForm(focusId){
   var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
   var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
   var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
-  [].forEach.call(ov.querySelectorAll('[data-dt]'),function(x){ x.onclick=function(){ var to=x.getAttribute('data-dt'); if(to===d.discType) return; d.discType=to; d.discount=''; delete SF.errs.discount; touch(); repaint('sf-disc'); }; });
-  var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; delete SF.errs.discount; touch(); liveTotals(); };
+  var dt=document.getElementById('sf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete SF.errs.discount; touch(); repaint('sf-disc'); };
+  var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; if(SF.errs.discount){ delete SF.errs.discount; var g=di.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-derr'); if(er) er.remove(); } touch(); liveTotals(); };
   /* document: one file, picked or dropped */
   var take=function(f){ if(!f) return; var ext=(f.name.split('.').pop()||'').toLowerCase();
     if(DOC_EXT.indexOf(ext)<0) SF.errs.doc=f.name+' isn’t a PDF, JPG, PNG or Word file.';

@@ -10924,7 +10924,7 @@ var DevData={
 var st=null, loadErr=null, clients=[];
 function expireDue(){ var ch=false, today=isoDay(Date.now()); st.list.forEach(function(q){ if(q.status==='sent'&&isoDay(q.validUntil)<today){ setStatus(q,'expired','expired',{by:'System',t:q.validUntil}); ch=true; } }); if(ch) QuoteStore.save(st); }
 function reload(){ try{ st=QuoteStore.load(); clients=loadClients(); expireDue(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
-function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{name:c.name,email:c.email||'',phone:c.phone||'',type:c.type,entity:c.entity}:{name:q.clientName||'Client no longer on file',email:'',phone:''}; }
+function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{id:c.id,name:c.name,email:c.email||'',phone:c.phone||'',type:c.type,entity:c.entity}:{name:q.clientName||'Client no longer on file',email:'',phone:''}; }
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
 function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
@@ -13548,7 +13548,7 @@ var DevData={
 var st=null, loadErr=null, clients=[];
 function reload(){ try{ st=SaleStore.load(); clients=loadClients(); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
 function save(){ return SaleStore.save(st); }
-function client(s){ var c=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0]; return c?{name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
+function client(s){ var c=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0]; return c?{id:c.id,name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
 function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
 
 /* ---------- money: payments and client credit reduce what's owed, each counted once ---------- */

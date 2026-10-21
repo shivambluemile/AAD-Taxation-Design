@@ -2836,9 +2836,9 @@ tbody tr:hover{background:#FCFCFD}
 @media (max-width:600px){.el-opts.two{grid-template-columns:1fr}}
 .el-prev{display:flex;flex-direction:column;gap:8px}
 /* Engagement letter: compact year line, document card, previous letters */
-.el-fy{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin:0;padding:9px 32px;border-bottom:1px solid var(--line);background:#FAFBFC;font-size:12.5px;color:var(--mute)}
+.el-fy{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin:0;padding:10px 32px 0;font-size:12.5px;color:var(--mute)}
 .el-fy b{color:var(--ink);font-size:12.5px}.el-fy span{white-space:nowrap}.el-fy span:before{content:"·";margin-right:14px;color:#CBD2DA}
-.el-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.el-card{border:1px solid var(--line);border-radius:12px;background:#fff;padding:18px 20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
 .el-ch{display:flex;align-items:center;gap:12px}
 .el-tt{flex:1;min-width:0}.el-tt h4{margin:0;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink)}.el-tt p{margin:2px 0 0;font-size:12.5px;color:var(--mute)}
 .el-to{margin:0;font-size:13.5px;color:var(--slate)}.el-to b{color:var(--ink)}.el-to span{color:var(--faint)}
@@ -2852,7 +2852,9 @@ tbody tr:hover{background:#FCFCFD}
 .el-menu{position:absolute;left:0;top:calc(100% + 4px);z-index:5;min-width:180px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);display:flex;flex-direction:column}
 .el-menu[hidden]{display:none}
 .el-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--ink)}.el-menu button:hover,.el-menu button:focus-visible{background:var(--orange-soft);color:var(--orange-ink);outline:none}
-.el-hs{padding-top:0}
+.el-main{display:flex;flex-direction:column;gap:12px}
+.el-none{display:flex;align-items:center;gap:8px;margin:0;padding:2px 4px;font-size:12.5px;color:var(--faint)}.el-none svg{width:14px;height:14px;flex-shrink:0}
+.el-acts{justify-content:flex-end;padding-top:2px}
 .el-hh{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left}
 .el-hh:hover:not([disabled]){border-color:#D6DBE1}.el-hh[aria-expanded="true"]{border-radius:12px 12px 0 0;border-bottom-color:var(--line-soft)}
 .el-hl{display:flex;align-items:center;gap:8px}.el-hl b{font-size:14px;color:var(--ink)}
@@ -5678,29 +5680,30 @@ function engagementTab(c){
       (A[2].length?'<span class="el-mw"><button type="button" class="el-more" data-elmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+EL_DOTS+'</button>'+
         '<span class="el-menu" role="menu" hidden>'+A[2].map(function(x){ return '<button type="button" role="menuitem" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</span></span>':'')+
     '</div>':'';
-  var card='<section class="vsec"><article class="el-card">'+
+  var card='<article class="el-card">'+
     '<header class="el-ch"><span class="ds-ic'+(st==='failed'?' bad':'')+'">'+OI.note+'</span><div class="el-tt"><h4>Engagement Letter</h4><p>FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1)+'</p></div>'+pill(EL_STATE,st)+'</header>'+
     (L||act.length?'<p class="el-to">To <b>'+esc(who||c.name)+'</b>'+(role?' <span>('+esc(role)+')</span>':'')+(mail?' · '+esc(mail):'')+'</p>':'<p class="el-to">No letter for this financial year yet. Assign a service first.</p>')+
     (L?'<dl class="el-meta">'+meta.map(function(m){ return '<div><dt>'+m[0]+'</dt><dd>'+m[1]+(m[2]?'<small>'+m[2]+'</small>':'')+'</dd></div>'; }).join('')+'</dl>':'')+
     ((st==='none'||st==='draft')&&act.length?review:'')+acts+
-  '</article></section>';
+  '</article>';
 
   /* ---- previous financial years ---- */
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var years=[]; older.forEach(function(l){ var y=letterFy(l); if(years.indexOf(y)<0) years.push(y); });
   var open=!!elOpen[c.id];
-  var hist='<section class="vsec el-hs"><button type="button" class="el-hh" data-elh aria-expanded="'+open+'"'+(older.length?'':' disabled')+'><span class="el-hl"><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span></span>'+
-      '<span class="el-hn">'+(older.length?(open?'Hide':'Show')+I.chev:'None yet')+'</span></button>'+
+  var hist=!older.length?'<p class="el-none">'+OI.note+'No previous engagement letters yet. Earlier years’ letters will be kept here.</p>':
+    '<div class="el-hs"><button type="button" class="el-hh" data-elh aria-expanded="'+open+'"><span class="el-hl"><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span></span>'+
+      '<span class="el-hn">'+(open?'Hide':'Show')+I.chev+'</span></button>'+
     (open&&older.length?'<div class="el-hlist">'+years.map(function(y){
       return '<div class="el-yg"><div class="el-yh"><b>FY '+fyLabel(y)+'</b><span>01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+older.filter(function(l){ return letterFy(l)===y; }).map(function(l){
         var exp=l.expiredAt||letterExpiresAt(l), s=elState(l);
         return '<div class="el-hrow"><div class="el-hi"><span>'+(l.status==='signed'?'Signed <b>'+dmyOf(l.signedAt)+'</b> by '+esc(l.signature.name):'<b>Not signed</b>')+'</span><span>'+(Date.now()>exp?'Expired':'Expires')+' '+whenOf(exp)+'</span><span>'+(elAuto(l)?'Automatic renewal':'Created manually')+'</span></div>'+
           pill(EL_STATE,s)+'<span class="el-hacts"><button class="linkbtn" data-elfull="'+l.id+'">Open</button><button class="sdt-ib" data-elpdf="'+l.id+'" title="Download PDF" aria-label="Download the FY '+fyLabel(y)+' letter">'+OI.dl+'</button></span></div>'; }).join('')+'</div>';
-    }).join('')+'</div>':'')+'</section>';
+    }).join('')+'</div>':'')+'</div>';
 
   /* the letter itself only while it still has to be checked before sending */
   var doc=(st==='none'&&act.length)?preview(actServices,null):st==='draft'?preview(L.services,L):'';
-  return fyBar+card+hist+doc;
+  return fyBar+'<section class="vsec el-main">'+card+hist+'</section>'+doc;
 }
 /* why a send failed: the last attempt, and the failures in the letter's audit trail */
 function elErrorDetails(c){

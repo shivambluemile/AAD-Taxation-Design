@@ -9926,6 +9926,18 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .fgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 24px;margin:0}
 .qd-drawer .fgrid dt{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin-bottom:5px}
 .qd-drawer .fgrid dd{margin:0;font-size:13.5px;color:var(--ink);overflow-wrap:anywhere}
+.qd-drawer .qd-head{align-items:center;padding:22px 32px 18px;flex-wrap:nowrap}
+.qd-drawer .qd-head h2{flex:1;min-width:0}
+.qd-drawer .qd-head .dhead-acts{flex-wrap:wrap}
+.qd-drawer .qd-info{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 28px}
+.qd-drawer .fgrid dd small{display:block;font-size:12px;color:var(--mute);margin-top:2px}
+.qd-drawer .fgrid dd .qd-cl{font-weight:700;color:var(--orange-ink);text-align:left}.qd-drawer .fgrid dd .qd-cl:hover{text-decoration:underline;text-underline-offset:2px}
+.qd-drawer .fgrid dd .qd-cl+small{display:inline;margin-left:6px}
+.qd-drawer .fgrid dd a{color:var(--ink);text-decoration:none}.qd-drawer .fgrid dd a:hover{color:var(--orange-ink);text-decoration:underline}
+.qd-drawer .qd-cp{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-width:0}.qd-drawer .qd-cp a{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qd-drawer .qd-two{grid-template-columns:repeat(2,minmax(0,1fr))}.qd-drawer .qd-two p{margin:0;color:var(--ink)}
+.qd-drawer .qd-sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px}.qd-drawer .qd-sh h3{margin:0}.qd-drawer .qd-sh span{font-size:12.5px;color:var(--faint)}
+@media (max-width:760px){.qd-drawer .qd-head{flex-wrap:wrap;padding-left:18px;padding-right:18px}.qd-drawer .qd-info{grid-template-columns:repeat(2,minmax(0,1fr))}.qd-drawer .qd-two{grid-template-columns:1fr}}
 .qd-t{width:100%}
 .qd-t thead th{padding:10px 14px}.qd-t tbody td{padding:11px 14px;font-size:13.5px;vertical-align:top}
 .qd-t tbody tr:hover{background:none}
@@ -11137,12 +11149,12 @@ function openHistory(id){
 }
 
 /* ---------- Step 3: Quotation Details, in the side panel (re-drawn after every change; Send and Edit return to it) ---------- */
-var detailId=null, qdTab='services';
+var detailId=null, qdTab='overview';
 function openDetail(id){
   closeMenu(); reload(); var q=byId(id);
   if(!q) return toast('This quotation no longer exists.',true);
   if(!inScope(q)) return toast('You don’t have access to this quotation.',true);
-  detailId=id; qdTab='services'; paintDetail();
+  detailId=id; qdTab='overview'; paintDetail();
 }
 function closeDetail(){ detailId=null; closeOv(); }
 /* Client link: the page the client opens from the email or SMS, in preview mode (nothing is signed or saved), and the real link to copy */
@@ -11190,41 +11202,45 @@ function paintDetail(keep){
   var hist=q.history||[], ok=hist.filter(function(e){ return e.ok; });
   var acts=ok.filter(function(e){ return ['sent','resent','accepted','rejected','cancelled','converted','expired'].indexOf(e.type)>=0; }), lastAct=acts[acts.length-1];
   var when=function(t){ return whenOf(t).replace(' · ',', '); };
-  var tabs=[['services','Services',items.length],['notes','Notes and terms']];
-  tabs.push(['activity','Activities',hist.length]);
-  if(!tabs.some(function(t){ return t[0]===qdTab; })) qdTab='services';
+  var tabs=[['overview','Overview'],['activity','Activities',hist.length]];
+  if(!tabs.some(function(t){ return t[0]===qdTab; })) qdTab='overview';
 
-  /* header: everything about the quotation at a glance, each fact once */
-  var dc=function(icon,html){ return html?'<span class="dc"><i class="dci">'+icon+'</i>'+html+'</span>':''; };
+  /* header: the quotation number, its status and what can be done with it, on one line */
   var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+AI.copy+'</button>'; };
-  var who=cr?'<button class="qd-cl" data-qd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+' <small>(no longer on file)</small>';
-  var latest=lastAct?(lastAct.type==='expired'?'Expired '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+', '+dmyOf(lastAct.t)):'';
-  if(q.invoiceId) latest=(latest?latest+' · ':'')+'Sale <b>'+esc(q.invoiceId)+'</b>';   // the linked sale, once, beside who converted it and when
-  var head='<div class="cl-dhead"><div class="dpmain"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
-      '<div class="dmetaline">'+dc(QD_IC.user,who+(q.onName&&q.onName!==c.name?' <small>on the name of</small> '+esc(q.onName):'')+(q.toName&&q.toName!==(q.onName||c.name)?' <small>to</small> '+esc(q.toName):''))+
-        (c.email?dc(QD_IC.mail,'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)):'')+
-        (c.phone?dc(QD_IC.phone,esc(c.phone)+copy(c.phone)):'')+'</div>'+
-      '<div class="dmetaline">'+dc(QD_IC.cal,dmyOf(q.created)+' <small>to</small> '+dmyOf(q.validUntil))+dc(QD_IC.branch,esc(q.branch))+
-        dc(QD_IC.staff,esc(q.accountant)+(q.accountant2?', '+esc(q.accountant2):''))+(latest?dc(QD_IC.clock,latest):'')+'</div></div>'+
+  var head='<div class="cl-dhead qd-head"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
     '<div class="dhead-acts">'+detailActions(q).map(function(a){ return '<button class="btn-ghost'+(a[3]==='danger'?' danger':'')+'" data-qa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
       '<button class="x" id="qd-x" aria-label="Close">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Quotation details">'+tabs.map(function(t){
     var on=t[0]===qdTab; return '<button role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-qtab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
 
   var b='';
-  if(qdTab==='services'){
-    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. Rates include GST.</p></div>'+
-      '<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th><th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
+  if(qdTab==='overview'){
+    var fv=function(label,html){ return '<div><dt>'+label+'</dt><dd>'+(html||'<span class="cl-muted">—</span>')+'</dd></div>'; };
+    var made=hist.filter(function(e){ return e.type==='created'; })[0];
+    var latest=lastAct?(lastAct.type==='expired'?'Expired on '+dmyOf(lastAct.t):esc(EV[lastAct.type][1]||EV[lastAct.type][0])+' '+esc(lastAct.by)+'<small>'+when(lastAct.t)+'</small>'):'';
+    var who=cr?'<button class="qd-cl" data-qd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+' <small>No longer on file</small>';
+    b='<section class="vsec"><h3>Quotation details</h3><dl class="fgrid qd-info">'+
+        fv('Client',who)+
+        fv('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
+        fv('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+
+        (q.onName&&q.onName!==c.name?fv('On the name of',esc(q.onName)):'')+
+        (q.toName&&q.toName!==(q.onName||c.name)?fv('Attention',esc(q.toName)):'')+
+        fv('Quotation date',dmyOf(q.created))+fv('Valid until',dmyOf(q.validUntil))+fv('Branch',esc(q.branch||''))+
+        fv('Accountant',esc(q.accountant||''))+fv('Additional accountant',q.accountant2?esc(q.accountant2):'')+
+        fv('Created by',esc(q.by||(made&&made.by)||'')+'<small>'+when(made?made.t:q.created)+'</small>')+
+        (latest?fv('Last update',latest):'')+
+        (q.invoiceId?fv('Sale',esc(q.invoiceId)):'')+(q.fromSale?fv('Created from sale',esc(q.fromSale)):'')+
+      '</dl></section>'+
+      '<section class="vsec"><div class="qd-sh"><h3>Services</h3><span>Rates include GST</span></div><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Service</th><th class="r">Quantity</th><th class="r">Unit price</th><th class="r">Line total</th></tr></thead><tbody>'+
       (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0;
         return '<tr><td><b>'+esc(x.name)+'</b>'+(x.desc?'<small>'+esc(x.desc)+'</small>':'')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
         :'<tr><td colspan="4" class="cl-muted">No services on this quotation</td></tr>')+
       '</tbody></table></div>'+
-      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Total discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+
-        '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>';
-  }
-  if(qdTab==='notes'){
-    b='<section class="vsec"><h3>Client-facing notes</h3>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<p class="cl-muted">No notes for the client</p>')+'</section>'+
-      '<section class="vsec"><h3>Terms and conditions</h3>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<p class="cl-muted">No terms and conditions</p>')+'</section>';
+      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+
+        '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
+      '<section class="vsec"><h3>Notes and terms</h3><dl class="fgrid qd-two">'+
+        '<div><dt>Customer notes</dt><dd>'+(q.customerNotes?'<p>'+esc(q.customerNotes)+'</p>':'<span class="cl-muted">No notes for the client</span>')+'</dd></div>'+
+        '<div><dt>Terms and conditions</dt><dd>'+(q.terms?'<p>'+esc(q.terms)+'</p>':'<span class="cl-muted">No terms and conditions</span>')+'</dd></div></dl></section>';
   }
   if(qdTab==='activity'){
     var list=hist.slice().sort(function(a,z){ return z.t-a.t; });

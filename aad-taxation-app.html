@@ -2834,7 +2834,14 @@ tbody tr:hover{background:#FCFCFD}
 .el-sigcol{flex:0 0 auto;display:flex;flex-direction:column;gap:6px}.el-sigline{font-size:12px;color:var(--mute)}
 .el-sigmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.el-sigmeta b{font-size:14px;color:var(--ink)}.el-sigmeta span{font-size:12.5px;color:var(--mute)}
 @media (max-width:600px){.el-opts.two{grid-template-columns:1fr}}
-.el-prev{display:flex;flex-direction:column;gap:8px}.el-prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.el-prev{display:flex;flex-direction:column;gap:8px}
+.el-hist .ds-pr{padding:12px 0}
+.el-yr{font-size:12px}
+.el-hrow{display:flex;align-items:center;gap:12px;margin-top:8px;padding:8px 12px;border:1px solid var(--line-soft);border-radius:10px;background:#fff}
+.el-hrow .ds-sub{flex:1;min-width:0;margin:0}
+.el-hacts{display:flex;align-items:center;gap:6px;flex-shrink:0}.el-hacts .linkbtn{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}
+.el-hacts .linkbtn svg{width:13px;height:13px}
+.ds-acts .btn-edit{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}.el-prow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
 .el-prow>div{flex:1;min-width:0}.el-prow b{display:block;font-size:13.5px;color:var(--ink)}.el-prow small{font-size:12px;color:var(--mute)}
 .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:4px 0}
 .linkbtn:hover:not([disabled]){text-decoration:underline;text-underline-offset:2px}
@@ -5602,24 +5609,53 @@ function notesTabC(c){
     '<section class="vsec">'+(list.length?'<div class="ntl">'+list.map(function(n){ return '<div class="ntl-i"><span class="ntl-av" aria-hidden="true">'+esc(String(n.by||'?').trim().split(' ').map(function(p){ return p[0]; }).join('').slice(0,2).toUpperCase())+'</span>'+
       '<div class="ntl-b"><div class="ntl-h"><b>'+esc(n.by)+'</b><span>'+whenOf(n.t)+'</span></div><p>'+esc(n.text)+'</p></div></div>'; }).join('')+'</div>':'<p class="cl-muted">No notes yet.</p>')+'</section>';
 }
+var elOpen={};                                               // client id -> document history shown
+/* the engagement letter as a document: this financial year's letter on one card, earlier years in a collapsible history grouped by year */
 function engagementTab(c){
   ONB=loadOnb(); var F=fyStart(Date.now()), L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var fyBar='<div class="el-fybar"><b>Financial year '+fyLabel(F)+'</b><span>Letters expire at the end of 30-06-'+(F+1)+'. On 01-07-'+(F+1)+' a new letter is generated and emailed for signing. Earlier letters are kept.</span></div>';
-  var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
-  var prev=older.length?'<section class="vsec"><div class="vsec-h"><h3>Earlier letters</h3><span class="cl-muted">Kept for audit</span></div><div class="el-prev">'+older.map(function(l){
-    return '<div class="el-prow"><div><b>FY '+fyLabel(letterFy(l))+'</b><small>'+(l.status==='signed'?'Signed '+dmyOf(l.signedAt)+' by '+esc(l.signature.name):'Never signed')+' · expired '+whenOf(l.expiredAt||letterExpiresAt(l))+'</small></div>'+pill(LETTER_STATUS,letterState(l))+
-      '<button class="linkbtn" data-elpdf="'+l.id+'">'+OI.print+'Open</button></div>'; }).join('')+'</div></section>':'';
   var review=function(){ return '<label class="el-review"><input type="checkbox" id="el-rev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'; };
+  var preview=function(services,x){ return '<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,services,x))+'</div></section>'; };
+  var actServices=act.map(function(a){ return {name:a.name,price:a.price}; });
   if(c._draft) return fyBar+'<div class="vbar"><p>'+(act.length?'This is a preview of the engagement letter. Finish setup to sign or send it.':'No services assigned yet, so there’s nothing to put in the letter.')+'</p></div>'+
-    (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>':'');
-  if(!L) return fyBar+'<div class="vbar"><p>No engagement letter for '+fyLabel(F)+' yet'+(act.length?'':'. Assign a service first')+'.</p>'+(act.length?'<span class="vsec-acts"><button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?esc(sg.name||'the director'):'client')+'</button></span>':'')+'</div>'+
-    (act.length?'<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,act.map(function(a){ return {name:a.name,price:a.price}; }),null))+'</div></section>'+review():'')+prev;
-  var h=fyBar+'<div class="vbar'+(L.status==='signed'?' el-sbar':'')+'"><p>'+pill(LETTER_STATUS,L.status)+' '+(L.status==='signed'?'On '+dmyOf(L.signedAt)+' by <b>'+esc(L.signature.name)+'</b>'+(L.method==='manual'?' (recorded by staff)':' (signed through the link)'):
-      L.status==='sent'?'Emailed '+whenOf(L.sends[L.sends.length-1].at)+' to <b>'+esc((L.signer&&L.signer.name)||sg.name)+'</b>. Waiting for them to sign.':'')+'</p><span class="vsec-acts">'+
-    (L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':
-      '<button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button>')+'</span></div>';
-  h+='<section class="vsec"><div class="el-wrap">'+letterHtml(letterCtx(c,L.services,L))+'</div></section>';
-  return h+prev;
+    (act.length?preview(actServices,null):'');
+
+  /* history: every other letter, newest year first; a year can hold more than one letter */
+  var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
+  var years=[]; older.forEach(function(l){ var y=letterFy(l); if(years.indexOf(y)<0) years.push(y); });
+  var open=!!elOpen[c.id];
+  var toggle=older.length?'<button class="ds-more" data-elh aria-expanded="'+open+'">'+(open?'Hide':'Show')+' document history ('+older.length+' letter'+(older.length===1?'':'s')+')'+I.chev+'</button>':'<span>No earlier letters</span>';
+  var history=older.length&&open?'<div class="ds-prev el-hist">'+years.map(function(y){
+      var ls=older.filter(function(l){ return letterFy(l)===y; });
+      return '<div class="ds-pr"><div class="ds-prh"><b>FY '+fyLabel(y)+'</b><span class="cl-muted el-yr">01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+ls.map(function(l){
+        var exp=l.expiredAt||letterExpiresAt(l), gone=Date.now()>exp;
+        return '<div class="el-hrow"><div class="ds-sub">'+(l.status==='signed'?'Signed <em>'+dmyOf(l.signedAt)+'</em> by '+esc(l.signature.name):'<em>Not signed</em>')+' · '+(gone?'Expired':'Expires')+' <em>'+whenOf(exp)+'</em></div>'+
+          pill(LETTER_STATUS,letterState(l))+
+          '<span class="el-hacts"><button class="linkbtn" data-elfull="'+l.id+'">'+OI.ext+'Open</button><button class="sdt-ib" data-elpdf="'+l.id+'" title="Download PDF" aria-label="Download the FY '+fyLabel(y)+' letter">'+OI.dl+'</button></span></div>'; }).join('')+'</div>';
+    }).join('')+'</div>':'';
+
+  /* this year's letter, prominently */
+  var sub, by, acts;
+  if(!L){
+    sub='No letter for this financial year yet'+(act.length?'':'. Assign a service first');
+    by='<span>Expires at the end of 30-06-'+(F+1)+'</span>';
+    acts=act.length?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Send to '+(c.type==='company'?esc(sg.name||'the director'):'client')+'</button>':'';
+  } else {
+    var last=L.sends&&L.sends.length?L.sends[L.sends.length-1]:null;
+    sub=(L.status==='signed'?'Signed <em>'+dmyOf(L.signedAt)+'</em> by <em>'+esc(L.signature.name)+'</em>'+(L.method==='manual'?' (recorded by staff)':' (through the signing link)'):
+      L.status==='sent'&&last?'Emailed <em>'+whenOf(last.at)+'</em> to <em>'+esc((L.signer&&L.signer.name)||sg.name)+'</em> · waiting for signature':
+      L.status==='failed'?'Not delivered'+(last&&last.error?': '+esc(last.error):''):'Not sent yet')+' · Expiry: <em>'+whenOf(letterExpiresAt(L))+'</em>';
+    by='<span>Created by <b>'+esc(L.by)+'</b> · '+whenOf(L.created)+'</span>';
+    acts=L.status!=='signed'?'<button class="btn-ghost btn-sm" data-el="sign">'+OI.pen+'Sign manually</button><button class="btn-edit" data-el="send">'+OI.send+'Resend</button>':
+      '<button type="button" class="btn-ghost btn-sm" data-el="full">'+OI.ext+'Open</button><button type="button" class="btn-ghost btn-sm" data-el="pdf">'+OI.dl+'Download PDF</button>';
+  }
+  var card='<section class="vsec"><div class="ds-item"><div class="ds-row"><span class="ds-ic">'+OI.note+'</span>'+
+      '<div class="ds-tt"><b>Engagement letter · FY '+fyLabel(F)+'</b><div class="ds-sub">'+sub+'</div><div class="ds-by">'+by+toggle+'</div></div>'+
+      '<div class="ds-st">'+(L?pill(LETTER_STATUS,letterState(L)):pill({none:['Not created','grey']},'none'))+'</div>'+
+      (acts?'<div class="ds-acts">'+acts+'</div>':'')+
+    '</div>'+history+'</div></section>';
+  if(!L) return fyBar+card+(act.length?preview(actServices,null)+review():'');
+  return fyBar+card+preview(L.services,L);
 }
 /* sign or (re)send the letter from the client's record */
 function letterAction(c,what,refresh){
@@ -5627,6 +5663,7 @@ function letterAction(c,what,refresh){
   var services=L?L.services:act.map(function(a){ return {name:a.name,price:a.price}; });
   if(what==='pdf') return printLetter(letterHtml(letterCtx(c,services,L)));
   if(what==='full') return printLetter(letterHtml(letterCtx(c,services,L)),true);
+  if(what.indexOf('full:')===0){ var o2=ONB.letters.filter(function(l){ return l.id===what.slice(5); })[0]; if(o2) printLetter(letterHtml(letterCtx(c,o2.services,o2)),true); return; }
   if(what.indexOf('pdf:')===0){ var old=ONB.letters.filter(function(l){ return l.id===what.slice(4); })[0]; if(old) printLetter(letterHtml(letterCtx(c,old.services,old))); return; }
   var rv=document.getElementById('el-rev');
   if(rv&&!rv.checked){ toast('Review the letter and tick the box first',true); rv.focus(); rv.closest('.el-review').classList.add('bad'); return; }
@@ -5684,6 +5721,8 @@ function wireClientTab(c,t,body,repaintTab){
   }
   if(t==='engagement'){ body.querySelectorAll('[data-el]').forEach(function(b){ b.onclick=function(){ letterAction(c,b.dataset.el,repaintTab); }; });
     body.querySelectorAll('[data-elpdf]').forEach(function(b){ b.onclick=function(){ letterAction(c,'pdf:'+b.dataset.elpdf,repaintTab); }; });
+    body.querySelectorAll('[data-elfull]').forEach(function(b){ b.onclick=function(){ letterAction(c,'full:'+b.dataset.elfull,repaintTab); }; });
+    body.querySelectorAll('[data-elh]').forEach(function(b){ b.onclick=function(){ elOpen[c.id]=!elOpen[c.id]; repaintTab(); }; });
     var rv=document.getElementById('el-rev'); if(rv) rv.onchange=function(){ rv.closest('.el-review').classList.remove('bad'); }; }
 }
 

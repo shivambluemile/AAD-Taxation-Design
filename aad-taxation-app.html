@@ -8108,6 +8108,22 @@ button.fchip:hover{border-color:var(--orange);color:var(--orange-ink)}
 .sf-brow span{font-size:12.5px;color:var(--mute)}
 .sf-rm{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute)}.sf-rm:hover{background:#FEF2F2;color:var(--red)}
 .sf-none{font-size:13px;color:var(--faint)}
+/* shift requests */
+.rq-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-left:2px;border-radius:999px;background:var(--orange);color:#fff;font-size:11.5px;font-weight:700}
+.drawer.rq-drawer{max-width:min(520px,100vw)}
+.rq-hint{font-size:13px;color:var(--mute);line-height:1.5;margin:0}
+.rq-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.rq-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rq-who{display:flex;flex-direction:column;gap:2px}.rq-who b{font-size:14px;color:var(--ink)}.rq-who span{font-size:12.5px;color:var(--mute)}
+.rq-times{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0;background:#FAFBFC;border-radius:10px;padding:10px 12px}
+.rq-times dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#64748B}.rq-times dd{margin:3px 0 0;font-size:14px;font-weight:600;color:var(--ink)}
+.rq-reason{font-size:13.5px;color:var(--slate);line-height:1.5;margin:0;overflow-wrap:anywhere}
+.rq-acts{display:flex;align-items:center;gap:8px}.rq-acts .btn-ghost,.rq-acts .btn-primary{height:34px;padding:0 14px;font-size:12.5px}.rq-acts small{font-size:12px;color:var(--faint)}
+.rq-empty{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:40px 16px;color:var(--mute);font-size:13px}.rq-empty b{font-size:14px;color:var(--ink)}
+.rq-mine{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:16px}
+.rq-mrow{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.rq-mrow div{display:flex;flex-direction:column;gap:2px}.rq-mrow b{font-size:13.5px;color:var(--ink)}.rq-mrow small{font-size:12px;color:var(--mute)}
+.rq-dn{margin:-4px 0 0;font-size:12.5px;color:var(--red)}
 .sf-drop{display:flex;align-items:center;gap:12px;border:1.5px dashed #D6DBE1;border-radius:12px;padding:14px 16px;background:#FCFCFD;cursor:pointer}
 .sf-drop:hover,.sf-drop.drag{border-color:var(--orange);background:var(--orange-soft)}
 .sf-dic{width:36px;height:36px;border-radius:10px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -8506,6 +8522,8 @@ function render(){
   var h='<div class="page-head"><h1>Attendance</h1><div class="ph-acts">'+
     '<button class="btn-ghost" id="csv"'+(rows.length?'':' disabled')+' title="Export the records shown ('+esc(monthName(f.month))+') as a CSV file">'+I.csv+'Export</button>'+
     '<button class="btn-ghost" id="ar-leave">'+I.cal+'Apply for leave</button>'+
+    (mg?'<button class="btn-ghost" id="ar-reqs">'+I.cal+'Shift requests'+(pendingReqs().length?'<b class="rq-n">'+pendingReqs().length+'</b>':'')+'</button>'
+       :'<button class="btn-ghost" id="ar-req">'+I.plus+'Request shift</button>')+
     (mg?'<button class="btn-primary" id="ar-add">'+I.plus+'Add Shift</button>':'')+'</div></div>';
   // same filter bar as the other modules: search on the left, "Filter By:" dropdowns, Clear filters when any is set
   h+='<div class="filterbar"><div class="search">'+I.search+
@@ -8566,6 +8584,8 @@ function render(){
   var am=document.getElementById('allm'); if(am) am.onclick=function(){ state.f.month=''; state.page=1; render(); };
   document.getElementById('ar-leave').onclick=function(){ applyLeave({staff:ME.id}); };
   var ad=document.getElementById('ar-add'); if(ad) ad.onclick=function(){ shiftForm(null); };
+  var rq=document.getElementById('ar-req'); if(rq) rq.onclick=function(){ requestForm(); };
+  var rqs=document.getElementById('ar-reqs'); if(rqs) rqs.onclick=function(){ openRequests(); };
   Array.prototype.forEach.call(content.querySelectorAll('.pager button'),function(b){
     b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); content.scrollTop=0; };
   });
@@ -8962,6 +8982,130 @@ function deleteShift(key){
 }
 /* leave from the timesheet: the Leave page opens Add Leave with the person (and day) filled in */
 function applyLeave(pre){ try{ parent.AADApplyLeave(pre); }catch(x){ toast('Open Leave to apply for leave.',true); } }
+
+/* ---------- shift requests: staff ask for a shift they forgot to log (or to log in / out) to be corrected; a manager approves or declines ---------- */
+var REQ_KEY='aad-shift-requests-v1';
+function keyOff(n){ var d=new Date(); d.setDate(d.getDate()-n); return dayKey(d); }
+function loadReqs(){
+  var v=null; try{ v=JSON.parse(localStorage.getItem(REQ_KEY)||'null'); }catch(e){}
+  if(!v||!Array.isArray(v.list)){                                   // sample requests for the prototype, made once
+    var now=Date.now(), s=function(staff,n,li,lo,why,ago){ return {id:'R'+staff+n,staff:staff,date:keyOff(n),login:li,logout:lo,reason:why,at:now-ago*36e5,status:'pending',by:member(staff).n}; };
+    v={list:[s('KPG1004',2,'09:00','17:30','Forgot to log out after an off-site client meeting.',20),
+             s('KPG1009',1,'08:50','17:20','Forgot to log in when I started in the morning.',30),
+             s('KPG1002',6,'09:10','17:05','The system was down, so I couldn’t start the shift.',100)]};
+    saveReqs(v);
+  }
+  return v;
+}
+function saveReqs(v){ try{ localStorage.setItem(REQ_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function pendingReqs(){ return loadReqs().list.filter(function(q){ return q.status==='pending'; }).sort(function(a,b){ return a.at-b.at; }); }
+function rqT(v){ if(!v) return '—'; var p=v.split(':'), h=+p[0], ap=h<12?'AM':'PM'; h=h%12||12; return pad(h)+':'+p[1]+' '+ap; }
+function closeReq(){ ov.classList.remove('open','as-drawer'); ov.innerHTML=''; document.body.style.overflow=''; }
+
+/* staff: Request shift */
+var rf=null;
+function requestForm(){ rf={d:{date:'',login:'',logout:'',reason:''},errs:{},busy:false}; paintRequestForm(); }
+function paintRequestForm(){
+  var d=rf.d, e=rf.errs, mine=loadReqs().list.filter(function(q){ return q.staff===ME.id; }).sort(function(a,b){ return b.at-a.at; }).slice(0,5);
+  var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
+  var inp=function(k,label,type,o){ o=o||{}; return '<div><label class="flabel" for="rq-'+k+'">'+label+(o.req?' <span class="req-star">*</span>':'')+'</label>'+
+    '<input class="fin plain sm'+(e[k]?' bad':'')+'" id="rq-'+k+'" data-rq="'+k+'" type="'+type+'" value="'+esc(d[k])+'"'+(o.max?' max="'+o.max+'"':'')+'>'+err(k)+'</div>'; };
+  var st={pending:['Pending','open'],approved:['Approved',''],declined:['Declined','no']};
+  ov.innerHTML='<div class="drawer sf rq-drawer" role="dialog" aria-modal="true" aria-labelledby="rq-t">'+
+    '<div class="modal-head"><h2 id="rq-t">Request shift</h2><button id="rq-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body">'+
+      '<p class="rq-hint">Forgot to log in, start a shift or log out? Ask for it to be corrected. Your manager reviews it before it’s added to your attendance.</p>'+
+      inp('date','Shift date','date',{req:true,max:dayKey()})+
+      '<div class="sf-grid">'+inp('login','Log in','time')+inp('logout','Log out','time')+'</div>'+err('times')+
+      '<div><label class="flabel" for="rq-reason">Reason <span class="req-star">*</span></label><textarea class="ftext'+(e.reason?' bad':'')+'" id="rq-reason" data-rq="reason" rows="3" maxlength="300" placeholder="Why does this need correcting? e.g. forgot to log out">'+esc(d.reason)+'</textarea>'+err('reason')+'</div>'+
+      (mine.length?'<div class="rq-mine"><span class="flabel">Your recent requests</span>'+mine.map(function(q){ var s=st[q.status];
+        return '<div class="rq-mrow"><div><b>'+dmy(fromKey(q.date))+'</b><small>'+rqT(q.login)+' – '+rqT(q.logout)+'</small></div><span class="ad-chip '+s[1]+'"><i></i>'+s[0]+'</span></div>'+
+          (q.status==='declined'&&q.note?'<p class="rq-dn">'+esc(q.note)+'</p>':''); }).join('')+'</div>':'')+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="rq-cancel">Cancel</button><button class="btn-primary" id="rq-go">Submit request</button></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  [].forEach.call(ov.querySelectorAll('[data-rq]'),function(el){ el.oninput=el.onchange=function(){ rf.d[el.getAttribute('data-rq')]=el.value; }; });
+  document.getElementById('rq-x').onclick=function(){ rf=null; closeReq(); };
+  document.getElementById('rq-cancel').onclick=function(){ rf=null; closeReq(); };
+  document.getElementById('rq-go').onclick=submitRequest;
+}
+function submitRequest(){
+  if(!rf||rf.busy) return;
+  var d=rf.d, e={}, today=dayKey(), r=d.date?dayOf(ME.id+'|'+d.date):null, hasStart=r&&!r.isLeave&&shiftsOf(r.events)[0]&&shiftsOf(r.events)[0].start;
+  if(!d.date) e.date='Choose the shift date'; else if(d.date>today) e.date='The date can’t be in the future';
+  if(!d.login&&!d.logout) e.times='Enter the log in time, the log out time, or both';
+  else if(!d.login&&!hasStart) e.times='Enter the log in time: there’s no shift started on that day';
+  else if(d.login&&d.logout&&d.logout<=d.login) e.times='The log out time must be after the log in time';
+  if(d.date&&!e.date&&r&&r.isLeave) e.date='You’re on approved leave that day';
+  if(!d.reason.trim()) e.reason='Say why this needs correcting';
+  if(d.date&&!e.date&&pendingReqs().some(function(q){ return q.staff===ME.id&&q.date===d.date; })) e.date='You already have a pending request for this date';
+  rf.errs=e;
+  if(Object.keys(e).length){ paintRequestForm(); var x=ov.querySelector('.bad'); if(x) x.focus(); return; }
+  rf.busy=true;
+  var v=loadReqs(); v.list.push({id:'R'+Date.now().toString(36),staff:ME.id,by:ME.name,date:d.date,login:d.login,logout:d.logout,reason:d.reason.trim(),at:Date.now(),status:'pending'});
+  if(!saveReqs(v)){ rf.busy=false; return toast('The request couldn’t be sent. Try again.',true); }
+  rf=null; closeReq(); render(); toast('Request sent for '+dmy(fromKey(d.date))+'. Your manager will review it.');
+}
+
+/* managers: Shift requests */
+function openRequests(){
+  if(!canManage()) return;
+  var list=pendingReqs();
+  ov.innerHTML='<div class="drawer sf rq-drawer" role="dialog" aria-modal="true" aria-labelledby="rqs-t">'+
+    '<div class="modal-head"><h2 id="rqs-t">Shift requests</h2><button id="rqs-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body">'+
+      '<p class="rq-hint">Requests from staff for shifts they forgot to log. Approving adds or corrects the shift in their attendance.</p>'+
+      (list.length?list.map(function(q){
+        return '<div class="rq-card"><div class="rq-top"><div class="rq-who"><b>'+esc(member(q.staff).n)+'</b><span>'+weekday(fromKey(q.date))+', '+dmy(fromKey(q.date))+'</span></div><span class="ad-chip open"><i></i>Pending</span></div>'+
+          '<dl class="rq-times"><div><dt>Log in</dt><dd>'+rqT(q.login)+'</dd></div><div><dt>Log out</dt><dd>'+rqT(q.logout)+'</dd></div></dl>'+
+          '<p class="rq-reason">'+esc(q.reason)+'</p>'+
+          '<div class="rq-acts"><small>Asked '+dmy(new Date(q.at))+'</small><span class="sp-grow"></span><button class="btn-ghost btn-sm" data-dec="'+q.id+'">Decline</button><button class="btn-primary btn-sm" data-app="'+q.id+'">Approve</button></div></div>';
+      }).join(''):'<div class="rq-empty"><b>No pending requests</b><span>Shift requests raised by staff will appear here.</span></div>')+
+    '</div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('rqs-x').onclick=closeReq;
+  [].forEach.call(ov.querySelectorAll('[data-app]'),function(x){ x.onclick=function(){ x.disabled=true; approveReq(x.getAttribute('data-app')); }; });
+  [].forEach.call(ov.querySelectorAll('[data-dec]'),function(x){ x.onclick=function(){ declineReq(x.getAttribute('data-dec')); }; });
+}
+function approveReq(id){
+  var v=loadReqs(), q=v.list.filter(function(x){ return x.id===id; })[0];
+  if(!q||q.status!=='pending'){ render(); return openRequests(); }
+  var r=dayOf(q.staff+'|'+q.date), who=member(q.staff).n;
+  if(r&&r.isLeave){ toast(who+' is on approved leave on '+dmy(fromKey(q.date))+'. Decline the request, or change the leave first.',true); return openRequests(); }
+  if(r&&r.mine&&r.today&&(data.today.status==='on'||data.today.status==='break')){ toast('This shift is still running. It can be corrected once it has ended.',true); return openRequests(); }
+  var at=function(tm){ return atOf(q.date,tm); }, ev=r?JSON.parse(JSON.stringify(r.events)):[];
+  var st=ev.filter(function(x){ return x.type==='start'; })[0], en=ev.filter(function(x){ return x.type==='end'; }).slice(-1)[0];
+  if(q.login){ if(st){ st.at=at(q.login); st.how='request'; } else ev.unshift({type:'start',at:at(q.login),how:'request'}); }
+  if(q.logout){ if(en){ en.at=at(q.logout); en.how='request'; } else ev.push({type:'end',at:at(q.logout),how:'request'}); }
+  ev.sort(function(a,b){ return a.at-b.at; });
+  var meta={by:ME.name,at:Date.now(),added:!r,request:q.id};
+  if(q.staff===ME.id){
+    data=loadShift();
+    if(q.date===dayKey()){ data.today.events=ev; data.today.status=ev.some(function(x){ return x.type==='end'; })?'ended':'on'; data.today.meta=meta; }
+    else { data.history=data.history.filter(function(h){ return h.date!==q.date; }); data.history.push({date:q.date,events:ev,meta:meta}); data.history.sort(function(a,b){ return a.date<b.date?1:-1; }); }
+    saveShift(data); try{ parent.AADShiftTick(); }catch(x){}
+  } else {
+    team=loadTeam(); team.days=team.days.filter(function(h){ return !(h.staff===q.staff&&h.date===q.date); });
+    team.days.push({staff:q.staff,date:q.date,events:ev,meta:meta}); saveTeam(team);
+  }
+  q.status='approved'; q.decidedBy=ME.name; q.decidedAt=Date.now(); saveReqs(v);
+  render(); openRequests(); toast('Approved. '+who+'’s shift on '+dmy(fromKey(q.date))+' is '+(r?'corrected':'added')+'.');
+}
+function declineReq(id){
+  var q=loadReqs().list.filter(function(x){ return x.id===id; })[0]; if(!q) return;
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="rd-t"><div class="confirm-body"><h3 id="rd-t">Decline this request?</h3>'+
+    '<p><strong>'+esc(member(q.staff).n)+'</strong>’s request for '+dmy(fromKey(q.date))+' won’t be added to their attendance.</p>'+
+    '<label class="flabel" for="rd-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="rd-n" rows="3" maxlength="300" placeholder="Shown to the staff member"></textarea><span class="ferr" id="rd-e">Say why it’s declined</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="rd-no">Cancel</button><button class="btn-danger" id="rd-go">Decline request</button></div></div>';
+  dlg.classList.add('open'); document.getElementById('rd-n').focus();
+  document.getElementById('rd-no').onclick=closeFile;
+  document.getElementById('rd-go').onclick=function(){
+    var n=document.getElementById('rd-n').value.trim(); if(!n) return document.getElementById('rd-e').classList.add('show');
+    var v=loadReqs(), x=v.list.filter(function(y){ return y.id===id; })[0];
+    if(x&&x.status==='pending'){ x.status='declined'; x.note=n; x.decidedBy=ME.name; x.decidedAt=Date.now(); saveReqs(v); }
+    closeFile(); render(); openRequests(); toast('Request declined.');
+  };
+}
 
 /* a document opened from the day panel. Only the name and size are stored in this prototype, so it shows a placeholder sheet */
 var dlg=document.getElementById('dlg');

@@ -2816,6 +2816,24 @@ tbody tr:hover{background:#FCFCFD}
 .linkbtn.danger{color:var(--red)}
 .linkbtn[disabled]{color:#B6BCC6;cursor:not-allowed}
 .add-dir{display:inline-flex;align-items:center;gap:8px;align-self:flex-start}
+.dir-linked .dir-head{border-bottom:0;border-radius:12px}
+.dir-linked .dir-lb{padding-top:0}
+.dir-who{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.dir-who b{font-size:14px;font-weight:600;color:var(--ink)}.dir-who small{font-size:12.5px;color:var(--mute);overflow-wrap:anywhere}
+.dir-find{display:flex;flex-direction:column;gap:8px}
+.dir-find .flabel{margin-bottom:0}
+.dir-find #add-dir{align-self:flex-start;padding:2px 0}
+.dir-pick{position:relative}
+.dir-pick .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--faint);display:flex;pointer-events:none}
+.dir-pick .fin{padding-left:40px}
+.dir-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:6;list-style:none;margin:0;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);max-height:300px;overflow-y:auto}
+.dir-list[hidden]{display:none}
+.dir-list li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:7px;cursor:pointer}
+.dir-list li.on,.dir-list li:hover{background:var(--orange-soft)}
+.dir-list .av{width:30px;height:30px;border-radius:50%;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dir-list .pm{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}.dir-list .pm b{font-size:13.5px;color:var(--ink)}.dir-list .pm small{font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dir-list em{font-style:normal;font-size:11.5px;color:var(--mute);white-space:nowrap}
+.dir-list li.none{cursor:default;font-size:13px;color:var(--mute)}.dir-list li.none:hover{background:none}
+.dir-list li.mk{border-top:1px solid var(--line-soft);margin-top:4px;padding-top:10px;color:var(--orange-ink);font-size:13px;font-weight:700;gap:6px}
 
 /* dialogs */
 .confirm-body .soft{width:44px;height:44px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
@@ -4006,6 +4024,39 @@ function resetPassword(c,d,done){
    Add / edit client (side panel)
 ========================================================= */
 function blankDirector(){ return {id:null,name:'',email:'',phone:'',abn:'',tfn:'',login:false,lastReset:null}; }
+/* a director is an individual: one already in the system (an individual client, or someone recorded as a director of another company) or a new one */
+function isPicked(x){ return x.personId!=null||!!x.pick; }
+function peopleIndex(){
+  var out=[], seen={};
+  CLIENTS.forEach(function(c){ if(c.type!=='individual'||c._draft) return; var em=String(c.email||'').toLowerCase(); if(em) seen[em]=1;
+    out.push({personId:c.id,name:c.name,email:c.email||'',phone:c.phone||'',abn:c.abn||'',tfn:c.tfn||'',src:'Individual client'}); });
+  CLIENTS.forEach(function(c){ if(c.type!=='company'||c._draft) return; (c.directors||[]).forEach(function(x){ var em=String(x.email||'').toLowerCase(); if(x.personId!=null||!em||seen[em]) return; seen[em]=1;
+    out.push({personId:null,name:x.name,email:x.email||'',phone:x.phone||'',abn:x.abn||'',tfn:x.tfn||'',src:'Director of '+c.name}); }); });
+  return out;
+}
+function personMatches(q){
+  q=String(q||'').trim().toLowerCase(); if(!q) return [];
+  var dq=q.replace(/\D/g,''), have=form.d.directors;
+  var taken=function(p){ return have.some(function(x){ return (p.personId!=null&&x.personId===p.personId)||(p.email&&String(x.email||'').trim().toLowerCase()===p.email.toLowerCase()); }); };
+  return peopleIndex().filter(function(p){ if(taken(p)) return false; if((p.name+' '+p.email).toLowerCase().indexOf(q)>=0) return true;
+    return dq.length>=3&&String(p.phone||'').replace(/\D/g,'').indexOf(dq)>=0; }).slice(0,8);
+}
+/* when a company is saved each director becomes (or stays linked to) an individual client, so they can be picked again later */
+function linkDirectorPeople(rec){
+  if(rec.type!=='company') return;
+  var now=Date.now();
+  rec.directors.forEach(function(x){
+    var p=x.personId!=null?CLIENTS.filter(function(c){ return c.id===x.personId; })[0]:null, em=String(x.email||'').toLowerCase();
+    if(!p&&em) p=CLIENTS.filter(function(c){ return c.type==='individual'&&String(c.email||'').toLowerCase()===em; })[0];
+    if(!p){
+      p={id:clientSeq++,type:'individual',entity:'Individual',name:x.name,email:em,phone:x.phone||'',abn:x.abn||'',tfn:x.tfn||'',acn:'',commEmail:'',commPhone:'',
+        address:{street:'',suburb:'',state:'',postcode:'',country:'Australia'},directors:[],active:true,created:now,login:false,lastReset:null,
+        history:[{t:now,kind:'created',title:'Client created',detail:'Added as a director of '+rec.name,by:ME}]};
+      CLIENTS.unshift(p);
+    }
+    x.personId=p.id; delete x.pick;
+  });
+}
 function startForm(id){
   var src=id!=null?findClient(id):null;
   var d=src?JSON.parse(JSON.stringify(src)):{
@@ -4013,7 +4064,10 @@ function startForm(id){
     address:{street:'',suburb:'',state:'',postcode:'',country:'Australia'},directors:[],active:true
   };
   ['abn','tfn','acn'].forEach(function(k){ d[k]=d[k]?(k==='abn'?fmtABN(d[k]):k==='tfn'?fmtTFN(d[k]):fmtACN(d[k])):''; });
-  d.directors.forEach(function(x){ x.abn=x.abn?fmtABN(x.abn):''; x.tfn=x.tfn?fmtTFN(x.tfn):''; });
+  d.directors.forEach(function(x){
+    var p=x.personId!=null?CLIENTS.filter(function(c){ return c.id===x.personId; })[0]:null;
+    if(p){ x.name=p.name; x.email=p.email||''; x.phone=p.phone||''; x.abn=p.abn||''; x.tfn=p.tfn||''; }
+    x.abn=x.abn?fmtABN(x.abn):''; x.tfn=x.tfn?fmtTFN(x.tfn):''; });
   form={id:id,src:src,d:d,dirty:false,errs:{},search:'',scrollTo:null,
     same:!!(src&&d.commEmail&&d.commEmail===d.email&&d.commPhone===d.phone)};   // communication details copied from the primary ones
 }
@@ -4118,8 +4172,16 @@ function renderForm(){
     if(f.errs.directors) h+='<div class="alert-err" role="alert" style="margin-top:0">'+I.warnSm+'<span>'+esc(f.errs.directors)+'</span></div>';
     d.directors.forEach(function(x,i){
       var saved=x.id!=null && f.src && f.src.directors.some(function(y){return y.id===x.id;});
+      if(isPicked(x)){
+        h+='<div class="dir dir-linked" data-dir="'+i+'"><div class="dir-head"><span class="dnum">'+(i+1)+'</span>'+
+           '<div class="dir-who"><b>'+esc(x.name)+'</b><small>'+[x.email,x.phone].filter(Boolean).map(esc).join(' · ')+'</small></div>'+
+           '<span class="dir-acts">'+(saved&&x.login?'<button class="linkbtn" data-reset="'+i+'">'+I.key+'Reset password</button>':'')+
+             '<button class="linkbtn danger" data-remove="'+i+'"'+(n<=1?' disabled title="A company needs at least one director"':'')+'>'+I.trash+'Remove</button></span></div>'+
+           (saved?'<div class="dir-body dir-lb">'+loginState(x)+'</div>':'')+'</div>';
+        return;
+      }
       h+='<div class="dir" data-dir="'+i+'"><div class="dir-head"><span class="dnum">'+(i+1)+'</span>'+
-         '<b>Director '+(i+1)+'</b>'+
+         '<b>'+(x.id==null?'New individual':'Director '+(i+1))+'</b>'+
          '<span class="dir-acts">'+
            (saved&&x.login?'<button class="linkbtn" data-reset="'+i+'">'+I.key+'Reset password</button>':'')+
            '<button class="linkbtn danger" data-remove="'+i+'"'+(n<=1?' disabled title="A company needs at least one director"':'')+'>'+I.trash+'Remove</button>'+
@@ -4135,7 +4197,10 @@ function renderForm(){
     });
     h+=full
       ? '<div class="cl-note" role="status">'+I.infoLg+'<span>You’ve added the maximum of '+MAX_DIRECTORS+' directors. Remove a director to add someone else.</span></div>'
-      : '<button class="pill-btn add-dir" id="add-dir">'+I.plus+(n?'Add another director':'Add director')+'</button>';
+      : '<div class="dir-find"><label class="flabel" for="dir-q">'+(n?'Add another director':'Add a director')+'</label>'+
+          '<div class="dir-pick"><span class="ico">'+I.search+'</span><input class="fin sm" id="dir-q" type="search" autocomplete="off" placeholder="Search individuals by name, email or phone" value="'+esc(f.dirQ||'')+'" aria-autocomplete="list" aria-controls="dir-list">'+
+          '<ul class="dir-list" id="dir-list" role="listbox" hidden></ul></div>'+
+          '<button type="button" class="linkbtn" id="add-dir">'+I.plus+'Create new individual</button></div>';
     h+='</div>';
   }
 
@@ -4166,7 +4231,6 @@ function wireForm(){
       if(d.type===b.dataset.type) return;
       readForm(); d.type=b.dataset.type; f.errs={}; f.dirty=true;
       d.entity = d.type==='company' ? '' : 'Individual';
-      if(d.type==='company' && !d.directors.length) d.directors.push(blankDirector());
       repaint();
     };
   });
@@ -4184,10 +4248,34 @@ function wireForm(){
   var ad=document.getElementById('add-dir');
   if(ad) ad.onclick=function(){
     readForm(); if(d.directors.length>=MAX_DIRECTORS) return;
-    d.directors.push(blankDirector()); delete f.errs.directors; f.dirty=true;
+    d.directors.push(blankDirector()); delete f.errs.directors; f.dirty=true; f.dirQ='';
     repaint('#f-dir-'+(d.directors.length-1)+'-name');
     var box=body.querySelector('[data-dir="'+(d.directors.length-1)+'"]'); if(box) box.scrollIntoView({block:'nearest'});
   };
+  var dq=document.getElementById('dir-q'), dl=document.getElementById('dir-list');
+  if(dq){
+    var pick=function(p){ readForm(); if(d.directors.length>=MAX_DIRECTORS) return;
+      d.directors.push({id:null,personId:p.personId,pick:p.personId==null,name:p.name,email:p.email,phone:p.phone,abn:p.abn?fmtABN(p.abn):'',tfn:p.tfn?fmtTFN(p.tfn):'',login:false,lastReset:null});
+      f.dirQ=''; delete f.errs.directors; f.dirty=true; repaint('#dir-q'); };
+    var create=function(q){ readForm(); if(d.directors.length>=MAX_DIRECTORS) return; var x=blankDirector(); q=String(q||'').trim();
+      if(q){ if(q.indexOf('@')>0) x.email=q; else if(/^[\d\s+()-]{6,}$/.test(q)) x.phone=q; else x.name=q; }
+      d.directors.push(x); f.dirQ=''; delete f.errs.directors; f.dirty=true; repaint('#f-dir-'+(d.directors.length-1)+'-'+(x.name?'email':'name'));
+      var box=body.querySelector('[data-dir="'+(d.directors.length-1)+'"]'); if(box) box.scrollIntoView({block:'nearest'}); };
+    var list=function(){ var q=dq.value, m=personMatches(q); f.dirQ=q;
+      if(!q.trim()){ dl.hidden=true; dl.innerHTML=''; return; }
+      dl.innerHTML=m.map(function(p,i){ return '<li role="option" data-pi="'+i+'"'+(i===0?' class="on"':'')+'><span class="av">'+esc(initials(p.name))+'</span><span class="pm"><b>'+esc(p.name)+'</b><small>'+[p.email,p.phone].filter(Boolean).map(esc).join(' · ')+'</small></span><em>'+esc(p.src)+'</em></li>'; }).join('')+
+        (m.length?'':'<li class="none">No one matches “'+esc(q.trim())+'”.</li>')+
+        '<li role="option" class="mk'+(m.length?'':' on')+'" data-mk="1">'+I.plus+'Create new individual'+(q.trim()&&q.indexOf('@')<0?' “'+esc(q.trim())+'”':'')+'</li>';
+      dl.hidden=false; dl._m=m; };
+    dq.oninput=list; dq.onfocus=function(){ if(dq.value.trim()) list(); };
+    dq.onblur=function(){ setTimeout(function(){ dl.hidden=true; },150); };
+    dq.onkeydown=function(ev){ var it=[].slice.call(dl.querySelectorAll('[role=option]')), i=it.findIndex(function(x){ return x.classList.contains('on'); });
+      if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){ ev.preventDefault(); if(dl.hidden) list(); if(!it.length) return; if(i>=0) it[i].classList.remove('on'); i=(i+(ev.key==='ArrowDown'?1:-1)+it.length)%it.length; it[i].classList.add('on'); it[i].scrollIntoView({block:'nearest'}); }
+      if(ev.key==='Enter'){ ev.preventDefault(); if(i<0) return; var li=it[i]; if(li.dataset.mk) create(dq.value); else pick(dl._m[+li.dataset.pi]); }
+      if(ev.key==='Escape'){ dl.hidden=true; } };
+    dl.onmousedown=function(ev){ var li=ev.target.closest('[role=option]'); if(!li) return; ev.preventDefault(); if(li.dataset.mk) create(dq.value); else pick(dl._m[+li.dataset.pi]); };
+    if(f.dirQ) list();
+  }
   body.querySelectorAll('[data-remove]').forEach(function(b){
     b.onclick=function(){ if(b.disabled) return; readForm(); removeDirector(+b.dataset.remove); };
   });
@@ -4243,7 +4331,7 @@ function autoFill(){
     if(!d.entity) d.entity='Company';
     if(d.entity==='Company') fill('acn',gen(9,validACN,fmtACN,acns));
     if(!d.directors.length) d.directors.push(blankDirector());
-    d.directors.forEach(function(x,i){ var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(x.name)); fill(p+'phone',mob()); fill(p+'abn',gen(11,validABN,fmtABN,abns)); fill(p+'tfn',gen(9,validTFN,fmtTFN,[])); });
+    d.directors.forEach(function(x,i){ if(isPicked(x)) return; var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(x.name)); fill(p+'phone',mob()); fill(p+'abn',gen(11,validABN,fmtABN,abns)); fill(p+'tfn',gen(9,validTFN,fmtTFN,[])); });
   }
   form.dirty=true;
 }
@@ -4274,6 +4362,7 @@ function validate(){
     var seen={};
     d.directors.forEach(function(x,i){
       var p='dir.'+i+'.';
+      if(isPicked(x)) return;
       req(p+'name','Full name'); req(p+'email','Email address'); req(p+'phone','Phone number');
       req(p+'abn','ABN'); req(p+'tfn','TFN');
       var em=x.email.trim().toLowerCase();
@@ -4308,8 +4397,10 @@ function saveForm(){
     var base=x.id!=null&&prev[x.id]?prev[x.id]:{id:dirSeq++,login:false,lastReset:null};
     var out={}; for(var k in base) out[k]=base[k];
     out.name=t(x.name); out.email=t(x.email).toLowerCase(); out.phone=fmtPhone(x.phone); out.abn=numText(x.abn); out.tfn=numText(x.tfn);
+    out.personId=x.personId!=null?x.personId:null;
     return out;
   }):[];
+  linkDirectorPeople(rec);
   var id;
   if(editing){
     var changes=describeChanges(f.src,rec), wasActive=f.src.active;
@@ -5022,8 +5113,9 @@ function finalizeClient(o){
   var rec={type:d.type,entity:co?d.entity:'Individual',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(),commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},active:true,
-    directors:co?d.directors.map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn)}; }):[]};
+    directors:co?d.directors.map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn),personId:x.personId!=null?x.personId:null}; }):[]};
   rec.id=clientSeq++; rec.created=now;
+  linkDirectorPeople(rec);
   rec.services=wiz.services.map(function(x){ return assignment(x,'Add Client',ME,now); });
   rec.kyc=[]; rec.kycRecords=[]; rec.notes=wiz.note.trim()?[{t:now,by:ME,text:wiz.note.trim()}]:[];
   rec.history=[{t:now,kind:'created',title:'Client created',detail:(co?rec.entity:'Individual')+' client added',by:ME}];
@@ -5334,6 +5426,7 @@ function completeRequest(r,kycDate,auto){
     commEmail:t(f.commEmail).toLowerCase(),commPhone:t(f.commPhone)?fmtPhone(f.commPhone):'',address:{street:t(f.address.street),suburb:t(f.address.suburb),state:f.address.state,postcode:t(f.address.postcode),country:'Australia'},
     directors:co?(f.directors||[]).map(function(x){ return {id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn)}; }):[],
     active:true,created:now,login:false,lastReset:null,onboardingId:r.id};
+  linkDirectorPeople(rec);
   rec.services=r.services.map(function(x){ return assignment(x,'Onboarding request',r.by,now); });
   rec.kyc=[]; rec.kycRecords=r.kyc.length?[{id:'k'+now.toString(36)+r.id,date:kycDate||isoOf(now),files:r.kyc.slice(),by:auto?(f.name||r.name):ME,at:now,source:'Client onboarding link'}]:[];
   rec.notes=(r.notes||[]).concat([{t:now,by:BY,text:auto?'Created automatically when the client signed the engagement letter and submitted the onboarding form.':'Created from onboarding request '+r.id+'.'}]);

@@ -10761,6 +10761,21 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-bottom{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 .qf2 .qf-notes{display:flex;flex-direction:column;gap:16px}
 .qf2 .qf-sum .qf-tot{margin:12px 0 0;background:none;border:0;padding:0}
+/* discount: the same one-row control as the Sale form */
+.qf2 .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}.qf2 .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
+.qf2 .qf-tot .sl-disc{align-items:center}
+.qf-tot .sl-disc dt{display:flex;align-items:center;gap:8px}
+.qf-tot .sl-dctl{display:flex;align-items:center;gap:2px}
+.qf-tot .sl-dgrp{flex:none;width:92px;display:flex;align-items:center;justify-content:flex-start;gap:0;height:30px;padding:0;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.sl-dgrp:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.sl-dgrp.bad{border-color:#F3A3A3;background:#FFF7F7}
+.sl-dgrp input{flex:1;min-width:0;height:100%;border:0;background:transparent;padding:0 8px;font-size:13px;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.sl-dgrp input:focus{outline:none}
+.sl-dgrp select{height:100%;border:0;border-left:1px solid var(--line);background:#F6F7F9;padding:0 4px;font-size:12.5px;font-weight:700;color:var(--slate);cursor:pointer}
+.sl-dgrp select:focus{outline:none;color:var(--orange-ink)}
+.sl-drm{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;color:var(--mute)}.sl-drm svg{width:14px;height:14px}.sl-drm:hover{color:var(--red)}
+.sl-disc dd{display:flex;align-items:center;gap:4px}
+.sl-derr{margin:0 0 4px;text-align:right}
 .qf2 .qf-sum .qf-tot .t{align-items:center;margin-top:8px;padding-top:12px}
 .qf2 .qf-sum .qf-tot .t dd{font-size:22px;color:var(--orange-ink)}
 .qf2 .modal-foot{justify-content:flex-end}
@@ -11210,10 +11225,12 @@ function nextQuoteId(){ var n=st.list.reduce(function(m,q){ return Math.max(m,+S
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
 function round2(x){ return Math.round(x*100)/100; }
 function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
-/* rates include GST, as everywhere in the app: the total is the sum of the lines and GST is the 1/11 share of it */
+/* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total (as in Sales) */
 function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
-  return {sub:sub,gst:d.gst===false?0:round2(sub/11),total:sub};
+  var v=d.showDisc?num(d.discount):0; if(!(v>0)) v=0;
+  var disc=d.discType==='%'?sub*Math.min(v,100)/100:v; disc=Math.min(disc,sub);
+  var total=round2(sub-disc); return {sub:sub,disc:round2(disc),gst:d.gst===false?0:round2(total/11),total:total};
 }
 /* who the quotation (and later the invoice) is made out to: the client, or for a company one of its directors */
 /* a company: itself and all its directors; an individual: themselves and every company they're a director of (linked by client record, or by email) */
@@ -11239,9 +11256,10 @@ function openForm(id){
       clientId:q.clientId,onName:q.onName||q.clientName||'',toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
-      customerNotes:q.customerNotes||'',terms:q.terms||'',gst:q.gstMode!=='none'
+      customerNotes:q.customerNotes||'',terms:q.terms||'',gst:q.gstMode!=='none',
+      showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
     }:{clientId:null,onName:'',toName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
-      items:[blankLine()],customerNotes:'',terms:'',gst:true}};
+      items:[blankLine()],customerNotes:'',terms:'',gst:true,showDisc:false,discType:'$',discount:''}};
   paintForm();
 }
 /* editing a quotation the client has answered (or that expired) puts it back to Draft, to be sent again */
@@ -11301,7 +11319,12 @@ function paintForm(focusId){
       '<div class="qf-bottom">'+
         '<section class="qf-card qf-notes"><div><label class="flabel" for="qf-cn">Customer notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the quote.</small></div>'+
           '<div><label class="flabel" for="qf-tc">Terms and conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></section>'+
-        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
+        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
+          '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="qf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
+            '<select id="qf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
+            '<button type="button" class="sl-drm" id="qf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="qf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
+          (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
+          '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Save &amp; Send</button></div></div>';
@@ -11320,7 +11343,8 @@ function clientMatches(q){
 function liveTotals(){
   var d=QF.d, T=totalsOf(d);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot dd'); if(dd.length===3){ dd[0].textContent=money(T.sub); dd[1].textContent=d.gst===false?'Not applied':money(T.gst); dd[2].textContent=money(T.total); }
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total)];
+  [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
 }
 function wireForm(focusId){
   var d=QF.d, body=document.getElementById('qf-body');
@@ -11356,6 +11380,10 @@ function wireForm(focusId){
   [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); QF.errs={}; touch(); repaint(); }; });
   var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
+  var da=document.getElementById('qf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('qf-disc'); };
+  var dr=document.getElementById('qf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete QF.errs.discount; touch(); repaint(); };
+  var dt=document.getElementById('qf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete QF.errs.discount; touch(); repaint('qf-disc'); };
+  var di=document.getElementById('qf-disc'); if(di) di.oninput=function(){ d.discount=di.value; if(QF.errs.discount){ delete QF.errs.discount; var g=di.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-derr'); if(er) er.remove(); } touch(); liveTotals(); };
   /* reorder lines: drag the grip, or focus it and use the arrow keys */
   var moveLine=function(i,j){ if(i===j||j<0||j>=d.items.length) return; var x=d.items.splice(i,1)[0]; d.items.splice(j,0,x);
     Object.keys(QF.errs).forEach(function(k){ if(/^[sqp]\d+$/.test(k)) delete QF.errs[k]; }); touch(); repaint('qf-grip'+j); };
@@ -11396,7 +11424,11 @@ function checkForm(full){
     else if(p<min) e['p'+i]='The rate can’t be below the minimum of '+money(min)+' set in Settings → Services';
   });
   if(full&&!filled.length) e.items='Add at least one line';
-  if(full&&filled.length&&T.total<=0) e.total='The total must be more than $0.00';
+  if(d.showDisc){ var dv=num(d.discount), isP=d.discType==='%';
+    if(d.discount===''||!isFinite(dv)||dv<=0) e.discount=isP?'Enter a percentage above 0, or remove the discount':'Enter the discount in dollars, or remove it';
+    else if(isP&&dv>100) e.discount='The percentage can’t be more than 100';
+    else if(!isP&&dv>T.sub) e.discount='The discount can’t be more than the sub total'; }
+  if(full&&filled.length&&T.total<=0&&!e.discount) e.total='The total must be more than $0.00';
   return e;
 }
 function submitForm(mode){
@@ -11414,7 +11446,7 @@ function saveForm(){
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
   var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
-    customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,discount:null,discountAmt:0,
+    customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
   if(QF.isNew){
     if(byId(QF.id)) QF.id=nextQuoteId();                       // the number was taken meanwhile
@@ -11695,7 +11727,7 @@ function convert(id){
       closeDlg(); render(); return toast(q.id+' is already invoiced ('+q.invoiceId+').',true); }
     if(q.status!=='accepted'){ closeDlg(); render(); return toast('Only an accepted quotation can be converted to a sale.',true); }
     var n=2000+inv.list.length+1; while(inv.list.some(function(x){ return x.id==='INV-'+n; })||st.list.some(function(x){ return x.invoiceId==='INV-'+n; })) n++;   // never reuse a number a quotation already points to
-    var rec={id:'INV-'+n,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,amount:q.amount,by:ME.name,at:Date.now()};
+    var rec={id:'INV-'+n,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,subtotal:q.subtotal,discountAmt:q.discountAmt||0,discountType:q.discountType||'',discountPct:q.discountPct!=null?q.discountPct:null,gst:q.gst,gstMode:q.gstMode,amount:q.amount,by:ME.name,at:Date.now()};
     inv.list.push(rec);
     if(!saveInvoices(inv)){ closeDlg(); return toast('The invoice couldn’t be created. Nothing was changed.',true); }
     q.invoiceId=rec.id; setStatus(q,'converted','converted',{sale:rec.id,note:'Invoice '+rec.id});

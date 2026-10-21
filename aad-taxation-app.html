@@ -1469,15 +1469,15 @@ function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
   var sub=[t.cat];
   if(d.no&&!gone) sub.push('No. <em>'+maskNo(d.no)+'</em>');
-  if(gone) sub.push('<em>No active document</em>');
+  if(gone){ sub.push('<em>No active document</em>'); sub.push('Last version expired '+fmtD(d.cur.exp)); }
   else { sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>'); sub.push('Version '+d.ver); }
   var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
       '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
         (gone?'':fileChips(d,t,0,d.cur.files))+
-        '<div class="ds-by">'+(gone?'<span>Version '+d.ver+' expired on <b>'+fmtD(d.cur.exp)+'</b> and moved to history</span>':'<span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
-          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
+        '<div class="ds-by">'+(gone?'':'<span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
+          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'<span>No previous versions</span>')+
           '<span class="ds-cap'+(vs.length>=KEEP_VERSIONS?' full':'')+'" title="Only the 5 most recent versions are kept">'+vs.length+' of '+KEEP_VERSIONS+' versions kept</span>'+
         '</div>'+
       '</div>'+
@@ -1496,7 +1496,7 @@ function docCard(d){
       if(v.no&&v.no!==d.no) m.push('<span>No. '+maskNo(v.no)+'</span>');
       return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b><span>'+v.files.length+' file'+(v.files.length===1?'':'s')+'</span></div>'+
         '<div class="ds-vrow"><div class="ds-vi">'+m.join('')+'</div>'+fileChips(d,t,vi,v.files)+'</div></div>';
-    }).join('')+'<p class="ds-pnote">'+I.hist+'Versions older than the 5 most recent are deleted automatically.</p></div>';
+    }).join('')+'</div>';   // the 5-versions rule is in the red note above
   }
   return h+'</div>';
 }
@@ -1513,7 +1513,7 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
-  h+='<div class="ds-keep" role="note">'+I.info+'<p><b>Only the 5 most recent versions of each document are kept</b> — the current one and 4 previous. When a new version is uploaded, anything older is <b>deleted permanently</b> and can’t be recovered.</p></div>';
+  h+='<div class="ds-keep" role="note">'+I.info+'<p>The 5 most recent versions of each document are retained. When a new version is uploaded, the oldest version is permanently deleted and cannot be recovered.</p></div>';
   return h+currentList(docs);
 }
 function currentList(docs){
@@ -5603,7 +5603,7 @@ function kycChips(files,vi){
 /* KYC: the same layout as the engagement letter: a quiet rule banner, then one card with the current check, what it means, the next step, and the previous checks */
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], n=recs.length, now=Date.now();
-  var banner='<div class="el-bn">'+EL_INFO+'<p><b>KYC.</b> Each check is valid for 365 days from when its documents are uploaded. A new check never replaces the record of an earlier one: expired checks and their documents are kept.</p></div>';
+  var banner='<div class="el-bn">'+EL_INFO+'<p>Each KYC verification remains valid for one year from the verification date. New verifications are saved as separate versions, and all previous verification records and their associated documents are retained.</p></div>';
   var st=cur?kycState(cur):'none', exp=cur?kycExpiresAt(cur):0, left=cur?Math.ceil((exp-now)/864e5):0;
   var S={none:['No KYC recorded','Record this client’s identity check to keep them compliant.',null,['add','Record KYC']],
     valid:['KYC is valid','Valid until '+whenOf(exp)+' · '+left+' day'+(left===1?'':'s')+' left.',['add','Record new KYC'],null],
@@ -5626,7 +5626,7 @@ function kycTab(c){
         '<span>Uploaded <b>'+whenOf(kycUploadedAt(r))+'</b> by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' '+whenOf(ex)+'</span><span>Replaced '+whenOf(kycUploadedAt(next))+'</span>'+
         (r.note?'<span>“'+esc(r.note)+'”</span>':'')+'</div>'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');
   var card='<article class="el-card">'+
-    '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Current check · Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
+    '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
     doc+status+hist+'</article>';
   return '<section class="vsec el-main">'+banner+card+'</section>';
 }

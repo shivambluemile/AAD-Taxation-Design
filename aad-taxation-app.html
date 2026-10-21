@@ -2576,6 +2576,7 @@ tbody tr:hover{background:#FCFCFD}
 .cl-table td:first-child{min-width:180px;max-width:240px}
 .cl-table .blink{white-space:normal;line-height:1.35}
 .cl-list .cl-person{display:flex;align-items:center;gap:11px;min-width:0}
+.cl-ent .cl-sub2{display:block;font-size:11.5px;font-weight:500;color:var(--faint);margin-top:2px}
 .cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .cl-pn{min-width:0}.cl-pn .blink{display:block;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1.3}.cl-pn small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
 .cl-contact{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--slate);line-height:1.5}.cl-contact>span{display:inline-flex;align-items:center;gap:5px}
@@ -3494,6 +3495,10 @@ var I = {
 
 var AU_STATES=['ACT','NSW','NT','QLD','SA','TAS','VIC','WA'];
 var ENTITY_TYPES=['Partnership','Trust','Company'];
+/* a Company's sub-type; clients saved before it existed are read from their name (… Pty Ltd / … Ltd) */
+var COMPANY_TYPES=['Proprietary (Pty Ltd)','Public (Ltd)','Not-for-profit'], CO_SHORT={'Proprietary (Pty Ltd)':'Pty Ltd','Public (Ltd)':'Ltd','Not-for-profit':'Not-for-profit'};
+function coTypeOf(c){ if(!c||c.type!=='company'||c.entity!=='Company') return ''; if(c.coType) return c.coType;
+  var n=String(c.name||''); return /\bpty\.?\s*(ltd|limited)\b/i.test(n)?'Proprietary (Pty Ltd)':/\b(ltd|limited)\b/i.test(n)?'Public (Ltd)':''; }
 var MAX_DIRECTORS=5;
 
 /* =========================================================
@@ -3807,7 +3812,7 @@ function renderList(){
         (r?'<button class="blink" data-rq="'+r.id+'">':'<button class="blink" data-view="'+c.id+'">')+esc(c.name)+'</button>'+
         (co&&!r&&c.directors.length?'<small>'+c.directors.length+(c.directors.length===1?' director':' directors')+'</small>':'')+'</span></div></td>'+
       '<td><div class="cl-contact"><span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span>'+copy(c.email,'email')+'</span><span>'+esc(c.phone)+copy(c.phone,'phone')+'</span></div></td>'+
-      '<td class="cl-ent">'+esc(c.entity)+'</td>'+
+      '<td class="cl-ent">'+esc(c.entity)+(coTypeOf(c)?'<small class="cl-sub2">'+esc(CO_SHORT[coTypeOf(c)])+'</small>':'')+'</td>'+
       '<td><div class="cl-chips">'+(chips||'<span class="cl-muted">--</span>')+'</div></td>'+
       '<td><span class="ob-ticks">'+kyc+letter+'</span></td>'+
       '<td>'+(r?'<span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small>':'<span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span>')+'</td>'+
@@ -4159,6 +4164,7 @@ function startForm(id){
     address:{street:'',suburb:'',state:'',postcode:'',country:'Australia'},directors:[],active:true
   };
   ['abn','tfn','acn'].forEach(function(k){ d[k]=d[k]?(k==='abn'?fmtABN(d[k]):k==='tfn'?fmtTFN(d[k]):fmtACN(d[k])):''; });
+  d.coType=coTypeOf(d);
   d.directors.forEach(function(x){
     var p=x.personId!=null?CLIENTS.filter(function(c){ return c.id===x.personId; })[0]:null;
     if(p){ x.name=p.name; x.email=p.email||''; x.phone=p.phone||''; x.abn=p.abn||''; x.tfn=p.tfn||''; }
@@ -4254,6 +4260,7 @@ function renderForm(){
     h+=field('name','Company name',d.name,{req:true,ph:'e.g. Harbourview Pty Ltd',max:120,auto:'off'});
     h+='<div class="grid2">'+
          sel('entity','Entity type',ENTITY_TYPES,'Select entity type')+
+         (d.entity==='Company'?sel('coType','Company type',COMPANY_TYPES,'Select company type'):'')+
          field('acn','ACN',d.acn,{req:d.entity==='Company',ph:'e.g. 004 085 616',mode:'numeric',max:11})+
          field('email','Email address',d.email,{req:true,ph:'accounts@company.com.au',type:'email',auto:'off'})+
          field('phone','Phone number',d.phone,{req:true,ph:'04XXXXXXXX',mode:'tel',auto:'off'})+
@@ -4430,6 +4437,7 @@ function autoFill(){
   if(co){
     if(!d.entity) d.entity='Company';
     if(d.entity==='Company') fill('acn',gen(9,validACN,fmtACN,acns));
+    if(d.entity==='Company'&&!d.coType) d.coType=coTypeOf({type:'company',entity:'Company',name:d.name})||'Proprietary (Pty Ltd)';
     if(!d.directors.length) d.directors.push(blankDirector());
     d.directors.forEach(function(x,i){ if(isPicked(x)) return; var p='dir.'+i+'.'; fill(p+'name',person()); fill(p+'email',mail(x.name)); fill(p+'phone',mob()); fill(p+'abn',gen(11,validABN,fmtABN,abns)); fill(p+'tfn',gen(9,validTFN,fmtTFN,[])); });
   }
@@ -4454,6 +4462,7 @@ function validate(){
   if(co){
     if(!d.entity) e.entity='Choose an entity type';
     if(d.entity==='Company') req('acn','ACN');
+    if(d.entity==='Company'&&!d.coType) e.coType='Choose the company type';
     if(!e.acn && digits(d.acn)){
       var dupC=CLIENTS.filter(function(c){ return c.id!==form.id && digits(c.acn)===digits(d.acn); })[0];
       if(dupC) e.acn='This ACN is already recorded for '+dupC.name;
@@ -4485,7 +4494,7 @@ function saveForm(){
   }
   var t=function(v){ return String(v||'').trim(); };
   var rec={
-    type:d.type, entity:co?d.entity:'Individual', name:t(d.name), email:t(d.email).toLowerCase(), phone:fmtPhone(d.phone),
+    type:d.type, entity:co?d.entity:'Individual', coType:co&&d.entity==='Company'?d.coType||'':'', name:t(d.name), email:t(d.email).toLowerCase(), phone:fmtPhone(d.phone),
     abn:numText(d.abn), tfn:numText(d.tfn), acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(), commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},
@@ -4524,9 +4533,9 @@ function saveForm(){
 
 // Plain-language list of what an edit changed, for the History tab
 function describeChanges(a,b){
-  var out=[], L={name:a.type==='company'?'Company name':'Full name',entity:'Entity type',email:'Email address',phone:'Phone number',abn:'ABN',tfn:'TFN',acn:'ACN',commEmail:'Communication email',commPhone:'Communication phone'};
+  var out=[], L={name:a.type==='company'?'Company name':'Full name',entity:'Entity type',coType:'Company type',email:'Email address',phone:'Phone number',abn:'ABN',tfn:'TFN',acn:'ACN',commEmail:'Communication email',commPhone:'Communication phone'};
   if(a.type!==b.type) out.push('Client type changed to '+(b.type==='company'?'Company':'Individual'));
-  Object.keys(L).forEach(function(k){ if(String(a[k]||'')!==String(b[k]||'')) out.push(L[k]); });
+  Object.keys(L).forEach(function(k){ var av=k==='coType'?coTypeOf(a):a[k]; if(String(av||'')!==String(b[k]||'')) out.push(L[k]); });
   if(JSON.stringify(a.address)!==JSON.stringify(b.address)) out.push('Address');
   var before={}; a.directors.forEach(function(x){ before[x.id]=x; });
   var after={}; b.directors.forEach(function(x){ after[x.id]=x; });
@@ -5064,7 +5073,7 @@ function wzSaveClient(){
   var rec=old||{id:clientSeq++,created:now,services:[],kyc:[],kycRecords:[],notes:[],login:false,lastReset:null,
     history:[{t:now,kind:'created',title:'Client created',detail:(co?d.entity:'Individual')+' client added',by:ME}]};
   var prev={}; (old&&old.directors||[]).forEach(function(x){ prev[x.id]=x; });
-  rec.type=d.type; rec.entity=co?d.entity:'Individual'; rec.name=t(d.name); rec.email=t(d.email).toLowerCase(); rec.phone=fmtPhone(d.phone);
+  rec.type=d.type; rec.entity=co?d.entity:'Individual'; rec.coType=co&&d.entity==='Company'?d.coType||'':''; rec.name=t(d.name); rec.email=t(d.email).toLowerCase(); rec.phone=fmtPhone(d.phone);
   rec.abn=numText(d.abn); rec.tfn=numText(d.tfn); rec.acn=co?numText(d.acn):''; rec.commEmail=t(d.commEmail).toLowerCase(); rec.commPhone=t(d.commPhone)?fmtPhone(d.commPhone):'';
   rec.address={street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'}; rec.active=true;
   rec.directors=co?d.directors.map(function(x){ var base=x.id!=null&&prev[x.id]?prev[x.id]:{id:dirSeq++,login:false,lastReset:null}, out={};
@@ -5234,7 +5243,7 @@ function wzSendScreen(){
 /* the client is only created here, once the letter is signed or has been sent successfully */
 function finalizeClient(o){
   var f=form, d=f.d, co=d.type==='company', t=function(v){ return String(v||'').trim(); }, now=Date.now();
-  var rec={type:d.type,entity:co?d.entity:'Individual',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',
+  var rec={type:d.type,entity:co?d.entity:'Individual',coType:co&&d.entity==='Company'?d.coType||'':'',name:t(d.name),email:t(d.email).toLowerCase(),phone:fmtPhone(d.phone),abn:numText(d.abn),tfn:numText(d.tfn),acn:co?numText(d.acn):'',
     commEmail:t(d.commEmail).toLowerCase(),commPhone:t(d.commPhone)?fmtPhone(d.commPhone):'',
     address:{street:t(d.address.street),suburb:t(d.address.suburb),state:d.address.state,postcode:t(d.address.postcode),country:'Australia'},active:true,
     directors:co?d.directors.map(function(x){ return {id:x.id!=null?x.id:dirSeq++,login:false,lastReset:null,name:t(x.name),email:t(x.email).toLowerCase(),phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn),personId:x.personId!=null?x.personId:null}; }):[]};

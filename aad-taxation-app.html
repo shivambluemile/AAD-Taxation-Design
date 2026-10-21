@@ -990,6 +990,44 @@ td[data-comp] .state{white-space:nowrap}
 .sdt-hist-h h3{font-size:14px;font-weight:700;color:var(--ink)}
 .sdt-hist-h span{font-size:12.5px;color:var(--mute)}
 
+
+/* Documents: the same card as the client's KYC and engagement letter */
+.sd-cards{display:flex;flex-direction:column;gap:12px}
+.el-bn{display:flex;align-items:flex-start;gap:8px;margin:0 0 12px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
+.el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
+.el-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:visible}
+.el-card.flash{box-shadow:0 0 0 3px rgba(241,137,52,.25)}
+.el-ch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line-soft,#F1F2F4)}
+.el-ch h4{margin:0;font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink)}.el-ch p{margin:1px 0 0;font-size:12.5px;color:var(--mute)}
+.el-dr{display:flex;align-items:flex-start;gap:12px;padding:14px 18px}
+.el-dt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.el-dt b{font-size:14px;font-weight:700;color:var(--ink)}
+.el-dt .ds-files{margin-top:6px}
+.el-to{font-size:13px;color:var(--slate)}.el-to i{font-style:normal;color:var(--faint)}
+.el-mt{font-size:12px;color:var(--faint)}.el-mt i{font-style:normal;margin:0 2px;color:#CBD2DA}
+.el-st{display:flex;align-items:center;gap:14px;margin:0 18px 14px;padding:12px 14px;border-radius:10px;background:#FAFBFC;border:1px solid var(--line-soft,#F1F2F4)}
+.el-st.s-awaiting{background:#FFF8EE;border-color:#FDE7C8}.el-st.s-failed{background:#FEF2F2;border-color:#FECACA}.el-st.s-signed{background:#F0FDF7;border-color:#CDEFE0}
+.el-stx{flex:1;min-width:0}.el-stx b{display:block;font-size:13.5px;color:var(--ink)}.el-stx p{margin:2px 0 0;font-size:12.5px;color:var(--slate);line-height:1.45}
+.el-acts{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.el-mw{position:relative;flex-shrink:0}
+.el-more{width:32px;height:32px;border-radius:8px;color:var(--mute);display:flex;align-items:center;justify-content:center}.el-more:hover,.el-more[aria-expanded="true"]{background:#F2F4F7;color:var(--ink)}
+.el-menu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;min-width:180px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);display:flex;flex-direction:column}
+.el-menu[hidden]{display:none}
+.el-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--ink);white-space:nowrap}.el-menu button:hover,.el-menu button:focus-visible{background:var(--orange-soft);color:var(--orange-ink);outline:none}
+.el-menu button.danger{color:#BE123C}.el-menu button.danger:hover,.el-menu button.danger:focus-visible{background:#FEF2F2;color:#BE123C}
+.el-hrw{width:100%;display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line-soft,#F1F2F4);border-radius:0 0 12px 12px}
+.el-hrw.open{border-radius:0}
+.el-hic{display:flex;color:var(--mute)}.el-hrw b{font-size:13.5px;color:var(--ink)}
+.el-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700}
+.el-hnone{margin-left:auto;font-size:12.5px;color:var(--faint)}
+.el-hlist{border-top:1px solid var(--line-soft,#F1F2F4);background:#FAFBFC;padding:4px 18px 14px;border-radius:0 0 12px 12px}
+.el-yg{padding-top:10px}.el-yh{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}.el-yh b{font-size:13px;color:var(--ink)}.el-yh span{font-size:12px;color:var(--faint)}
+.el-hrow{display:flex;align-items:center;gap:12px;margin-top:6px;padding:9px 12px;border:1px solid var(--line-soft,#F1F2F4);border-radius:10px;background:#fff}
+.ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:4px}
+.el-hi{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;color:var(--mute)}.el-hi b{color:var(--ink);font-weight:600}
+.ob-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}.ob-pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.ob-pill.grey{background:#F1F2F4;color:#64748B}.ob-pill.amber{background:#FFF6E8;color:#B4690E}.ob-pill.green{background:#ECFDF5;color:#047857}.ob-pill.red{background:#FEF2F2;color:#BE123C}
+@media (max-width:720px){.el-st{flex-direction:column;align-items:stretch}.el-acts .btn{flex:1;justify-content:center}}
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1456,42 +1494,40 @@ function verTag(v,i){
   if(v.exp&&daysTo(v.exp)<0) return '<span class="ds-tag bad">Expired</span>';
   return '<span class="ds-tag">Replaced</span>';
 }
-/* one row per document type: details, files, who uploaded it, status, actions; older versions open underneath */
+/* one card per document type, the same layout as the client's KYC and engagement letter:
+   header (name, category, number, status), the current version, what its status means and the next step, then every previous version */
+var SD_PILL={valid:['Valid','green'],none:['No expiry','grey'],soon:['Expiring soon','amber'],expired:['Expired','red']};
+var SD_DOTS='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
+function sdPill(st){ var p=SD_PILL[st]; return '<span class="ob-pill '+p[1]+'"><i></i>'+p[0]+'</span>'; }
 function docCard(d){
-  var t=typeOf(d.k), st=stOf(d), vs=versionsOf(d), prev=vs.length-1, open=!!docOpen[d.k];
-  var sub=[t.cat];
-  if(d.no) sub.push('No. <em>'+maskNo(d.no)+'</em>');
-  sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>');
-  sub.push('Version '+d.ver);
-  var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    '<div class="ds-row">'+
-      '<span class="ds-ic">'+I.file+'</span>'+
-      '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
-        fileChips(d,t,0,d.cur.files)+
-        '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>'+
-          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
-          '<span class="ds-cap'+(vs.length>=KEEP_VERSIONS?' full':'')+'" title="Only the 5 most recent versions are kept">'+vs.length+' of '+KEEP_VERSIONS+' versions kept</span>'+
-        '</div>'+
-      '</div>'+
-      '<div class="ds-st">'+stDot(st,stLabel(d))+'</div>'+
-      '<div class="ds-acts">'+
-        '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+(st==='expired'||st==='soon'?'Renew':'Replace')+'</button>'+
-        '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete document" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+
-      '</div>'+
-    '</div>';
-  if(prev&&open){
-    h+='<div class="ds-prev">'+vs.slice(1).map(function(v,j){
-      var vi=j+1, m=[];
-      if(v.no) m.push('No. '+maskNo(v.no));
-      if(t.exp) m.push('Expiry '+(v.exp?fmtD(v.exp):'--'));
-      m.push('Uploaded '+fmtD(v.on)+', '+fmtT(v.on)+' by '+esc(v.by));
-      if(v.rOn) m.push('Replaced '+fmtD(v.rOn));
-      return '<div class="ds-pr"><div class="ds-prh"><b>Version '+v.ver+'</b>'+verTag(v,vi)+'</div>'+
-        '<div class="ds-sub">'+m.join(' · ')+'</div>'+
-        fileChips(d,t,vi,v.files)+'</div>';
-    }).join('')+'<p class="ds-pnote">'+I.hist+'Versions older than the 5 most recent are deleted automatically.</p></div>';
-  }
-  return h+'</div>';
+  var t=typeOf(d.k), st=stOf(d), vs=versionsOf(d), older=vs.slice(1), left=d.cur.exp?daysTo(d.cur.exp):0;
+  var head='<header class="el-ch"><div><h4>'+t.name+'</h4><p>'+t.cat+(d.no?' · No. '+maskNo(d.no):'')+'</p></div>'+sdPill(st)+'</header>';
+  var meta=[d.cur.files.length+' file'+(d.cur.files.length===1?'':'s')];
+  // the expiry is in the status box below, not repeated here
+  if(d.cur.note) meta.push('“'+esc(d.cur.note)+'”');
+  var doc='<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+I.file+'</span><div class="el-dt"><b>Version '+d.ver+' · current</b>'+
+      '<span class="el-to">Uploaded by '+esc(d.cur.by)+' · '+fmtDT(d.cur.on)+'</span><span class="el-mt">'+meta.join(' <i>·</i> ')+'</span>'+
+      fileChips(d,t,0,d.cur.files)+'</div>'+
+    '<span class="el-mw"><button type="button" class="el-more" data-sdmenu="'+d.k+'" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+SD_DOTS+'</button>'+
+      '<span class="el-menu" role="menu" hidden><button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">Delete document</button></span></span></div>';
+  // what the status means, and the next step
+  var S=st==='none'?['On file','This document doesn’t expire. Replace it when a new version is issued.',['ghost','Replace']]
+    :st==='valid'?['Document is valid','Valid until '+fmtD(d.cur.exp)+' · '+left+' day'+(left===1?'':'s')+' left.',['ghost','Replace']]
+    :st==='soon'?['Expires soon','Expires on '+fmtD(d.cur.exp)+' ('+rel(left)+'). Upload the renewed document before then.',['pri','Renew']]
+    :['Document expired','Expired on '+fmtD(d.cur.exp)+' ('+rel(left)+'). Upload the renewed document to stay compliant.',['pri','Renew']];   // only the wording for this status (no-expiry documents have no date)
+  var status='<div class="el-st '+{valid:'s-signed',none:'',soon:'s-awaiting',expired:'s-failed'}[st]+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
+    '<div class="el-acts"><button type="button" class="btn btn-'+S[2][0]+' xs" data-replace="'+d.k+'">'+I.upsm+S[2][1]+'</button></div></div>';
+  // previous versions: newest first, always shown
+  var hist='<div class="el-hrw'+(older.length?' open':'')+'"><span class="el-hic">'+I.hist+'</span><b>Previous versions</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
+    (older.length?'<div class="el-hlist">'+older.map(function(v,j){ var vi=j+1, info=[];
+      info.push('<span>Uploaded <b>'+fmtDT(v.on)+'</b> by '+esc(v.by)+'</span>');
+      if(t.exp) info.push('<span>'+(v.exp&&daysTo(v.exp)<0?'Expired ':'Expiry ')+(v.exp?fmtD(v.exp):'--')+'</span>');
+      if(v.rOn) info.push('<span>Replaced '+fmtD(v.rOn)+(v.rBy?' by '+esc(v.rBy):'')+'</span>');
+      if(v.no&&v.no!==d.no) info.push('<span>No. '+maskNo(v.no)+'</span>');
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+v.ver+'</b><span>'+v.files.length+' file'+(v.files.length===1?'':'s')+'</span></div>'+
+        '<div class="el-hrow ky-hrow"><div class="el-hi">'+info.join('')+'</div>'+fileChips(d,t,vi,v.files)+'</div></div>'; }).join('')+'</div>':'');
+  return '<article class="el-card sd-card'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+head+doc+status+hist+'</article>';
 }
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
 var KEEP_VERSIONS=5;
@@ -1506,7 +1542,7 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
-  h+='<div class="ds-keep" role="note">'+I.hist+'<p><b>Only the 5 most recent versions of each document are kept</b> — the current one and 4 previous. When a new version is uploaded, anything older is <b>deleted permanently</b> and can’t be recovered.</p></div>';
+  h+='<div class="el-bn" role="note">'+I.info+'<p><b>Versions.</b> Each document keeps its 5 most recent versions, the current one and 4 previous. When a new version is uploaded, anything older is deleted permanently and can’t be recovered.</p></div>';
   return h+currentList(docs);
 }
 function currentList(docs){
@@ -1515,7 +1551,7 @@ function currentList(docs){
   var list=docs.filter(function(d){ var t=typeOf(d.k); return (!q||(t.name+' '+t.cat).toLowerCase().indexOf(q)>=0)&&(docFilter==='all'||stOf(d)===docFilter); })
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
-  return '<div class="ds-list">'+list.map(docCard).join('')+'</div>';
+  return '<div class="ds-list sd-cards">'+list.map(docCard).join('')+'</div>';
 }
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){
@@ -1534,6 +1570,13 @@ function viewDoc(k,vi,fi){
   show(fi||0); openModal('m-prev');
 }
 I.close='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+/* the ⋮ menu on a document card */
+document.addEventListener('click',function(e){
+  var mb=e.target.closest&&e.target.closest('[data-sdmenu]');
+  [].forEach.call(document.querySelectorAll('.sd-card .el-menu'),function(x){ if(!mb||x.parentNode!==mb.parentNode){ x.hidden=true; var o=x.parentNode.querySelector('[data-sdmenu]'); if(o) o.setAttribute('aria-expanded','false'); } });
+  if(mb){ var menu=mb.parentNode.querySelector('.el-menu'); menu.hidden=!menu.hidden; mb.setAttribute('aria-expanded',String(!menu.hidden)); if(!menu.hidden) menu.querySelector('button').focus(); }
+});
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; [].forEach.call(document.querySelectorAll('.sd-card .el-menu:not([hidden])'),function(x){ x.hidden=true; var o=x.parentNode.querySelector('[data-sdmenu]'); if(o){ o.setAttribute('aria-expanded','false'); o.focus(); } }); });
 document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('[data-view],[data-dtab],[data-fmore]'); if(!b) return;
   if(b.hasAttribute('data-fmore')){ var fk=b.getAttribute('data-fmore'); filesOpen[fk]=!filesOpen[fk]; keepScroll(renderDetail); return; }

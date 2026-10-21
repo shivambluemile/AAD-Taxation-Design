@@ -11279,9 +11279,8 @@ function paintForm(focusId){
   ov.innerHTML='<div class="drawer sf qf qf2" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
-      card('Client','','<div class="stack">'+field('Select client',true,clientField,'client')+
-        '<div class="g2">'+field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
-          '<div></div></div></div>')+
+      card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
+        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+'</div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
@@ -13846,8 +13845,8 @@ function paintSaleForm(focusId){
   ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="sf-body">'+
-      card('Client','','<div class="stack">'+field('Select client',true,clientField,'client')+
-        '<div class="g2">'+field('On the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div></div>')+
+      card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
+        field('On the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
           field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+

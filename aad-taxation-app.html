@@ -10734,7 +10734,7 @@ function paintForm(focusId){
         '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div><div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
       '</div>'+err('total')+
     '</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as Draft</button><button class="btn-primary" id="qf-send">Send quotation</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as Draft</button><button class="btn-primary" id="qf-send">Save &amp; Send</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
 }

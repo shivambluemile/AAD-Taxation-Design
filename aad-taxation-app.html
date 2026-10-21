@@ -10232,6 +10232,8 @@ table,td,th{font-size:13.5px}
 .qf-no{font-family:'Inter';font-size:13px;font-weight:600;color:var(--mute);margin-left:6px;letter-spacing:0}
 .qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
 .qf-pick{position:relative}
+.qf-pick .qf-sic{position:absolute;left:13px;top:22px;transform:translateY(-50%);display:flex;color:var(--faint);pointer-events:none;z-index:1}.qf-pick .qf-sic svg{width:15px;height:15px}
+.qf-pick .fin{padding-left:38px}
 .qf-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;list-style:none;margin:0;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);max-height:260px;overflow-y:auto}
 .qf-list li{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:7px;cursor:pointer}
 .qf-list li b{font-size:13.5px;font-weight:600;color:var(--ink)}.qf-list li span{font-size:12px;color:var(--faint)}
@@ -10693,7 +10695,7 @@ function paintForm(focusId){
     opts.map(function(o){ var v=Array.isArray(o)?o[0]:o, l=Array.isArray(o)?o[1]:o; return '<option value="'+esc(v)+'"'+(String(v)===String(val)?' selected':'')+'>'+esc(l)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; };
   var field=function(label,req,html,k){ return '<div><label class="flabel">'+label+(req?' <span class="req-star">*</span>':'')+'</label>'+html+(k?err(k):'')+'</div>'; };
   var clientField=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b><button type="button" class="act" id="qf-chg" title="Change client" aria-label="Change client">'+I.close+'</button></div>'
-    :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="qf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(QF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="qf-list">'+
+    :'<div class="qf-pick"><span class="qf-sic" aria-hidden="true">'+I.search+'</span><input class="fin plain sm'+(e.client?' bad':'')+'" id="qf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(QF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="qf-list">'+
       '<ul class="qf-list" id="qf-list" role="listbox"'+(QF.pick.trim()?'':' hidden')+'>'+clientMatches(QF.pick)+'</ul></div>';
   var names=nameOptions(c), noClient='<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>';
   var lines=d.items.map(function(x,i){
@@ -12516,6 +12518,8 @@ table,td,th{font-size:13.5px}
 .qf-no{font-family:'Inter';font-size:13px;font-weight:600;color:var(--mute);margin-left:6px;letter-spacing:0}
 .qf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px}
 .qf-pick{position:relative}
+.qf-pick .qf-sic{position:absolute;left:13px;top:22px;transform:translateY(-50%);display:flex;color:var(--faint);pointer-events:none;z-index:1}.qf-pick .qf-sic svg{width:15px;height:15px}
+.qf-pick .fin{padding-left:38px}
 .qf-list{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;list-style:none;margin:0;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.12);max-height:260px;overflow-y:auto}
 .qf-list li{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:7px;cursor:pointer}
 .qf-list li b{font-size:13.5px;font-weight:600;color:var(--ink)}.qf-list li span{font-size:12px;color:var(--faint)}
@@ -12566,7 +12570,9 @@ table,td,th{font-size:13.5px}
 .sl-sf .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
 .sl-sf .qf-tot .sl-disc{align-items:center;min-height:32px}
 .sl-disc dd{display:flex;align-items:center;gap:4px}
-.sl-dinp{width:120px}.sl-dinp .fin{height:34px}
+.sl-dinp{width:96px}.sl-dinp .fin{height:34px}
+.sl-seg{display:inline-flex;background:#E9ECF0;padding:2px;border-radius:7px;flex-shrink:0}.sl-seg button{padding:0 10px;height:30px;border-radius:5px;font-size:12.5px;font-weight:700;color:var(--slate)}.sl-seg button.on{background:var(--orange);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.sl-damt{margin:-2px 0 4px;text-align:right;font-size:12px;color:var(--mute)}
 .sl-derr{margin:0 0 4px;text-align:right}
 .qf-tot .sl-pendrow{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px;font-weight:600}.qf-tot .sl-pendrow dt{color:var(--ink)}
 @media (max-width:900px){.sl-sf .qf-row{grid-template-columns:1fr 1fr}.sl-sf .sl-fee{justify-content:flex-start}}
@@ -13022,7 +13028,8 @@ function nextSaleId(){ var qs=quotes(), ids=st.list.map(function(s){ return s.id
 /* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total */
 function saleTotals(d,paid){
   var sub=r2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
-  var disc=d.showDisc?num(d.discount):0; if(!(disc>0)) disc=0; disc=Math.min(disc,sub);
+  var v=d.showDisc?num(d.discount):0; if(!(v>0)) v=0;
+  var disc=d.discType==='%'?sub*Math.min(v,100)/100:v; disc=Math.min(disc,sub);
   var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:r2(total/11),total:total,pending:Math.max(0,r2(total-(paid||0)))};
 }
 function formClient(){ return SF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(SF.d.clientId); })[0]:null; }
@@ -13035,9 +13042,9 @@ function openSaleForm(id){
       clientId:s.clientId,onName:s.onName||client(s).name,branch:s.branch||'',accountant:s.accountant||'',accountant2:s.accountant2||'',date:isoDay(s.date),due:isoDay(s.due),
       items:(s.items&&s.items.length?s.items:[blankLine()]).map(function(x){ var v=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(v&&v.cats&&v.cats[0]!=null?String(v.cats[0]):''),svcId:v?v.id:null,name:x.name||'',desc:x.desc||'',qty:String(x.qty!=null?x.qty:1),price:x.price!=null?String(x.price):''}; }),
-      showDisc:!!s.discountAmt,discount:s.discountAmt?String(s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||''
+      showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||''
     }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
-      items:[blankLine()],showDisc:false,discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
+      items:[blankLine()],showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
   paintSaleForm();
 }
 function clientMatches(q){
@@ -13063,7 +13070,7 @@ function paintSaleForm(focusId){
     opts.map(function(o){ return '<option value="'+esc(o)+'"'+(String(o)===String(val)?' selected':'')+'>'+esc(o)+'</option>'; }).join('')+'</select>'+I.chev+'</div>'; };
   var field=function(label,req,html,k,forId){ return '<div><label class="flabel"'+(forId?' for="'+forId+'"':'')+'>'+label+(req?' <span class="req-star">*</span>':'')+'</label>'+html+(k?err(k):'')+'</div>'; };
   var clientField=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b>'+(SF.isNew?'<button type="button" class="act" id="sf-chg" title="Change client" aria-label="Change client">'+I.close+'</button>':'')+'</div>'
-    :'<div class="qf-pick"><input class="fin plain sm'+(e.client?' bad':'')+'" id="sf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(SF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="sf-list">'+
+    :'<div class="qf-pick"><span class="qf-sic" aria-hidden="true">'+I.search+'</span><input class="fin plain sm'+(e.client?' bad':'')+'" id="sf-q" type="search" placeholder="Search by name, email, phone, ABN or TFN" autocomplete="off" value="'+esc(SF.pick)+'" aria-label="Select client" aria-autocomplete="list" aria-controls="sf-list">'+
       '<ul class="qf-list" id="sf-list" role="listbox"'+(SF.pick.trim()?'':' hidden')+'>'+clientMatches(SF.pick)+'</ul></div>';
   var names=nameOptions(c), staff=ASSIGNABLE.map(function(x){ return x.name; });
   var lines=d.items.map(function(x,i){
@@ -13108,14 +13115,17 @@ function paintSaleForm(focusId){
           '<div><label class="flabel" for="sf-tc">Terms &amp; Conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="3" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
           '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></div>'+
         '<dl class="qf-tot"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+
-          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'<span class="qf-price sl-dinp"><span class="qf-cur">$</span><input class="fin plain sm'+(e.discount?' bad':'')+'" id="sf-disc" type="number" min="0" step="0.01" inputmode="decimal" value="'+esc(d.discount)+'" aria-label="Discount in dollars"></span><button type="button" class="act" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button>'
+          '<div class="sl-disc"><dt>Discount</dt><dd>'+(d.showDisc?'<span class="seg sl-seg" role="group" aria-label="Discount type"><button type="button" data-dt="$" class="'+(d.discType==='%'?'':'on')+'" aria-pressed="'+!(d.discType==='%')+'">$</button><button type="button" data-dt="%" class="'+(d.discType==='%'?'on':'')+'" aria-pressed="'+(d.discType==='%')+'">%</button></span>'+
+            '<span class="qf-price sl-dinp'+(d.discType==='%'?' pct':'')+'"><span class="qf-cur">'+(d.discType==='%'?'%':'$')+'</span><input class="fin plain sm'+(e.discount?' bad':'')+'" id="sf-disc" type="number" min="0"'+(d.discType==='%'?' max="100" step="0.1"':' step="0.01"')+' inputmode="decimal" value="'+esc(d.discount)+'" aria-label="Discount '+(d.discType==='%'?'percentage':'in dollars')+'"></span>'+
+            '<button type="button" class="act" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button>'
             :'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add Discount</button>')+'</dd></div>'+
+          (d.showDisc&&d.discType==='%'?'<p class="sl-damt">−<span id="sf-damt">'+money(T.disc)+'</span> off the sub total</p>':'')+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+money(T.pending)+'</dd></div></dl>'+
       '</div>'+err('total')+
     '</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><span class="sp-grow"></span><button class="btn-primary" id="sf-go">Submit</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-go">Submit</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireSaleForm(focusId);
 }
@@ -13124,6 +13134,7 @@ function liveTotals(){
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
   var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),null,money(T.gst),money(T.total),money(T.pending)];
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
+  var da=document.getElementById('sf-damt'); if(da) da.textContent=money(T.disc);
 }
 function wireSaleForm(focusId){
   var d=SF.d, touch=function(){ SF.dirty=true; };
@@ -13160,6 +13171,7 @@ function wireSaleForm(focusId){
   /* discount: a dollar amount off the sub total, as on quotations */
   var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
   var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
+  [].forEach.call(ov.querySelectorAll('[data-dt]'),function(x){ x.onclick=function(){ var to=x.getAttribute('data-dt'); if(to===d.discType) return; d.discType=to; d.discount=''; delete SF.errs.discount; touch(); repaint('sf-disc'); }; });
   var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; delete SF.errs.discount; touch(); liveTotals(); };
   /* document: one file, picked or dropped */
   var take=function(f){ if(!f) return; var ext=(f.name.split('.').pop()||'').toLowerCase();
@@ -13194,7 +13206,10 @@ function checkSale(){
     else if(p<min) e['p'+i]='The rate can’t be below the '+money(min)+' fee set in Settings → Services';
   });
   if(!filled.length) e.items='Add at least one line';
-  if(d.showDisc){ var dv=num(d.discount); if(d.discount===''||!isFinite(dv)||dv<0) e.discount='Enter the discount in dollars, or remove it'; else if(dv>T.sub) e.discount='The discount can’t be more than the sub total'; }
+  if(d.showDisc){ var dv=num(d.discount), isP=d.discType==='%';
+    if(d.discount===''||!isFinite(dv)||dv<=0) e.discount=isP?'Enter a percentage above 0, or remove the discount':'Enter the discount in dollars, or remove it';
+    else if(isP&&dv>100) e.discount='The percentage can’t be more than 100';
+    else if(!isP&&dv>T.sub) e.discount='The discount can’t be more than the sub total'; }
   if(filled.length&&T.total<=0&&!e.discount) e.total='The total must be more than $0.00';
   if(SF.paid>0&&T.total<SF.paid) e.total='The total can’t be less than the '+money(SF.paid)+' already paid';
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
@@ -13214,7 +13229,7 @@ function submitSale(){
     var doc=d.doc?{name:d.doc.name,size:d.doc.size,type:d.doc.type,key:key||d.doc.key||null}:null;
     var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
       items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price))}; }),
-      subtotal:T.sub,discountAmt:T.disc,gst:T.gst,amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};
+      subtotal:T.sub,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'?num(d.discount):null,gst:T.gst,amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};
     if(SF.isNew){
       if(byId(SF.id)) SF.id=nextSaleId();               // the number was taken meanwhile
       s={id:SF.id,by:ME.name,at:Date.now(),status:'draft',payments:[],history:[]}; for(var k in fields) s[k]=fields[k];
@@ -13458,7 +13473,7 @@ function paintDetail(keep){
           '<td class="r num">'+(fee!=null?money(fee):'<span class="cl-muted">—</span>')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
         :'<tr><td colspan="7" class="cl-muted">No services on this sale</td></tr>')+
       '</tbody></table></div>'+
-      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div>'+
+      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount'+(s.discountType==='%'&&s.discountPct?' ('+s.discountPct+'%)':'')+'</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div>'+
         '<div><dt>GST (incl.)</dt><dd>'+money(T.gst)+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
         '<div class="sd-paid"><dt>Amount Paid'+(credit?'<small>incl. '+money(credit)+' client credit</small>':'')+'</dt><dd>'+money(paidOf(s))+'</dd></div>'+
         '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+(dis?'<span class="cl-muted">— Disabled</span>':money(pendingOf(s)))+'</dd></div></dl></section>';

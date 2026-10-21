@@ -11281,7 +11281,7 @@ function paintForm(focusId){
     '<div class="modal-body" id="qf-body">'+
       card('Client','','<div class="stack">'+field('Select client',true,clientField,'client')+
         '<div class="g2">'+field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Invoice on the name of'):noClient,'onName')+
-          field('To the name of',true,c?sel('qf-to','toName',names,d.toName,'Addressed to'):noClient,'toName')+'</div></div>')+
+          '<div></div></div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
@@ -11376,7 +11376,7 @@ function wireForm(focusId){
 function checkForm(full){
   var d=QF.d, e={}, T=totalsOf(d), filled=d.items.filter(function(x){ return x.svcId; });
   if(d.clientId==null||!formClient()) e.client='Choose the client this quotation is for';
-  else { if(full&&!d.onName) e.onName='Choose who the quotation is made out to'; if(full&&!d.toName) e.toName='Choose who the quotation is addressed to'; }
+  else { if(full&&!d.onName) e.onName='Choose who the quotation is made out to'; }
   if(full&&!d.branch) e.branch='Choose the branch';
   if(full&&!d.accountant) e.accountant='Choose the accountant';
   if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
@@ -11406,7 +11406,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:d.toName||d.onName||c.name,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,discount:null,discountAmt:0,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};

@@ -1465,17 +1465,18 @@ function verTag(v,i){
 }
 /* one row per document type: details, files, who uploaded it, status, actions; older versions open underneath */
 function docCard(d){
-  var t=typeOf(d.k), st=stOf(d), vs=versionsOf(d), prev=vs.length-1, open=!!docOpen[d.k];
+  /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
+  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
   var sub=[t.cat];
-  if(d.no) sub.push('No. <em>'+maskNo(d.no)+'</em>');
-  sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>');
-  sub.push('Version '+d.ver);
+  if(d.no&&!gone) sub.push('No. <em>'+maskNo(d.no)+'</em>');
+  if(gone) sub.push('<em>No active document</em>');
+  else { sub.push('Expiry: <em>'+(t.exp&&d.cur.exp?fmtD(d.cur.exp):'Not applicable')+'</em>'); sub.push('Version '+d.ver); }
   var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
       '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b><div class="ds-sub">'+sub.join(' · ')+'</div>'+
-        fileChips(d,t,0,d.cur.files)+
-        '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>'+
+        (gone?'':fileChips(d,t,0,d.cur.files))+
+        '<div class="ds-by">'+(gone?'<span>Version '+d.ver+' expired on <b>'+fmtD(d.cur.exp)+'</b> and moved to history</span>':'<span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
           '<span class="ds-cap'+(vs.length>=KEEP_VERSIONS?' full':'')+'" title="Only the 5 most recent versions are kept">'+vs.length+' of '+KEEP_VERSIONS+' versions kept</span>'+
         '</div>'+
@@ -1487,8 +1488,8 @@ function docCard(d){
       '</div>'+
     '</div>';
   if(prev&&open){
-    h+='<div class="ds-prev">'+vs.slice(1).map(function(v,j){
-      var vi=j+1, m=[];   // one block per version: its details, then its files
+    h+='<div class="ds-prev">'+hist.map(function(v,j){
+      var vi=j+first, m=[];   // one block per version: its details, then its files
       m.push('<span>Uploaded <b>'+fmtD(v.on)+' · '+fmtT(v.on)+'</b> by '+esc(v.by)+'</span>');
       if(t.exp) m.push('<span>'+(v.exp&&daysTo(v.exp)<0?'Expired ':'Expiry ')+(v.exp?fmtD(v.exp):'--')+'</span>');
       if(v.rOn) m.push('<span>Replaced '+fmtD(v.rOn)+(v.rBy?' by '+esc(v.rBy):'')+'</span>');

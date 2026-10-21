@@ -937,6 +937,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-more svg{transition:transform .15s}
 .ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
 .ds-st{width:150px;flex-shrink:0;padding-top:2px}
+.ds-exp{display:block;margin:3px 0 0 14px;font-size:12px;color:var(--faint)}
 .ds-st .state{white-space:nowrap}
 .ds-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .ds-acts .btn.xs{height:32px;padding:0 12px;font-size:12.5px;gap:6px}
@@ -1477,7 +1478,7 @@ function docCard(d){
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'')+
         '</div>'+
       '</div>'+
-      '<div class="ds-st"'+(exp?' title="'+(gone?'Expired ':'Expires ')+exp+'"':'')+'>'+stDot(st,stLabel(d))+'</div>'+
+      '<div class="ds-st">'+stDot(st,stLabel(d))+(exp?'<small class="ds-exp">'+(gone?'Expired on ':'Expiry date ')+exp+'</small>':'')+'</div>'+
       '<div class="ds-acts">'+
         '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+(st==='expired'||st==='soon'?'Renew':'Replace')+'</button>'+
         '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete document" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+

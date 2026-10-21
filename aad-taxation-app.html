@@ -1473,7 +1473,7 @@ function docCard(d){
       '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b>'+
         (gone?'<div class="ds-sub">No active document</div>':fileChips(d,t,0,d.cur.files))+
-        '<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+'</span>')+
+        '<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'')+
         '</div>'+
       '</div>'+
@@ -1486,7 +1486,7 @@ function docCard(d){
   if(prev&&open){
     h+='<div class="ds-prev">'+hist.map(function(v,j){
       var vi=j+first, m=[];   // one block per version: its details, then its files
-      m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+'</span>');
+      m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+', '+fmtT(v.on)+'</span>');
       if(t.exp&&v.exp) m.push('<span>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
       return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b></div>'+
         '<div class="ds-vrow">'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div></div>';
@@ -5701,7 +5701,7 @@ function kycTab(c){
     (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
   var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
       kycChips(cur.files||[],0)+
-      '<span class="ky-sm">Uploaded by '+esc(cur.by)+' · '+dmyOf(kycUploadedAt(cur))+'</span>'+
+      '<span class="ky-sm">Uploaded by '+esc(cur.by)+' · '+whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'</span>'+
       (cur.note?'<span class="ky-sm">Note: '+esc(cur.note)+'</span>':'')+'</div></div>':'';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown
@@ -5709,7 +5709,7 @@ function kycTab(c){
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
       return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'<div class="el-hi ky-lines">'+
-        '<span>Uploaded by '+esc(r.by)+' · '+dmyOf(kycUploadedAt(r))+'</span><span>'+(gone?'Expired':'Expires')+' '+dmyOf(ex)+'</span>'+
+        '<span>Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+'</span><span>'+(gone?'Expired':'Expires')+' '+dmyOf(ex)+'</span>'+
         (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div></div></div>'; }).join('')+'</div>':'');   // files first, then the details in small text
   var card='<article class="el-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+

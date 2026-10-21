@@ -2575,7 +2575,8 @@ tbody tr:hover{background:#FCFCFD}
 .cl-list .cl-person{display:flex;align-items:center;gap:11px;min-width:0}
 .wz-cur{position:relative}.wz-cur>span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13.5px;color:var(--mute);pointer-events:none}.wz-cur .fin{padding-left:24px}
 .rq-dep{margin-top:14px}.rq-dep .cl-hint{display:block;margin-top:5px}
-.wz-payg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:14px}@media (max-width:640px){.wz-payg{grid-template-columns:1fr}}
+.wz-payg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:14px;align-items:start;margin-bottom:14px}.wz-paysave{padding-top:23px}.wz-paysave .btn-primary{height:40px}
+@media (max-width:640px){.wz-payg{grid-template-columns:1fr}.wz-paysave{padding-top:0}}
 .el-wait{display:flex;align-items:center;gap:8px;margin:0;padding:14px 16px;border:1px dashed var(--line);border-radius:10px;background:#FAFBFC;font-size:13px;color:var(--mute)}.el-wait svg{flex-shrink:0;color:var(--faint)}
 .cl-ent .cl-sub2{display:block;font-size:11.5px;font-weight:500;color:var(--faint);margin-top:2px}
 .cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
@@ -5008,7 +5009,7 @@ function openWizard(draftId){
   var dr=draftId?loadWzDrafts().filter(function(x){ return x.id===draftId; })[0]:null;
   if(dr){
     form.d=JSON.parse(JSON.stringify(dr.d));
-    ['step','services','note','pay','kycNote','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
+    ['step','services','note','pay','payOk','kycNote','kycDate','reviewed','signerIdx','method','channels','sigDate','sig','sigAt'].forEach(function(k){ if(dr[k]!=null) wiz[k]=JSON.parse(JSON.stringify(dr[k])); });
     wiz.files=(dr.files||[]).slice(); wiz.draftId=dr.id; wiz.token=dr.token;
     if(dr.clientId!=null&&CLIENTS.some(function(c){ return c.id===dr.clientId; })){ wiz.clientId=dr.clientId; form.id=dr.clientId; }   // saved on step 1: checks treat it as this client, not a duplicate
   }
@@ -5095,7 +5096,7 @@ function storeDraft(){
     var key='kyc-'+id+'-'+now+'-'+i; return putKyc(key,x.file,{owner:'draft-'+id,name:x.name,type:x.type,size:x.size,at:x.at||now,by:x.by||ME}).then(function(){ x.key=key; }); });
   return Promise.all(puts).then(function(){
     var list=loadWzDrafts(), old=list.filter(function(x){ return x.id===id; })[0];
-    var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,pay:wiz.pay,kycNote:wiz.kycNote||'',kycDate:wiz.kycDate,
+    var rec={id:id,created:old?old.created:now,updated:now,by:old?old.by:ME,step:wiz.step,d:form.d,services:wiz.services,note:wiz.note,pay:wiz.pay,payOk:!!wiz.payOk,kycNote:wiz.kycNote||'',kycDate:wiz.kycDate,
       files:wiz.files.map(function(x){ return {key:x.key,name:x.name,type:x.type,size:x.size,at:x.at,by:x.by}; }),reviewed:wiz.reviewed,signerIdx:wiz.signerIdx,method:wiz.method,channels:wiz.channels,sigDate:wiz.sigDate,sig:wiz.sig||null,sigAt:wiz.sigAt||null,token:wiz.token||null,clientId:wiz.clientId!=null?wiz.clientId:null};
     list=list.filter(function(x){ return x.id!==id; }); list.unshift(rec);
     form.dirty=false;
@@ -5122,19 +5123,29 @@ function paintPay(){
   var fld=function(k,label,req,o){ o=o||{}; return '<div><label class="flabel" for="wz-p-'+k+'">'+label+(req?' <span class="req">*</span>':'')+'</label>'+
     (o.cur?'<div class="wz-cur"><span>$</span>':'')+'<input class="fin sm'+(e[k]?' bad':'')+'" id="wz-p-'+k+'" data-pay="'+k+'" value="'+esc(p[k]||'')+'" inputmode="'+(o.mode||'text')+'" maxlength="'+(o.max||60)+'" placeholder="'+(o.ph||'')+'" autocomplete="off">'+(o.cur?'</div>':'')+
     (e[k]?'<span class="cl-err">'+I.info+esc(e[k])+'</span>':'')+'</div>'; };
-  sec.innerHTML='<div class="grid3 wz-payg">'+fld('deposit','Deposit amount',true,{cur:true,mode:'decimal',ph:'0.00',max:12})+
-      fld('bsb','BSB',true,{mode:'numeric',ph:'000-000',max:7})+fld('accNo','Account number',true,{mode:'numeric',ph:'e.g. 12345678',max:12})+'</div>';
-  sec.querySelectorAll('[data-pay]').forEach(function(el){ el.oninput=function(){ var k=el.dataset.pay, was=payReady(); p[k]=el.value; form.dirty=true;
-    if(e[k]){ delete e[k]; el.classList.remove('bad'); var w=el.parentNode.classList.contains('wz-cur')?el.parentNode.parentNode:el.parentNode, er=w.querySelector(':scope > .cl-err'); if(er) er.remove(); }
-    if(payReady()!==was){ var pos=el.selectionStart; paintLetterStep(); var n=document.getElementById(el.id); if(n){ n.focus(); try{ n.setSelectionRange(pos,pos); }catch(x){} } }   // the letter appears (or goes) as the last field is filled
-    else if(was){ var lt=document.getElementById('el-letter'); if(lt) lt.innerHTML='<span class="el-pvb">Preview</span>'+wzLetterHtml(); } }; });
+  sec.innerHTML='<div class="wz-payg">'+fld('deposit','Deposit amount',true,{cur:true,ph:'0.00',max:30})+
+      fld('bsb','BSB',true,{ph:'000-000',max:30})+fld('accNo','Account number',true,{ph:'e.g. 12345678',max:30})+
+      '<div class="wz-paysave"><button type="button" class="btn-primary btn-sm" id="wz-paysave">Save</button></div></div>';
+  sec.querySelectorAll('[data-pay]').forEach(function(el){
+    el.oninput=function(){ var k=el.dataset.pay; p[k]=el.value; form.dirty=true;
+      if(e[k]){ delete e[k]; el.classList.remove('bad'); var w=el.parentNode.classList.contains('wz-cur')?el.parentNode.parentNode:el.parentNode, er=w.querySelector(':scope > .cl-err'); if(er) er.remove(); } };
+    el.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); savePay(); } }; });
+  document.getElementById('wz-paysave').onclick=savePay;
 }
-function payReady(){ return !Object.keys(payErrs()).length; }
+/* Save: all three just need something in them (no format rules); the letter shows what was saved */
+function savePay(){
+  wiz.payErr=payErrs();
+  if(Object.keys(wiz.payErr).length){ wiz.payOk=false; paintLetterStep(); var b=formBody().querySelector('#wz-pay .bad'); if(b) b.focus(); return; }
+  ['deposit','bsb','accNo'].forEach(function(k){ wiz.pay[k]=String(wiz.pay[k]||'').trim(); });
+  wiz.payOk=true; form.dirty=true; paintLetterStep(); toast('Saved');
+  var lt=document.getElementById('el-letter'); if(lt) lt.scrollIntoView({block:'start',behavior:'smooth'});
+}
+function payReady(){ return !!wiz.payOk&&!Object.keys(payErrs()).length; }
 function payErrs(){
-  var p=wiz.pay, e={}, d=String(p.deposit||'').replace(/[$,\s]/g,''), bsb=String(p.bsb||'').replace(/\D/g,''), acc=String(p.accNo||'').replace(/\D/g,'');
-  if(d==='') e.deposit='Deposit amount is required'; else if(!isFinite(+d)||+d<0) e.deposit='Enter the deposit in dollars, e.g. 500.00';
-  if(!bsb) e.bsb='BSB is required'; else if(bsb.length!==6) e.bsb='A BSB has 6 digits';
-  if(!acc) e.accNo='Account number is required'; else if(acc.length<5||acc.length>10) e.accNo='An account number has 5 to 10 digits';
+  var p=wiz.pay, e={};
+  if(!String(p.deposit||'').trim()) e.deposit='Deposit amount is required';
+  if(!String(p.bsb||'').trim()) e.bsb='BSB is required';
+  if(!String(p.accNo||'').trim()) e.accNo='Account number is required';
   return e;
 }
 function paintKyc(){
@@ -5173,12 +5184,11 @@ function paintLetterStep(){
   var sg=wzSigner();
   var err=function(k){ return e[k]?'<span class="cl-err">'+I.info+esc(e[k])+'</span>':''; };
   var ready=payReady();
-  if(ready){ var pb=String(wiz.pay.bsb||'').replace(/\D/g,''); wiz.pay.bsb=pb.slice(0,3)+'-'+pb.slice(3); }   // shown as 000-000 on the letter
   var h='<section class="wz-sec el-step"><h3 class="wz-h">Engagement letter</h3><div id="wz-pay"></div>'+
     (ready?'<div class="el-acts"><button type="button" class="pill-btn quiet" id="el-full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" id="el-pdf">'+OI.dl+'Download PDF</button></div>'+
       '<div class="el-wrap el-pvw" id="el-letter"><span class="el-pvb">Preview</span>'+wzLetterHtml()+'</div>'+
       '<label class="el-review'+(e.review?' bad':'')+'"><input type="checkbox" id="wz-rev"'+(wiz.reviewed?' checked':'')+'><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+err('review')
-      :'<p class="el-wait">'+I.info+'Enter the deposit amount, BSB and account number to see the engagement letter.</p>')+'</section>';
+      :'<p class="el-wait">'+I.info+'Enter the deposit amount, BSB and account number, then Save to see the engagement letter.</p>')+'</section>';
   if(ready&&co){
     h+='<section class="wz-sec"><h3 class="wz-h">Which director will sign the engagement letter?</h3>'+
       (dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x,n){ var on=wiz.signerIdx===x.i;
@@ -5236,7 +5246,7 @@ function isoFromDmy(v){ var m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(v||''); if(!m) re
 function wzSend(){
   if(wiz.busy) return;
   var c=wzClient(), co=c.type==='company', sg=wzSigner(), e={};
-  if(!payReady()){ wiz.payErr=payErrs(); paintLetterStep(); var bp=formBody().querySelector('#wz-pay .bad'); if(bp){ bp.scrollIntoView({block:'center'}); bp.focus(); } toast('Enter the deposit amount, BSB and account number first',true); return; }
+  if(!payReady()){ wiz.payErr=payErrs(); paintLetterStep(); var bp=formBody().querySelector('#wz-pay .bad')||document.getElementById('wz-paysave'); if(bp){ bp.scrollIntoView({block:'center'}); bp.focus(); } toast('Enter and save the deposit amount, BSB and account number first',true); return; }
   if(!wiz.reviewed) e.review='Confirm you’ve reviewed the letter';
   if(co&&wiz.signerIdx==null) e.signer='Choose the director who will sign';
   if(!wiz.method) e.method='Choose how the letter will be signed';
@@ -19665,7 +19675,7 @@ function letterHtml(c){                               // c: {name,type,entity,em
     n('(d)','this engagement letter will apply in respect of the above returns, statements and advices as well as returns, statements and advices we prepare for you in the future, subject to clause 4; and')+
     n('(e)','you agree, where applicable, to appoint us as your registered tax agent with the Australian Taxation Office (ATO) and registered agent with the Australian Securities Investments Commission (ASIC), and for us to access your records on the ATO\'s Tax Agent Portal, and the ASIC portal, or other portals / systems connected with and to regulators and software providers, as is necessary for the purpose of providing the services.')+
     n('(f)','The Client must maintain an active MYOB or XERO subscription (if operating as a company) for the purpose of managing their accounts. The subscription must be obtained and paid for by the Client at their own cost. The Client agrees to provide the Service Provider with the necessary access to the software to perform the agreed services. All subscription fees and related charges will be the responsibility of the Client.')+
-    n('(g)','As discussed, transfer $'+(pay.deposit!==''&&pay.deposit!=null&&isFinite(+pay.deposit)?e((+pay.deposit).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})):blank(7))+' now at the time of engagement and balance at delivery to below business account:')+
+    n('(g)','As discussed, transfer $'+(String(pay.deposit==null?'':pay.deposit).trim()===''?blank(7):/^\d+(\.\d+)?$/.test(String(pay.deposit).replace(/[$,\s]/g,''))?e((+String(pay.deposit).replace(/[$,\s]/g,'')).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})):e(String(pay.deposit).replace(/^\s*\$\s*/,'')))+' now at the time of engagement and balance at delivery to below business account:')+
     '<dl class="lt-meta lt-bank">'+(pay.accName?'<div><dt>Account Name:</dt><dd>'+e(pay.accName)+'</dd></div>':'')+'<div><dt>Account Number:</dt><dd>'+(pay.accNo?e(pay.accNo):blank(12))+'</dd></div><div><dt>BSB:</dt><dd>'+(pay.bsb?e(pay.bsb):blank(8))+'</dd></div><div><dt>Reference:</dt><dd>Your reference (at top left hand corner)</dd></div></dl>'+
     sec('2.','Your responsibilities'),
     // 4

@@ -779,6 +779,11 @@ body.gridmode .listview{display:none}
 .dl-foot{display:flex;justify-content:flex-end;margin-top:12px}
 .dl-del{font-size:12.5px;font-weight:600;color:var(--mute);padding:6px 8px;border-radius:7px}
 .dl-del:hover{color:var(--red);background:var(--red-soft)}
+.ds-keep{display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:10px 14px;border-radius:10px;background:#F8FAFC;border:1px solid var(--line-soft);color:var(--slate)}
+.ds-keep svg{flex-shrink:0;margin-top:2px;color:var(--mute);width:15px;height:15px}.ds-keep p{margin:0;font-size:12.5px;line-height:1.5}.ds-keep b{color:var(--ink)}
+.ds-cap{font-size:11.5px;font-weight:600;color:var(--faint);padding:1px 8px;border-radius:999px;background:#F3F4F6}.ds-cap.full{background:#FFF6E8;color:#B4690E}
+.ds-pnote{display:flex;align-items:center;gap:6px;margin:4px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;color:var(--mute)}.ds-pnote svg{width:13px;height:13px}
+.up-cur-n.warn{background:#FFF6E8;color:#92400E}.up-cur-n.warn b{color:#92400E}
 .dl-none{padding:40px 20px;text-align:center;border:1px dashed var(--line);border-radius:12px;font-size:13px;color:var(--mute)}
 .dl-none b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px}
 
@@ -1465,6 +1470,7 @@ function docCard(d){
         fileChips(d,t,0,d.cur.files)+
         '<div class="ds-by"><span>Uploaded by <b>'+esc(d.cur.by)+'</b> · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>'+
           (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+
+          '<span class="ds-cap'+(vs.length>=KEEP_VERSIONS?' full':'')+'" title="Only the 5 most recent versions are kept">'+vs.length+' of '+KEEP_VERSIONS+' versions kept</span>'+
         '</div>'+
       '</div>'+
       '<div class="ds-st">'+stDot(st,stLabel(d))+'</div>'+
@@ -1483,10 +1489,12 @@ function docCard(d){
       return '<div class="ds-pr"><div class="ds-prh"><b>Version '+v.ver+'</b>'+verTag(v,vi)+'</div>'+
         '<div class="ds-sub">'+m.join(' · ')+'</div>'+
         fileChips(d,t,vi,v.files)+'</div>';
-    }).join('')+'</div>';
+    }).join('')+'<p class="ds-pnote">'+I.hist+'Versions older than the 5 most recent are deleted automatically.</p></div>';
   }
   return h+'</div>';
 }
+/* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
+var KEEP_VERSIONS=5;
 function docsBody(s){
   var docs=storeOf(s.id).docs, n={valid:0,none:0,soon:0,expired:0};
   docs.forEach(function(d){ n[stOf(d)]++; });
@@ -1498,6 +1506,7 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
+  h+='<div class="ds-keep" role="note">'+I.hist+'<p><b>Only the 5 most recent versions of each document are kept</b> — the current one and 4 previous. When a new version is uploaded, anything older is <b>deleted permanently</b> and can’t be recovered.</p></div>';
   return h+currentList(docs);
 }
 function currentList(docs){
@@ -1569,6 +1578,7 @@ function paintUpd(){
           (t.slots.length>1?slotLabel(d.k,f.slot)+' · ':'')+f.s+(t.exp?' · '+(st==='expired'?'expired ':'expires ')+fmtD(d.cur.exp):'')+'</span></div></div>';
       }).join('')+
       '<div class="up-cur-n">'+I.hist+'<span>Moves to <b>Previous versions</b> when you save. No new document entry is created.</span></div>'+
+      (versionsOf(d).length>=KEEP_VERSIONS?'<div class="up-cur-n warn">'+I.hist+'<span>This document already has '+KEEP_VERSIONS+' versions. Saving <b>permanently deletes Version '+versionsOf(d)[versionsOf(d).length-1].ver+'</b>, the oldest.</span></div>':'')+
     '</div>';
   }
   if(t){
@@ -1632,6 +1642,9 @@ function saveUpd(){
     d.ver++; d.no=no;
     d.cur={files:files,exp:exp,on:now,by:ME,note:note};
     store.audit.unshift({act:'replaced',k:k,name:t.name,ver:d.ver,on:now,by:ME,from:names(prev),to:names(d.cur),expFrom:prev.exp,expTo:exp,note:note});
+    var gone=d.hist.splice(KEEP_VERSIONS-1);                      // only the 5 most recent versions are kept
+    if(gone.length) store.audit.unshift({act:'purged',k:k,name:t.name,ver:0,on:new Date(now.getTime()+1),by:'System',files:gone.map(function(v){ return 'Version '+v.ver; }).join(', '),
+      note:'Only the '+KEEP_VERSIONS+' most recent versions are kept'});
     var after=stOf(d);
     toast(t.name+' replaced · old file moved to previous versions'+(t.exp&&before!==after?' · now '+ST[after][1]:''));
   } else {
@@ -1668,13 +1681,14 @@ function doDelete(){
 /* ---------- audit trail ---------- */
 function auditBody(s){
   var all=storeOf(s.id).audit;
-  var tone={uploaded:'t-green',replaced:'t-blue',deleted:'t-red'};
-  var icon={uploaded:ACT.created,replaced:ACT.replaced,deleted:ACT.deleted};
+  var tone={uploaded:'t-green',replaced:'t-blue',deleted:'t-red',purged:'t-red'};
+  var icon={uploaded:ACT.created,replaced:ACT.replaced,deleted:ACT.deleted,purged:ACT.deleted};
   if(!all.length) return '<div class="dl-none"><b>No document activity yet</b>Uploads, replacements and deletions will appear here.</div>';
   var seenCur={};
   return ''+
     '<div class="al">'+all.map(function(a){
       var detail = a.act==='replaced' ? esc(a.from)+' → '+esc(a.to)+(a.expTo?' · new expiry '+fmtD(a.expTo):'')
+        : a.act==='purged' ? esc(a.files)+' deleted · '+esc(a.note)
         : esc(a.files)+(a.act==='deleted'&&a.prev?' and '+a.prev+' previous version'+(a.prev===1?'':'s'):'');
       // the files this entry added: that version can still be opened and downloaded
       var files = a.act==='uploaded' ? a.files : a.act==='replaced' ? a.to : '';
@@ -1689,7 +1703,7 @@ function auditBody(s){
       }
       return '<div class="al-row">'+
         '<span class="al-ic '+tone[a.act]+'">'+icon[a.act]+'</span>'+
-        '<div class="al-main"><b>'+a.name+' '+a.act+(a.ver?' <em>v'+a.ver+'</em>':'')+tag+'</b><span>'+detail+'</span></div>'+
+        '<div class="al-main"><b>'+a.name+' '+(a.act==='purged'?'older versions deleted':a.act)+(a.ver?' <em>v'+a.ver+'</em>':'')+tag+'</b><span>'+detail+'</span></div>'+
         '<div class="al-when">'+fmtD(a.on)+'<small>'+fmtT(a.on)+' · '+esc(a.by)+'</small></div>'+
         acts+
       '</div>';
@@ -2837,6 +2851,8 @@ tbody tr:hover{background:#FCFCFD}
 .el-prev{display:flex;flex-direction:column;gap:8px}
 /* Engagement letter: info banner, one card (header, document, status and next step, previous letters) */
 .el-main{display:flex;flex-direction:column;gap:12px}
+.el-dt .ds-files{margin-top:6px}
+.ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:4px}
 .el-bn{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
 .el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
 .el-none{margin:0;font-size:13px;color:var(--mute)}
@@ -5577,30 +5593,35 @@ function kycChips(files,vi){
       (view?'<button class="ds-fname" data-kpv="'+vi+'|'+fi+'" aria-label="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b>'+esc(f.name)+'</b>')+fsize(f.size)+
       (view?'<button class="sdt-ib" data-kdl="'+vi+'|'+fi+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'')+'</span>'; }).join('')+'</div>';
 }
+/* KYC: the same layout as the engagement letter: a quiet rule banner, then one card with the current check, what it means, the next step, and the previous checks */
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], n=recs.length, now=Date.now();
-  if(!cur) return '<div class="vbar"><p>No KYC recorded yet. Each KYC check is valid for 365 days from upload.</p>'+(c._draft?'':'<button class="btn-edit" data-kyc-add>'+I.plus+'Record KYC</button>')+'</div>';
-  var st=kycState(cur), open=!!kycOpen[c.id], prev=n-1;
-  var h='<section class="vsec"><div class="ds-item">'+
-    '<div class="ds-row"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span>'+
-      '<div class="ds-tt"><b>KYC check</b><div class="ds-sub">Checked <em>'+dmyOf(fromIso(cur.date))+'</em> · '+(st==='expired'?'Expired':'Expiry')+': <em>'+whenOf(kycExpiresAt(cur))+'</em> · Version '+n+'</div>'+
-        kycChips(cur.files||[],0)+
-        (cur.note?'<p class="ky-note">“'+esc(cur.note)+'”</p>':'')+
-        '<div class="ds-by"><span>Uploaded by <b>'+esc(cur.by)+'</b> · '+whenOf(kycUploadedAt(cur))+(cur.source?' · '+esc(cur.source):'')+'</span>'+
-          (prev?'<button class="ds-more" data-kyv aria-expanded="'+open+'">'+(open?'Hide':'Show')+' '+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'<span>No previous versions</span>')+'</div>'+
-      '</div>'+
-      '<div class="ds-st">'+pill(KYC_STATUS,st)+'</div>'+
-      (c._draft?'':'<div class="ds-acts"><button class="'+(st==='valid'?'btn-ghost':'btn-edit')+' btn-sm" data-kyc-add>'+I.plus+(st==='valid'?'Record new KYC':'Renew KYC')+'</button></div>')+
-    '</div>';
-  if(prev&&open){
-    h+='<div class="ds-prev">'+recs.slice(1).map(function(r,j){ var vi=j+1, exp=kycExpiresAt(r), gone=now>=exp, next=recs[j];   // recs[j] is the version that replaced it
-      var m=['Checked '+dmyOf(fromIso(r.date)),'Uploaded '+whenOf(kycUploadedAt(r))+' by '+esc(r.by),(gone?'Expired ':'Expiry ')+whenOf(exp),'Replaced '+whenOf(kycUploadedAt(next))];
-      return '<div class="ds-pr"><div class="ds-prh"><b>Version '+(n-vi)+'</b>'+(gone?'<span class="ds-tag bad">Expired</span>':'<span class="ds-tag">Replaced</span>')+'</div>'+
-        '<div class="ds-sub">'+m.join(' · ')+'</div>'+(r.note?'<p class="ky-note">“'+esc(r.note)+'”</p>':'')+kycChips(r.files||[],vi)+'</div>'; }).join('')+'</div>';
-  }
-  h+='</div></section>';
-  h+='<section class="vsec"><div class="vsec-h"><h3>Audit trail</h3><span class="cl-muted">Uploads, renewals and expiry · expired checks are kept</span></div>'+kycTrail(c)+'</section>';
-  return h;
+  var banner='<div class="el-bn">'+EL_INFO+'<p><b>KYC.</b> Each check is valid for 365 days from when its documents are uploaded. A new check never replaces the record of an earlier one: expired checks and their documents are kept.</p></div>';
+  var st=cur?kycState(cur):'none', exp=cur?kycExpiresAt(cur):0, left=cur?Math.ceil((exp-now)/864e5):0;
+  var S={none:['No KYC recorded','Record this client’s identity check to keep them compliant.',null,['add','Record KYC']],
+    valid:['KYC is valid','Valid until '+whenOf(exp)+' · '+left+' day'+(left===1?'':'s')+' left.',['add','Record new KYC'],null],
+    expiring:['KYC expires soon','Expires on '+whenOf(exp)+'. Record a new check before then to stay compliant.',null,['add','Renew KYC']],
+    expired:['KYC expired','Expired on '+whenOf(exp)+'. The client isn’t compliant until a new check is recorded.',null,['add','Renew KYC']]}[st];
+  var tone={none:'',valid:'s-signed',expiring:'s-awaiting',expired:'s-failed'}[st];
+  var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x[1]+'</button>':''; };
+  var status='<div class="el-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
+    (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
+  var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
+      '<span class="el-to">Uploaded by '+esc(cur.by)+' · '+whenOf(kycUploadedAt(cur))+(cur.source?' <i>· '+esc(cur.source)+'</i>':'')+'</span>'+
+      '<span class="el-mt">'+(cur.files||[]).length+' document'+((cur.files||[]).length===1?'':'s')+' <i>·</i> '+(st==='expired'?'Expired ':'Expires ')+whenOf(exp)+(cur.note?' <i>·</i> “'+esc(cur.note)+'”':'')+'</span>'+
+      kycChips(cur.files||[],0)+'</div></div>':'';
+  /* previous checks, newest first, collapsed */
+  var older=recs.slice(1), open=!!kycOpen[c.id]&&older.length>0;
+  var hist='<button type="button" class="el-hrw" data-kyv aria-expanded="'+open+'"'+(older.length?'':' disabled')+'><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'<span class="el-chev">'+I.chev+'</span>':'<span class="el-hnone">None yet</span>')+'</button>'+
+    (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+'</b><span>verified '+dmyOf(fromIso(r.date))+'</span></div><div class="el-hrow ky-hrow"><div class="el-hi">'+
+        '<span>Uploaded <b>'+whenOf(kycUploadedAt(r))+'</b> by '+esc(r.by)+'</span><span>'+(gone?'Expired':'Expires')+' '+whenOf(ex)+'</span><span>Replaced '+whenOf(kycUploadedAt(next))+'</span>'+
+        (r.note?'<span>“'+esc(r.note)+'”</span>':'')+'</div>'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');
+  var card='<article class="el-card">'+
+    '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Current check · Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
+    doc+status+hist+'</article>';
+  return '<section class="vsec el-main">'+banner+card+'</section>';
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
 function kycTrail(c){
@@ -5699,7 +5720,7 @@ function engagementTab(c){
       return '<div class="el-yg"><div class="el-yh"><b>FY '+fyLabel(y)+'</b><span>01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+older.filter(function(l){ return letterFy(l)===y; }).map(function(l){
         var exp=l.expiredAt||letterExpiresAt(l), s=elState(l);
         return '<div class="el-hrow"><div class="el-hi"><span>'+(l.status==='signed'?'Signed <b>'+dmyOf(l.signedAt)+'</b>':'<b>Not signed</b>')+'</span><span>'+(Date.now()>exp?'Expired':'Expires')+' '+whenOf(exp)+'</span></div>'+
-          pill(EL_STATE,s)+'<span class="el-hacts"><button class="linkbtn" data-elfull="'+l.id+'">View</button><button class="sdt-ib" data-elpdf="'+l.id+'" title="Download PDF" aria-label="Download the FY '+fyLabel(y)+' letter">'+OI.dl+'</button></span></div>'; }).join('')+'</div>';
+          '<span class="el-hacts"><button class="linkbtn" data-elfull="'+l.id+'">View</button><button class="sdt-ib" data-elpdf="'+l.id+'" title="Download PDF" aria-label="Download the FY '+fyLabel(y)+' letter">'+OI.dl+'</button></span></div>'; }).join('')+'</div>';
     }).join('')+'</div>':'');
 
   var card='<article class="el-card">'+

@@ -1803,7 +1803,7 @@ function paintNeed(){
   document.getElementById('need-body').innerHTML=list.length?'<p class="nd-intro">Upload each document below. Earlier versions of an expired document stay in its history.</p><ul class="nd-list">'+list.map(function(x){
     var t=typeOf(x.k), n=x.d?Math.abs(daysTo(x.d.cur.exp)):0, hv=x.d?versionsOf(x.d).length:0;
     return '<li class="nd-row"><span class="dt-ic">'+DOC_IC.HR+'</span><div class="nd-t"><b>'+esc(t.name)+'</b><span class="'+(x.d?'bad':'')+'">'+
-        (x.d?'Expired on '+fmtD(x.d.cur.exp):'Mandatory · not uploaded yet')+' · needs '+t.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
+        (x.d?'Expired on '+fmtD(x.d.cur.exp):'Mandatory · not uploaded yet')+'</span></div>'+
       (x.d?'<button type="button" class="dx-hist" data-needhist="'+x.k+'">History<span class="dc2-hn">'+hv+'</span></button>':'')+
       '<button type="button" class="dx-up nd-up" data-needup="'+x.k+'">'+I.upsm+'Upload</button></li>'; }).join('')+'</ul>'
     :'<p class="nd-intro">Every required document is on file.</p>';

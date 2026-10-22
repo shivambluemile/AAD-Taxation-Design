@@ -10931,6 +10931,13 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-bottom{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
 .qf2 .qf-notes{display:flex;flex-direction:column;gap:16px}
 .qf2 .qf-sum .qf-tot{margin:12px 0 0;background:none;border:0;padding:0}
+/* internal company badges */
+.qf-cos{display:flex;flex-wrap:wrap;gap:8px;min-height:40px;align-items:center}
+.qf-co{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:500;color:var(--slate);transition:border-color .12s,background .12s}
+.qf-co:hover{border-color:#CBD2DA;color:var(--ink)}.qf-co.on{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink);font-weight:600}.qf-co svg{width:12px;height:12px}
+.qf-co.bad{border-color:#F3A3A3}
+.drawer.qs-swap{animation:none}
+.qf-cohint{margin:0;height:40px;display:flex;align-items:center;font-size:13px;color:var(--faint)}
 /* discount: the same one-row control as the Sale form */
 .qf2 .linkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--orange-ink);padding:0}.qf2 .linkbtn:hover{text-decoration:underline;text-underline-offset:2px}
 .qf2 .qf-tot .sl-disc{align-items:center}
@@ -11397,6 +11404,8 @@ function round2(x){ return Math.round(x*100)/100; }
 function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
 /* the firm's own companies a quotation can be issued from. PROTOTYPE ONLY: sample names until Settings has the real list */
 var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd'];
+/* which of them each branch can issue from. PROTOTYPE ONLY: every branch has AAD888 Services; some also have a second company */
+function branchCos(b){ if(!b) return []; var i=BRANCHES.indexOf(b); return i<0?[INTERNAL_COS[0]]:i%3===0?[INTERNAL_COS[0],INTERNAL_COS[1]]:i%3===1?[INTERNAL_COS[0]]:[INTERNAL_COS[0],INTERNAL_COS[2]]; }
 /* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total (as in Sales) */
 function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
@@ -11425,13 +11434,14 @@ function openForm(id){
   openForm.ok=false;
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
-      clientId:q.clientId,onName:q.onName||q.clientName||'',company:q.company||INTERNAL_COS[0],toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
+      clientId:q.clientId,onName:q.onName||q.clientName||'',company:q.company||'',toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
       customerNotes:q.customerNotes||'',terms:q.terms||'',gst:q.gstMode!=='none',
       showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
-    }:{clientId:null,onName:'',toName:'',company:INTERNAL_COS[0],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+    }:{clientId:null,onName:'',toName:'',company:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:'',gst:true,showDisc:false,discType:'$',discount:''}};
+  if(!QF.d.company){ var c0=branchCos(QF.d.branch); if(c0.length===1) QF.d.company=c0[0]; }   // one company for the branch: chosen for you
   paintForm();
 }
 /* editing a quotation the client has answered (or that expired) puts it back to Draft, to be sent again */
@@ -11474,13 +11484,17 @@ function paintForm(focusId){
   }).join('');
   var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
   var staff=ASSIGNABLE.map(function(s){ return s.name; });
-  ov.innerHTML='<div class="drawer sf qf qf2" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
+  var again=!!ov.querySelector('.drawer.qf');   // already open: redraw without sliding in again
+  ov.innerHTML='<div class="drawer sf qf qf2'+(again?' qs-swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
       card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
         field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>'+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
-          field('Internal company',true,sel('qf-co','company',INTERNAL_COS,d.company,'Select'),'company')+'</div></div>')+
+          field('Internal company',true,(function(){ var cos=branchCos(d.branch);
+            if(!cos.length) return '<p class="qf-cohint">Select a branch first</p>';
+            return '<div class="qf-cos" role="radiogroup" aria-label="Internal company">'+cos.map(function(n){ var on=d.company===n;
+              return '<button type="button" class="qf-co'+(on?' on':'')+(e.company?' bad':'')+'" role="radio" aria-checked="'+on+'" data-co="'+esc(n)+'">'+(on?I.tick:'')+esc(n)+'</button>'; }).join('')+'</div>'; })(),'company')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
           field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'<div></div></div>'+
@@ -11526,7 +11540,8 @@ function wireForm(focusId){
   var repaint=function(fid){ var keep=document.getElementById('qf-body').scrollTop; paintForm(); document.getElementById('qf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-qf]'),function(el){
     var k=el.getAttribute('data-qf'), live=el.tagName==='TEXTAREA';
-    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2=''; if(!live) repaint(el.id); };
+    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2='';
+      if(k==='branch'){ var cos=branchCos(d.branch); if(cos.indexOf(d.company)<0) d.company=cos.length===1?cos[0]:''; delete QF.errs.company; } if(!live) repaint(el.id); };
   });
   var pick=document.getElementById('qf-q');
   if(pick){
@@ -11573,6 +11588,7 @@ function wireForm(focusId){
     row.ondrop=function(ev){ ev.preventDefault(); if(dragFrom==null) return; var below=row.classList.contains('drop-below'), to=i+(below?1:0); if(dragFrom<to) to--; var f=dragFrom; dragFrom=null; moveLine(f,to); };
     row.ondragend=function(){ row.draggable=false; dragFrom=null; [].forEach.call(ov.querySelectorAll('.qf-row'),function(x){ x.classList.remove('dragging','drop-above','drop-below'); }); };
   });
+  [].forEach.call(ov.querySelectorAll('[data-co]'),function(b){ b.onclick=function(){ d.company=b.getAttribute('data-co'); delete QF.errs.company; touch(); repaint(); var n=ov.querySelector('[data-co="'+CSS.escape(d.company)+'"]'); if(n) n.focus(); }; });
   document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;
   document.getElementById('qf-draft').onclick=function(){ submitForm('draft'); };

@@ -11403,9 +11403,10 @@ function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,''))
 function round2(x){ return Math.round(x*100)/100; }
 function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
 /* the firm's own companies a quotation can be issued from. PROTOTYPE ONLY: sample names until Settings has the real list */
-var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd'];
-/* which of them each branch can issue from. PROTOTYPE ONLY: every branch has AAD888 Services; some also have a second company */
-function branchCos(b){ if(!b) return []; var i=BRANCHES.indexOf(b); return i<0?[INTERNAL_COS[0]]:i%3===0?[INTERNAL_COS[0],INTERNAL_COS[1]]:i%3===1?[INTERNAL_COS[0]]:[INTERNAL_COS[0],INTERNAL_COS[2]]; }
+var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd','AAD Bookkeeping Pty Ltd','AAD Business Services Pty Ltd','AAD SMSF Services Pty Ltd','AAD Wealth Partners Pty Ltd'];
+/* which of them each branch can issue from. PROTOTYPE ONLY: sample spread, from one company up to all of them, until branches record their own */
+var BRANCH_CO_COUNT=[2,1,3,5,2,4,7,6];
+function branchCos(b){ if(!b) return []; var i=BRANCHES.indexOf(b); return INTERNAL_COS.slice(0,i<0?1:BRANCH_CO_COUNT[i%BRANCH_CO_COUNT.length]); }
 /* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total (as in Sales) */
 function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));

@@ -5832,11 +5832,6 @@ function engagementTab(c){
   var who=(L&&L.signer&&L.signer.name)||sg.name||c.name, mail=(L&&L.signer&&L.signer.email)||sg.email, role=(L&&L.signer&&L.signer.role)||sg.role;
   if(st==='none'&&!act.length) st='noservice';
 
-  /* the document */
-  var meta=[];
-  if(lastOk) meta.push('Sent '+whenOf(lastOk.at)+(okSends.length>1?' ('+okSends.length+' times)':''));
-  meta.push((L&&letterExpired(L)?'Expired ':'Expires ')+whenOf(L?letterExpiresAt(L):fyEndAt));
-  if(L) meta.push(elAuto(L)?'Automatic renewal':'Created by '+esc(L.by)+' '+dmyOf(L.created));
   /* what's happening, and the next step: [title, text, secondary, primary, menu] */
   var S={
     noservice:['No services assigned','Assign a service to this client to create the engagement letter for FY '+fyLabel(F)+'.',null,null,[]],
@@ -5853,10 +5848,17 @@ function engagementTab(c){
   var dup=function(x){ return !x||['view','full','pdf'].indexOf(x[0])>=0; };   // opening and downloading are on the file row itself
   var acts=(dup(S[2])?'':'<button type="button" class="btn-ghost btn-sm" data-el="'+S[2][0]+'">'+S[2][1]+'</button>')+(dup(S[3])?'':'<button type="button" class="btn-primary btn-sm" data-el="'+S[3][0]+'">'+S[3][1]+'</button>');
   /* who signs, when it was sent / signed, expiry, who created it: small muted text under the file, like KYC */
-  var lines=['<span>'+esc(who)+(role?' ('+esc(role)+')':'')+(mail?' · '+esc(mail):'')+'</span>'];
-  if(st==='signed'&&L) lines.push('<span>Signed by '+esc(L.signature?L.signature.name:who)+' · '+whenOf(L.signedAt).replace(' · ',', ')+(L.method==='manual'?' · recorded by staff':' · signing link')+'</span>');
-  meta.forEach(function(m){ lines.push('<span>'+m+'</span>'); });
-  if(st==='failed') lines.push('<span class="ky-bad">'+S[1]+'</span>');
+  /* signed: who signed, when, and who recorded it. Otherwise who it goes to (and when it was sent). The expiry is in the banner above */
+  var lines=[];
+  if(st==='signed'&&L){
+    var rec=(L.audit||[]).filter(function(x){ return /signed manually/i.test(x.action); }).slice(-1)[0];
+    lines.push('<span>Signed by '+esc(L.signature?L.signature.name:who)+' · '+whenOf(L.signedAt).replace(' · ',', ')+'</span>');
+    lines.push('<span>'+(L.method==='manual'?'Recorded by '+esc(rec&&rec.by||L.by||'staff'):'Signed through the signing link')+'</span>');
+  } else {
+    lines.push('<span>To be signed by '+esc(who)+(role?' ('+esc(role)+')':'')+'</span>');
+    if(lastOk) lines.push('<span>Sent '+whenOf(lastOk.at).replace(' · ',', ')+'</span>');
+    if(st==='failed') lines.push('<span class="ky-bad">'+S[1]+'</span>');
+  }
   var fname='engagement-letter-FY'+F+'-'+String(F+1).slice(2)+'.pdf', open=st==='none'||st==='draft'?'view':'full';
   var file=st==='noservice'?'<p class="cl-muted ky-none">'+S[1]+'</p>':
     '<div class="ky-cur"><div class="ds-files ky-files"><div class="ky-file"><span class="x e-pdf">PDF</span><div class="ky-fn"><button class="ky-fname" data-el="'+open+'" title="Open '+fname+'">'+fname+'</button></div>'+

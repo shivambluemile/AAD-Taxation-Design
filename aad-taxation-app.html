@@ -1026,13 +1026,14 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .vt-box{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
 .vt{width:100%;min-width:0!important;border-collapse:collapse;font-size:13px;table-layout:fixed}.vt th:nth-child(1){width:84px}.vt th:nth-child(3){width:130px}.vt th:nth-child(4){width:100px}
 .vt th{text-align:left;padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line)}
-.vt td{padding:10px 14px;border-top:1px solid var(--line-soft);vertical-align:middle;color:var(--ink)}
+.vt td{padding:10px 14px;border-top:1px solid var(--line-soft);vertical-align:top;color:var(--ink)}
 .vt tbody tr:first-child td{border-top:0}
 .vt tr.cur td{background:#FFFAF5}
 .vt-v{width:84px;font-weight:600;white-space:nowrap}.vt tr.cur .vt-v{color:var(--orange-ink)}
 .vt-v small,.vt-u small{display:block;font-size:11.5px;font-weight:500;color:var(--faint)}
 .vt-f{min-width:0}
-.vt-file{display:inline-flex;align-items:center;gap:6px;margin:2px 14px 2px 0;font-size:12.5px;max-width:100%;min-width:0}.vt-file .ds-fname{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vt-fl{display:grid;grid-template-columns:auto minmax(0,max-content) auto auto;align-items:center;column-gap:8px;row-gap:4px;justify-content:start}
+.vt-file{display:contents;font-size:12.5px}.vt-file .x{justify-self:start}.vt-file .ds-fname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font-size:12.5px}.vt-file .ds-fsz{font-size:12px;white-space:nowrap}
 .vt-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.vt-file .x.e-pdf{background:#FDECEC;color:#C2410C}
 .vt-file .ds-fname{font-weight:600}.vt-file .sdt-ib{width:24px;height:24px}
 .vt-u{width:130px;white-space:nowrap}
@@ -1581,9 +1582,9 @@ function docDetail(d){
   var cols='<colgroup><col class="c-v"><col><col class="c-u"><col class="c-e"></colgroup>';
   var row=function(v,vi){ var gone=t.exp&&v.exp&&daysTo(v.exp)<0;
     return '<tr'+(vi||!cur?'':' class="cur"')+'><td class="vt-v">'+(vi||!cur?'v'+v.ver:'v'+v.ver+'<small>current</small>')+'</td>'+
-      '<td class="vt-f">'+v.files.map(function(f,fi){ var x=extOf(f.n);
+      '<td class="vt-f"><div class="vt-fl">'+v.files.map(function(f,fi){ var x=extOf(f.n);
         return '<span class="vt-file"><span class="x e-'+x+'">'+x.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="'+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button><span class="ds-fsz">'+f.s+'</span>'+
-          '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>'; }).join('')+'</td>'+
+          '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>'; }).join('')+'</div></td>'+
       '<td class="vt-u">'+fmtD(v.on)+'<small>by '+esc(v.by)+'</small></td>'+
       '<td class="vt-e'+(gone?' bad':'')+'">'+(t.exp&&v.exp?fmtD(v.exp):'<span class="vt-na">—</span>')+'</td></tr>'; };
   return '<div class="dt-detail" data-detail="'+d.k+'"><div class="vt-box">'+

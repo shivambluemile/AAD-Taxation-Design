@@ -3816,7 +3816,7 @@ function renderList(){
         (r?'<button class="blink" data-rq="'+r.id+'">':'<button class="blink" data-view="'+c.id+'">')+esc(c.name)+'</button>'+
         (co&&!r&&c.directors.length?'<small>'+c.directors.length+(c.directors.length===1?' director':' directors')+'</small>':'')+'</span></div></td>'+
       '<td><div class="cl-contact"><span><span class="cl-em" title="'+esc(c.email)+'">'+esc(c.email)+'</span>'+copy(c.email,'email')+'</span><span>'+esc(c.phone)+copy(c.phone,'phone')+'</span></div></td>'+
-      '<td class="cl-ent">'+esc(c.entity)+(coTypeOf(c)?'<small class="cl-sub2">'+esc(CO_SHORT[coTypeOf(c)])+'</small>':'')+'</td>'+
+      '<td class="cl-ent">'+(c.type==='company'?'Company<small class="cl-sub2">'+esc(c.entity==='Company'?(CO_SHORT[coTypeOf(c)]||'Company'):(c.entity||'—'))+'</small>':esc(c.entity||'Individual'))+'</td>'+
       '<td><div class="cl-chips">'+(chips||'<span class="cl-muted">--</span>')+'</div></td>'+
       '<td><span class="ob-ticks">'+kyc+letter+'</span></td>'+
       '<td>'+(r?'<span class="state draft"><i></i>Draft</span><small class="cl-stage">'+esc(DRAFT_STAGE[r.status]||'')+'</small>':'<span class="state'+(c.active?'':' no')+'"><i></i>'+(c.active?'Active':'Inactive')+'</span>')+'</td>'+

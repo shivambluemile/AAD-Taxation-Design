@@ -2868,6 +2868,7 @@ tbody tr:hover{background:#FCFCFD}
 .ky-meta{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:8px;font-size:12px;color:var(--faint)}.ky-meta .ky-note{flex-basis:100%}
 .ky-hrow .ky-meta{flex-basis:100%}.ky-none{margin:0;padding:14px 18px}
 .ky-hact{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ky-cur .el-review{margin:12px 0 0}.ky-meta .ky-bad{flex-basis:100%;color:var(--red)}
 .ky-file{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .ky-file .x{font-size:10px;font-weight:800;padding:4px 7px;border-radius:5px;background:#E8F1FD;color:#2563EB;flex-shrink:0}.ky-file .x.e-pdf{background:#FDECEC;color:#C2410C}
 .ky-fn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -5746,6 +5747,7 @@ function kycChips(files,vi){
 /* KYC: the same layout as the engagement letter: a quiet rule banner, then one card with the current check, what it means, the next step, and the previous checks */
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], n=recs.length, now=Date.now();
+  var banner='<div class="el-bn">'+EL_INFO+'<p>Each KYC verification remains valid for one year from the verification date. New verifications are saved as separate versions, and all previous verification records and their associated documents are retained.</p></div>';
   var st=cur?kycState(cur):'none';
   var A={none:[null,'Record KYC'],valid:['Record new KYC',null],expiring:[null,'Renew KYC'],expired:[null,'Renew KYC']}[st];   // one action, in the card header
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x+'</button>':''; };
@@ -5764,7 +5766,7 @@ function kycTab(c){
   var card='<article class="el-card ky-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div><div class="ky-hact">'+(st==='none'?'':pill(KYC_STATUS,st))+act+'</div></header>'+
     doc+hist+'</article>';
-  return '<section class="vsec el-main">'+card+'</section>';
+  return '<section class="vsec el-main">'+banner+card+'</section>';
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
 function kycTrail(c){
@@ -5848,29 +5850,36 @@ function engagementTab(c){
   var menu=S[4].length?'<span class="el-mw"><button type="button" class="el-more" data-elmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+EL_DOTS+'</button>'+
       '<span class="el-menu" role="menu" hidden>'+S[4].map(function(x){ return '<button type="button" role="menuitem" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</span></span>':'';
   var needsReview=(st==='none'||st==='draft');
-  var status='<div class="el-st s-'+st+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p>'+
-      (needsReview?'<label class="el-review"><input type="checkbox" id="el-rev"><span>I have reviewed this letter and verified the client details, services, and fees.</span></label>':'')+'</div>'+
-      (S[2]||S[3]?'<div class="el-acts">'+(S[2]?'<button type="button" class="btn-ghost btn-sm" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+(S[3]?'<button type="button" class="btn-primary btn-sm" data-el="'+S[3][0]+'">'+S[3][1]+'</button>':'')+'</div>':'')+
-    '</div>';
+  var dup=function(x){ return !x||['view','full','pdf'].indexOf(x[0])>=0; };   // opening and downloading are on the file row itself
+  var acts=(dup(S[2])?'':'<button type="button" class="btn-ghost btn-sm" data-el="'+S[2][0]+'">'+S[2][1]+'</button>')+(dup(S[3])?'':'<button type="button" class="btn-primary btn-sm" data-el="'+S[3][0]+'">'+S[3][1]+'</button>');
+  /* who signs, when it was sent / signed, expiry, who created it: small muted text under the file, like KYC */
+  var lines=['<span>'+esc(who)+(role?' ('+esc(role)+')':'')+(mail?' · '+esc(mail):'')+'</span>'];
+  if(st==='signed') lines.push('<span>'+S[1].replace(/\.$/,'')+'</span>');
+  meta.forEach(function(m){ lines.push('<span>'+m+'</span>'); });
+  if(st==='failed') lines.push('<span class="ky-bad">'+S[1]+'</span>');
+  var fname='engagement-letter-FY'+F+'-'+String(F+1).slice(2)+'.pdf', open=st==='none'||st==='draft'?'view':'full';
+  var file=st==='noservice'?'<p class="cl-muted ky-none">'+S[1]+'</p>':
+    '<div class="ky-cur"><div class="ds-files ky-files"><div class="ky-file"><span class="x e-pdf">PDF</span><div class="ky-fn"><button class="ky-fname" data-el="'+open+'" title="Open '+fname+'">'+fname+'</button></div>'+
+      '<button type="button" class="sdt-ib" data-el="pdf" title="Download" aria-label="Download '+fname+'">'+OI.dl+'</button></div></div>'+
+      '<div class="ky-meta">'+lines.join('')+'</div>'+
+      (needsReview?'<label class="el-review"><input type="checkbox" id="el-rev"><span>I have reviewed this letter and verified the client details, services, and fees.</span></label>':'')+'</div>';
 
   /* previous letters: newest year first, collapsed */
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var years=[]; older.forEach(function(l){ var y=letterFy(l); if(years.indexOf(y)<0) years.push(y); });
-  var open=older.length>0;                                        // always shown
-  var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
+  var hopen=older.length>0;                                       // always shown
+  var hist='<div class="el-hrw'+(hopen?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
-    (open?'<div class="el-hlist">'+years.map(function(y){
+    (hopen?'<div class="el-hlist">'+years.map(function(y){
       return '<div class="el-yg"><div class="el-yh"><b>FY '+fyLabel(y)+'</b><span>01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+older.filter(function(l){ return letterFy(l)===y; }).map(function(l){
         var exp=l.expiredAt||letterExpiresAt(l), s=elState(l);
         return '<div class="el-hrow"><div class="el-hi"><span>'+(l.status==='signed'?'Signed <b>'+dmyOf(l.signedAt)+'</b>':'<b>Not signed</b>')+'</span><span>'+(Date.now()>exp?'Expired':'Expires')+' '+whenOf(exp)+'</span></div>'+
           '<span class="el-hacts"><button class="linkbtn" data-elfull="'+l.id+'">View</button><button class="sdt-ib" data-elpdf="'+l.id+'" title="Download PDF" aria-label="Download the FY '+fyLabel(y)+' letter">'+OI.dl+'</button></span></div>'; }).join('')+'</div>';
     }).join('')+'</div>':'');
 
-  var card='<article class="el-card">'+
-    '<header class="el-ch"><div><h4>Engagement Letter</h4><p>FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1)+'</p></div>'+pill(EL_STATE,st==='noservice'?'none':st)+'</header>'+
-    '<div class="el-dr"><span class="ds-ic'+(st==='failed'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>engagement-letter-FY'+F+'-'+String(F+1).slice(2)+'.pdf</b>'+
-      '<span class="el-to">'+esc(who)+(role?' <i>('+esc(role)+')</i>':'')+(mail?' · '+esc(mail):'')+'</span><span class="el-mt">'+meta.join(' <i>·</i> ')+'</span></div>'+menu+'</div>'+
-    status+hist+
+  var card='<article class="el-card ky-card">'+
+    '<header class="el-ch"><div><h4>Engagement Letter</h4><p>FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1)+'</p></div><div class="ky-hact">'+pill(EL_STATE,st==='noservice'?'none':st)+acts+menu+'</div></header>'+
+    file+hist+
   '</article>';
   var doc=st==='none'?preview(actServices,null):st==='draft'?preview(L.services,L):'';
   return '<section class="vsec el-main">'+banner+card+'</section>'+doc;

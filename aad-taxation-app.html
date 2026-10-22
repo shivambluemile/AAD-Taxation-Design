@@ -821,7 +821,7 @@ select.up-in{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg x
 .up-cur .dl-ext,.up-picked .dl-ext{width:36px;height:40px;border-radius:6px 10px 6px 6px;align-items:flex-end;padding-bottom:6px}
 
 .up-drops{display:grid;gap:12px}
-.up-drops.two{grid-template-columns:1fr 1fr}
+.up-drops.two{grid-template-columns:repeat(2,minmax(0,1fr))}.up-drops>div{min-width:0}
 .up-side{display:block;font-size:12px;font-weight:600;color:var(--mute);margin-bottom:6px}
 #upd-body .up-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
   min-height:132px;padding:18px 14px;margin:0;border:1.5px dashed #E3C5AA;border-radius:11px;background:#FFFCF9;cursor:pointer;
@@ -833,8 +833,8 @@ select.up-in{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg x
 .up-t b{color:var(--orange-ink);font-weight:700}
 .up-s{font-size:12px;color:var(--faint)}
 .up-picked{display:flex;align-items:center;gap:12px;min-height:64px;padding:11px 12px 11px 14px;border:1px solid #A7E3C9;border-radius:11px;background:var(--green-soft)}
-.up-picked .up-cur-t span{color:var(--green);font-weight:600}
-.up-rm{font-size:12.5px;font-weight:600;color:var(--mute);padding:6px 9px;border-radius:7px;flex-shrink:0}
+.up-picked .up-cur-t span{color:var(--mute);font-weight:500}.up-picked{min-width:0}.up-picked .up-rm{flex-shrink:0;margin-left:auto}
+.up-rm{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute);padding:0;border-radius:7px;flex-shrink:0}.up-rm svg{width:14px;height:14px}
 .up-rm:hover{background:#fff;color:var(--red)}
 
 .up-exprow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -1862,8 +1862,8 @@ function paintUpd(){
       '<div class="up-drops'+(t.slots.length>1?' two':'')+'">'+t.slots.map(function(sl){
         var p=pend[sl.id], cap=t.slots.length>1?'<span class="up-side">'+sl.label+'</span>':'';
         if(p) return '<div>'+cap+'<div class="up-picked">'+extTag(p.n)+
-          '<div class="up-cur-t"><b>'+esc(p.n)+'</b><span>'+p.s+' · ready to upload</span></div>'+
-          '<button class="up-rm" data-unpick="'+sl.id+'">Remove</button></div></div>';
+          '<div class="up-cur-t"><b title="'+esc(p.n)+'">'+esc(p.n)+'</b><span>'+p.s+'</span></div>'+
+          '<button class="up-rm" data-unpick="'+sl.id+'" title="Remove" aria-label="Remove '+esc(p.n)+'">'+I.close+'</button></div></div>';
         return '<div>'+cap+'<label class="rdrop up-drop" data-slot="'+sl.id+'">'+
           '<input type="file" data-pick="'+sl.id+'" accept=".png,.jpg,.jpeg,.pdf" hidden>'+
           '<span class="up-ic">'+I.upcl+'</span>'+

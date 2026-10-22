@@ -1114,6 +1114,14 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-slim{border:1px solid var(--line);border-radius:10px;background:#F8FAFC;padding:2px 12px;margin-bottom:14px}
 .dx-line{display:flex;align-items:center;gap:10px;min-height:40px;font-size:13px;color:var(--slate)}.dx-line+.dx-line{border-top:1px solid var(--line)}
 .dx-li{display:flex;color:var(--mute);flex-shrink:0}.dx-lt{flex:1;min-width:0}.dx-lt b{color:var(--ink)}
+#m-need .m-body{padding-top:12px}
+.nd-intro{margin:0 0 12px;font-size:13px;color:var(--mute)}
+.nd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.nd-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.nd-row .dt-ic{width:36px;height:36px;flex-shrink:0}
+.nd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.nd-t b{font-size:14px;color:var(--ink)}.nd-t span{font-size:12.5px;color:var(--mute)}.nd-t span.bad{color:#B91C1C}
+.nd-up{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+@media (max-width:560px){.nd-row{flex-wrap:wrap}.nd-t{flex-basis:calc(100% - 50px)}}
 .dx-ups{display:flex;gap:14px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
 .dx-line{padding:6px 0}
 .dx-up{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--orange-ink);padding:4px 0;flex-shrink:0}.dx-up:hover{text-decoration:underline;text-underline-offset:2px}.dx-up svg{width:12px;height:12px}
@@ -1338,6 +1346,14 @@ table,td,th{font-size:13.5px}
       <button class="btn btn-soft" data-close>Close</button>
     </div>
   </div>
+</div>
+
+<div class="modal wide" id="m-need" role="dialog" aria-modal="true" aria-labelledby="need-title">
+  <div class="m-head">
+    <h3 id="need-title">Documents needed</h3>
+    <button class="xbtn" data-close aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="m-body" id="need-body"></div>
 </div>
 
 <div class="modal wide" id="m-hist" role="dialog" aria-modal="true" aria-labelledby="hist-title">
@@ -1769,6 +1785,22 @@ function docDetail(d){
     (hOpen?'<table class="vt vt-hist">'+cols+'<tbody>'+hist.map(function(v,j){ return row(v,j+off); }).join('')+'</tbody></table>':'')+
   '</div></div>';
 }
+/* the documents not on file: mandatory ones never uploaded, then expired ones (newest expiry first) */
+function neededDocs(){
+  var docs=storeOf(detailStaff.id).docs, have=docs.map(function(d){ return d.k; });
+  return REQUIRED_DOCS.filter(function(k){ return have.indexOf(k)<0; }).map(function(k){ return {k:k,d:null}; })
+    .concat(docs.filter(function(d){ return stOf(d)==='expired'; }).map(function(d){ return {k:d.k,d:d}; }));
+}
+function paintNeed(){
+  var list=neededDocs();
+  document.getElementById('need-body').innerHTML=list.length?'<p class="nd-intro">Upload each document below. Earlier versions of an expired document stay in its history.</p><ul class="nd-list">'+list.map(function(x){
+    var t=typeOf(x.k), n=x.d?Math.abs(daysTo(x.d.cur.exp)):0, hv=x.d?versionsOf(x.d).length:0;
+    return '<li class="nd-row"><span class="dt-ic">'+DOC_IC.HR+'</span><div class="nd-t"><b>'+esc(t.name)+'</b><span class="'+(x.d?'bad':'')+'">'+
+        (x.d?'Expired '+fmtD(x.d.cur.exp)+' · '+n+' day'+(n===1?'':'s')+' ago':'Mandatory · not uploaded yet')+' · needs '+t.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
+      (x.d?'<button type="button" class="dx-hist" data-needhist="'+x.k+'">History<span class="dc2-hn">'+hv+'</span></button>':'')+
+      '<button type="button" class="btn btn-pri xs nd-up" data-needup="'+x.k+'">'+I.upsm+'Upload</button></li>'; }).join('')+'</ul>'
+    :'<p class="nd-intro">Every required document is on file.</p>';
+}
 /* documents every staff member must have on file */
 var REQUIRED_DOCS=['lic','pass'];
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
@@ -1791,7 +1823,7 @@ function docsBody(s){
   if(missing.length) parts.push(join(missing.map(low))+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded');
   if(gone.length) parts.push(join(gone.map(function(d){ return low(d.k); }))+(gone.length>1?' have':' has')+' expired');
   if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(who)+'’s '+parts.join(', and ')+'. Please click Upload to provide '+(need.length>1?'the required documents':gone.length?'a new copy':'it')+'.</span>'+
-    '<span class="dx-ups">'+need.map(function(k){ return '<button type="button" class="dx-up" data-replace="'+k+'" aria-label="Upload '+esc(typeOf(k).name)+'">'+I.upsm+(need.length>1?'Upload '+esc(typeOf(k).name):'Upload')+'</button>'; }).join('')+'</span></div>';
+    '<button type="button" class="dx-up" data-needpop aria-haspopup="dialog">'+I.upsm+'Upload</button></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
@@ -2097,7 +2129,7 @@ function closeDrawer(){drawer.classList.remove('show');scrim.classList.remove('s
 /* ================= Modals ================= */
 function openModal(id){document.getElementById(id).classList.add('show');scrim.classList.add('show')}
 function closeAll(){
-  ['m-pw','m-cpw','m-prev','m-upd','m-del','m-hist'].forEach(function(i){document.getElementById(i).classList.remove('show')});
+  ['m-pw','m-cpw','m-prev','m-upd','m-del','m-hist','m-need'].forEach(function(i){document.getElementById(i).classList.remove('show')});
   if(!drawer.classList.contains('show'))scrim.classList.remove('show');
 }
 
@@ -2163,6 +2195,10 @@ document.addEventListener('click',function(e){
   var dm=b&&b.getAttribute('data-dmenu');
   if(dm){ docMenu=docMenu===dm?null:dm; keepScroll(renderDetail); var fi=drawer.querySelector('.ds-menu [role=menuitem]'); if(fi) fi.focus(); else { var kb=drawer.querySelector('[data-dmenu="'+dm+'"]'); if(kb) kb.focus(); } return; }
   if(docMenu&&!(t.closest&&t.closest('.ds-menu'))){ var was=docMenu; docMenu=null; keepScroll(renderDetail); var kb2=drawer.querySelector('[data-dmenu="'+was+'"]'); if(kb2&&!b) kb2.focus({preventScroll:true}); if(!b) return; }
+  var nh=b&&b.getAttribute('data-needhist');
+  if(nh){ document.getElementById('hist-title').textContent=typeOf(nh).name+' · History'; document.getElementById('hist-body').innerHTML=versionTimeline(findDoc(nh)); openModal('m-hist'); return; }
+  var nu=b&&b.getAttribute('data-needup');
+  if(nu){ document.getElementById('m-need').classList.remove('show'); openUpd(nu); return; }
   var hp2=b&&b.closest('#m-upd')&&b.getAttribute('data-histpop');
   if(hp2){ document.getElementById('hist-title').textContent=typeOf(hp2).name+' · History'; document.getElementById('hist-body').innerHTML=versionTimeline(findDoc(hp2)); openModal('m-hist'); return; }
   var rp=b&&b.getAttribute('data-replace');
@@ -2185,6 +2221,7 @@ document.addEventListener('click',function(e){
   if(dm){ var mm=dm.nextElementSibling; mm.hidden=!mm.hidden; dm.setAttribute('aria-expanded',String(!mm.hidden)); if(!mm.hidden){ var f0=mm.querySelector('button'); if(f0) f0.focus(); } return; }
   var sh=t.closest('[data-shut]');
   if(sh){ var sk=sh.getAttribute('data-shut'), card=drawer.querySelector('[data-doc="'+sk+'"]'); docShut[sk]=!(card&&card.classList.contains('shut')); keepScroll(renderDetail); var sb=drawer.querySelector('[data-shut="'+sk+'"]'); if(sb) sb.focus({preventScroll:true}); return; }
+  if(t.closest('[data-needpop]')){ paintNeed(); openModal('m-need'); return; }
   var hp=t.closest('[data-histpop]');
   if(hp){ var hk=hp.getAttribute('data-histpop'); document.getElementById('hist-title').textContent=typeOf(hk).name+' · History'; document.getElementById('hist-body').innerHTML=versionTimeline(findDoc(hk)); openModal('m-hist'); return; }
   var xe=t.closest('[data-expedit]');

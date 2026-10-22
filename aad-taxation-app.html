@@ -11444,6 +11444,7 @@ function confirmReopen(q){
 }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
 function paintForm(focusId){
+  if(QF&&QF.step===2) return paintSignStep();
   var d=QF.d, e=QF.errs, T=totalsOf(d), c=formClient(), cat=catalogAll(), cats=cat.categories.filter(function(x){ return x.active!==false; }), svc=cat.services.filter(function(s){ return s.active; });
   var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
   var sel=function(id,k,opts,val,ph){ return '<div class="sf-sel"><select class="fin plain sm'+(e[k]?' bad':'')+'" id="'+id+'" data-qf="'+k+'"><option value="">'+ph+'</option>'+
@@ -11497,7 +11498,7 @@ function paintForm(focusId){
           '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-pv">Preview</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Save &amp; Send</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Next</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
 }
@@ -11572,8 +11573,7 @@ function wireForm(focusId){
   document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;
   document.getElementById('qf-draft').onclick=function(){ submitForm('draft'); };
-  document.getElementById('qf-send').onclick=function(){ submitForm('send'); };
-  document.getElementById('qf-pv').onclick=previewForm;
+  document.getElementById('qf-send').onclick=function(){ submitForm('next'); };
   if(focusId){ var f=document.getElementById(focusId); if(f) f.focus(); }
 }
 /* checks: a draft needs a client and only valid numbers; sending needs everything */
@@ -11602,9 +11602,10 @@ function checkForm(full){
   return e;
 }
 function submitForm(mode){
-  var full=mode==='send', e=checkForm(full);
+  var full=mode==='send'||mode==='next', e=checkForm(full);
   QF.errs=e;
   if(Object.keys(e).length){ paintForm(); var b=ov.querySelector('.bad, .ferr.show'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast(full?'Fix the highlighted fields before sending':'Fix the highlighted fields to save the draft',true); return; }
+  if(mode==='next'){ QF.step=2; QF.signErr={}; return paintSignStep(); }
   var saved=saveForm(); if(!saved) return;
   var wasNew=QF.wasNew; QF=null; closeOv(); render();
   if(full) openSend(saved.id); else toast(wasNew?saved.id+' saved as a draft':saved.id+' saved');
@@ -11651,12 +11652,98 @@ function showDoc(m){
   dlg.classList.add('open'); document.getElementById('qp-x').onclick=closeDlg; document.getElementById('qp-x').focus();
 }
 /* Preview: the quotation as the client will see it, from what's in the form (nothing is saved) */
-function previewForm(){
+function previewForm(){ showDoc(formModel()); }
+function formModel(sign){
   var d=QF.d, c=formClient();
   var to=c?(d.onName||c.name):'';
-  showDoc({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.toName&&d.toName!==to?d.toName:'',sign:null,
+  return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.toName&&d.toName!==to?d.toName:'',sign:null,
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
-    T:totalsOf(d),noGst:d.gst===false,notes:d.customerNotes.trim(),terms:d.terms.trim()});
+    T:totalsOf(d),noGst:d.gst===false,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
+}
+/* ---------- step 2: the quotation as the client sees it, reviewed, then sent for signature or signed manually (as in Add Client) ---------- */
+function dmyTxt(t){ var x=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(x.getDate())+'-'+p(x.getMonth()+1)+'-'+x.getFullYear(); }
+function isoOfDmy(v){ var m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(v||''); if(!m) return ''; var x=new Date(+m[3],+m[2]-1,+m[1]); return x.getDate()===+m[1]&&x.getMonth()===+m[2]-1?m[3]+'-'+m[2]+'-'+m[1]:''; }
+function ensureSignCss(){ if(document.getElementById('qs-css')) return; var el=document.createElement('style'); el.id='qs-css';
+  el.textContent=LETTER_CSS+
+    '.qs-sec+.qs-sec{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}.qs-h{display:block;font-family:Manrope;font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}'+
+    '.qs-acts{display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px}.qs-pv{background:#E9EBEE;border-radius:12px;padding:18px;overflow:auto;max-height:560px;margin-bottom:14px}'+
+    '.qs-rev{display:flex;gap:12px;align-items:center;cursor:pointer;font-size:13.5px;color:var(--ink);line-height:1.45}.qs-rev.bad span{color:#C2415B}'+
+    '.qs-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.qs-opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}'+
+    '.qs-opt:hover{border-color:#F8C9A2}.qs-opt.on{border-color:var(--orange);background:var(--orange-soft)}.qs-opt input{accent-color:var(--orange);margin-top:2px}.qs-opt b{display:block;font-size:13.5px;color:var(--ink)}.qs-opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}'+
+    '.qs-sub{margin-top:16px}.qs-sub .g2{margin-bottom:14px}.qs-foot{display:flex;justify-content:flex-end;margin-top:10px}.qs-err{display:block;margin-top:6px;font-size:12.5px;color:#C2415B;font-weight:600}'+
+    '.qs-signed{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}'+
+    '.qs-sigimg{min-width:160px;max-width:260px;height:64px;display:flex;align-items:center;border-bottom:1px solid #CBD5E1}.qs-sigimg img{max-height:60px;max-width:100%;object-fit:contain}.qs-sigimg .el-typed{font-size:32px;line-height:60px}'+
+    '.drawer.qs-swap{animation:none}.qs-sigline{font-size:12px;color:var(--mute)}@media (max-width:640px){.qs-opts{grid-template-columns:1fr}}';
+  document.head.appendChild(el);
+  if(typeof SIG_FONT_URL!=='undefined'&&!document.getElementById('qs-fonts')){ var l=document.createElement('link'); l.id='qs-fonts'; l.rel='stylesheet'; l.href=SIG_FONT_URL; document.head.appendChild(l); }
+}
+function paintSignStep(){
+  ensureSignCss();
+  var d=QF.d, c=formClient(), e=QF.signErr||{}, who=(d.onName||(c&&c.name)||'').trim(), sv=QF.sig;
+  var sign=sv?{name:sv.name,sig:sv.v,at:sv.at}:null;
+  var err=function(k){ return e[k]?'<span class="qs-err">'+esc(e[k])+'</span>':''; };
+  var h='<section class="qs-sec"><span class="qs-h">Quotation</span>'+
+    '<div class="qs-acts"><button type="button" class="btn-ghost btn-sm" id="qs-pdf">'+(AI.pdf||'')+'Download PDF</button></div>'+
+    '<div class="qs-pv">'+docHtml(formModel(sign))+'</div>'+
+    '<label class="qs-rev'+(e.review?' bad':'')+'"><input type="checkbox" id="qs-rev"'+(QF.reviewed?' checked':'')+'><span>I confirm that I have reviewed this quotation and verified the client details, services, and fees.</span></label>'+err('review')+'</section>'+
+    '<section class="qs-sec"><span class="qs-h">How should this be signed?</span><div class="qs-opts" role="radiogroup" aria-label="Signing method">'+
+      [['request','Request Signature','Send a secure link to '+esc(who||'the client')+' to sign and accept'],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=QF.method===m[0];
+        return '<label class="qs-opt'+(on?' on':'')+'"><input type="radio" name="qs-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div>'+err('method');
+  if(QF.method==='manual'){
+    if(sv) h+='<div class="qs-sub"><span class="flabel">Signature of '+esc(sv.name)+'</span><div class="qs-signed"><div class="qs-sigimg">'+
+        (sv.v.method==='type'?'<em class="el-typed"'+(sv.v.font?' style="font-family:'+esc(sv.v.font)+'"':'')+'>'+esc(sv.v.text)+'</em>':'<img src="'+sv.v.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
+        '<span class="qs-sigline">Signed on '+dmyTxt(sv.at)+' · recorded by '+esc(ME.name)+'</span><button type="button" class="linkbtn" id="qs-resign">Change</button></div></div>';
+    else h+='<div class="qs-sub"><div class="g2"><div><label class="flabel" for="qs-name">Signer name</label><input class="fin plain sm'+(e.name?' bad':'')+'" id="qs-name" maxlength="80" value="'+esc(QF.signName!=null?QF.signName:who)+'" autocomplete="off">'+err('name')+'</div>'+
+        '<div><label class="flabel" for="qs-date">Signing date</label><input class="fin plain sm'+(e.date?' bad':'')+'" id="qs-date" inputmode="numeric" maxlength="10" placeholder="dd-mm-yyyy" autocomplete="off" value="'+esc(QF.signDate!=null?QF.signDate:dmyTxt(Date.now()))+'">'+err('date')+'</div></div>'+
+        '<span class="flabel">Signature</span><div id="qs-pad"></div>'+err('sig')+
+        '<div class="qs-foot"><button type="button" class="btn-primary btn-sm" id="qs-sigok">Submit signature</button></div></div>';
+  }
+  h+='</section>';
+  var body=document.getElementById('qf-body'), keep=body?body.scrollTop:0, again=!!ov.querySelector('.drawer.qf');   // already open: no slide-in again
+  ov.innerHTML='<div class="drawer sf qf qf2'+(again?' qs-swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
+    '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body" id="qf-body">'+h+'</div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qs-back">Back</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-draft">Save as draft</button>'+
+      '<button class="btn-primary" id="qs-go">'+(QF.method==='manual'?'Save':'Send')+'</button></div></div>';
+  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  document.getElementById('qf-body').scrollTop=keep;
+  var pad=QF.method==='manual'&&!sv?sigPad(document.getElementById('qs-pad'),QF.signName!=null?QF.signName:who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}):null;
+  document.getElementById('qf-x').onclick=leaveForm;
+  document.getElementById('qs-back').onclick=function(){ QF.step=1; paintForm(); };
+  document.getElementById('qf-draft').onclick=function(){ QF.step=1; submitForm('draft'); };
+  document.getElementById('qs-pdf').onclick=function(){ if(!printQuote(formModel(sign))) toast('Allow pop-ups to download the PDF',true); };
+  document.getElementById('qs-rev').onchange=function(){ QF.reviewed=this.checked; QF.dirty=true; if(this.checked&&e.review){ delete e.review; paintSignStep(); } };
+  [].forEach.call(ov.querySelectorAll('input[name=qs-how]'),function(x){ x.onchange=function(){ QF.method=x.value; QF.dirty=true; delete e.method; paintSignStep(); }; });
+  var nm=document.getElementById('qs-name'); if(nm) nm.oninput=function(){ QF.signName=nm.value; if(pad&&pad.setName) pad.setName(nm.value); };
+  var dt=document.getElementById('qs-date'); if(dt) dt.oninput=function(){ var g=dt.value.replace(/\D/g,'').slice(0,8), v=g.slice(0,2)+(g.length>2?'-'+g.slice(2,4):'')+(g.length>4?'-'+g.slice(4):''); if(v!==dt.value) dt.value=v; QF.signDate=v; };
+  var rs=document.getElementById('qs-resign'); if(rs) rs.onclick=function(){ QF.sig=null; paintSignStep(); };
+  var ok=document.getElementById('qs-sigok'); if(ok) ok.onclick=function(){
+    var n=String(QF.signName!=null?QF.signName:who).trim(), dv=QF.signDate!=null?QF.signDate:dmyTxt(Date.now()), iso=isoOfDmy(dv), today=isoDay(Date.now()), er={};
+    if(!n) er.name='Enter the signer’s name';
+    if(!iso) er.date=dv?'Enter a real date as dd-mm-yyyy':'Enter the signing date'; else if(iso>today) er.date='The signing date can’t be in the future';
+    var v=pad&&pad.value(n); if(!v) er.sig='Draw the signature, select a style, or upload a signature image';
+    delete e.name; delete e.date; delete e.sig; for(var k in er) e[k]=er[k];
+    if(Object.keys(er).length) return paintSignStep();
+    var now=new Date(), at=new Date(iso+'T00:00:00'); at.setHours(now.getHours(),now.getMinutes(),now.getSeconds(),0);
+    QF.sig={v:v,name:n,at:at.getTime()}; QF.dirty=true; paintSignStep();
+  };
+  document.getElementById('qs-go').onclick=finishSignStep;
+}
+function finishSignStep(){
+  var e={};
+  if(!QF.reviewed) e.review='Confirm you’ve reviewed the quotation';
+  if(!QF.method) e.method='Choose how the quotation will be signed';
+  else if(QF.method==='manual'&&!QF.sig) e.sig='Add the signature and click Submit signature';
+  QF.signErr=e;
+  if(Object.keys(e).length){ paintSignStep(); var b=ov.querySelector('.qs-err'); if(b) b.scrollIntoView({block:'center'}); toast('Fix the highlighted fields to continue',true); return; }
+  var manual=QF.method==='manual', sig=QF.sig, saved=saveForm(); if(!saved) return;
+  if(manual){
+    var q=byId(saved.id); q.signature=sig.v; q.signedBy=sig.name; q.signedAt=sig.at;
+    setStatus(q,'accepted','accepted',{note:'Signed manually by '+sig.name+' on '+dmyTxt(sig.at)+' · recorded by '+ME.name});
+    if(!QuoteStore.save(st)){ toast('Couldn’t save the signature. Try again.',true); return; }
+    QF=null; closeOv(); render(); toast(saved.id+' signed and accepted'); return;
+  }
+  QF=null; closeOv(); render(); openSend(saved.id);
 }
 /* a saved quotation's totals: the saved figures, worked out the same way as the form (rates include GST; GST is 1/11 of the total) */
 function savedTotals(q){

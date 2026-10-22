@@ -1507,8 +1507,6 @@ function docCard(d){
       (prev?'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+I.hist+'Version history ('+prev+')'+I.chev+'</button>':'<span class="ds-nohist">No previous versions</span>')+
       '<div class="ds-acts">'+
         '<button type="button" class="ds-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button>'+
-        '<button type="button" class="sdt-ib ds-kebab" data-dmenu="'+d.k+'" aria-haspopup="menu" aria-expanded="'+menu+'" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+I.dots3+'</button>'+
-        (menu?'<div class="ds-menu" role="menu" aria-label="'+esc(t.name)+' actions"><button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">'+I.trash+'Delete document</button></div>':'')+
       '</div>'+
     '</div>';
   if(prev&&open){

@@ -1108,6 +1108,8 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-slim{border:1px solid var(--line);border-radius:10px;background:#F8FAFC;padding:2px 12px;margin-bottom:14px}
 .dx-line{display:flex;align-items:center;gap:10px;min-height:40px;font-size:13px;color:var(--slate)}.dx-line+.dx-line{border-top:1px solid var(--line)}
 .dx-li{display:flex;color:var(--mute);flex-shrink:0}.dx-lt{flex:1;min-width:0}.dx-lt b{color:var(--ink)}
+.dx-ups{display:flex;gap:14px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+.dx-line{padding:6px 0}
 .dx-up{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--orange-ink);padding:4px 0;flex-shrink:0}.dx-up:hover{text-decoration:underline;text-underline-offset:2px}.dx-up svg{width:12px;height:12px}
 .dx-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .dx-row{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #FDE2E2}
@@ -1761,6 +1763,8 @@ function docDetail(d){
     (hOpen?'<table class="vt vt-hist">'+cols+'<tbody>'+hist.map(function(v,j){ return row(v,j+off); }).join('')+'</tbody></table>':'')+
   '</div></div>';
 }
+/* documents every staff member must have on file */
+var REQUIRED_DOCS=['lic','pass'];
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
 var KEEP_VERSIONS=5;
 function docsBody(s){
@@ -1773,13 +1777,20 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div></div>';
   var gone=docs.filter(function(d){ return stOf(d)==='expired'; });
-  if(gone.length){
-    /* a short notice per expired document: what expired, and the two actions */
-    h='<div class="dx-slim" role="alert">'+gone.map(function(d){ var x=typeOf(d.k), hv=versionsOf(d).length;
-      return '<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>'+esc(x.name)+'</b> expired on '+fmtD(d.cur.exp)+'. Upload a new copy.</span>'+
-        '<button type="button" class="dx-hist" data-histpop="'+d.k+'" aria-haspopup="dialog">History<span class="dc2-hn">'+hv+'</span></button>'+
-        '<button type="button" class="dx-up" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload new</button></div>'; }).join('')+'</div>'+h;
+  /* action required: mandatory documents not uploaded yet, then any document that has expired */
+  var have=docs.map(function(d){ return d.k; }), missing=REQUIRED_DOCS.filter(function(k){ return have.indexOf(k)<0; }), lines='';
+  if(missing.length){
+    var who=String(detailStaff.n||'').trim().split(' ')[0], names=missing.map(function(k){ return typeOf(k).name.toLowerCase(); });
+    var list=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0];
+    lines+='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(who)+'’s '+esc(list)+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+
+      ' not been uploaded. Please click Upload to provide '+(missing.length>1?'the required documents':'it')+'.</span><span class="dx-ups">'+
+      missing.map(function(k){ return '<button type="button" class="dx-up" data-replace="'+k+'" aria-label="Upload '+esc(typeOf(k).name)+'">'+I.upsm+(missing.length>1?'Upload '+esc(typeOf(k).name):'Upload')+'</button>'; }).join('')+'</span></div>';
   }
+  lines+=gone.map(function(d){ var x=typeOf(d.k), hv=versionsOf(d).length;
+    return '<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(x.name)+' expired on '+fmtD(d.cur.exp)+'. Please click Upload to provide a new copy.</span>'+
+      '<button type="button" class="dx-hist" data-histpop="'+d.k+'" aria-haspopup="dialog">History<span class="dc2-hn">'+hv+'</span></button>'+
+      '<button type="button" class="dx-up" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload</button></div>'; }).join('');
+  if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
 function currentList(docs){
@@ -1838,7 +1849,7 @@ function paintUpd(){
   var docs=storeOf(detailStaff.id).docs, k=updMode.k, t=k?typeOf(k):null, d=k?findDoc(k):null, st=d?stOf(d):null;
   document.getElementById('upd-title').innerHTML = d
     ? (st==='expired'?'Renew ':'Replace ')+t.name
-    : 'Upload document<p>Add a new document to '+esc(detailStaff.n)+'’s profile.</p>';
+    : (updMode.fixed&&t?'Upload '+esc(t.name):'Upload document')+'<p>Add a new document to '+esc(detailStaff.n)+'’s profile.</p>';
   var h='';
   if(!updMode.fixed){
     var onFile=docs.map(function(x){return x.k}), free=DOC_TYPES.filter(function(x){return onFile.indexOf(x.k)<0});
@@ -11327,7 +11338,7 @@ table,td,th{font-size:13.5px}
 .page-head .page-sub{color:var(--mute);margin-top:4px}
 .qt-dev{display:inline-flex;align-items:center;height:22px;padding:0 9px;margin-left:8px;border-radius:999px;background:#FFF7EC;color:#B45309;font-family:'Inter';font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:4px;cursor:help}
 .qt-sbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
-.qt-sb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 5px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
+.qt-sb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
 .qt-sb:hover{border-color:#CBD2DA;color:var(--ink)}.qt-sb.all{padding-right:14px}
 .qt-sb i{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0}
 .qt-sb i.q-draft{background:#94A3B8}.qt-sb i.q-sent{background:#3B82F6}.qt-sb i.q-acc{background:#10B981}.qt-sb i.q-conv{background:#8B5CF6}.qt-sb i.q-rej{background:#EF4444}.qt-sb i.q-exp{background:#F59E0B}.qt-sb i.q-can{background:#CBD5E1}
@@ -11818,7 +11829,7 @@ function render(){
   /* status badges: each one filters the list; the counts follow every other filter */
   var base=filtered(true), cnt=function(s){ return base.filter(function(x){ return !s||x.status===s; }).length; };
   var sb=function(s,label,dot){ var on=(f.status||'')===s, n=cnt(s);
-    return '<button type="button" class="qt-sb'+(n||!s?'':' zero')+(s?'':' all')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+(s?'<span class="qt-n">'+n+'</span>':'')+'</button>'; };   // All carries no count
+    return '<button type="button" class="qt-sb'+(s?'':' all')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+'</button>'; };   // text only, no counts
   var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).filter(function(k){ return k!=='cancelled'; }).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });

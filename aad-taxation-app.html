@@ -5871,8 +5871,7 @@ function engagementTab(c){
   var lines=[];
   if(st==='signed'&&L){
     var rec=(L.audit||[]).filter(function(x){ return /signed manually/i.test(x.action); }).slice(-1)[0];
-    lines.push('<span>Signed by '+esc(L.signature?L.signature.name:who)+' · '+whenOf(L.signedAt).replace(' · ',', ')+'</span>');
-    lines.push('<span>'+(L.method==='manual'?'Recorded by '+esc(rec&&rec.by||L.by||'staff'):'Signed through the signing link')+'</span>');
+    lines.push('<span>Signed by '+esc(L.signature?L.signature.name:who)+' · '+whenOf(L.signedAt).replace(' · ',', ')+' · '+(L.method==='manual'?'Recorded by '+esc(rec&&rec.by||L.by||'staff'):'through the signing link')+'</span>');
   } else {
     lines.push('<span>To be signed by '+esc(who)+(role?' ('+esc(role)+')':'')+'</span>');
     if(lastOk) lines.push('<span>Sent '+whenOf(lastOk.at).replace(' · ',', ')+'</span>');

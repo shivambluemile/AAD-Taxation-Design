@@ -955,6 +955,33 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-ver>b{font-size:12.5px;font-weight:700;color:var(--ink);padding-top:4px}
 .ds-ver .ds-files{margin-top:0}
 .ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:4px;font-size:12px;color:var(--faint)}
+/* documents as a grid of compact cards */
+.ds-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start;border:0;background:none}
+.ds-list+.ds-glabel{margin-top:22px}
+.ds-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px!important;background:#fff;padding:14px 16px 0;min-width:0;transition:border-color .15s,box-shadow .15s}
+.ds-card+.ds-card{border-top:1px solid var(--line)}
+.ds-card:hover{border-color:#D6DBE1;box-shadow:0 2px 8px -4px rgba(15,23,42,.12)}
+.ds-card.is-exp{box-shadow:inset 3px 0 0 #F43F5E}.ds-card.is-soon{box-shadow:inset 3px 0 0 #F59E0B}
+.ds-card.is-exp:hover{box-shadow:inset 3px 0 0 #F43F5E,0 2px 8px -4px rgba(15,23,42,.12)}.ds-card.is-soon:hover{box-shadow:inset 3px 0 0 #F59E0B,0 2px 8px -4px rgba(15,23,42,.12)}
+.ds-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.ds-ch .ds-name{min-width:0;font-size:14px;line-height:1.35}
+.ds-ch .state{flex-shrink:0;padding-top:1px;white-space:nowrap}
+.ds-card .ds-exp{margin:2px 0 0;font-size:12px}
+.ds-cb{flex:1;padding:10px 0 12px;min-width:0}
+.ds-cb .ds-files{margin-top:0}
+.ds-cb .ds-by{margin-top:6px}
+.ds-card .ds-none{margin:0;font-size:12.5px;color:var(--mute)}
+.ds-cf{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 -16px;padding:6px 10px 6px 16px;border-top:1px solid var(--line-soft)}
+.ds-cf .ds-more svg:first-child{width:13px;height:13px}
+.ds-nohist{font-size:12px;color:var(--faint)}
+.ds-card .ds-acts{gap:2px}
+.ds-card .ds-act{padding:6px 6px;font-size:12.5px}
+.ds-card .ds-kebab{width:30px;height:30px}
+.ds-card .ds-prev{margin:0 -16px;border-top:1px solid var(--line-soft);border-radius:0 0 12px 12px;padding:4px 16px 8px}
+.ds-card .ds-ver{display:block;padding:9px 0}
+.ds-card .ds-ver>b{display:block;padding:0 0 4px;font-size:12.5px}
+.ds-vi .bad{color:#B91C1C}
+@media (max-width:760px){.ds-list{grid-template-columns:1fr}}
 .ds-note{display:flex;align-items:flex-start;gap:7px;margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--mute)}
 .ds-note svg{flex-shrink:0;margin-top:2px;width:13px;height:13px;color:var(--faint)}
 @media (max-width:640px){
@@ -1465,30 +1492,31 @@ function fileChips(d,t,vi,files){
 var docMenu=null;   // the document whose ⋮ menu is open
 I.dots3='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
 function docCard(d){
-  /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
-  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
-  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', menu=docMenu===d.k;
-  var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    '<div class="ds-row">'+
-      '<div class="ds-tt"><b class="ds-name">'+t.name+'</b>'+
-        (gone?'<div class="ds-none">No active document</div>':fileChips(d,t,0,d.cur.files))+
-        (gone&&!prev?'':'<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
-          (prev?(gone?'':'<i class="ds-sep">·</i>')+'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">Version history ('+prev+')'+I.chev+'</button>':'')+'</div>')+
-      '</div>'+
-      '<div class="ds-st">'+stDot(st,stLabel(d))+(exp?'<small class="ds-exp'+(gone?' bad':st==='soon'?' soon':'')+'">'+(gone?'Expired on ':'Expiry date ')+exp+'</small>':'')+'</div>'+
+  /* an expired version is no longer the active document: it moves into the history and the card asks for the renewal */
+  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
+  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', menu=docMenu===d.k, renew=gone||soon;
+  var h='<div class="ds-item ds-card'+(gone?' is-exp':soon?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+    /* name and status */
+    '<div class="ds-ch"><b class="ds-name">'+t.name+'</b>'+stDot(st,stLabel(d))+'</div>'+
+    (exp?'<div class="ds-exp'+(gone?' bad':soon?' soon':'')+'">'+(gone?'Expired on ':'Expires ')+exp+'</div>':'')+
+    /* the files, or what's missing */
+    '<div class="ds-cb">'+(gone?'<div class="ds-none">No active document. The expired version is in Version history.</div>':
+      fileChips(d,t,0,d.cur.files)+'<div class="ds-by">Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</div>')+'</div>'+
+    /* history on the left, the one action and the menu on the right */
+    '<div class="ds-cf">'+
+      (prev?'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+I.hist+'Version history ('+prev+')'+I.chev+'</button>':'<span class="ds-nohist">No previous versions</span>')+
       '<div class="ds-acts">'+
-        '<button type="button" class="ds-act'+(gone||st==='soon'?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(gone||st==='soon'?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(gone||st==='soon'?'Renew':'Replace')+'</button>'+
+        '<button type="button" class="ds-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button>'+
         '<button type="button" class="sdt-ib ds-kebab" data-dmenu="'+d.k+'" aria-haspopup="menu" aria-expanded="'+menu+'" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+I.dots3+'</button>'+
-        (menu?'<div class="ds-menu" role="menu" aria-label="'+esc(t.name)+' actions">'+
-          '<button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">'+I.trash+'Delete document</button></div>':'')+
+        (menu?'<div class="ds-menu" role="menu" aria-label="'+esc(t.name)+' actions"><button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">'+I.trash+'Delete document</button></div>':'')+
       '</div>'+
     '</div>';
   if(prev&&open){
     h+='<div class="ds-prev">'+hist.map(function(v,j){
-      var vi=j+first, m=[];   // one compact block per version: label, files, then who and when
+      var vi=j+first, m=[];
       m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+', '+fmtT(v.on)+'</span>');
-      if(t.exp&&v.exp) m.push('<span>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
-      return '<div class="ds-ver"><b>Version '+v.ver+'</b><div>'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div></div>';
+      if(t.exp&&v.exp) m.push('<span'+(daysTo(v.exp)<0?' class="bad"':'')+'>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
+      return '<div class="ds-ver"><b>Version '+v.ver+'</b>'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div>';
     }).join('')+'</div>';
   }
   return h+'</div>';

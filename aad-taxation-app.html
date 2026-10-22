@@ -1019,6 +1019,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dt-main{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px 14px 4px;text-align:left;min-width:0}
 .dt-ic{width:34px;height:34px;border-radius:9px;background:#F3F4F6;color:var(--slate);display:flex;align-items:center;justify-content:center}
 
+.dt-hd{display:flex;align-items:center;gap:10px;min-width:0;max-width:100%}.dt-hd .dt-ic{flex-shrink:0}.dt-hd .dt-name{min-width:0;overflow-wrap:anywhere}
 .dt-name{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
 .dt-line{font-size:12px;color:var(--faint)}.dt-tile.is-exp .dt-line{color:#B91C1C;font-weight:600}.dt-tile.is-soon .dt-line{color:#B45309;font-weight:600}
 .dt-nv{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:#FEF2F2;color:#B91C1C;font-size:11.5px;font-weight:700}.dt-nv i{width:6px;height:6px;border-radius:50%;background:currentColor}
@@ -1029,11 +1030,11 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
 @media (max-width:560px){.dx-alert{flex-wrap:wrap}.dx-btn{margin-left:44px}}
 .dt-files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 14px 4px}
-.dt-fbox{min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 6px 8px 10px;background:#fff}
+.dt-fbox{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;padding:8px 6px 8px 10px;background:#fff}
 .dt-flbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .dt-frow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:7px}
 .dt-frow .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.dt-frow .x.e-pdf{background:#FDECEC;color:#C2410C}
-.dt-fbox>.ds-fname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;margin-top:4px;text-align:left;font-size:12.5px;font-weight:600;line-height:1.35}
+.dt-fbox>.ds-fname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:normal;width:100%;max-width:100%;min-width:0;margin-top:4px;text-align:left;font-size:12.5px;font-weight:600;line-height:1.35}
 .dt-frow .sdt-ib{width:24px;height:24px;margin:-3px 0}
 .dt-fmore{grid-column:1/-1;justify-self:start;font-size:12px;font-weight:600;color:var(--mute);padding:2px 0}.dt-fmore:hover{color:var(--orange-ink);text-decoration:underline}
 @media (max-width:520px){.dt-files{grid-template-columns:1fr}}
@@ -1374,7 +1375,7 @@ var detailStaff=null, detailTab='docs';
 
 function openDetail(id){
   detailStaff=STAFF.filter(function(x){return x.id===id})[0]||STAFF[0];
-  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null; docMenu=null;
+  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; filesAll={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null; docMenu=null;
   renderDetail(); drawer.classList.add('show'); scrim.classList.add('show'); drawer.setAttribute('aria-hidden','false');
 }
 
@@ -1580,20 +1581,22 @@ var DOC_IC={
   Payroll:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>',
   HR:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
 };
+/* a card with more than two files: the rest open inside the card (the versions table opens from the card itself) */
+var filesAll={};
 function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
   var line=gone?'Expired '+exp:soon?'Expires '+exp:exp?'Until '+exp:'No expiry';
   var nv=gone?'<span class="dt-nv"><i></i>No valid document</span>':'';
-  var FILES_SHOWN=2, fl=gone?[]:d.cur.files, sided=t.slots.length>1;
+  var FILES_SHOWN=filesAll[d.k]?Infinity:2, fl=gone?[]:d.cur.files, sided=t.slots.length>1;
   var files=fl.length?'<div class="dt-files">'+fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n);
       return '<div class="dt-fbox"><div class="dt-frow"><span class="x e-'+x+'">'+x.toUpperCase()+'</span>'+(sided?'<span class="dt-flbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'<span></span>')+
         '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></div>'+
         '<button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button></div>'; }).join('')+
-      (fl.length>FILES_SHOWN?'<button type="button" class="dt-fmore" data-toggle="'+d.k+'">+'+(fl.length-FILES_SHOWN)+' more file'+(fl.length-FILES_SHOWN===1?'':'s')+'</button>':'')+'</div>':'';
+      (fl.length>2?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-2)+' more file'+(fl.length-2===1?'':'s'))+'</button>':'')+'</div>':'';
   return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+(gone?'no valid document, ':'')+line+'. '+(open?'Hide':'Show')+' files and history">'+
-      '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b>'+nv+'<span class="dt-line">'+line+'</span></button>'+files+
+      '<span class="dt-hd"><span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b></span>'+nv+'<span class="dt-line">'+line+'</span></button>'+files+
     '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
   '</div>';
 }
@@ -1649,11 +1652,11 @@ function currentList(docs){
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
   var PER=2;
   var group=function(label,items,cls){ if(!items.length) return '';
-    var h='<div class="dt-grp '+cls+'">'+label+' <span>'+items.length+'</span></div><div class="dt-grid">';
+    var h=(label?'<div class="dt-grp '+cls+'">'+label+' <span>'+items.length+'</span></div>':'')+'<div class="dt-grid">';
     for(var i=0;i<items.length;i+=PER){ var row=items.slice(i,i+PER), op=row.filter(function(d){ return docOpen[d.k]; })[0];
       h+=row.map(docCard).join('')+(op?docDetail(op):''); }
     return h+'</div>'; };
-  return group('Needs attention',need,'warn')+group('Up to date',ok,'ok');
+  return group('Needs attention',need,'warn')+group('',ok,'ok');
 }
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){
@@ -2023,6 +2026,8 @@ document.addEventListener('click',function(e){
   if(pv){ document.getElementById('sheet').textContent=pv.getAttribute('data-preview').toUpperCase(); openModal('m-prev'); return; }
   var vh=t.closest('[data-vh]');
   if(vh){ var vk=vh.getAttribute('data-vh'); histOpen[vk]=!histOpen[vk]; keepScroll(renderDetail); var vb=drawer.querySelector('[data-vh="'+vk+'"]'); if(vb) vb.focus({preventScroll:true}); return; }
+  var fx=t.closest('[data-fx]');
+  if(fx){ var fk=fx.getAttribute('data-fx'); filesAll[fk]=!filesAll[fk]; keepScroll(renderDetail); var fb=drawer.querySelector('[data-fx="'+fk+'"]'); if(fb) fb.focus({preventScroll:true}); return; }
   var tg=t.closest('[data-toggle]');
   if(tg){ toggleDoc(tg.getAttribute('data-toggle')); return; }
 

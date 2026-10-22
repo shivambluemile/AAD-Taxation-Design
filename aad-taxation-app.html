@@ -1018,7 +1018,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dt-tile.flash{animation:dvflash 2.4s ease-out}
 .dt-main{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px 14px 4px;text-align:left;min-width:0}
 .dt-ic{width:34px;height:34px;border-radius:9px;background:#F3F4F6;color:var(--slate);display:flex;align-items:center;justify-content:center}
-.dt-tile.is-exp .dt-ic{background:#FEF2F2;color:#B91C1C}.dt-tile.is-soon .dt-ic{background:#FFF6E8;color:#B45309}
+
 .dt-name{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
 .dt-line{font-size:12px;color:var(--faint)}.dt-tile.is-exp .dt-line{color:#B91C1C;font-weight:600}.dt-tile.is-soon .dt-line{color:#B45309;font-weight:600}
 .dt-act{align-self:flex-start;margin:0 0 10px 14px;padding:4px 0;font-size:12.5px}
@@ -1564,7 +1564,7 @@ function docCard(d){
   var line=gone?'Expired '+exp:soon?'Expires '+exp:exp?'Until '+exp:'No expiry';
   return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+line+'. '+(open?'Hide':'Show')+' files and history">'+
-      '<span class="dt-ic">'+(DOC_IC[t.cat]||DOC_IC.HR)+'</span><b class="dt-name">'+t.name+'</b><span class="dt-line">'+line+'</span></button>'+
+      '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b><span class="dt-line">'+line+'</span></button>'+
     '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
   '</div>';
 }

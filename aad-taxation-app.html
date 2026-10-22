@@ -2865,7 +2865,7 @@ tbody tr:hover{background:#FCFCFD}
 .ky-card .el-dt>b{font-size:12.5px;font-weight:600;color:var(--mute)}
 .ky-files{display:flex;flex-direction:column;gap:8px;margin-top:0}
 .ky-cur{padding:14px 18px}
-.ky-meta{display:flex;flex-direction:column;gap:3px;margin-top:10px;font-size:12px;line-height:1.45;color:var(--faint)}
+.ky-meta{display:flex;flex-direction:column;gap:3px;margin-top:10px;font-size:12px;line-height:1.45;color:var(--faint)}.ky-meta .ky-note{color:var(--slate)}
 .ky-hrow .ky-meta{flex-basis:100%}.ky-none{margin:0;padding:14px 18px}
 .ky-hact{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .ky-cur .el-review{margin:12px 0 0}.ky-meta .ky-bad{flex-basis:100%;color:var(--red)}
@@ -5348,7 +5348,7 @@ function finalizeClient(o){
     return putKyc(key,x.file,{owner:'client-'+rec.id,name:x.name,type:x.type,size:x.size,at:now,by:ME}).then(function(){ rec.kyc.push({key:key,name:x.name,type:x.type,size:x.size,at:now,by:ME}); }); });   // rec.kyc is gathered into the first KYC record below
   Promise.all(saves).then(function(){ finish(); },function(){ toast('Some KYC files couldn’t be stored. Upload them again from the client’s record.',true); finish(); });
   function finish(){
-    if(rec.kyc.length){ var kr={id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:String(wiz.kycNote||'').trim(),source:'Add Client'}; rec.kycRecords.unshift(kr); rec.kyc=[];
+    if(rec.kyc.length){ var kr={id:'k'+now.toString(36),date:wiz.kycDate||isoOf(now),files:rec.kyc,by:ME,at:now,expiresAt:now+KYC_DAYS*864e5,note:String(wiz.kycNote||wiz.note||'').trim(),source:'Add Client'}; rec.kycRecords.unshift(kr); rec.kyc=[];
       rec.history.push({t:now,kind:'document',title:'KYC recorded',detail:'Checked '+dmyOf(fromIso(kr.date))+' · valid until '+whenOf(kycExpiresAt(kr))+' · '+kr.files.length+' file'+(kr.files.length===1?'':'s'),by:ME}); }
     var sg=signer, letter={id:'L'+now.toString(36),clientId:rec.id,client:snap(rec),token:o.token||newToken(),created:now,by:ME,fy:fyStart(now),signer:{name:sg.name,email:sg.email,role:sg.role},services:rec.services.map(function(a){ return {name:a.name,price:a.price}; }),
       status:o.mode==='signed'?'signed':'sent',sends:o.send?[o.send]:[],expires:o.expires||null,audit:[],pay:wiz.pay};
@@ -5753,9 +5753,12 @@ function kycTab(c){
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x+'</button>':''; };
   var act=btn(A[0],'btn-ghost')+btn(A[1],'btn-primary');
   /* under the files, in small muted text: verified, uploaded (by, date, time), expiry, note */
-  var meta=function(r){ var ex=kycExpiresAt(r), gone=now>=ex;
-    return '<div class="ky-meta"><span>Verified '+dmyOf(fromIso(r.date))+'</span><span>Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+'</span>'+
-      '<span>'+(gone?'Expired on ':'Expires on ')+whenOf(ex).replace(' · ',', ')+'</span>'+(r.note?'<span class="ky-note">Note: '+esc(r.note)+'</span>':'')+'</div>'; };
+  /* a check made in Add Client carries the note typed on that step (older ones: the client note saved at the same moment) */
+  var noteOf=function(r){ if(r.note) return r.note; if(r.source!=='Add Client') return ''; var t=kycUploadedAt(r);
+    var n=(c.notes||[]).filter(function(x){ return Math.abs((x.t||0)-t)<120000; })[0]; return n?n.text:''; };
+  var meta=function(r){ var ex=kycExpiresAt(r), gone=now>=ex, note=noteOf(r);
+    return '<div class="ky-meta"><span>Verified '+dmyOf(fromIso(r.date))+' · Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+' · '+(gone?'Expired on ':'Expires on ')+whenOf(ex).replace(' · ',', ')+'</span>'+
+      (note?'<span class="ky-note">Note: '+esc(note)+'</span>':'')+'</div>'; };
   var doc=cur?'<div class="ky-cur">'+kycChips(cur.files||[],0)+meta(cur)+'</div>':'<p class="cl-muted ky-none">No KYC recorded yet.</p>';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown

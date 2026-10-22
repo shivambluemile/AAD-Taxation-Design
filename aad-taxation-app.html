@@ -1057,6 +1057,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .vh-pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:#F1F2F4;color:var(--slate)}.vh-pill.bad{background:#FEF2F2;color:#B91C1C}
 .vh-valid{font-size:12.5px;color:var(--faint)}
 .vh-ev{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:13px;color:var(--ink)}.vh-ev svg{color:var(--mute);flex-shrink:0}.vh-ev b{font-weight:700}
+.vh-sum{display:block}.vh-sum .vh-ev{margin-bottom:0}.vh-acc[open] .vh-sum .vh-ev{margin-bottom:10px}.vh-in{padding-bottom:2px}
 .vh-acc>summary{list-style:none;cursor:pointer;border-radius:8px;padding:2px 4px 2px 0}.vh-acc>summary::-webkit-details-marker{display:none}
 .vh-acc>summary:hover .vh-valid{color:var(--ink)}.vh-acc>summary:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .vh-chev{margin-left:auto;display:flex;color:var(--mute)}.vh-chev svg{transition:transform .15s;transform:rotate(-90deg)}.vh-acc[open] .vh-chev svg{transform:none}
@@ -1722,15 +1723,15 @@ function versionTimeline(d){
     var v=vs[vi], newer=vi>0?vs[vi-1]:null, lapsed=t.exp&&v.exp&&(newer?v.exp<newer.on:daysTo(v.exp)<0);
     var what=lapsed?'<span class="vh-ev">'+DC_I.clock+'Expired by <span class="vh-sys">System</span> on '+fmtD(v.exp)+' 12:00 AM</span>'
       :'<span class="vh-ev">'+DC_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+fmtD(newer.on)+' '+fmtT(newer.on)+'</span>';
-    items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><details class="vh-acc"'+(vi===from?' open':'')+'><summary class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
-        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>'+what+
+    items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
+        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+what+'</summary><div class="vh-in">'+
       v.files.map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
         return '<div class="vh-file">'+(sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
           '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
           '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
             '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+
           '<span class="dc2-fa">'+
-          '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</details></li>');
+          '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</div></details></li>');
   }
   return '<div class="vh">'+(items.length?'<ol class="vh-list">'+items.join('')+'</ol>':'<p class="vh-none">No previous versions</p>')+'</div>';
 }
@@ -3291,6 +3292,7 @@ tbody tr:hover{background:#FCFCFD}
 .vh-pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:#F1F2F4;color:var(--slate)}.vh-pill.bad{background:#FEF2F2;color:#B91C1C}
 .vh-valid{font-size:12.5px;color:var(--faint)}
 .vh-ev{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:13px;color:var(--ink)}.vh-ev svg{color:var(--mute);flex-shrink:0}.vh-ev b{font-weight:700}
+.vh-sum{display:block}.vh-sum .vh-ev{margin-bottom:0}.vh-acc[open] .vh-sum .vh-ev{margin-bottom:10px}.vh-in{padding-bottom:2px}
 .vh-acc>summary{list-style:none;cursor:pointer;border-radius:8px;padding:2px 4px 2px 0}.vh-acc>summary::-webkit-details-marker{display:none}
 .vh-acc>summary:hover .vh-valid{color:var(--ink)}.vh-acc>summary:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .vh-chev{margin-left:auto;display:flex;color:var(--mute)}.vh-chev svg{transition:transform .15s;transform:rotate(-90deg)}.vh-acc[open] .vh-chev svg{transform:none}
@@ -6300,8 +6302,8 @@ function cdBanner(title,text,row){ return '<div class="cd2-alert" role="alert"><
 /* the history popup: earlier versions as a timeline, each with its files */
 function cdHistPop(title,items,wire){
   var body=items.length?'<ol class="vh-list">'+items.map(function(it,i){
-      return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"'+(i?'':' open')+'><summary class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>'+
-        '<span class="vh-ev">'+it.ev+'</span><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</details></li>'; }).join('')+'</ol>'
+      return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+
+        '<span class="vh-ev">'+it.ev+'</span></summary><div class="vh-in"><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</div></details></li>'; }).join('')+'</ol>'
     :'<p class="vh-none">No previous versions</p>';
   showModal('<div class="modal cd2-hm" role="dialog" aria-modal="true" aria-labelledby="ch-t"><div class="modal-head"><h2 id="ch-t">'+esc(title)+'</h2><button data-close aria-label="Close">'+I.close+'</button></div><div class="modal-body">'+body+'</div></div>');
   if(wire) wire(document.querySelector('.cd2-hm'));
@@ -11385,7 +11387,7 @@ table,td,th{font-size:13.5px}
 <style id="qt-css">
 .page-head .page-sub{color:var(--mute);margin-top:4px}
 .qt-dev{display:inline-flex;align-items:center;height:22px;padding:0 9px;margin-left:8px;border-radius:999px;background:#FFF7EC;color:#B45309;font-family:'Inter';font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:4px;cursor:help}
-.qt-sbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.qt-sbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
 .qt-sb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
 .qt-sb:hover{border-color:#CBD2DA;color:var(--ink)}.qt-sb.all{padding-right:14px}
 .qt-sb i{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0}
@@ -11878,7 +11880,8 @@ function render(){
   var base=filtered(true), cnt=function(s){ return base.filter(function(x){ return !s||x.status===s; }).length; };
   var sb=function(s,label,dot){ var on=(f.status||'')===s, n=cnt(s);
     return '<button type="button" class="qt-sb'+(s?'':' all')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+'</button>'; };   // text only, no counts
-  var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).filter(function(k){ return k!=='cancelled'; }).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
+  var sbar='<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).filter(function(k){ return k!=='cancelled'; }).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
+  var h=head();
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });
   h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
@@ -11891,6 +11894,7 @@ function render(){
   var chips=[['accountant','Accountant',f.accountant],['branch','Branch',f.branch]].filter(function(c){ return c[2]; });
   if(chips.length) h+='<div class="qt-chips" aria-label="Active filters">'+chips.map(function(c){
     return '<span class="qt-chip">'+c[1]+': <b>'+esc(c[2])+'</b><button type="button" data-unf="'+c[0]+'" aria-label="Remove '+c[1].toLowerCase()+' filter '+esc(c[2])+'" title="Remove">'+I.close+'</button></span>'; }).join('')+'</div>';
+  h+=sbar;   // status badges between the filters and the table
   h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!all.length) h+='<tr><td colspan="9"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="9"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';

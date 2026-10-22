@@ -1721,10 +1721,10 @@ function versionTimeline(d){
   var t=typeOf(d.k), vs=versionsOf(d), sided=t.slots.length>1, gone=stOf(d)==='expired', from=gone?0:1, items=[];
   for(var vi=from;vi<vs.length;vi++){
     var v=vs[vi], newer=vi>0?vs[vi-1]:null, lapsed=t.exp&&v.exp&&(newer?v.exp<newer.on:daysTo(v.exp)<0);
-    var what=lapsed?'<span class="vh-ev">'+DC_I.clock+'Expired by <span class="vh-sys">System</span> on '+fmtD(v.exp)+' 12:00 AM</span>'
+    var what=lapsed?'<span class="vh-ev">'+DC_I.clock+'Expired on '+fmtD(v.exp)+'</span>'
       :'<span class="vh-ev">'+DC_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+fmtD(newer.on)+' '+fmtT(newer.on)+'</span>';
     items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
-        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+what+'</summary><div class="vh-in">'+
+        '<span class="vh-valid">Version '+v.ver+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+what+'</summary><div class="vh-in">'+
       v.files.map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
         return (sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+'<div class="vh-file">'+
           '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
@@ -6314,8 +6314,8 @@ function kycNoteOf(c,r){ if(r.note) return r.note; if(r.source!=='Add Client') r
 function kycHistItems(c){
   var recs=kycRecs(c), now=Date.now(), view=canViewKyc(), cur=recs[0], from=cur&&kycState(cur)==='expired'?0:1, out=[];
   for(var vi=from;vi<recs.length;vi++){ var r=recs[vi], newer=vi>0?recs[vi-1]:null, ex=kycExpiresAt(r), lapsed=newer?ex<kycUploadedAt(newer):now>=ex, note=kycNoteOf(c,r);
-    out.push({bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'Version '+(recs.length-vi)+' · Verified '+dmyOf(fromIso(r.date))+' by '+esc(r.by)+' · Valid until '+dmyOf(ex),
-      ev:lapsed?CD_I.clock+'Expired by <span class="vh-sys">System</span> on '+dmyOf(ex)+' 12:00 AM':CD_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+cdStamp(kycUploadedAt(newer)),
+    out.push({bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'Version '+(recs.length-vi)+' · Verified '+dmyOf(fromIso(r.date))+' by '+esc(r.by),
+      ev:lapsed?CD_I.clock+'Expired on '+dmyOf(ex):CD_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+cdStamp(kycUploadedAt(newer)),
       files:(r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return {name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||r.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(r)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}; }),
       note:note?'Note: '+esc(note):''}); }
   return out;
@@ -6396,8 +6396,8 @@ function letterHistItems(c){
   var F=fyStart(Date.now()), L=currentLetter(c), gone=elState(L)==='expired', now=Date.now();
   return ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
-    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+' · Valid until '+dmyOf(e2),
-      ev:lapsed?CD_I.clock+'Expired by <span class="vh-sys">System</span> on '+dmyOf(e2)+' 11:59 PM':CD_I.swap+'Replaced by a newer letter',
+    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l)),
+      ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
       files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
 function engagementTab(c){

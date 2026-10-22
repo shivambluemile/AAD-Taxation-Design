@@ -1498,12 +1498,11 @@ function docCard(d){
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
 var KEEP_VERSIONS=5;
 function docsBody(s){
-  var docs=storeOf(s.id).docs, n={valid:0,none:0,soon:0,expired:0};
-  docs.forEach(function(d){ n[stOf(d)]++; });
-  // one status filter; each option shows how many documents it matches
+  var docs=storeOf(s.id).docs;
+  // one status filter
   var filter='<div class="sel ds-sel"><select id="sd-f" aria-label="Filter by status">'+
-    [['all','All status',docs.length],['expired','Expired',n.expired],['soon','Expiring soon',n.soon],['valid','Valid',n.valid],['none','No expiry',n.none]].map(function(c){
-      return '<option value="'+c[0]+'"'+(docFilter===c[0]?' selected':'')+'>'+c[1]+' ('+c[2]+')</option>';
+    [['all','All status'],['expired','Expired'],['soon','Expiring soon'],['valid','Valid'],['none','No expiry']].map(function(c){
+      return '<option value="'+c[0]+'"'+(docFilter===c[0]?' selected':'')+'>'+c[1]+'</option>';
     }).join('')+'</select></div>';
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+

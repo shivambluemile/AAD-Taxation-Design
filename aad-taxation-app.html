@@ -3197,7 +3197,7 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-exp{flex-shrink:0;font-size:13px;color:var(--mute);white-space:nowrap}.cd2-exp.warn{color:#B45309;font-weight:600}.cd2-exp.bad{color:#B91C1C;font-weight:600}
 .cd2-chev{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute);flex-shrink:0}.cd2-chev:hover{background:#F2F4F7;color:var(--ink)}
 .cd2-chev svg{transition:transform .15s}.cd2.shut .cd2-chev svg{transform:rotate(-90deg)}
-.cd2-b{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px 12px;margin-top:14px;align-items:end}
+.cd2-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px 12px;margin-top:14px;align-items:end}
 .cd2-cell{min-width:0;display:flex;flex-direction:column}
 .cd2-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
 .cd2-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}
@@ -6364,13 +6364,16 @@ function engagementTab(c){
   if(st==='expired'){ var ex=letterExpiresAt(L), da=Math.round((now-ex)/864e5);
     return '<section class="vsec el-main">'+cdBanner('Engagement letter has expired','The FY '+fyLabel(letterFy(L))+' letter is no longer valid. Start the renewal to send this year’s letter, or upload one the client has signed.',
       '<div class="cd2-art"><b>Engagement Letter · FY '+fyLabel(letterFy(L))+'</b><span>Expired '+dmyOf(ex)+' · '+cdDays(da)+' ago · needs a signed letter</span></div>'+
-      '<button type="button" class="cd2-hbtn" data-cdhist="l" aria-haspopup="dialog">History<span class="cd2-hn">'+nHist+'</span></button>'+menu+
+      '<button type="button" class="cd2-hbtn" data-cdhist="l" aria-haspopup="dialog">History<span class="cd2-hn">'+nHist+'</span></button>'+
+      '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed letter</button>'+
       '<button type="button" class="btn-primary btn-sm cd2-abtn" data-el="send">'+CD_I.up+'Start renewal</button>')+'</section>';
   }
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=30;
   var fileWho=st==='signed'?letterHow(L):'Created by <em>'+esc(L.by||'staff')+'</em> · '+cdStamp(L.created);
   var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'<span class="'+(st==='awaiting'?'warn':'')+'">'+S[0]+'</span> · To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
-  var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+menu;
+  /* the next step first, then the other ways to get it signed, all as links (no menu) */
+  var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
+    S[4].map(function(x){ return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
   var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),line:'Expires '+dmyOf(fyEndAt)+(soon?' · '+cdDays(dl)+' left':''),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});

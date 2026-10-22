@@ -2906,7 +2906,7 @@ tbody tr:hover{background:#FCFCFD}
 .el-menu[hidden]{display:none}
 .el-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--ink);white-space:nowrap}.el-menu button:hover,.el-menu button:focus-visible{background:var(--orange-soft);color:var(--orange-ink);outline:none}
 .el-hrw{width:100%;display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line-soft);background:none;text-align:left;border-radius:0 0 12px 12px}
-.el-hrw.open{border-radius:0}
+.el-hrw.open{border-radius:0}button.el-hrw{cursor:pointer}button.el-hrw:hover{background:#FAFBFC}
 .el-hic{display:flex;color:var(--mute)}.el-hrw b{font-size:13.5px;color:var(--ink)}
 .el-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700}
 .el-chev{margin-left:auto;display:flex;color:var(--mute)}.el-chev svg{width:14px;height:14px;transition:transform .15s}.el-hrw[aria-expanded="true"] .el-chev svg{transform:rotate(180deg)}
@@ -5777,9 +5777,9 @@ function kycTab(c){
       (note?'<span class="ky-note">Note: '+esc(note)+'</span>':'')+'</div>'; };
   var doc=cur?'<div class="ky-cur">'+kycChips(cur.files||[],0)+meta(cur)+'</div>':'<p class="cl-muted ky-none">No KYC recorded yet.</p>';
   /* previous checks, newest first, collapsed */
-  var older=recs.slice(1), open=older.length>0;                  // always shown
-  var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
-      (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
+  var older=recs.slice(1), open=older.length>0&&!histShut['k'+c.id];   // open unless closed
+  var hist='<'+(older.length?'button type="button" data-hist="k" aria-expanded="'+open+'"':'div')+' class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'<span class="el-chev">'+I.chev+'</span></button>':'<span class="el-hnone">None yet</span></div>')+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
       return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+meta(r)+'</div></div>'; }).join('')+'</div>':'');
   var card='<article class="el-card ky-card">'+
@@ -5831,6 +5831,7 @@ function notesTabC(c){
       '<div class="ntl-b"><div class="ntl-h"><b>'+esc(n.by)+'</b><span>'+whenOf(n.t)+'</span></div><p>'+esc(n.text)+'</p></div></div>'; }).join('')+'</div>':'<p class="cl-muted">No notes yet.</p>')+'</section>';
 }
 var elOpen={};                                               // client id -> previous letters shown
+var histShut={};                                             // 'k'/'l' + client id -> previous KYC checks / letters closed by the user (open by default)
 /* one status per letter, from its actual state: a sent letter is waiting for a signature */
 var EL_STATE={none:['Not created','grey'],draft:['Draft','grey'],awaiting:['Awaiting Signature','amber'],signed:['Signed','green'],failed:['Failed','red'],expired:['Expired','grey']};
 function elState(L){ if(!L) return 'none'; if(letterExpired(L)) return 'expired'; return L.status==='signed'?'signed':L.status==='sent'?'awaiting':L.status==='failed'?'failed':'draft'; }
@@ -5887,9 +5888,9 @@ function engagementTab(c){
   /* previous letters: newest year first, collapsed */
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,b){ return letterFy(b)-letterFy(a)||b.created-a.created; });
   var years=[]; older.forEach(function(l){ var y=letterFy(l); if(years.indexOf(y)<0) years.push(y); });
-  var hopen=older.length>0;                                       // always shown
-  var hist='<div class="el-hrw'+(hopen?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
-      (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
+  var hopen=older.length>0&&!histShut['l'+c.id];                  // open unless closed
+  var hist='<'+(older.length?'button type="button" data-hist="l" aria-expanded="'+hopen+'"':'div')+' class="el-hrw'+(hopen?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous Engagement Letters</b><span class="el-cnt">'+older.length+'</span>'+
+      (older.length?'<span class="el-chev">'+I.chev+'</span></button>':'<span class="el-hnone">None yet</span></div>')+
     (hopen?'<div class="el-hlist">'+years.map(function(y){
       return '<div class="el-yg"><div class="el-yh"><b>FY '+fyLabel(y)+'</b><span>01-07-'+y+' to 30-06-'+(y+1)+'</span></div>'+older.filter(function(l){ return letterFy(l)===y; }).map(function(l){
         var exp=l.expiredAt||letterExpiresAt(l), s=elState(l);
@@ -5969,6 +5970,7 @@ function wireClientTab(c,t,body,repaintTab){
     body.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kpv); if(f) openKyc(f); }; });
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });
   }
+  body.querySelectorAll('[data-hist]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.hist+c.id; histShut[k]=!histShut[k]; repaintTab(); }; });
   if(t==='notes'){
     var add=document.getElementById('cn-add');
     if(add) add.onclick=function(){

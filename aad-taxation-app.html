@@ -2857,7 +2857,23 @@ tbody tr:hover{background:#FCFCFD}
 .el-dt .ds-files{margin-top:6px}
 .ky-hrow{flex-wrap:wrap}.ky-hrow .ds-files{flex-basis:100%;margin-top:0}
 .ky-lines{flex-direction:column;gap:2px;flex-basis:100%;margin-top:6px;font-size:12px;color:var(--faint)}
-.ky-sm{font-size:12px;color:var(--faint)}.el-dt .ds-files+.ky-sm{margin-top:4px}
+.ky-sm{font-size:12px;color:var(--faint)}
+.ky-card .el-dt>b{font-size:12.5px;font-weight:600;color:var(--mute)}
+.ky-files{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ky-file{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.ky-file .x{font-size:10px;font-weight:800;padding:4px 7px;border-radius:5px;background:#E8F1FD;color:#2563EB;flex-shrink:0}.ky-file .x.e-pdf{background:#FDECEC;color:#C2410C}
+.ky-fn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ky-fname,.ky-fn b{font-size:14px;font-weight:700;color:var(--ink);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.ky-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
+.ky-fn small{font-size:12px;color:var(--faint)}
+.ky-fa{display:flex;gap:8px;flex-shrink:0}.ky-fa .pill-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 12px}.ky-fa svg{width:13px;height:13px}
+.ky-hrow .ky-files{flex-basis:100%;margin-top:0}
+.ky-card .el-st.ky-st{margin:0;padding:10px 18px;border:0;border-top:1px solid var(--line-soft);border-radius:0;background:none}
+.ky-card .ky-st .el-stx{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px}
+.ky-card .ky-st .el-stx b{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--slate)}
+.ky-card .ky-st .el-stx b::before{content:'';width:7px;height:7px;border-radius:50%;background:#C5CBD3}
+.ky-card .ky-st.s-signed .el-stx b::before{background:var(--green,#16A34A)}.ky-card .ky-st.s-awaiting .el-stx b::before{background:#F59E0B}.ky-card .ky-st.s-failed .el-stx b::before{background:var(--red,#DC2626)}
+.ky-card .ky-st .el-stx p{margin:0;font-size:12px;color:var(--faint)}
+@media (max-width:640px){.ky-file{flex-wrap:wrap}.ky-fa{width:100%}.ky-fa .pill-btn{flex:1;justify-content:center}}.el-dt .ds-files+.ky-sm{margin-top:4px}
 .wz-kycn{margin-top:14px}
 .el-bn{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;background:#F8FAFC;color:var(--mute)}
 .el-bn svg{flex-shrink:0;margin-top:1px;color:var(--faint)}.el-bn p{margin:0;font-size:12.5px;line-height:1.5}.el-bn b{color:var(--slate)}
@@ -5714,10 +5730,11 @@ var kycOpen={};                                              // client id -> pre
 function kycChips(files,vi){
   if(!files.length) return '<p class="cl-muted ds-none">No files in this check.</p>';
   var view=canViewKyc();
-  return '<div class="ds-files">'+files.map(function(f,fi){ var e=String(f.name||'').split('.').pop().toLowerCase();
-    return '<span class="ds-file" title="'+esc(f.name)+'"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+
-      (view?'<button class="ds-fname" data-kpv="'+vi+'|'+fi+'" aria-label="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b>'+esc(f.name)+'</b>')+fsize(f.size)+
-      (view?'<button class="sdt-ib" data-kdl="'+vi+'|'+fi+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'')+'</span>'; }).join('')+'</div>';
+  return '<div class="ds-files ky-files">'+files.map(function(f,fi){ var e=String(f.name||'').split('.').pop().toLowerCase();
+    return '<div class="ky-file"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+
+      '<div class="ky-fn">'+(view?'<button class="ky-fname" data-kpv="'+vi+'|'+fi+'" title="'+esc(f.name)+'">'+esc(f.name)+'</button>':'<b title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+fsize(f.size)+'</small></div>'+
+      (view?'<span class="ky-fa"><button type="button" class="pill-btn quiet" data-kpv="'+vi+'|'+fi+'" aria-label="Open '+esc(f.name)+'">'+OI.ext+'Open</button>'+
+        '<button type="button" class="pill-btn quiet" data-kdl="'+vi+'|'+fi+'" aria-label="Download '+esc(f.name)+'">'+OI.dl+'Download</button></span>':'')+'</div>'; }).join('')+'</div>';
 }
 /* KYC: the same layout as the engagement letter: a quiet rule banner, then one card with the current check, what it means, the next step, and the previous checks */
 function kycTab(c){
@@ -5730,7 +5747,7 @@ function kycTab(c){
     expired:['This KYC check has expired','Expired on '+whenOf(exp).replace(' · ',' at '),null,['add','Renew KYC']]}[st];   // the expiry lives here, not in the check details
   var tone={none:'',valid:'s-signed',expiring:'s-awaiting',expired:'s-failed'}[st];
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x[1]+'</button>':''; };
-  var status='<div class="el-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
+  var status='<div class="el-st ky-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
     (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
   var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
       kycChips(cur.files||[],0)+
@@ -5744,7 +5761,7 @@ function kycTab(c){
       return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'<div class="el-hi ky-lines">'+
         '<span>Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+'</span><span>'+(gone?'Expired':'Expires')+' '+dmyOf(ex)+'</span>'+
         (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div></div></div>'; }).join('')+'</div>':'');   // files first, then the details in small text
-  var card='<article class="el-card">'+
+  var card='<article class="el-card ky-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
     doc+status+hist+'</article>';
   return '<section class="vsec el-main">'+banner+card+'</section>';

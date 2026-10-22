@@ -1023,21 +1023,22 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dt-line{font-size:12px;color:var(--faint)}.dt-tile.is-exp .dt-line{color:#B91C1C;font-weight:600}.dt-tile.is-soon .dt-line{color:#B45309;font-weight:600}
 .dt-act{align-self:flex-start;margin:0 0 10px 14px;padding:4px 0;font-size:12.5px}
 .dt-detail{grid-column:1/-1}
-.dt-card{display:flex;align-items:center;gap:16px;padding:14px 14px 14px 16px;border:1px solid var(--line);border-radius:12px;background:#fff}
-.dt-card.old{background:#FAFBFC}
-.dt-big{width:46px;height:56px;border-radius:8px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:800;letter-spacing:.3px;background:#E8F1FD;color:#2563EB}
-.dt-big.e-pdf{background:#FDECEC;color:#C2410C}.dt-big.e-set{background:#F3F4F6;color:var(--slate);font-size:15px}.dt-big small{font-size:10px;font-weight:600}
-.dt-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
-.dt-fn{font-size:14.5px;font-weight:600;color:var(--ink);text-align:left;max-width:100%}
-.dt-meta{font-size:12.5px;color:var(--faint)}.dt-meta em{font-style:normal}.dt-meta em.bad{color:#B91C1C}
-.dt-fl{display:flex;flex-direction:column;gap:2px}
-.dt-fi{display:flex;align-items:center;gap:8px;font-size:13px}
-.dt-ext{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.dt-ext.e-pdf{background:#FDECEC;color:#C2410C}
-.dt-fi .ds-fname{font-weight:600}
-.dt-ctrl{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.dt-dl{display:inline-flex;align-items:center;gap:6px;height:34px}
-.dt-vsel select{height:34px;min-width:170px;font-size:13px}
-@media (max-width:760px){.dt-card{flex-wrap:wrap}.dt-ctrl{width:100%;justify-content:flex-end}}
+.vt-box{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.vt{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.vt th:nth-child(1){width:84px}.vt th:nth-child(3){width:130px}.vt th:nth-child(4){width:100px}
+.vt th{text-align:left;padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line)}
+.vt td{padding:10px 14px;border-top:1px solid var(--line-soft);vertical-align:middle;color:var(--ink)}
+.vt tbody tr:first-child td{border-top:0}
+.vt tr.cur td{background:#FFFAF5}
+.vt-v{width:84px;font-weight:600;white-space:nowrap}.vt tr.cur .vt-v{color:var(--orange-ink)}
+.vt-v small,.vt-u small{display:block;font-size:11.5px;font-weight:500;color:var(--faint)}
+.vt-f{min-width:0}
+.vt-file{display:inline-flex;align-items:center;gap:6px;margin:2px 14px 2px 0;font-size:12.5px;max-width:100%;min-width:0}.vt-file .ds-fname{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vt-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.vt-file .x.e-pdf{background:#FDECEC;color:#C2410C}
+.vt-file .ds-fname{font-weight:600}.vt-file .sdt-ib{width:24px;height:24px}
+.vt-u{width:130px;white-space:nowrap}
+.vt-e{width:96px;white-space:nowrap}.vt-na{color:var(--faint)}.vt-e.bad{color:#B91C1C;font-weight:600}
+.vt-foot{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 14px;border-top:1px solid var(--line-soft)}
+@media (max-width:760px){.vt thead{display:none}.vt tr{display:grid;grid-template-columns:1fr auto}.vt td{border:0}.vt-f{grid-column:1/-1}}
 .dt-dh{display:flex;align-items:center;justify-content:space-between;padding:6px 0 2px}.dt-dh b{font-size:13.5px;color:var(--ink)}
 .dt-detail .dg-ver{grid-template-columns:110px minmax(0,1fr)}
 @media (max-width:760px){.dt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -1568,23 +1569,21 @@ function docCard(d){
     '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
   '</div>';
 }
-/* the open tile's details: one file card for the chosen version; other versions are picked from a dropdown */
-var selVer={};                                                  // document -> version index shown (0 = current)
+/* the open tile's details: a compact versions table; older versions show only when asked for */
+var selVer={}, histOpen={};
 function docDetail(d){
-  var t=typeOf(d.k), vs=versionsOf(d), vi=Math.min(selVer[d.k]||0,vs.length-1), v=vs[vi], files=v.files, multi=files.length>1;
-  var gone=t.exp&&v.exp&&daysTo(v.exp)<0, e=extOf(files[0].n);
-  var meta='Uploaded '+fmtD(v.on)+', '+fmtT(v.on)+' by '+esc(v.by)+(vi&&t.exp&&v.exp?' · <em'+(gone?' class="bad"':'')+'>'+(gone?'Expired ':'Expires ')+fmtD(v.exp)+'</em>':'');
-  var pick=vs.length>1?'<label class="sr" for="vs-'+d.k+'">Version</label><div class="sel dt-vsel"><select id="vs-'+d.k+'" data-vsel="'+d.k+'">'+vs.map(function(x,i){
-      var ex=t.exp&&x.exp&&daysTo(x.exp)<0; return '<option value="'+i+'"'+(i===vi?' selected':'')+'>Version '+x.ver+(i===0?' (current)':ex?' (expired)':'')+'</option>'; }).join('')+'</select>'+I.chev+'</div>':'';
-  var body=multi
-    ? '<div class="dt-fl">'+files.map(function(f,fi){ var x=extOf(f.n);
-        return '<div class="dt-fi"><span class="dt-ext x e-'+x+'">'+x.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'">'+esc(sideName(d,t,f))+'</button><span class="ds-fsz">'+f.s+'</span>'+
-          '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></div>'; }).join('')+'</div>'
-    : '<button class="ds-fname dt-fn" data-view="'+d.k+'|'+vi+'|0">'+esc(files[0].n)+'</button>';
-  return '<div class="dt-detail" data-detail="'+d.k+'"><div class="dt-card'+(vi?' old':'')+'">'+
-    '<span class="dt-big e-'+(multi?'set':e)+'">'+(multi?files.length+'<small>files</small>':e.toUpperCase())+'</span>'+
-    '<div class="dt-info">'+body+'<span class="dt-meta">'+(multi?'':files[0].s+' · ')+meta+'</span></div>'+
-    '<div class="dt-ctrl">'+(multi?'':'<button type="button" class="btn btn-soft xs dt-dl" data-dl="'+esc(files[0].n)+'">'+I.dl+'Download</button>')+pick+
+  var t=typeOf(d.k), vs=versionsOf(d), hist=vs.slice(1), hOpen=!!histOpen[d.k]&&hist.length>0;
+  var row=function(v,vi){ var gone=t.exp&&v.exp&&daysTo(v.exp)<0;
+    return '<tr'+(vi?'':' class="cur"')+'><td class="vt-v">'+(vi?'v'+v.ver:'v'+v.ver+'<small>current</small>')+'</td>'+
+      '<td class="vt-f">'+v.files.map(function(f,fi){ var x=extOf(f.n);
+        return '<span class="vt-file"><span class="x e-'+x+'">'+x.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="'+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button><span class="ds-fsz">'+f.s+'</span>'+
+          '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>'; }).join('')+'</td>'+
+      '<td class="vt-u">'+fmtD(v.on)+'<small>by '+esc(v.by)+'</small></td>'+
+      '<td class="vt-e'+(gone?' bad':'')+'">'+(t.exp&&v.exp?fmtD(v.exp):'<span class="vt-na">—</span>')+'</td></tr>'; };
+  return '<div class="dt-detail" data-detail="'+d.k+'"><div class="vt-box">'+
+    '<table class="vt"><thead><tr><th>Version</th><th>File</th><th>Uploaded</th><th>Expiry</th></tr></thead><tbody>'+
+      row(vs[0],0)+(hOpen?hist.map(function(v,j){ return row(v,j+1); }).join(''):'')+'</tbody></table>'+
+    '<div class="vt-foot">'+(hist.length?'<button type="button" class="ds-more" data-vh="'+d.k+'" aria-expanded="'+hOpen+'">'+(hOpen?'Hide':'Show')+' version history ('+hist.length+')'+I.chev+'</button>':'<span class="dg-none">No previous versions</span>')+
       '<button type="button" class="sdt-ib" data-toggle="'+d.k+'" aria-label="Close" title="Close">'+I.close+'</button></div>'+
   '</div></div>';
 }
@@ -2009,7 +2008,7 @@ document.addEventListener('click',function(e){
 
 
 function keepScroll(fn){ var bd=drawer.querySelector('.dr-body'), y=bd?bd.scrollTop:0; fn(); var nb=drawer.querySelector('.dr-body'); if(nb) nb.scrollTop=y; }
-function toggleDoc(k){ var was=!!docOpen[k]; docOpen={}; docOpen[k]=!was; delete selVer[k]; keepScroll(renderDetail); var r=drawer.querySelector('[data-toggle="'+k+'"]'); if(r) r.focus({preventScroll:true}); }
+function toggleDoc(k){ var was=!!docOpen[k]; docOpen={}; docOpen[k]=!was; delete selVer[k]; delete histOpen[k]; keepScroll(renderDetail); var r=drawer.querySelector('[data-toggle="'+k+'"]'); if(r) r.focus({preventScroll:true}); }
 document.addEventListener('keydown',function(e){
   if(docMenu){ var mn=drawer.querySelector('.ds-menu');
     if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); var k0=docMenu; docMenu=null; keepScroll(renderDetail); var kb=drawer.querySelector('[data-dmenu="'+k0+'"]'); if(kb) kb.focus(); return; }

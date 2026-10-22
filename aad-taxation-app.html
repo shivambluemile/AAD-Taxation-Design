@@ -1121,7 +1121,8 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .nd-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .nd-row .dt-ic{width:36px;height:36px;flex-shrink:0}
 .nd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.nd-t b{font-size:14px;color:var(--ink)}.nd-t span{font-size:12.5px;color:var(--mute)}.nd-t span.bad{color:#B91C1C}
-.nd-up{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
+.nd-up{flex-shrink:0;padding:4px 2px}.nd-row .dx-hist{padding:4px 0}
+.nd-row{gap:16px}
 @media (max-width:560px){.nd-row{flex-wrap:wrap}.nd-t{flex-basis:calc(100% - 50px)}}
 .dx-act{display:flex;align-items:center;gap:20px;padding:12px 4px}
 .dx-ac{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
@@ -1804,7 +1805,7 @@ function paintNeed(){
     return '<li class="nd-row"><span class="dt-ic">'+DOC_IC.HR+'</span><div class="nd-t"><b>'+esc(t.name)+'</b><span class="'+(x.d?'bad':'')+'">'+
         (x.d?'Expired on '+fmtD(x.d.cur.exp):'Mandatory · not uploaded yet')+' · needs '+t.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
       (x.d?'<button type="button" class="dx-hist" data-needhist="'+x.k+'">History<span class="dc2-hn">'+hv+'</span></button>':'')+
-      '<button type="button" class="btn btn-pri xs nd-up" data-needup="'+x.k+'">'+I.upsm+'Upload</button></li>'; }).join('')+'</ul>'
+      '<button type="button" class="dx-up nd-up" data-needup="'+x.k+'">'+I.upsm+'Upload</button></li>'; }).join('')+'</ul>'
     :'<p class="nd-intro">Every required document is on file.</p>';
 }
 /* documents every staff member must have on file */

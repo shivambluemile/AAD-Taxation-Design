@@ -1044,9 +1044,11 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-exp.edit input{width:auto;height:32px;font-size:13px}
 .dc2-ok,.dc2-no{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
 .dc2-ok{background:#ECFDF5;color:#059669}.dc2-ok:hover{background:#D1FAE5}.dc2-no{background:#FEF2F2;color:#DC2626}.dc2-no:hover{background:#FEE2E2}
-.dc2-b{display:flex;flex-direction:column;margin-top:14px}
+.dc2-b{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px 12px;margin-top:14px;align-items:end}
+.dc2-cell{min-width:0;display:flex;flex-direction:column}.dc2-cell .dc2-file{margin-bottom:0}
+.dc2-b>.dc2-empty,.dc2-b>.dt-fmore{grid-column:1/-1}
 .dc2-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:6px 0 6px}
-.dc2-lbl:first-child{margin-top:0}
+.dc2-lbl{margin-top:0}
 .dc2-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:8px;min-width:0}
 .dc2-fic{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#E8EEFC;color:#3B5BDB}
 .dc2-fic.e-pdf{background:#FDECEC;color:#DC2626}.dc2-fic.e-doc,.dc2-fic.e-docx{background:#E8F1FD;color:#2563EB}
@@ -1655,11 +1657,11 @@ function docCard(d){
     :'<div class="dc2-exp'+(gone?' bad':soon?' warn':'')+'"><span>'+line+'</span>'+(t.exp?'<button type="button" class="dc2-pen" data-expedit="'+d.k+'" title="Edit expiry date" aria-label="Edit expiry date of '+esc(t.name)+'">'+I.edit+'</button>':'')+'</div>';
   var files=gone?'<div class="dc2-empty"><b>No valid document</b><span>The last one expired. Upload a new copy to replace it.</span></div>'
     :fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
-      return (sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
+      return '<div class="dc2-cell">'+(sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
         '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
         '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small></div>'+
         '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|0|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
-        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+
+        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div></div>'; }).join('')+
       (fl.length>3?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-3)+' more file'+(fl.length-3===1?'':'s'))+'</button>':'');
   return '<div class="dc2'+(open?' open':'')+(shut?' shut':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="dc2-h"><button type="button" class="dc2-tg" data-shut="'+d.k+'" aria-expanded="'+!shut+'" aria-label="'+esc(t.name)+', '+line+'. '+(shut?'Expand':'Collapse')+'">'+

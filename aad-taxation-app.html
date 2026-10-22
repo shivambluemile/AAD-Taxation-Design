@@ -983,6 +983,29 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-card .ds-ver>b{display:block;padding:0 0 4px;font-size:12.5px}
 .ds-vi .bad{color:#B91C1C}
 @media (max-width:760px){.ds-list{grid-template-columns:1fr}}
+/* documents as a register table */
+.dg-tbl{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.dg-head,.dg-row{display:grid;grid-template-columns:minmax(0,1fr) 128px 104px 150px 92px;gap:16px;align-items:start;padding:0 18px}
+.dg-head{padding-top:11px;padding-bottom:11px;background:#FAFBFC;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B}
+.dg-grp{display:flex;align-items:center;gap:6px;padding:9px 18px;font-size:12px;font-weight:700;color:var(--slate);background:#fff;border-bottom:1px solid var(--line-soft)}
+.dg-grp span{font-weight:600;color:var(--faint)}.dg-grp.warn{color:#B45309}.dg-row+.dg-grp,.dg-hist+.dg-grp{border-top:1px solid var(--line)}
+.dg-row{padding-top:14px;padding-bottom:14px;border-bottom:1px solid var(--line-soft)}
+.dg-row:last-child{border-bottom:0}
+.dg-row.is-exp{background:#FFFBFB}.dg-row.is-soon{background:#FFFDF8}
+.dg-row.flash{animation:dvflash 2.4s ease-out}
+.dg-doc{min-width:0}.dg-doc .ds-name{font-size:14px}
+.dg-files .ds-files{margin-top:6px}.dg-files.is-gone .ds-fname{color:var(--mute)}.dg-files.is-gone .x{opacity:.6}
+.dg-doc .ds-more{margin-top:6px}
+.dg-st,.dg-exp,.dg-up,.dg-act{padding-top:2px;font-size:13px}
+.dg-st .state{white-space:nowrap}
+.dg-exp{color:var(--ink);font-variant-numeric:tabular-nums}.dg-exp.bad{color:#B91C1C;font-weight:600}.dg-exp.soon{color:#B45309;font-weight:600}.dg-na{color:var(--faint)}
+.dg-up span{display:block;color:var(--ink);white-space:nowrap}.dg-up small{display:block;margin-top:2px;font-size:12px;color:var(--faint)}
+.dg-act{text-align:right;padding-top:0}.dg-act .ds-act{padding:3px 0;font-size:13px}
+.dg-hist{background:#FAFBFC;border-bottom:1px solid var(--line-soft);padding:4px 18px 8px 34px}
+.dg-ver{display:grid;grid-template-columns:84px minmax(0,1fr);gap:4px 12px;padding:8px 0}.dg-ver+.dg-ver{border-top:1px dashed var(--line)}
+.dg-vn{font-size:12.5px;font-weight:700;color:var(--ink);padding-top:4px}.dg-vf .ds-files{margin-top:0}
+.dg-vi{grid-column:2;font-size:12px;color:var(--faint)}.dg-vi em{font-style:normal}.dg-vi em.bad{color:#B91C1C}
+@media (max-width:760px){.dg-head{display:none}.dg-row{grid-template-columns:1fr auto;gap:6px 12px}.dg-doc{grid-column:1/-1}.dg-exp:before{content:"Expiry ";color:var(--faint);font-weight:400}.dg-up{grid-column:1}.dg-act{grid-column:2;grid-row:2}}
 .ds-note{display:flex;align-items:flex-start;gap:7px;margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--mute)}
 .ds-note svg{flex-shrink:0;margin-top:2px;width:13px;height:13px;color:var(--faint)}
 @media (max-width:640px){
@@ -1493,31 +1516,24 @@ function fileChips(d,t,vi,files){
 var docMenu=null;   // the document whose ⋮ menu is open
 I.dots3='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
 function docCard(d){
-  /* every state shows the latest version's files and upload details; an expired one is greyed and the card asks for the renewal */
-  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', vs=versionsOf(d), hist=vs.slice(1), first=1, prev=hist.length, open=!!docOpen[d.k];
-  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', menu=docMenu===d.k, renew=gone||soon;
-  var h='<div class="ds-item ds-card'+(gone?' is-exp':soon?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    /* name and status */
-    '<div class="ds-ch"><b class="ds-name">'+t.name+'</b>'+stDot(st,stLabel(d))+'</div>'+
-    (exp?'<div class="ds-exp'+(gone?' bad':soon?' soon':'')+'">'+(gone?'Expired on ':'Expires ')+exp+'</div>':'<div class="ds-exp" aria-hidden="true">&nbsp;</div>')+
-    /* the files, or what's missing */
-    '<div class="ds-cb'+(gone?' is-gone':'')+'">'+fileChips(d,t,0,d.cur.files)+'<div class="ds-by">Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</div></div>'+
-    /* history on the left, the one action and the menu on the right */
-    '<div class="ds-cf">'+
-      (prev?'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+I.hist+'Version history ('+prev+')'+I.chev+'</button>':'<span class="ds-nohist">No previous versions</span>')+
-      '<div class="ds-acts">'+
-        '<button type="button" class="ds-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button>'+
-      '</div>'+
-    '</div>';
+  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', vs=versionsOf(d), hist=vs.slice(1), prev=hist.length, open=!!docOpen[d.k], renew=gone||soon;
+  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
+  var h='<div class="dg-row'+(gone?' is-exp':soon?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+    '<div class="dg-doc"><b class="ds-name">'+t.name+'</b><div class="dg-files'+(gone?' is-gone':'')+'">'+fileChips(d,t,0,d.cur.files)+'</div>'+
+      (prev?'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+prev+' previous version'+(prev===1?'':'s')+I.chev+'</button>':'')+'</div>'+
+    '<div class="dg-st">'+stDot(st,stLabel(d))+'</div>'+
+    '<div class="dg-exp'+(gone?' bad':soon?' soon':'')+'">'+(exp||'<span class="dg-na">—</span>')+'</div>'+
+    '<div class="dg-up"><span>'+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span><small>by '+esc(d.cur.by)+'</small></div>'+
+    '<div class="dg-act"><button type="button" class="ds-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button></div>'+
+  '</div>';
   if(prev&&open){
-    h+='<div class="ds-prev">'+hist.map(function(v,j){
-      var vi=j+first, m=[];
-      m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+', '+fmtT(v.on)+'</span>');
-      if(t.exp&&v.exp) m.push('<span'+(daysTo(v.exp)<0?' class="bad"':'')+'>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
-      return '<div class="ds-ver"><b>Version '+v.ver+'</b>'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div>';
+    h+='<div class="dg-hist">'+hist.map(function(v,j){
+      var vi=j+1, gone2=t.exp&&v.exp&&daysTo(v.exp)<0;
+      return '<div class="dg-ver"><span class="dg-vn">Version '+v.ver+'</span><div class="dg-vf">'+fileChips(d,t,vi,v.files)+'</div>'+
+        '<span class="dg-vi">'+fmtD(v.on)+', '+fmtT(v.on)+' · '+esc(v.by)+(t.exp&&v.exp?' · <em'+(gone2?' class="bad"':'')+'>'+(gone2?'Expired ':'Expires ')+fmtD(v.exp)+'</em>':'')+'</span></div>';
     }).join('')+'</div>';
   }
-  return h+'</div>';
+  return h;
 }
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
 var KEEP_VERSIONS=5;
@@ -1540,8 +1556,9 @@ function currentList(docs){
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
-  var group=function(label,items){ return items.length?'<div class="ds-glabel">'+label+' <span>'+items.length+'</span></div><div class="ds-list">'+items.map(docCard).join('')+'</div>':''; };
-  return group('Needs attention',need)+group('Up to date',ok);
+  var group=function(label,items,cls){ return items.length?'<div class="dg-grp '+cls+'">'+label+' <span>'+items.length+'</span></div>'+items.map(docCard).join(''):''; };
+  return '<div class="dg-tbl" role="table" aria-label="Documents"><div class="dg-head" role="row"><span>Document</span><span>Status</span><span>Expiry</span><span>Uploaded</span><span></span></div>'+
+    group('Needs attention',need,'warn')+group('Up to date',ok,'ok')+'</div>';
 }
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){

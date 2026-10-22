@@ -1104,6 +1104,10 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-ic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;color:#DC2626}
 .dx-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#7F1D1D}.dx-tx b{font-size:13.5px;color:#991B1B}
 .dx-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+.dx-slim{border:1px solid #FECACA;border-radius:10px;background:#FEF2F2;padding:2px 12px;margin-bottom:14px}
+.dx-line{display:flex;align-items:center;gap:10px;min-height:40px;font-size:13px;color:#7F1D1D}.dx-line+.dx-line{border-top:1px solid #FDE2E2}
+.dx-li{display:flex;color:#DC2626;flex-shrink:0}.dx-lt{flex:1;min-width:0}.dx-lt b{color:#991B1B}
+.dx-up{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--orange-ink);padding:4px 0;flex-shrink:0}.dx-up:hover{text-decoration:underline;text-underline-offset:2px}.dx-up svg{width:12px;height:12px}
 .dx-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .dx-row{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #FDE2E2}
 .dx-rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.dx-rt b{font-size:13.5px;color:var(--ink)}.dx-rt span{font-size:12px;color:#B91C1C}
@@ -1770,13 +1774,11 @@ function docsBody(s){
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
   var gone=docs.filter(function(d){ return stOf(d)==='expired'; });
   if(gone.length){
-    var row=function(d){ var x=typeOf(d.k), n=Math.abs(daysTo(d.cur.exp)), hv=versionsOf(d).length;
-      return '<li class="dx-row"><div class="dx-rt"><b>'+esc(x.name)+'</b><span>Expired '+fmtD(d.cur.exp)+' · '+n+' day'+(n===1?'':'s')+' ago · needs '+x.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
+    /* a short notice per expired document: what expired, and the two actions */
+    h='<div class="dx-slim" role="alert">'+gone.map(function(d){ var x=typeOf(d.k), hv=versionsOf(d).length;
+      return '<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>'+esc(x.name)+'</b> expired on '+fmtD(d.cur.exp)+'. Upload a new copy.</span>'+
         '<button type="button" class="dx-hist" data-histpop="'+d.k+'" aria-haspopup="dialog">History<span class="dc2-hn">'+hv+'</span></button>'+
-        '<button type="button" class="btn btn-pri xs dx-btn" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload new</button></li>'; };
-    h='<div class="dx-alert" role="alert"><span class="dx-ic">'+I.warn+'</span><div class="dx-tx"><b>'+(gone.length>1?gone.length+' documents have expired':esc(typeOf(gone[0].k).name)+' has expired')+'</b>'+
-      '<span>There’s no valid copy on file. Upload a new one to replace '+(gone.length>1?'each':'it')+'. Earlier versions stay in the history.</span>'+
-      '<ul class="dx-list">'+gone.map(row).join('')+'</ul></div></div>'+h;
+        '<button type="button" class="dx-up" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload new</button></div>'; }).join('')+'</div>'+h;
   }
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
@@ -3213,6 +3215,11 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-act{display:inline-flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;font-weight:600;color:var(--orange-ink)}.cd2-act:hover{text-decoration:underline;text-underline-offset:2px}.cd2-act.quiet{color:var(--slate)}
 .cd2-hbtn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate);padding:4px 0;flex-shrink:0}.cd2-hbtn:hover{color:var(--orange-ink)}.cd2-hbtn.off{color:var(--faint);cursor:default}
 .cd2-hn{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.dx-slim{border:1px solid #FECACA;border-radius:10px;background:#FEF2F2;padding:2px 12px}
+.dx-line{display:flex;align-items:center;gap:12px;min-height:40px;font-size:13px;color:#7F1D1D}
+.dx-li{display:flex;color:#DC2626;flex-shrink:0}.dx-lt{flex:1;min-width:0}.dx-lt b{color:#991B1B}
+.dx-up{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--orange-ink);padding:4px 0;flex-shrink:0}.dx-up:hover{text-decoration:underline;text-underline-offset:2px}
+@media (max-width:600px){.dx-line{flex-wrap:wrap;padding:6px 0}.dx-lt{flex-basis:calc(100% - 30px)}}
 .cd2-alert{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid #FECACA;border-radius:12px;background:#FEF2F2}
 .cd2-aic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;color:#DC2626}
 .cd2-atx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#7F1D1D}.cd2-atx>b{font-size:13.5px;color:#991B1B}
@@ -6229,6 +6236,7 @@ function cdCard(o){ var shut=!!cdShut[o.key+o.cid];
       (o.nHist?'<button type="button" class="cd2-hbtn" data-cdhist="'+o.key+'" aria-haspopup="dialog">History<span class="cd2-hn">'+o.nHist+'</span></button>':'<span class="cd2-hbtn off">History<span class="cd2-hn">0</span></span>')+'</div>')+'</div>';
 }
 /* the banner that replaces an expired card */
+function cdLine(text,acts){ return '<div class="dx-slim cd2-slim" role="alert"><div class="dx-line"><span class="dx-li">'+CD_I.warn+'</span><span class="dx-lt">'+text+'</span>'+acts+'</div></div>'; }
 function cdBanner(title,text,row){ return '<div class="cd2-alert" role="alert"><span class="cd2-aic">'+CD_I.warn+'</span><div class="cd2-atx"><b>'+title+'</b><span>'+text+'</span><ul class="cd2-alist"><li class="cd2-arow">'+row+'</li></ul></div></div>'; }
 /* the history popup: earlier versions as a timeline, each with its files */
 function cdHistPop(title,items,wire){
@@ -6256,10 +6264,9 @@ function kycTab(c){
   if(!cur) return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',body:dcEmpty('No KYC uploaded','Upload the client’s identity documents, such as a passport or driver licence. Each verification stays valid for 12 months.',
       c._draft?'':'<button type="button" class="btn-primary btn-sm" data-kyc-add>Upload KYC</button>')})+'</section>';
   var ex=kycExpiresAt(cur), dl=Math.round((ex-now)/864e5), nHist=kycHistItems(c).length;
-  if(st==='expired') return '<section class="vsec el-main">'+cdBanner('KYC has expired','There’s no valid KYC on file. Record a new verification to replace it. Earlier checks stay in the history.',
-    '<div class="cd2-art"><b>KYC Verification</b><span>Expired '+dmyOf(ex)+' · '+cdDays(dl)+' ago · needs identity documents</span></div>'+
+  if(st==='expired') return '<section class="vsec el-main">'+cdLine('<b>KYC</b> expired on '+dmyOf(ex)+'. Record a new verification.',
     '<button type="button" class="cd2-hbtn" data-cdhist="k" aria-haspopup="dialog">History<span class="cd2-hn">'+nHist+'</span></button>'+
-    (c._draft?'':'<button type="button" class="btn-primary btn-sm cd2-abtn" data-kyc-add>'+CD_I.up+'Upload new</button>'))+'</section>';
+    (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+'</section>';
   var note=kycNoteOf(c,cur);
   var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
   return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:'Next verification '+dmyOf(ex)+(st==='expiring'?' · '+cdDays(dl)+' left':''),lineCls:st==='expiring'?'warn':'',
@@ -6362,11 +6369,10 @@ function engagementTab(c){
 
   var nHist=letterHistItems(c).length;
   if(st==='expired'){ var ex=letterExpiresAt(L), da=Math.round((now-ex)/864e5);
-    return '<section class="vsec el-main">'+cdBanner('Engagement letter has expired','The FY '+fyLabel(letterFy(L))+' letter is no longer valid. Start the renewal to send this year’s letter, or upload one the client has signed.',
-      '<div class="cd2-art"><b>Engagement Letter · FY '+fyLabel(letterFy(L))+'</b><span>Expired '+dmyOf(ex)+' · '+cdDays(da)+' ago · needs a signed letter</span></div>'+
+    return '<section class="vsec el-main">'+cdLine('<b>Engagement letter</b> for FY '+fyLabel(letterFy(L))+' expired on '+dmyOf(ex)+'. Send this year’s letter.',
       '<button type="button" class="cd2-hbtn" data-cdhist="l" aria-haspopup="dialog">History<span class="cd2-hn">'+nHist+'</span></button>'+
-      '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed letter</button>'+
-      '<button type="button" class="btn-primary btn-sm cd2-abtn" data-el="send">'+CD_I.up+'Start renewal</button>')+'</section>';
+      '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed</button>'+
+      '<button type="button" class="dx-up" data-el="send">'+CD_I.up+'Start renewal</button>')+'</section>';
   }
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=30;
   var fileWho=st==='signed'?letterHow(L):'Created by <em>'+esc(L.by||'staff')+'</em> · '+cdStamp(L.created);

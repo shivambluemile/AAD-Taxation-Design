@@ -782,6 +782,11 @@ body.gridmode .listview{display:none}
 .ds-cap{font-size:11.5px;font-weight:600;color:var(--faint);padding:1px 8px;border-radius:999px;background:#F3F4F6}.ds-cap.full{background:#FFF6E8;color:#B4690E}
 .ds-pnote{display:flex;align-items:center;gap:6px;margin:4px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;color:var(--mute)}.ds-pnote svg{width:13px;height:13px}
 .up-cur-n.warn{background:#FFF6E8;color:#92400E}.up-cur-n.warn b{color:#92400E}
+.ds-act{display:inline-flex;align-items:center;gap:6px;padding:6px 4px;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
+.ds-act svg{width:13px;height:13px}
+.ds-act:hover,.ds-act:focus-visible{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px;outline:none}
+.ds-act.renew{color:var(--orange-ink)}
+.ds-fname{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
 .dl-none{padding:40px 20px;text-align:center;border:1px dashed var(--line);border-radius:12px;font-size:13px;color:var(--mute)}
 .dl-none b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px}
 
@@ -1441,7 +1446,7 @@ function stLabel(d){
 function stDot(st,label){ var k={valid:'',none:' na',soon:' soon',expired:' no'}[st]; return '<span class="state'+k+'"><i></i>'+esc(label)+'</span>'; }
 I.chev='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
 function extOf(n){ return n.split('.').pop().toLowerCase(); }
-function sideName(d,t,f){ return t.slots.length>1?slotLabel(d.k,f.slot):'Document'; }
+function sideName(d,t,f){ return t.slots.length>1?slotLabel(d.k,f.slot):f.n; }
 /* a file chip: type, side, size, view + download */
 function fileChip(d,t,vi,fi,f){
   var e=extOf(f.n);
@@ -1472,10 +1477,9 @@ function docCard(d){
       '</div>'+
       '<div class="ds-st">'+stDot(st,stLabel(d))+(exp?'<small class="ds-exp'+(gone?' bad':st==='soon'?' soon':'')+'">'+(gone?'Expired on ':'Expiry date ')+exp+'</small>':'')+'</div>'+
       '<div class="ds-acts">'+
-        (gone||st==='soon'?'<button class="btn '+(gone?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+'Renew</button>':'')+
+        '<button type="button" class="ds-act'+(gone||st==='soon'?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(gone||st==='soon'?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(gone||st==='soon'?'Renew':'Replace')+'</button>'+
         '<button type="button" class="sdt-ib ds-kebab" data-dmenu="'+d.k+'" aria-haspopup="menu" aria-expanded="'+menu+'" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+I.dots3+'</button>'+
         (menu?'<div class="ds-menu" role="menu" aria-label="'+esc(t.name)+' actions">'+
-          (gone||st==='soon'?'':'<button type="button" role="menuitem" data-replace="'+d.k+'">'+I.upsm+'Replace</button>')+
           '<button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">'+I.trash+'Delete document</button></div>':'')+
       '</div>'+
     '</div>';

@@ -13636,6 +13636,15 @@ th.r .sl-sort{flex-direction:row}
 .sl-ptable table,.sl-rtable table{min-width:900px}.sl-reason{white-space:normal!important;max-width:320px;color:var(--slate);font-size:13px}
 .sl-h3{margin:22px 0 10px;font-family:Manrope;font-size:15px;font-weight:800;color:var(--ink)}
 .sl-quote{color:var(--ink)}
+.sl-rends{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.sl-rr{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:13.5px;color:var(--ink);cursor:pointer}
+.sl-rr.on{border-color:var(--orange);background:var(--orange-soft)}.sl-rr input[type=radio]{accent-color:var(--orange);margin:0}
+.sl-rnum{width:72px!important;height:32px!important}.sl-rdate{width:150px!important;height:32px!important}
+.sl-auto{display:flex;align-items:center;gap:10px;min-height:40px;font-size:13px;color:var(--slate)}
+.sl-rnote{margin:0;padding:10px 12px;border-radius:10px;background:#F6F7F9;font-size:12.5px;color:var(--slate)}
+.sl-recf{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sl-recf .sl-span{grid-column:1/-1}.sl-recf .cl-muted{margin:0;font-size:12.5px}
+tr.sl-flash td{animation:slflash 2.4s ease-out}@keyframes slflash{0%,40%{background:var(--orange-soft)}100%{background:transparent}}
+.sl-rect table{min-width:980px}.drawer.sl-sf.swap{animation:none}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
@@ -13846,7 +13855,7 @@ var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disab
 var PAY={unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid',overdue:'Overdue'};
 var PAY_TYPES=['Bank Transfer','Card','Cash','Cheque','Direct Debit','Client Credit'];
 var EV={created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
-  payment:'Payment recorded',disabled:'Sale disabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request rejected'};
+  payment:'Payment recorded',disabled:'Sale disabled',to_quote:'Quotation created from this sale',recurring_set:'Recurring set up',recurring_created:'Created by recurring',recurring_paused:'Recurring paused',recurring_resumed:'Recurring resumed',recurring_ended:'Recurring ended',recurring_edited:'Recurring changed',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request rejected'};
 var DUE_DAYS=14, DAY=864e5;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function canManage(s){ return isManager()||s.accountant===ME.name||s.by===ME.name; }
@@ -13923,10 +13932,61 @@ var DevData={
   }
 };
 
+/* ---------- recurring invoices: setups in aad-recurring-v1; each run makes a sale from the setup's template ---------- */
+var REC_KEY='aad-recurring-v1', rec={list:[]};
+var FREQ=[['weekly','Weekly'],['fortnightly','Fortnightly'],['monthly','Monthly'],['quarterly','Quarterly'],['yearly','Yearly']];
+function freqName(k){ for(var i=0;i<FREQ.length;i++) if(FREQ[i][0]===k) return FREQ[i][1]; return k; }
+function loadRec(){ try{ var v=JSON.parse(localStorage.getItem(REC_KEY)||'null'); rec=v&&Array.isArray(v.list)?v:{list:[]}; }catch(e){ rec={list:[]}; } return rec; }
+function saveRec(){ try{ localStorage.setItem(REC_KEY,JSON.stringify(rec)); return true; }catch(e){ return false; } }
+function recById(id){ return rec.list.filter(function(x){ return x.id===id; })[0]; }
+function nextRecId(){ return 'REC-'+(rec.list.reduce(function(m,x){ return Math.max(m,+String(x.id).replace(/\D/g,'')||0); },1000)+1); }
+/* the next run after an ISO date: whole weeks, or the same day of the month (the 31st becomes the month's last day) */
+function stepIso(iso,freq){ var p=iso.split('-').map(Number), d=new Date(p[0],p[1]-1,p[2]);
+  if(freq==='weekly') d.setDate(d.getDate()+7); else if(freq==='fortnightly') d.setDate(d.getDate()+14);
+  else { var m=freq==='monthly'?1:freq==='quarterly'?3:12, day=p[2]; d=new Date(p[0],p[1]-1+m,1); var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate(); d.setDate(Math.min(day,last)); }
+  return isoDay(d.getTime()); }
+function recEnded(x){ return x.end.type==='count'&&x.count>=x.end.count||x.end.type==='date'&&x.next>x.end.date; }
+function recEndText(x){ return x.end.type==='never'?'No end date':x.end.type==='count'?'Ends after '+x.end.count+' invoice'+(x.end.count===1?'':'s'):'Ends '+fmtD(x.end.date); }
+function recLog(x,type,note){ (x.history=x.history||[]).push({type:type,by:ME.name,t:Date.now(),note:note||''}); }
+/* a sale from the setup, dated on its run day */
+function saleFromRec(x,iso){
+  var p=iso.split('-').map(Number), at=new Date(p[0],p[1]-1,p[2],9,0,0).getTime(), t=x.tpl;
+  var sl={id:nextSaleId(),clientId:t.clientId,onName:t.onName||'',branch:t.branch,accountant:t.accountant,accountant2:t.accountant2||'',date:at,due:at+DUE_DAYS*DAY,
+    items:JSON.parse(JSON.stringify(t.items||[])),subtotal:t.subtotal,discountAmt:t.discountAmt||0,discountType:t.discountType||'',discountPct:t.discountPct!=null?t.discountPct:null,gst:t.gst,gstMode:t.gstMode,amount:t.amount,
+    customerNotes:t.customerNotes||'',terms:t.terms||'',referral:'',doc:null,by:x.by,at:at,status:'draft',payments:[],history:[],recurringId:x.id,autoSend:!!x.autoSend};
+  log(sl,'created',{by:'System',t:at,note:'Created by recurring '+x.id+' · invoice '+(x.count+1)+(x.end.type==='count'?' of '+x.end.count:'')});
+  log(sl,'recurring_created',{by:'System',t:at,note:freqName(x.freq)+' · '+recEndText(x)});
+  return sl;
+}
+/* every active setup catches up to today: one sale per missed run, until it ends */
+function runRecurring(){
+  if(!st) return; loadRec(); var today=isoDay(Date.now()), made=0, changed=false;
+  rec.list.forEach(function(x){
+    if(x.status!=='active') return;
+    var guard=0;
+    while(x.next<=today&&!recEnded(x)&&guard++<60){ var sl=saleFromRec(x,x.next); st.list.push(sl); x.count++; x.lastId=sl.id; x.lastAt=sl.date; recLog(x,'generated',sl.id+' for '+fmtD(x.next)); x.next=stepIso(x.next,x.freq); made++; changed=true; }
+    if(recEnded(x)){ x.status='ended'; recLog(x,'ended','Reached its end: '+recEndText(x)); changed=true; }
+  });
+  if(changed){ save(); saveRec(); }
+  if(made) processAutoSend();
+}
+/* auto-send: each new invoice is emailed once; a failure is logged and shown on the sale */
+function processAutoSend(){
+  st.list.filter(function(x){ return x.autoSend; }).forEach(function(x){
+    x.autoSend=false; save(); var c=client(x), to=c.email;
+    if(!validEmail(to||'')){ log(x,'send_failed',{by:'System',note:'To '+(to||'—')+' · the client has no valid email address · auto-send',ok:false,to:to||''}); save(); return; }
+    deliver({email:{to:to,subject:'Invoice '+x.id+' from '+FIRM.name,body:'Hi '+c.name+',\n\nPlease find attached invoice '+x.id+' for '+money(x.amount)+', due '+dmyOf(x.due)+'.\n\nKind regards,\n'+FIRM.name,attachment:x.id+'.pdf'}}).then(function(res){
+      reload(); var y=byId(x.id); if(!y) return;
+      if(res.ok){ y.status='sent'; y.sentAt=Date.now(); log(y,'sent',{by:'System',note:'To '+to+' · invoice '+y.id+'.pdf attached · auto-send',to:to}); }
+      else log(y,'send_failed',{by:'System',note:'To '+to+' · '+(res.error||'The email service didn’t accept it')+' · auto-send',ok:false,to:to});
+      save(); render(); });
+  });
+}
+
 /* ---------- load ---------- */
 var st=null, loadErr=null, clients=[];
 var CMAP={};
-function reload(){ try{ st=SaleStore.load(); clients=loadClients(); CMAP={}; clients.forEach(function(c){ CMAP[String(c.id)]=c; }); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
+function reload(){ try{ st=SaleStore.load(); clients=loadClients(); CMAP={}; clients.forEach(function(c){ CMAP[String(c.id)]=c; }); st.list.forEach(normalise); loadRec(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
 function save(){ return SaleStore.save(st); }
 function client(s){ var c=CMAP[String(s.clientId)]; return c?{id:c.id,name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
 function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
@@ -14087,7 +14147,7 @@ function wireFilters(){
   [['f-pay','pay'],['f-status','status']].forEach(function(p){ var el=document.getElementById(p[0]); if(el) el.onchange=function(){ f[p[1]]=this.value; state.page=1; render(); }; });
   document.getElementById('f-more').onclick=openMoreFilters;
   [].forEach.call(content.querySelectorAll('[data-chip]'),function(x){ x.onclick=function(){ var k=x.getAttribute('data-chip'), v=x.getAttribute('data-v');
-    if(k==='min'||k==='max') f[k]=''; else f[k]=f[k].filter(function(y){ return y!==v; }); state.errs={}; state.page=1; render(); var n=content.querySelector('[data-chip]')||document.getElementById('f-more'); if(n) n.focus(); }; });
+    if(k==='min'||k==='max'||k==='rec') f[k]=''; else f[k]=f[k].filter(function(y){ return y!==v; }); state.errs={}; state.page=1; render(); var n=content.querySelector('[data-chip]')||document.getElementById('f-more'); if(n) n.focus(); }; });
   bindRange();
   var clear=function(){ state.f=blank(); state.applied=state.f; state.errs={}; state.page=1; render(); };
   var cf=document.getElementById('clearf'); if(cf) cf.onclick=function(){ clear(); document.getElementById('f-more').focus(); }; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
@@ -14111,6 +14171,7 @@ function chipsHtml(f){
   if(!anyFilter(f)) return '';
   var lab={ptype:'Payment type',acc:'Accountant',branch:'Branch',svc:'Service'}, c=[];
   ['ptype','acc','branch','svc'].forEach(function(k){ f[k].forEach(function(v){ c.push([k,v,lab[k]+': '+v]); }); });
+  if(f.rec) c.push(['rec','','Recurring: '+f.rec]);
   if(f.min!=='') c.push(['min','','Min price: '+money(+f.min)]);
   if(f.max!=='') c.push(['max','','Max price: '+money(+f.max)]);
   return '<div class="mf-chips" aria-label="Active filters">'+c.map(function(x){ return '<span class="mf-chip">'+esc(x[2])+'<button type="button" data-chip="'+x[0]+'" data-v="'+esc(x[1])+'" aria-label="Remove '+esc(x[2])+'">'+I.close+'</button></span>'; }).join('')+
@@ -14248,6 +14309,107 @@ function renderPayments(){
   var pp=document.getElementById('sl-per'); if(pp) pp.onchange=function(){ state.per=+pp.value; state.pp=1; render(); };
   [].forEach.call(content.querySelectorAll('[data-pay]'),function(tr){ var go=function(){ openDetail(tr.getAttribute('data-pay'),'payments'); }; tr.onclick=go; tr.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); go(); } }; });
   if(detailId) paintDetail(true);
+}
+function renderRecurring(){
+  loadRec();
+  var mine=rec.list.filter(function(x){ return inScope({accountant:x.tpl.accountant,accountant2:x.tpl.accountant2,by:x.by,branch:x.tpl.branch}); });
+  var rf=state.rf||(state.rf={q:'',status:''}), q=rf.q.trim().toLowerCase();
+  var rows=mine.filter(function(x){ var c=client(x.tpl); if(rf.status&&x.status!==rf.status) return false; return !q||(x.id+' '+c.name).toLowerCase().indexOf(q)>=0; })
+    .sort(function(a,b){ var o={active:0,paused:1,ended:2}; return o[a.status]-o[b.status]||(a.next<b.next?-1:1); });
+  var act=mine.filter(function(x){ return x.status==='active'; }), soon=isoDay(Date.now()+30*DAY), due30=act.filter(function(x){ return x.next<=soon; });
+  var h=head()+tabsHtml()+'<dl class="qt-stats sl-stats"><div class="stat" title="Recurring setups making invoices"><dt>Active</dt><dd>'+act.length+'</dd></div>'+
+    '<div class="stat" title="Invoices the active setups will create in the next 30 days"><dt>Due in 30 Days</dt><dd>'+due30.length+'<small>'+money(r2(due30.reduce(function(a,x){ return a+x.tpl.amount; },0)))+'</small></dd></div>'+
+    '<div class="stat" title="Paused setups make no invoices until resumed"><dt>Paused</dt><dd>'+mine.filter(function(x){ return x.status==='paused'; }).length+'</dd></div>'+
+    '<div class="stat" title="Setups that have finished"><dt>Ended</dt><dd>'+mine.filter(function(x){ return x.status==='ended'; }).length+'</dd></div></dl>';
+  h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="rq" placeholder="Search by client or setup ID" aria-label="Search recurring" value="'+esc(rf.q)+'"></div><div class="filters"><span class="lbl">'+I.filter+'Filter By:</span>'+
+    selF('rf-status','All Status',[['active','Active'],['paused','Paused'],['ended','Ended']],rf.status)+'</div></div>';
+  h+='<div class="card ar-table qt-table sl-table sl-rtable sl-rect"><table><thead><tr><th>Setup</th><th>Client</th><th class="r">Amount</th><th>Frequency</th><th>Next run</th><th>Status</th><th>Last invoice</th><th class="c">Actions</th></tr></thead><tbody>';
+  if(!mine.length) h+='<tr><td colspan="8"><div class="empty"><h3>No recurring invoices yet</h3><p>Turn on “Make this recurring” when you add a sale, and it’s created again on its schedule.</p><button class="btn-primary" id="rc-add">'+I.plus+'Add Sale</button></div></td></tr>';
+  else if(!rows.length) h+='<tr><td colspan="8"><div class="empty"><h3>No recurring invoices match</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="rc-clear">Clear filters</button></div></td></tr>';
+  var ST={active:['Active','p-paid'],paused:['Paused','p-partial'],ended:['Ended','s-dis']};
+  rows.forEach(function(x){ var c=client(x.tpl), stt=ST[x.status];
+    h+='<tr'+(state.recFlash===x.id?' class="sl-flash"':'')+' data-recrow="'+esc(x.id)+'"><td class="nowrap"><b>'+esc(x.id)+'</b><small class="ar-sub">'+recEndText(x)+(x.autoSend?' · auto-send':'')+'</small></td>'+
+      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
+      '<td class="num r">'+money(x.tpl.amount)+'</td><td>'+freqName(x.freq)+'<small class="ar-sub">'+x.count+' made</small></td>'+
+      '<td class="num nowrap">'+(x.status==='ended'?'<span class="ar-dash">—</span>':fmtD(x.next)+'<small class="ar-sub">'+(x.status==='paused'?'on hold':dueWords(x.next))+'</small>')+'</td>'+
+      '<td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span></td>'+
+      '<td>'+(x.lastId?'<button class="name-link" data-do="open" data-s="'+esc(x.lastId)+'"><span class="name">'+esc(x.lastId)+'</span></button><small class="ar-sub">'+(x.lastAt?dmyOf(x.lastAt):'')+'</small>':'<span class="ar-dash">None yet</span>')+'</td>'+
+      '<td class="c"><button class="qt-more" data-recmenu="'+esc(x.id)+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(x.id)+'" title="Actions">'+I.dots+'</button></td></tr>'; });
+  h+='</tbody></table></div>';
+  content.innerHTML=h; wireHead(); keepView(); state.recFlash='';
+  var qi=document.getElementById('rq'); qi.oninput=function(){ rf.q=qi.value; render(); var n=document.getElementById('rq'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+  document.getElementById('rf-status').onchange=function(){ rf.status=this.value; render(); };
+  var ra=document.getElementById('rc-add'); if(ra) ra.onclick=function(){ openSaleForm(); };
+  var rc=document.getElementById('rc-clear'); if(rc) rc.onclick=function(){ state.rf={q:'',status:''}; render(); };
+  [].forEach.call(content.querySelectorAll('[data-recmenu]'),function(b){ b.onclick=function(ev){ ev.stopPropagation(); recMenu(b); }; });
+  var fl=content.querySelector('.sl-flash'); if(fl) fl.scrollIntoView({block:'center'});
+  if(detailId) paintDetail(true);
+}
+window.renderRecurring=renderRecurring;
+function dueWords(iso){ var d=dayDiff(new Date(iso+'T00:00:00').getTime()); return d>1?'in '+d+' days':d===1?'tomorrow':d===0?'today':'catching up'; }
+window.openRecurring=function(id){ closeMenu(); if(ov.classList.contains('open')) closeOv(); state.tab='recurring'; state.rf={q:'',status:''}; state.recFlash=id; render(); };
+/* the setup's ⋮ menu: Edit, Pause/Resume, End, View invoices */
+function recMenu(btn){
+  var id=btn.getAttribute('data-recmenu'); if(menuEl&&menuEl.dataset.s===id) return closeMenu(); closeMenu(); var x=recById(id); if(!x) return;
+  var can=isManager()||x.by===ME.name||x.tpl.accountant===ME.name, a=[];
+  if(can&&x.status!=='ended') a.push(['redit','Edit schedule',MI.edit]);
+  if(can&&x.status==='active') a.push(['rpause','Pause',MI.disable]);
+  if(can&&x.status==='paused') a.push(['rresume','Resume',MI.resend]);
+  a.push(['rview','View invoices ('+st.list.filter(function(y){ return y.recurringId===id; }).length+')',MI.log]);
+  if(can&&x.status!=='ended') a.push(['rend','End',MI['delete'],'danger']);
+  menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.s=id;
+  var item=function(z){ return '<button role="menuitem" data-ra="'+z[0]+'"'+(z[3]?' class="'+z[3]+'"':'')+'>'+z[2]+'<span>'+esc(z[1])+'</span></button>'; };
+  menuEl.innerHTML=a.filter(function(z){ return !z[3]; }).map(item).join('')+(a.some(function(z){ return z[3]; })?'<hr role="separator">'+a.filter(function(z){ return z[3]; }).map(item).join(''):'');
+  document.body.appendChild(menuEl);
+  var rr=btn.getBoundingClientRect(), mh=menuEl.offsetHeight, top=rr.bottom+4; if(top+mh>window.innerHeight-8) top=Math.max(8,rr.top-mh-4);
+  menuEl.style.top=top+'px'; menuEl.style.left=Math.max(8,rr.right-menuEl.offsetWidth)+'px'; btn.setAttribute('aria-expanded','true'); menuEl.querySelector('button').focus();
+  [].forEach.call(menuEl.querySelectorAll('[data-ra]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-ra'); closeMenu(); recAction(k,id); }; });
+  menuEl.onkeydown=function(e){ var it=[].slice.call(menuEl.querySelectorAll('button')), i=it.indexOf(document.activeElement);
+    if(e.key==='ArrowDown'){ e.preventDefault(); it[(i+1)%it.length].focus(); } if(e.key==='ArrowUp'){ e.preventDefault(); it[(i-1+it.length)%it.length].focus(); } if(e.key==='Escape'){ closeMenu(); btn.focus(); } };
+}
+/* a setup event: on the setup, and in the Activities of the sale it was set up from */
+function recEvent(x,type,note){ recLog(x,type,note); var src=byId(x.sourceId); if(src){ log(src,'recurring_'+type,{note:x.id+(note?' · '+note:'')}); save(); } saveRec(); }
+function recAction(k,id){
+  reload(); var x=recById(id); if(!x){ render(); return toast('This recurring setup no longer exists.',true); }
+  if(k==='rview'){ state.tab='sales'; var b=blank(); b.range='custom'; b.from=''; b.to=''; b.rec=id; state.f=b; state.applied=b; state.page=1; return render(); }
+  if(k==='rpause'){ x.status='paused'; recEvent(x,'paused','No invoices until it’s resumed'); render(); return toast(id+' paused'); }
+  if(k==='rresume'){ var today=isoDay(Date.now()); while(x.next<today) x.next=stepIso(x.next,x.freq);   // missed runs while paused are skipped, not back-filled
+    x.status='active'; recEvent(x,'resumed','Next invoice '+fmtD(x.next)); runRecurring(); render(); return toast(id+' resumed · next invoice '+fmtD(x.next)); }
+  if(k==='rend') return modal('<div class="confirm-body"><h3 id="m-t">End '+esc(id)+'?</h3><p>No more invoices are created for <strong>'+esc(client(x.tpl).name)+'</strong>. The '+x.count+' invoice'+(x.count===1?'':'s')+' already made stay as they are. This can’t be undone.</p></div>'+
+      '<div class="modal-foot"><button class="btn-ghost" id="m-no">Keep it</button><button class="btn-danger" id="m-go">End recurring</button></div>'),
+    document.getElementById('m-no').onclick=closeDlg,
+    document.getElementById('m-go').onclick=function(){ reload(); var y=recById(id); y.status='ended'; recEvent(y,'ended','Ended by '+ME.name); closeDlg(); render(); toast(id+' ended'); };
+  if(k==='redit') return editRec(x);
+}
+function editRec(x){
+  var R0={freq:x.freq,next:x.next,endType:x.end.type,count:x.end.count||'',endDate:x.end.date||'',auto:x.autoSend};
+  var paint=function(err){ err=err||{};
+    modal('<div class="modal-head"><h2 id="m-t">Edit schedule · '+esc(x.id)+'</h2><button data-x aria-label="Close">'+I.close+'</button></div>'+
+      '<div class="modal-body sl-form sl-recf"><div><label class="flabel" for="re-f">Frequency</label><div class="sel"><select id="re-f">'+FREQ.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===R0.freq?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+        '<div><label class="flabel" for="re-n">Next invoice <span class="req-star">*</span></label><input class="fin plain" type="date" id="re-n" value="'+esc(R0.next)+'" min="'+isoDay(Date.now())+'"><span class="ferr'+(err.next?' show':'')+'">'+esc(err.next||'')+'</span></div>'+
+        '<div class="sl-span"><span class="flabel">Ends</span><div class="sl-rends">'+
+          '<label class="sl-rr'+(R0.endType==='never'?' on':'')+'"><input type="radio" name="re-e" value="never"'+(R0.endType==='never'?' checked':'')+'><span>Never</span></label>'+
+          '<label class="sl-rr'+(R0.endType==='count'?' on':'')+'"><input type="radio" name="re-e" value="count"'+(R0.endType==='count'?' checked':'')+'><span>After</span><input class="fin plain sm sl-rnum" type="number" min="'+Math.max(1,x.count)+'" id="re-c" value="'+esc(R0.count)+'"><span>invoices in total</span></label>'+
+          '<label class="sl-rr'+(R0.endType==='date'?' on':'')+'"><input type="radio" name="re-e" value="date"'+(R0.endType==='date'?' checked':'')+'><span>On</span><input class="fin plain sm sl-rdate" type="date" id="re-d" value="'+esc(R0.endDate)+'"></label></div>'+
+          '<span class="ferr'+(err.end?' show':'')+'">'+esc(err.end||'')+'</span></div>'+
+        '<div class="sl-span"><label class="sl-auto"><button type="button" class="toggle sm'+(R0.auto?' on':'')+'" id="re-a" role="switch" aria-checked="'+R0.auto+'" aria-label="Email each invoice automatically"><i></i></button><span>'+(R0.auto?'Email each invoice to the client':'Save each invoice as Not sent')+'</span></label></div>'+
+        '<p class="cl-muted sl-span">'+x.count+' invoice'+(x.count===1?'':'s')+' made so far. To change the services, prices or client, end this setup and add a new recurring sale.</p></div>'+
+      '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Save changes</button></div>',true);
+    var rd=function(){ R0.freq=document.getElementById('re-f').value; R0.next=document.getElementById('re-n').value; R0.count=document.getElementById('re-c').value; R0.endDate=document.getElementById('re-d').value;
+      var e0=dlg.querySelector('input[name=re-e]:checked'); R0.endType=e0?e0.value:'never'; };
+    dlg.querySelector('[data-x]').onclick=closeDlg; document.getElementById('m-no').onclick=closeDlg;
+    document.getElementById('re-a').onclick=function(){ rd(); R0.auto=!R0.auto; paint(); };
+    [].forEach.call(dlg.querySelectorAll('input[name=re-e]'),function(i){ i.onchange=function(){ rd(); paint(); }; });
+    document.getElementById('m-go').onclick=function(){ rd(); var er={};
+      if(!R0.next) er.next='Choose the next invoice date'; else if(R0.next<isoDay(Date.now())) er.next='The next invoice can’t be in the past';
+      if(R0.endType==='count'&&!(+R0.count>=Math.max(1,x.count+1))) er.end='Enter a number above the '+x.count+' already made';
+      if(R0.endType==='date'&&(!R0.endDate||R0.endDate<R0.next)) er.end='The end date must be on or after the next invoice';
+      if(Object.keys(er).length) return paint(er);
+      reload(); var y=recById(x.id), was=freqName(y.freq)+' · next '+fmtD(y.next)+' · '+recEndText(y);
+      y.freq=R0.freq; y.next=R0.next; y.end={type:R0.endType,count:R0.endType==='count'?+R0.count:null,date:R0.endType==='date'?R0.endDate:null}; y.autoSend=R0.auto;
+      recEvent(y,'edited',was+' → '+freqName(y.freq)+' · next '+fmtD(y.next)+' · '+recEndText(y)); closeDlg(); render(); toast(y.id+' updated · next invoice '+fmtD(y.next)); };
+  };
+  paint();
 }
 function payExportRows(){ return payRows().map(function(x){ return [dmyOf(x.p.at),x.s.id,x.c.name,x.p.type,x.p.ref||'',x.p.amount.toFixed(2),x.p.by||'',x.s.branch||'']; }); }
 var PAY_HEAD=['Payment date','Sale ID','Client','Payment type','Reference','Amount','Recorded by','Branch'];
@@ -14438,6 +14600,8 @@ function openSaleForm(id){
     }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
       items:[blankLine()],gst:true,showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
   SF.d.useCredit=false; SF.d.credit='';
+  SF.d.rec={on:false,freq:'monthly',start:SF.d.date,endType:'never',count:'12',endDate:'',auto:true};
+  SF.recOf=s&&s.recurringId?s.recurringId:'';                                  // made by (or the first invoice of) a recurring setup
   paintSaleForm();
 }
 function clientMatches(q){
@@ -14488,7 +14652,8 @@ function paintSaleForm(focusId){
     :'<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
       '<span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
   var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
-  ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
+  var again=!!ov.querySelector('.drawer.sl-sf');   // already open: redraw without sliding in again
+  ov.innerHTML='<div class="drawer sf qf qf2 sl-sf'+(again?' swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="sf-body">'+
       card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
@@ -14499,6 +14664,7 @@ function paintSaleForm(focusId){
           field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
         '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div></div>')+
+      recCard(d,e,field,sel)+
       card('Services','',
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
@@ -14525,6 +14691,33 @@ function paintSaleForm(focusId){
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-go">Submit</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireSaleForm(focusId);
+}
+/* the recurring card: a switch, then how often, from when, until when, and auto-send */
+function recCard(d,e,field,sel){
+  if(SF.recOf){ var x=recById(SF.recOf);
+    return '<section class="qf-card"><div class="qf-ch"><div><h3>Recurring</h3><p>'+(x?'Part of '+esc(x.id)+' · '+freqName(x.freq)+' · '+(x.status==='active'?'next '+fmtD(x.next):x.status==='paused'?'paused':'ended'):'Made by a recurring setup that no longer exists')+
+      '. Changes here apply to this invoice only; change the schedule from the Recurring tab.</p></div></div></section>'; }
+  var R0=d.rec, on=R0.on; if(!R0.startSet) R0.start=d.date;   // follows the invoice date until changed by hand
+  var sw='<label class="qf-gstt"><span>Make this recurring</span><button type="button" class="toggle sm'+(on?' on':'')+'" data-recsw role="switch" aria-checked="'+on+'" aria-label="Make this recurring"><i></i></button></label>';
+  if(!on) return '<section class="qf-card"><div class="qf-ch"><div><h3>Recurring</h3><p>Create this invoice again automatically on a schedule.</p></div>'+sw+'</div></section>';
+  var radio=function(v,label,extra){ return '<label class="sl-rr'+(R0.endType===v?' on':'')+'"><input type="radio" name="sf-rend" value="'+v+'"'+(R0.endType===v?' checked':'')+'><span>'+label+'</span>'+(extra||'')+'</label>'; };
+  var body='<div class="stack"><div class="g3">'+
+      field('Frequency',true,'<div class="sf-sel"><select class="fin plain sm" id="sf-rfreq">'+FREQ.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===R0.freq?' selected':'')+'>'+o[1]+'</option>'; }).join('')+'</select>'+I.chev+'</div>','recFreq','sf-rfreq')+
+      field('Start date',true,'<input class="fin plain sm'+(e.recStart?' bad':'')+'" id="sf-rstart" data-rec="start" type="date" value="'+esc(R0.start||'')+'">','recStart','sf-rstart')+
+      field('Auto-send',false,'<label class="sl-auto"><button type="button" class="toggle sm'+(R0.auto?' on':'')+'" data-recauto role="switch" aria-checked="'+R0.auto+'" aria-label="Email each invoice automatically"><i></i></button><span>'+(R0.auto?'Email each invoice to the client':'Save each invoice as Not sent')+'</span></label>','recAuto')+'</div>'+
+    '<div><span class="flabel">Ends <span class="req-star">*</span></span><div class="sl-rends" role="radiogroup" aria-label="When it ends">'+
+      radio('never','Never')+
+      radio('count','After','<input class="fin plain sm sl-rnum'+(e.recCount?' bad':'')+'" id="sf-rcount" data-rec="count" type="number" min="1" max="999" value="'+esc(R0.count)+'"'+(R0.endType==='count'?'':' tabindex="-1"')+' aria-label="Number of invoices"><span>invoices</span>')+
+      radio('date','On','<input class="fin plain sm sl-rdate'+(e.recEnd?' bad':'')+'" id="sf-rdate" data-rec="endDate" type="date" value="'+esc(R0.endDate||'')+'"'+(R0.endType==='date'?'':' tabindex="-1"')+' aria-label="End date">')+'</div>'+
+      (e.recCount||e.recEnd?'<span class="ferr show">'+esc(e.recCount||e.recEnd)+'</span>':'')+'</div>'+
+    '<p class="sl-rnote">'+recSummary(R0,d)+'</p></div>';
+  return '<section class="qf-card"><div class="qf-ch"><div><h3>Recurring</h3><p>Create this invoice again automatically on a schedule.</p></div>'+sw+'</div>'+body+'</section>';
+}
+function recSummary(R0,d){
+  if(!R0.start) return 'Choose the start date.';
+  var first=R0.start===d.date, n=first?stepIso(R0.start,R0.freq):R0.start;
+  return (first?'This invoice is the first one. ':'This invoice stands alone; the first recurring one is on '+fmtD(R0.start)+'. ')+'Next: '+fmtD(n)+', then '+freqName(R0.freq).toLowerCase()+'. '+
+    (R0.endType==='never'?'Runs until you end it.':R0.endType==='count'?'Stops after '+(R0.count||'?')+' invoice'+(+R0.count===1?'':'s')+'.':'Stops after '+(R0.endDate?fmtD(R0.endDate):'the end date')+'.');
 }
 function liveTotals(){
   var d=SF.d, T=saleTotals(d,SF.paid);
@@ -14588,6 +14781,11 @@ function wireSaleForm(focusId){
   var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
   var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
   var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
+  var rsw=ov.querySelector('[data-recsw]'); if(rsw) rsw.onclick=function(){ d.rec.on=!d.rec.on; if(d.rec.on&&!d.rec.start) d.rec.start=d.date; touch(); repaint(); var n=ov.querySelector('[data-recsw]'); if(n) n.focus(); };
+  var rau=ov.querySelector('[data-recauto]'); if(rau) rau.onclick=function(){ d.rec.auto=!d.rec.auto; touch(); repaint(); var n=ov.querySelector('[data-recauto]'); if(n) n.focus(); };
+  var rfq=document.getElementById('sf-rfreq'); if(rfq) rfq.onchange=function(){ d.rec.freq=rfq.value||'monthly'; delete SF.errs.recFreq; touch(); repaint('sf-rfreq'); };
+  [].forEach.call(ov.querySelectorAll('[data-rec]'),function(el){ el.onchange=function(){ var k=el.getAttribute('data-rec'); d.rec[k]=el.value; if(k==='start') d.rec.startSet=true; delete SF.errs.recStart; delete SF.errs.recCount; delete SF.errs.recEnd; touch(); repaint(el.id); }; });
+  [].forEach.call(ov.querySelectorAll('input[name=sf-rend]'),function(x){ x.onchange=function(){ d.rec.endType=x.value; delete SF.errs.recCount; delete SF.errs.recEnd; touch(); repaint(x.value==='count'?'sf-rcount':x.value==='date'?'sf-rdate':null); }; });
   var dt=document.getElementById('sf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete SF.errs.discount; touch(); repaint('sf-disc'); };
   var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; if(SF.errs.discount){ delete SF.errs.discount; var g=di.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-derr'); if(er) er.remove(); } touch(); liveTotals(); };
   /* document: one file, picked or dropped */
@@ -14634,6 +14832,10 @@ function checkSale(){
     else if(r2(cv)>bal) e.credit='The client has only '+money(bal)+' credit';
     else if(r2(cv)>owed) e.credit='That’s more than the '+money(owed)+' owed on this sale'; }
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
+  if(d.rec&&d.rec.on&&!SF.recOf){ var R0=d.rec; if(!R0.startSet) R0.start=d.date;
+    if(!R0.start) e.recStart='Choose the start date'; else if(d.date&&R0.start<d.date) e.recStart='The start date can’t be before the invoice date';
+    if(R0.endType==='count'){ var nn=+R0.count; if(!(nn>=1)||Math.round(nn)!==nn) e.recCount='Enter how many invoices, 1 or more'; }
+    if(R0.endType==='date'){ if(!R0.endDate) e.recEnd='Choose the end date'; else if(R0.start&&R0.endDate<=R0.start) e.recEnd='The end date must be after the start date'; } }
   return e;
 }
 function submitSale(){
@@ -14667,8 +14869,18 @@ function submitSale(){
       s.payments.push({id:'P'+Date.now().toString(36),amount:cr,type:'Client Credit',at:Date.now(),by:ME.name,ref:''});
       log(s,'payment',{note:money(cr)+' · Client Credit'+(pendingOf(s)<=0?' · paid in full':' · '+money(pendingOf(s))+' still owed')});
     }
+    var R0=d.rec&&d.rec.on&&!SF.recOf?d.rec:null, setup=null; if(R0&&!R0.startSet) R0.start=d.date;
+    if(R0){ loadRec(); var first=R0.start===isoDay(s.date);
+      setup={id:nextRecId(),tpl:{clientId:s.clientId,onName:s.onName,branch:s.branch,accountant:s.accountant,accountant2:s.accountant2,items:JSON.parse(JSON.stringify(s.items)),subtotal:s.subtotal,discountAmt:s.discountAmt,discountType:s.discountType,discountPct:s.discountPct,gst:s.gst,gstMode:s.gstMode,amount:s.amount,customerNotes:s.customerNotes,terms:s.terms},
+        freq:R0.freq,start:R0.start,end:{type:R0.endType,count:R0.endType==='count'?+R0.count:null,date:R0.endType==='date'?R0.endDate:null},autoSend:!!R0.auto,status:'active',
+        next:first?stepIso(R0.start,R0.freq):R0.start,count:first?1:0,lastId:first?s.id:'',lastAt:first?s.date:null,sourceId:s.id,by:ME.name,at:Date.now(),history:[]};
+      recLog(setup,'created',freqName(setup.freq)+' from '+fmtD(setup.start)+' · '+recEndText(setup)+(setup.autoSend?' · auto-send':''));
+      if(first) s.recurringId=setup.id;
+      log(s,'recurring_set',{note:setup.id+' · '+freqName(setup.freq)+' · next '+fmtD(setup.next)+' · '+recEndText(setup)}); }
     if(!save()){ if(cr>0) unspendCredit(s.id); reload(); return fail('Couldn’t save the sale. Nothing was changed.'); }
-    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); toast((isNew?'Sale '+id+' added':'Sale '+id+' updated')+(cr>0?' · '+money(cr)+' credit applied':''));
+    if(setup){ rec.list.push(setup); if(!saveRec()) toast('The sale is saved, but the recurring setup couldn’t be stored. Try again from Edit.',true); else runRecurring(); }   // a start in the past catches up now
+    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); var now0=setup&&recById(setup.id);
+    toast(setup?'Sale '+id+' saved · recurring '+setup.id+(now0&&now0.status==='ended'?' (all '+now0.count+' invoices made)':now0?', next '+fmtD(now0.next):''):(isNew?'Sale '+id+' added':'Sale '+id+' updated')+(cr>0?' · '+money(cr)+' credit applied':''));
   },function(){ fail('The document couldn’t be stored. Try again, or remove it.'); });
 }
 /* documents are kept in this browser's private storage (IndexedDB) next to the sale */
@@ -14886,7 +15098,8 @@ function paintDetail(keep){
         (cr&&cr.phone?dc(SD_IC.phone,esc(cr.phone)+copy(cr.phone)):'')+'</div>'+
       '<div class="dmetaline">'+dc(SD_IC.cal,dmyOf(s.date)+' <small>due</small> '+dmyOf(s.due),'Invoice date and due date')+dc(SD_IC.branch,esc(s.branch||''),'Branch')+
         dc(SD_IC.staff,esc(s.accountant||'')+(s.accountant2?' <small>with</small> '+esc(s.accountant2):''),'Staff and additional accountant')+
-        dc(SD_IC.clock,'Created by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+'</div></div>'+
+        dc(SD_IC.clock,'Created by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+
+        (s.recurringId?'<span class="dc"><button type="button" class="sl-rtag" data-sdrec="'+esc(s.recurringId)+'" title="Open the recurring setup">Recurring · '+esc(s.recurringId)+'</button></span>':'')+'</div></div>'+
     '<div class="dhead-acts">'+detailActions(s).map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
       '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
@@ -14952,6 +15165,7 @@ function paintDetail(keep){
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   ov.querySelectorAll('[data-doc]').forEach(function(x){ x.onclick=function(){ openDoc(s,x.getAttribute('data-doc')==='down'); }; });
   var vc=ov.querySelector('[data-sd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+s.clientId); }catch(e){} };
+  var vr=ov.querySelector('[data-sdrec]'); if(vr) vr.onclick=function(){ openRecurring(vr.getAttribute('data-sdrec')); };
   if(!keep) document.getElementById('sd-x').focus();
 }
 /* the uploaded document, from this browser's storage: PDFs and images open in a new tab, anything else downloads */
@@ -15042,8 +15256,17 @@ function route(){ var m=/^#\/sales\/(.+)$/.exec(location.hash||''); if(!m||!st) 
   var id=decodeURIComponent(m[1]); if(byId(id)) openDetail(id); }
 window.addEventListener('hashchange',function(){ reload(); route(); });
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
-setTimeout(function(){ reload(); render(); route(); },0);
-window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });
+setTimeout(function(){ reload(); seedRec(); runRecurring(); render(); route(); },0);
+/* DEVELOPMENT DATA (temporary): two sample recurring setups from sample sales, once. Remove when the API is connected. */
+function seedRec(){ loadRec(); var seen=false; try{ seen=localStorage.getItem('aad-recurring-seeded')==='1'; }catch(e){} if(seen||rec.list.length||!st) return;
+  var src=st.list.filter(function(x){ return x.dev&&x.status==='sent'; }).slice(0,2); if(!src.length) return;
+  src.forEach(function(x,i){ var start=isoDay(x.date), id=nextRecId();
+    var setup={id:id,tpl:{clientId:x.clientId,onName:x.onName||'',branch:x.branch,accountant:x.accountant,accountant2:x.accountant2,items:JSON.parse(JSON.stringify(x.items)),subtotal:x.subtotal,discountAmt:0,discountType:'',discountPct:null,gst:x.gst,gstMode:x.gstMode||'incl',amount:x.amount,customerNotes:'',terms:''},
+      freq:i?'quarterly':'monthly',start:start,end:i?{type:'count',count:4,date:null}:{type:'never',count:null,date:null},autoSend:!i,status:i?'paused':'active',next:stepIso(start,i?'quarterly':'monthly'),count:1,lastId:x.id,lastAt:x.date,sourceId:x.id,by:x.by,at:x.date,history:[],dev:true};
+    while(setup.next<isoDay(Date.now())&&i) setup.next=stepIso(setup.next,setup.freq);
+    x.recurringId=id; log(x,'recurring_set',{by:x.by,t:x.date+60000,note:id+' · '+freqName(setup.freq)}); rec.list.push(setup); });
+  save(); saveRec(); try{ localStorage.setItem('aad-recurring-seeded','1'); }catch(e){} }
+window.addEventListener('storage',function(e){ if(e.key===REC_KEY){ reload(); if(!dlg.classList.contains('open')) render(); } if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });
 
 })();
 

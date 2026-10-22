@@ -779,8 +779,6 @@ body.gridmode .listview{display:none}
 .dl-foot{display:flex;justify-content:flex-end;margin-top:12px}
 .dl-del{font-size:12.5px;font-weight:600;color:var(--mute);padding:6px 8px;border-radius:7px}
 .dl-del:hover{color:var(--red);background:var(--red-soft)}
-.ds-keep{display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:10px 14px;border-radius:10px;background:#FEF2F2;border:1px solid #FECACA;color:#BE123C}
-.ds-keep svg{flex-shrink:0;margin-top:2px;color:#BE123C;width:15px;height:15px}.ds-keep p{margin:0;font-size:12.5px;line-height:1.5}.ds-keep b{color:#9F1239}
 .ds-cap{font-size:11.5px;font-weight:600;color:var(--faint);padding:1px 8px;border-radius:999px;background:#F3F4F6}.ds-cap.full{background:#FFF6E8;color:#B4690E}
 .ds-pnote{display:flex;align-items:center;gap:6px;margin:4px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;color:var(--mute)}.ds-pnote svg{width:13px;height:13px}
 .up-cur-n.warn{background:#FFF6E8;color:#92400E}.up-cur-n.warn b{color:#92400E}
@@ -901,8 +899,8 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .state.soon i{background:#F59E0B}
 .sdt-hist{margin-top:26px}
 /* ===== documents tab v3 ===== */
-/* Documents tab: same calm list, with every requirement from the reference */
-.ds-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+/* Documents tab: one calm list per group; status colour only on the dot and the expiry date */
+.ds-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px}
 .ds-bar .btn.xs{height:34px;flex-shrink:0}
 .ds-sel{flex-shrink:0}
 .ds-sel select{height:34px;min-width:170px;font-size:13px}
@@ -910,56 +908,56 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
 .ds-search input{width:100%;height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:0 12px 0 34px;font-size:13px}
 .ds-search input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
-.ds-list{display:flex;flex-direction:column;gap:10px}
-.ds-item{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
+.ds-glabel{display:flex;align-items:center;gap:6px;margin:0 0 8px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.ds-glabel span{color:var(--faint)}
+.ds-list{border:1px solid var(--line);border-radius:12px;background:#fff}
+.ds-list+.ds-glabel{margin-top:20px}
+.ds-item+.ds-item{border-top:1px solid var(--line)}
+.ds-item:first-child{border-radius:12px 12px 0 0}.ds-item:last-child{border-radius:0 0 12px 12px}.ds-item:only-child{border-radius:12px}
 @keyframes dvflash{0%{background:#FFF4EA}100%{background:#fff}}
 .ds-item.flash{animation:dvflash 2.4s ease-out}
-/* expiring soon = soft orange, expired = soft red; valid and no-expiry stay neutral */
-.ds-item .ds-ic{background:#F3F4F6;color:var(--slate)}
-.ds-item.is-soon{border-color:#FBE3C6;background:#FFFCF8}.ds-item.is-soon .ds-ic{background:#FFF4E5;color:#D97706}.ds-item.is-soon .ds-exp{color:#B45309}
-.ds-item.is-expired{border-color:#F7D2D2;background:#FFFAFA}.ds-item.is-expired .ds-ic{background:#FEF2F2;color:var(--red)}.ds-item.is-expired .ds-exp{color:#B91C1C}
-.ds-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px}
-.ds-ic{width:36px;height:36px;border-radius:9px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ds-ic svg{width:17px;height:17px}
-.ds-ic.bad{background:var(--red-soft);color:var(--red)}
-.ds-tt{flex:1;min-width:0}
-.ds-tt>b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
-.ds-sub{font-size:12.5px;color:var(--mute);margin-top:2px}
-.ds-sub em{font-style:normal;font-weight:600;color:var(--ink)}
-.ds-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.ds-file{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 4px 0 6px;border:1px solid var(--line-soft);border-radius:8px;background:#FAFBFC;font-size:12px;color:var(--slate);max-width:100%}
+.ds-row{display:grid;grid-template-columns:minmax(0,1fr) 150px auto;gap:14px;align-items:start;padding:13px 16px;position:relative}
+.ds-name{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.ds-none{margin-top:3px;font-size:12.5px;color:var(--mute)}
+.ds-files{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin-top:5px}
+.ds-file{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--slate);max-width:100%;min-height:26px}
 .ds-file .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}
 .ds-file .x.e-pdf{background:#FDECEC;color:#C2410C}
-.ds-file b,.ds-fname{font-weight:600;color:var(--ink);font-size:inherit}.ds-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
+.ds-fname{font-weight:600;color:var(--ink);font-size:inherit;padding:0}.ds-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
+.ds-fsz{color:var(--faint)}
 .ds-file .sdt-ib{width:24px;height:24px}
-.ds-fmore{height:30px;padding:0 11px;border:1px dashed var(--line);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--orange-ink)}
-.ds-fmore:hover{border-color:var(--orange);background:var(--orange-soft)}
-.ds-by{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:12px;color:var(--faint)}
-.ds-by b{color:var(--slate);font-weight:600}
-.ds-more{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--orange-ink)}
-.ds-more:hover{text-decoration:underline}
-.ds-more svg{transition:transform .15s}
-.ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
-.ds-st{width:150px;flex-shrink:0;padding-top:2px}
-.ds-exp{display:block;margin:3px 0 0 14px;font-size:12px;color:var(--faint);white-space:nowrap}
+.ds-fmore{font-size:12px;font-weight:600;color:var(--orange-ink);padding:0}.ds-fmore:hover{text-decoration:underline}
+.ds-by{display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;margin-top:5px;font-size:12px;color:var(--faint)}
+.ds-sep{color:var(--line);font-style:normal}
+.ds-more{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--mute);padding:0}
+.ds-more:hover,.ds-more[aria-expanded="true"]{color:var(--orange-ink)}
+.ds-more svg{transition:transform .15s}.ds-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.ds-st{padding-top:2px;min-width:0}
 .ds-st .state{white-space:nowrap}
-.ds-acts{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ds-exp{display:block;margin:3px 0 0 14px;font-size:12px;color:var(--faint);white-space:nowrap}
+.ds-exp.bad{color:#B91C1C}.ds-exp.soon{color:#B45309}
+.ds-acts{display:flex;align-items:center;justify-content:flex-end;gap:6px;position:relative}
 .ds-acts .btn.xs{height:32px;padding:0 12px;font-size:12.5px;gap:6px}
-.ds-prev{background:#FAFBFC;border-top:1px solid var(--line-soft);padding:4px 16px 6px 64px}
-.ds-pr{padding:10px 0}
-.ds-pr+.ds-pr{border-top:1px dashed var(--line)}
-.ds-prh{display:flex;align-items:center;gap:8px;font-size:13px}
-.ds-prh b{font-weight:700;color:var(--ink)}
-.ds-pr .ds-sub{margin-top:3px}
-.ds-pr .ds-files{margin-top:6px}
-.ds-tag{display:inline-flex;align-items:center;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:#F1F2F4;color:var(--mute)}
-.ds-tag.cur{background:var(--orange-soft);color:var(--orange-ink)}
-.ds-tag.bad{background:var(--red-soft);color:var(--red)}
+.ds-kebab{width:32px;height:32px}
+.ds-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:30;min-width:180px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px -8px rgba(15,23,42,.18)}
+.ds-menu button{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border-radius:7px;font-size:13px;color:var(--ink);text-align:left;white-space:nowrap}
+.ds-menu button:hover,.ds-menu button:focus-visible{background:#F6F7F9;outline:none}
+.ds-menu button.danger{color:var(--red)}.ds-menu button.danger:hover,.ds-menu button.danger:focus-visible{background:#FEF2F2}
+.ds-menu svg{width:15px;height:15px;flex-shrink:0}
+.ds-prev{background:#FAFBFC;border-top:1px solid var(--line-soft);padding:6px 16px 8px}
+.ds-ver{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;padding:8px 0}
+.ds-ver+.ds-ver{border-top:1px solid var(--line-soft)}
+.ds-ver>b{font-size:12.5px;font-weight:700;color:var(--ink);padding-top:4px}
+.ds-ver .ds-files{margin-top:0}
+.ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:4px;font-size:12px;color:var(--faint)}
+.ds-note{display:flex;align-items:flex-start;gap:7px;margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--mute)}
+.ds-note svg{flex-shrink:0;margin-top:2px;width:13px;height:13px;color:var(--faint)}
 @media (max-width:640px){
-  .ds-row,.ds-hrow{flex-wrap:wrap}
-  .ds-st{width:auto;order:3;margin-left:48px}
-  .ds-acts{order:4;margin-left:auto}
-  .ds-prev{padding-left:16px}
+  .ds-row{grid-template-columns:minmax(0,1fr);gap:8px}
+  .ds-acts{position:absolute;top:9px;right:10px}
+  .ds-name{padding-right:116px}
+  .ds-sep{display:none}
+  .ds-ver{grid-template-columns:minmax(0,1fr);gap:4px}
   .ds-bar{flex-wrap:wrap}
   .ds-search{flex-basis:100%;order:3}
 }
@@ -997,11 +995,7 @@ td[data-comp] .state{white-space:nowrap}
 
 
 /* previous versions (opened from Show N previous versions): Version N + file count, then a box with the details and files */
-.ds-vg{padding-top:10px}.ds-vg:first-child{padding-top:2px}
-.ds-vh{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}.ds-vh b{font-size:13px;color:var(--ink)}.ds-vh span{font-size:12px;color:var(--faint)}
-.ds-vrow{padding:9px 12px;border:1px solid var(--line-soft,#F1F2F4);border-radius:10px;background:#fff}
-.ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px;font-size:12px;color:var(--faint)}
-.ds-vrow .ds-files{margin-top:0}
+
 </style>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1267,7 +1261,7 @@ var detailStaff=null, detailTab='docs';
 
 function openDetail(id){
   detailStaff=STAFF.filter(function(x){return x.id===id})[0]||STAFF[0];
-  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null;
+  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null; docMenu=null;
   renderDetail(); drawer.classList.add('show'); scrim.classList.add('show'); drawer.setAttribute('aria-hidden','false');
 }
 
@@ -1360,7 +1354,6 @@ var DOC_TYPES=[
   {k:'super',name:'Superannuation Choice Form',cat:'Payroll',exp:false,slots:[{id:'main',label:'Form'}]}
 ];
 /* document numbers are stored in full but only the last 4 characters are shown */
-function maskNo(n){ n=String(n||'').replace(/\s+/g,''); return n?'•••• '+n.slice(-4):''; }
 var SOON_DAYS=60;
 function typeOf(k){ for(var i=0;i<DOC_TYPES.length;i++) if(DOC_TYPES[i].k===k) return DOC_TYPES[i]; return null; }
 function slotLabel(k,id){ var t=typeOf(k); for(var i=0;i<t.slots.length;i++) if(t.slots[i].id===id) return t.slots[i].label; return 'File'; }
@@ -1417,7 +1410,7 @@ function seedDocs(id){
   return {docs:docs,audit:audit};
 }
 var docStore={}, docOpen={}, docFilter='all', auditFilter='all', flashK=null;
-var updMode=null, pend={}, updExp='', updNote='', updNo='', delK=null;
+var updMode=null, pend={}, updExp='', delK=null;
 function storeOf(id){ if(!docStore[id]) docStore[id]=seedDocs(id); return docStore[id]; }
 function findDoc(k){ var a=storeOf(detailStaff.id).docs; for(var i=0;i<a.length;i++) if(a[i].k===k) return a[i]; return null; }
 
@@ -1452,7 +1445,7 @@ function sideName(d,t,f){ return t.slots.length>1?slotLabel(d.k,f.slot):'Documen
 /* a file chip: type, side, size, view + download */
 function fileChip(d,t,vi,fi,f){
   var e=extOf(f.n);
-  return '<span class="ds-file" title="'+esc(f.n)+'"><span class="x e-'+e+'">'+e.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" aria-label="Open '+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button>'+f.s+
+  return '<span class="ds-file" title="'+esc(f.n)+'"><span class="x e-'+e+'">'+e.toUpperCase()+'</span><button class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" aria-label="Open '+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button><span class="ds-fsz">'+f.s+'</span>'+
     '<button class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span>';
 }
 /* a version's files: the first 3 show, the rest sit behind "+N more" so the card stays one row tall */
@@ -1463,39 +1456,36 @@ function fileChips(d,t,vi,files){
     (files.length>MAX_FILES?'<button class="ds-fmore" data-fmore="'+key+'" aria-expanded="'+all+'">'+(all?'Show less':'+'+(files.length-MAX_FILES)+' more')+'</button>':'')+
   '</div>';
 }
-function verTag(v,i){
-  if(i===0) return '<span class="ds-tag cur">Current</span>';
-  if(v.exp&&daysTo(v.exp)<0) return '<span class="ds-tag bad">Expired</span>';
-  return '<span class="ds-tag">Replaced</span>';
-}
-/* one row per document type: details, files, who uploaded it, status, actions; older versions open underneath */
+/* one row per document type: name, files, who uploaded it | status | actions; older versions open underneath */
+var docMenu=null;   // the document whose ⋮ menu is open
+I.dots3='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
 function docCard(d){
   /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
-  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
-  var h='<div class="ds-item'+(st==='expired'?' is-expired':st==='soon'?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', menu=docMenu===d.k;
+  var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
-      '<span class="ds-ic">'+I.file+'</span>'+
-      '<div class="ds-tt"><b>'+t.name+'</b>'+
-        (gone?'<div class="ds-sub">No active document</div>':fileChips(d,t,0,d.cur.files))+
-        '<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
-          (prev?'<button class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide':'Show')+' version history ('+prev+')'+I.chev+'</button>':'')+
-        '</div>'+
+      '<div class="ds-tt"><b class="ds-name">'+t.name+'</b>'+
+        (gone?'<div class="ds-none">No active document</div>':fileChips(d,t,0,d.cur.files))+
+        (gone&&!prev?'':'<div class="ds-by">'+(gone?'':'<span>Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</span>')+
+          (prev?(gone?'':'<i class="ds-sep">·</i>')+'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">Version history ('+prev+')'+I.chev+'</button>':'')+'</div>')+
       '</div>'+
-      '<div class="ds-st">'+stDot(st,stLabel(d))+(exp?'<small class="ds-exp">'+(gone?'Expired on ':'Expiry date ')+exp+'</small>':'')+'</div>'+
+      '<div class="ds-st">'+stDot(st,stLabel(d))+(exp?'<small class="ds-exp'+(gone?' bad':st==='soon'?' soon':'')+'">'+(gone?'Expired on ':'Expiry date ')+exp+'</small>':'')+'</div>'+
       '<div class="ds-acts">'+
-        '<button class="btn '+(st==='expired'?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+(st==='expired'||st==='soon'?'Renew':'Replace')+'</button>'+
-        '<button class="sdt-ib danger" data-deldoc="'+d.k+'" title="Delete document" aria-label="Delete '+esc(t.name)+'">'+I.trash+'</button>'+
+        (gone||st==='soon'?'<button class="btn '+(gone?'btn-pri':'btn-ghost')+' xs" data-replace="'+d.k+'">'+I.upsm+'Renew</button>':'')+
+        '<button type="button" class="sdt-ib ds-kebab" data-dmenu="'+d.k+'" aria-haspopup="menu" aria-expanded="'+menu+'" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+I.dots3+'</button>'+
+        (menu?'<div class="ds-menu" role="menu" aria-label="'+esc(t.name)+' actions">'+
+          (gone||st==='soon'?'':'<button type="button" role="menuitem" data-replace="'+d.k+'">'+I.upsm+'Replace</button>')+
+          '<button type="button" role="menuitem" class="danger" data-deldoc="'+d.k+'">'+I.trash+'Delete document</button></div>':'')+
       '</div>'+
     '</div>';
   if(prev&&open){
     h+='<div class="ds-prev">'+hist.map(function(v,j){
-      var vi=j+first, m=[];   // one block per version: its details, then its files
+      var vi=j+first, m=[];   // one compact block per version: label, files, then who and when
       m.push('<span>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+', '+fmtT(v.on)+'</span>');
       if(t.exp&&v.exp) m.push('<span>'+(daysTo(v.exp)<0?'Expired ':'Expires ')+fmtD(v.exp)+'</span>');
-      return '<div class="ds-vg"><div class="ds-vh"><b>Version '+v.ver+'</b></div>'+
-        '<div class="ds-vrow">'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div></div>';
-    }).join('')+'</div>';   // the 5-versions rule is in the red note above
+      return '<div class="ds-ver"><b>Version '+v.ver+'</b><div>'+fileChips(d,t,vi,v.files)+'<div class="ds-vi">'+m.join('')+'</div></div></div>';
+    }).join('')+'</div>';
   }
   return h+'</div>';
 }
@@ -1511,8 +1501,7 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div>'+filter+
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
-  h+='<div class="ds-keep" role="note">'+I.info+'<p>The 5 most recent versions of each document are retained. When a new version is uploaded, the oldest version is permanently deleted and cannot be recovered.</p></div>';
-  return h+currentList(docs);
+  return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
 function currentList(docs){
   var q=docQ.trim().toLowerCase(), order={expired:0,soon:1,valid:2,none:3};
@@ -1520,7 +1509,9 @@ function currentList(docs){
   var list=docs.filter(function(d){ var t=typeOf(d.k); return (!q||(t.name+' '+t.cat).toLowerCase().indexOf(q)>=0)&&(docFilter==='all'||stOf(d)===docFilter); })
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
-  return '<div class="ds-list">'+list.map(docCard).join('')+'</div>';
+  var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
+  var group=function(label,items){ return items.length?'<div class="ds-glabel">'+label+' <span>'+items.length+'</span></div><div class="ds-list">'+items.map(docCard).join('')+'</div>':''; };
+  return group('Needs attention',need)+group('Up to date',ok);
 }
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){
@@ -1558,7 +1549,7 @@ I.hist='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="curr
 function extTag(n){ var e=n.split('.').pop().toLowerCase(); return '<span class="dl-ext e-'+e+'">'+e.toUpperCase()+'</span>'; }
 function openUpd(k){
   var d=k?findDoc(k):null;
-  updMode={k:k||null, fixed:!!k}; pend={}; updExp=''; updNote=''; updNo=d&&d.no||'';
+  updMode={k:k||null, fixed:!!k}; pend={}; updExp='';
   paintUpd(); openModal('m-upd');
 }
 function paintUpd(){
@@ -1633,9 +1624,9 @@ function saveUpd(){
     if(!exp){ ferr('err-exp','Enter the expiry date shown on the document'); ei.classList.add('bad'); ei.focus(); return; }
     if(daysTo(exp)<1){ ferr('err-exp','The expiry date must be in the future'); ei.classList.add('bad'); ei.focus(); return; }
   }
-  var store=storeOf(detailStaff.id), d=findDoc(k), now=new Date(), note=updNote.trim();
+  var store=storeOf(detailStaff.id), d=findDoc(k), now=new Date(), note='';
   var files=t.slots.map(function(sl){ return F(sl.id,pend[sl.id].n,pend[sl.id].s); });
-  var no=t.num?updNo.trim():'';
+  var no=d&&d.no||'';   // a recorded number stays with the document; there's no field to change it
   if(d){
     var prev=d.cur, before=stOf(d);
     d.hist.unshift({ver:d.ver,no:d.no,files:prev.files,exp:prev.exp,on:prev.on,by:prev.by,note:prev.note,rOn:now,rBy:ME});
@@ -1871,12 +1862,15 @@ document.addEventListener('click',function(e){
   if(df){ docFilter=df; keepScroll(renderDetail); return; }
   var af=b&&b.getAttribute('data-afilter');
   if(af){ auditFilter=af; keepScroll(renderDetail); return; }
+  var dm=b&&b.getAttribute('data-dmenu');
+  if(dm){ docMenu=docMenu===dm?null:dm; keepScroll(renderDetail); var fi=drawer.querySelector('.ds-menu [role=menuitem]'); if(fi) fi.focus(); else { var kb=drawer.querySelector('[data-dmenu="'+dm+'"]'); if(kb) kb.focus(); } return; }
+  if(docMenu&&!(t.closest&&t.closest('.ds-menu'))){ var was=docMenu; docMenu=null; keepScroll(renderDetail); var kb2=drawer.querySelector('[data-dmenu="'+was+'"]'); if(kb2&&!b) kb2.focus({preventScroll:true}); if(!b) return; }
   var rp=b&&b.getAttribute('data-replace');
-  if(rp){ openUpd(rp); return; }
+  if(rp){ if(docMenu){ docMenu=null; keepScroll(renderDetail); } openUpd(rp); return; }
   if(b&&b.id==='sd-upload'){ openUpd(null); return; }
   if(b&&b.id==='upd-save'){ saveUpd(); return; }
   var dd=b&&b.getAttribute('data-deldoc');
-  if(dd){ askDelete(dd); return; }
+  if(dd){ docMenu=null; keepScroll(renderDetail); askDelete(dd); return; }
   if(b&&b.id==='del-yes'){ keepScroll(doDelete); return; }
   var dl=b&&b.getAttribute('data-dl');
   if(dl){ toast('Downloading '+dl); return; }
@@ -1910,14 +1904,15 @@ document.addEventListener('click',function(e){
 function keepScroll(fn){ var bd=drawer.querySelector('.dr-body'), y=bd?bd.scrollTop:0; fn(); var nb=drawer.querySelector('.dr-body'); if(nb) nb.scrollTop=y; }
 function toggleDoc(k){ docOpen[k]=!docOpen[k]; keepScroll(renderDetail); var r=drawer.querySelector('[data-toggle="'+k+'"]'); if(r) r.focus({preventScroll:true}); }
 document.addEventListener('keydown',function(e){
+  if(docMenu){ var mn=drawer.querySelector('.ds-menu');
+    if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); var k0=docMenu; docMenu=null; keepScroll(renderDetail); var kb=drawer.querySelector('[data-dmenu="'+k0+'"]'); if(kb) kb.focus(); return; }
+    if(mn&&(e.key==='ArrowDown'||e.key==='ArrowUp')){ e.preventDefault(); var it=[].slice.call(mn.querySelectorAll('[role=menuitem]')), i=it.indexOf(document.activeElement); it[(i+(e.key==='ArrowDown'?1:-1)+it.length)%it.length].focus(); return; } }
   var r=e.target.closest&&e.target.closest('.sd-row');
   if(r&&e.target===r&&(e.key==='Enter'||e.key===' ')){ e.preventDefault(); toggleDoc(r.getAttribute('data-toggle')); }
 });
 document.addEventListener('input',function(e){
   var el=e.target;
   if(el.id==='upd-exp'){ updExp=el.value; el.classList.remove('bad'); var er=document.getElementById('err-exp'); if(er) er.classList.remove('show'); paintPrev(); }
-  if(el.id==='upd-note'){ updNote=el.value; }
-  if(el.id==='upd-no'){ updNo=el.value; }
 });
 function dropZone(e){ return e.target.closest&&e.target.closest('#upd-body .rdrop'); }
 document.addEventListener('dragover',function(e){ var l=dropZone(e); if(!l) return; e.preventDefault(); l.classList.add('drag'); });

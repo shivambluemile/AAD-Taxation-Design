@@ -3047,7 +3047,9 @@ tbody tr:hover{background:#FCFCFD}
 .dc-fbox{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;padding:8px 6px 8px 10px;background:#fff}
 .dc-frow{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:24px}
 .dc-frow .x,.dc-chip .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.dc-frow .x.e-pdf,.dc-chip .x.e-pdf{background:#FDECEC;color:#C2410C}
-.dc-frow .sdt-ib{width:24px;height:24px;margin:-3px 0}
+.dc-frow .sdt-ib{width:24px;height:24px;margin:-3px 0 -3px auto}
+.dc-fsz{font-size:11.5px;color:var(--faint);white-space:nowrap}
+.dc-meta dd small{display:block;font-size:11.5px;color:var(--faint);margin-top:1px}
 .dc-fname{display:block;width:100%;margin-top:4px;text-align:left;font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35;overflow-wrap:anywhere;padding:0}
 button.dc-fname:hover,button.dc-cn:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
 .dc-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 18px;margin:14px 0 0}
@@ -3069,7 +3071,7 @@ button.dc-hbtn:hover{background:#FAFBFC}.dc-hbtn b{font-size:13px;color:var(--in
 .dc-ht td small{display:block;font-size:11.5px;color:var(--faint);margin-top:1px}
 .dc-v{font-weight:600;white-space:nowrap}
 .dc-chips{display:flex;flex-direction:column;gap:4px;min-width:0}
-.dc-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:7px;min-width:0}
+.dc-chip{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:7px;min-width:0}
 .dc-cn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;font-size:12.5px;font-weight:600;color:var(--ink);padding:0}
 .dc-chip .sdt-ib{width:24px;height:24px}
 .dc-hn{display:block;margin-top:4px}
@@ -5949,8 +5951,8 @@ function kycChips(files,vi){
 }
 /* KYC and the engagement letter use the Staff Documents card: icon and name, status, the files as boxes, the details, then the history */
 var DC_DOC='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
-function dcFile(name,openAttr,dlAttr){ var e=String(name||'').split('.').pop().toLowerCase();
-  return '<div class="dc-fbox"><div class="dc-frow"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+(dlAttr?'<button type="button" class="sdt-ib" '+dlAttr+' title="Download" aria-label="Download '+esc(name)+'">'+OI.dl+'</button>':'')+'</div>'+
+function dcFile(name,openAttr,dlAttr,size){ var e=String(name||'').split('.').pop().toLowerCase();
+  return '<div class="dc-fbox"><div class="dc-frow"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+(size?'<span class="dc-fsz">'+fsize(size)+'</span>':'')+(dlAttr?'<button type="button" class="sdt-ib" '+dlAttr+' title="Download" aria-label="Download '+esc(name)+'">'+OI.dl+'</button>':'')+'</div>'+
     (openAttr?'<button type="button" class="dc-fname" '+openAttr+' title="Open '+esc(name)+'">'+esc(name)+'</button>':'<b class="dc-fname" title="'+esc(name)+'">'+esc(name)+'</b>')+'</div>'; }
 function dcMeta(items){ return '<dl class="dc-meta">'+items.map(function(x){ return '<div><dt>'+x[0]+'</dt><dd'+(x[2]?' class="'+x[2]+'"':'')+'>'+x[1]+'</dd></div>'; }).join('')+'</dl>'; }
 function dcCard(o){ return '<article class="dc-card"><header class="dc-h"><span class="dc-ic">'+DC_DOC+'</span><div class="dc-tt"><h4>'+o.title+'</h4>'+(o.sub?'<p>'+o.sub+'</p>':'')+'</div>'+
@@ -5962,8 +5964,8 @@ function dcHist(key,cid,label,n,rows,head){ var open=n>0&&!histShut[key+cid];
       :'<div class="dc-hbtn off"><span class="el-hic">'+EL_HIST+'</span><b>'+label+'</b><span class="el-hnone">None yet</span></div>')+
     (open?'<div class="dc-hw"><table class="dc-ht"><thead><tr>'+head.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div>':'')+'</div>'; }
 function dcChips(list){ return '<div class="dc-chips">'+list.join('')+'</div>'; }
-function dcChip(name,openAttr,dlAttr){ var e=String(name||'').split('.').pop().toLowerCase();
-  return '<span class="dc-chip"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+(openAttr?'<button type="button" class="dc-cn" '+openAttr+' title="Open '+esc(name)+'">'+esc(name)+'</button>':'<b class="dc-cn">'+esc(name)+'</b>')+
+function dcChip(name,openAttr,dlAttr,size){ var e=String(name||'').split('.').pop().toLowerCase();
+  return '<span class="dc-chip"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+(openAttr?'<button type="button" class="dc-cn" '+openAttr+' title="Open '+esc(name)+'">'+esc(name)+'</button>':'<b class="dc-cn">'+esc(name)+'</b>')+(size?'<span class="dc-fsz">'+fsize(size)+'</span>':'')+
     (dlAttr?'<button type="button" class="sdt-ib" '+dlAttr+' title="Download" aria-label="Download '+esc(name)+'">'+OI.dl+'</button>':'')+'</span>'; }
 /* KYC: empty state with Upload KYC; once uploaded the files, who verified it, when it was uploaded and the next verification; earlier checks stay in the history */
 function kycTab(c){
@@ -5971,17 +5973,17 @@ function kycTab(c){
   /* a check made in Add Client carries the note typed on that step (older ones: the client note saved at the same moment) */
   var noteOf=function(r){ if(r.note) return r.note; if(r.source!=='Add Client') return ''; var t=kycUploadedAt(r);
     var x=(c.notes||[]).filter(function(y){ return Math.abs((y.t||0)-t)<120000; })[0]; return x?x.text:''; };
-  var files=function(r,vi){ return (r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return dcFile(f.name,view?'data-kpv="'+a+'"':'',view?'data-kdl="'+a+'"':''); }).join(''); };
+  var files=function(r,vi){ return (r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return dcFile(f.name,view?'data-kpv="'+a+'"':'',view?'data-kdl="'+a+'"':'',f.size); }).join(''); };
   if(!cur) return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',body:dcEmpty('No KYC uploaded','Upload the client’s identity documents, such as a passport or driver licence. Each verification stays valid for 12 months.',
       c._draft?'':'<button type="button" class="btn-primary btn-sm" data-kyc-add>Upload KYC</button>')})+'</section>';
   var ex=kycExpiresAt(cur), gone=now>=ex, note=noteOf(cur);
   var act=c._draft?'':'<button type="button" class="linkbtn dc-act" data-kyc-add>'+(st==='valid'?'Record new KYC':'Renew KYC')+'</button>';
   var body=(cur.files&&cur.files.length?'<div class="dc-files">'+files(cur,0)+'</div>':'<p class="cl-muted">No files in this check.</p>')+
-    dcMeta([['Verified on',dmyOf(fromIso(cur.date))],['Verified by',esc(cur.by)],['Uploaded',whenOf(kycUploadedAt(cur)).replace(' · ',', ')],[gone?'Expired on':'Next verification',dmyOf(ex),gone?'bad':'']])+
+    dcMeta([['Verified on',dmyOf(fromIso(cur.date))],['Verified by',esc(cur.by)],['Uploaded',whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'<small>by '+esc((cur.files&&cur.files[0]&&cur.files[0].by)||cur.by)+'</small>'],[gone?'Expired on':'Next verification',dmyOf(ex),gone?'bad':'']])+
     (note?'<p class="dc-note">Note: '+esc(note)+'</p>':'');
   var older=recs.slice(1);
   var rows=older.map(function(r,j){ var vi=j+1, e2=kycExpiresAt(r), g2=now>=e2;
-    return '<tr><td class="dc-v">v'+(n-vi)+'</td><td>'+dcChips((r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return dcChip(f.name,view?'data-kpv="'+a+'"':'',view?'data-kdl="'+a+'"':''); }))+(noteOf(r)?'<small class="dc-hn">'+esc(noteOf(r))+'</small>':'')+'</td>'+
+    return '<tr><td class="dc-v">v'+(n-vi)+'</td><td>'+dcChips((r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return dcChip(f.name,view?'data-kpv="'+a+'"':'',view?'data-kdl="'+a+'"':'',f.size); }))+(noteOf(r)?'<small class="dc-hn">'+esc(noteOf(r))+'</small>':'')+'</td>'+
       '<td>'+dmyOf(fromIso(r.date))+'<small>by '+esc(r.by)+'</small></td><td'+(g2?' class="bad"':'')+'>'+dmyOf(e2)+'</td></tr>'; }).join('');
   return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',sub:'Version '+n,pill:pill(KYC_STATUS,st),acts:act,body:body,
     hist:dcHist('k',c.id,'History',older.length,rows,['Version','Documents','Verified','Expiry'])})+'</section>';
@@ -6075,14 +6077,14 @@ function engagementTab(c){
     var meta=st==='signed'
       ?[['Signed by',esc(signedBy)],['Signed on',L.method==='upload'?dmyOf(L.signedAt):whenOf(L.signedAt).replace(' · ',', ')],L.method==='upload'?['Uploaded by',esc(L.uploadedBy||rec&&rec.by||'staff')]:L.method==='manual'?['Recorded by',esc(rec&&rec.by||L.by||'staff')]:['Signed','Through the signing link'],['Expires',dmyOf(fyEndAt)]]
       :[['To be signed by',esc(who)+(role?' ('+esc(role)+')':'')],lastOk?['Sent',whenOf(lastOk.at).replace(' · ',', ')]:['Created',whenOf(L.created).replace(' · ',', ')+' by '+esc(L.by||'')],[st==='expired'?'Expired':'Expires',dmyOf(st==='expired'?letterExpiresAt(L):fyEndAt),st==='expired'?'bad':'']];
-    body='<div class="dc-files">'+dcFile(fileName(L),'data-el="'+(st==='draft'?'view':'full')+'"','data-el="pdf"')+'</div>'+dcMeta(meta)+
+    body='<div class="dc-files">'+dcFile(fileName(L),'data-el="'+(st==='draft'?'view':'full')+'"','data-el="pdf"',L.file&&L.file.size)+'</div>'+dcMeta(meta)+
       (st==='failed'?'<p class="dc-note bad">'+S[1]+'</p>':'')+(st==='draft'?review:'');
   }
 
   /* earlier letters, newest year first, each with its file */
   var older=ONB.letters.filter(function(l){ return l.clientId===c.id&&l!==L; }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; });
   var rows=older.map(function(l){ var y=letterFy(l), exp=l.expiredAt||letterExpiresAt(l);
-    return '<tr><td class="dc-v">FY '+fyLabel(y)+'</td><td>'+dcChips([dcChip(fileName(l),'data-elfull="'+l.id+'"','data-elpdf="'+l.id+'"')])+'</td>'+
+    return '<tr><td class="dc-v">FY '+fyLabel(y)+'</td><td>'+dcChips([dcChip(fileName(l),'data-elfull="'+l.id+'"','data-elpdf="'+l.id+'"',l.file&&l.file.size)])+'</td>'+
       '<td>'+(l.status==='signed'?dmyOf(l.signedAt)+'<small>by '+esc(l.signature&&l.signature.name||l.signedBy||'')+'</small>':'<span class="cl-muted">Not signed</span>')+'</td><td'+(Date.now()>exp?' class="bad"':'')+'>'+dmyOf(exp)+'</td></tr>'; }).join('');
   var doc=st==='none'?preview(actServices,null):st==='draft'?preview(L.services,L):'';
   return '<section class="vsec el-main">'+dcCard({title:'Engagement Letter',sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),pill:st==='noservice'||st==='none'?'':pill(EL_STATE,st),acts:head,body:body,

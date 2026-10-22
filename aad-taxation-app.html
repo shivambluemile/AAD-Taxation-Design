@@ -11442,18 +11442,17 @@ function render(){
   var base=filtered(true), cnt=function(s){ return base.filter(function(x){ return !s||x.status===s; }).length; };
   var sb=function(s,label,dot){ var on=(f.status||'')===s, n=cnt(s);
     return '<button type="button" class="qt-sb'+(n?'':' zero')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+'<span class="qt-n">'+n+'</span></button>'; };
-  var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
+  var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).filter(function(k){ return k!=='cancelled'; }).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });
   h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
-    selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     selHtml('f-acc','All Accountants',people(accts.sort()),f.accountant)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
   /* the chosen filter values, each removable on its own */
-  var chips=[['status','Status',f.status&&STATUS[f.status]?STATUS[f.status][0]:''],['accountant','Accountant',f.accountant],['branch','Branch',f.branch]].filter(function(c){ return c[2]; });
+  var chips=[['accountant','Accountant',f.accountant],['branch','Branch',f.branch]].filter(function(c){ return c[2]; });
   if(chips.length) h+='<div class="qt-chips" aria-label="Active filters">'+chips.map(function(c){
     return '<span class="qt-chip">'+c[1]+': <b>'+esc(c[2])+'</b><button type="button" data-unf="'+c[0]+'" aria-label="Remove '+c[1].toLowerCase()+' filter '+esc(c[2])+'" title="Remove">'+I.close+'</button></span>'; }).join('')+'</div>';
   h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
@@ -11478,7 +11477,7 @@ function render(){
   qi.oninput=function(){ state.f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
   [].forEach.call(content.querySelectorAll('[data-sb]'),function(x){ x.onclick=function(){ state.f.status=x.getAttribute('data-sb'); state.page=1; render(); var n=content.querySelector('[data-sb="'+state.f.status+'"]'); if(n) n.focus(); }; });
   [].forEach.call(content.querySelectorAll('[data-unf]'),function(x){ x.onclick=function(){ state.f[x.getAttribute('data-unf')]=''; state.page=1; render(); }; });
-  [['f-status','status'],['f-acc','accountant'],['f-branch','branch']].forEach(function(p){
+  [['f-acc','accountant'],['f-branch','branch']].forEach(function(p){
     var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
   bindRange();

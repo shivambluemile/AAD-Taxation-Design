@@ -1039,7 +1039,12 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-fn small em{font-style:normal;font-weight:600;color:var(--slate)}
 .dc2-fn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dc2.open{border-color:var(--line);box-shadow:none}
-.vh{margin-top:12px;padding-top:14px;border-top:1px dashed var(--line)}
+.vh{margin-top:4px}
+#m-hist .m-body{max-height:72vh;overflow-y:auto;padding-top:16px}
+.dc2-need{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.dc2-nlbl{font-size:12.5px;font-weight:600;color:var(--mute);margin-right:2px}
+.dc2-nb{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-size:12.5px;font-weight:700}
+.dc2-nb svg{width:12px;height:12px}.dc2-nb:hover{background:#FEE2E2}
 .vh-none{margin:0;font-size:12.5px;color:var(--faint)}
 .vh-list{list-style:none;margin:0;padding:0 0 0 22px;position:relative}
 .vh-list:before{content:"";position:absolute;left:5px;top:8px;bottom:6px;width:2px;background:var(--line)}
@@ -1314,6 +1319,14 @@ table,td,th{font-size:13.5px}
       <button class="btn btn-soft" data-close>Close</button>
     </div>
   </div>
+</div>
+
+<div class="modal wide" id="m-hist" role="dialog" aria-modal="true" aria-labelledby="hist-title">
+  <div class="m-head">
+    <h3 id="hist-title">History</h3>
+    <button class="xbtn" data-close aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="m-body" id="hist-body"></div>
 </div>
 
 <div class="modal wide" id="m-prev">
@@ -1697,7 +1710,7 @@ function docCard(d){
     ?'<div class="dc2-exp edit"><label class="sr" for="dx-'+d.k+'">Expiry date</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+
       '<button type="button" class="dc2-ok" data-expsave="'+d.k+'" title="Save expiry" aria-label="Save expiry">'+DC_I.tick+'</button><button type="button" class="dc2-no" data-expcancel title="Cancel" aria-label="Cancel">'+I.close+'</button></div>'
     :'<div class="dc2-exp'+(gone?' bad':soon?' warn':'')+'"><span>'+line+'</span>'+(t.exp?'<button type="button" class="dc2-pen" data-expedit="'+d.k+'" title="Edit expiry date" aria-label="Edit expiry date of '+esc(t.name)+'">'+I.edit+'</button>':'')+'</div>';
-  var files=gone?'<div class="dc2-empty"><b>No valid document</b><span>The last one expired. Upload a new copy to replace it.</span></div>'
+  var files=gone?'<div class="dc2-need"><span class="dc2-nlbl">Upload needed</span>'+t.slots.map(function(s){ return '<button type="button" class="dc2-nb" data-replace="'+d.k+'" title="Upload '+esc(s.label)+'">'+I.upsm+esc(s.label)+'</button>'; }).join('')+'</div>'
     :fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
       return '<div class="dc2-cell">'+(sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
         '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
@@ -1711,8 +1724,8 @@ function docCard(d){
       expRow+
       '<button type="button" class="dc2-chev" data-shut="'+d.k+'" aria-hidden="true" tabindex="-1">'+DC_I.chev+'</button></div>'+
     (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="Replace '+esc(t.name)+'">'+I.upsm+'Replace</button>'+
-      (nHist?'<button type="button" class="dc2-hbtn" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' history, '+nHist+' earlier version'+(nHist===1?'':'s')+'">History<span class="dc2-hn">'+nHist+'</span>'+DC_I.chev+'</button>'
-        :'<span class="dc2-hbtn off">History<span class="dc2-hn">0</span></span>')+'</div>'+(open?versionTimeline(d):''))+
+      (nHist?'<button type="button" class="dc2-hbtn" data-histpop="'+d.k+'" aria-haspopup="dialog" aria-label="History, '+nHist+' earlier version'+(nHist===1?'':'s')+'">History<span class="dc2-hn">'+nHist+'</span></button>'
+        :'<span class="dc2-hbtn off">History<span class="dc2-hn">0</span></span>')+'</div>')+
   '</div>';
 }
 /* the open tile's details: a compact versions table; older versions open below the history toggle.
@@ -2057,7 +2070,7 @@ function closeDrawer(){drawer.classList.remove('show');scrim.classList.remove('s
 /* ================= Modals ================= */
 function openModal(id){document.getElementById(id).classList.add('show');scrim.classList.add('show')}
 function closeAll(){
-  ['m-pw','m-cpw','m-prev','m-upd','m-del'].forEach(function(i){document.getElementById(i).classList.remove('show')});
+  ['m-pw','m-cpw','m-prev','m-upd','m-del','m-hist'].forEach(function(i){document.getElementById(i).classList.remove('show')});
   if(!drawer.classList.contains('show'))scrim.classList.remove('show');
 }
 
@@ -2143,6 +2156,8 @@ document.addEventListener('click',function(e){
   if(dm){ var mm=dm.nextElementSibling; mm.hidden=!mm.hidden; dm.setAttribute('aria-expanded',String(!mm.hidden)); if(!mm.hidden){ var f0=mm.querySelector('button'); if(f0) f0.focus(); } return; }
   var sh=t.closest('[data-shut]');
   if(sh){ var sk=sh.getAttribute('data-shut'), card=drawer.querySelector('[data-doc="'+sk+'"]'); docShut[sk]=!(card&&card.classList.contains('shut')); keepScroll(renderDetail); var sb=drawer.querySelector('[data-shut="'+sk+'"]'); if(sb) sb.focus({preventScroll:true}); return; }
+  var hp=t.closest('[data-histpop]');
+  if(hp){ var hk=hp.getAttribute('data-histpop'); document.getElementById('hist-title').textContent=typeOf(hk).name+' · History'; document.getElementById('hist-body').innerHTML=versionTimeline(findDoc(hk)); openModal('m-hist'); return; }
   var xe=t.closest('[data-expedit]');
   if(xe){ expEdit=xe.getAttribute('data-expedit'); keepScroll(renderDetail); var xi=drawer.querySelector('#dx-'+expEdit); if(xi) xi.focus(); return; }
   if(t.closest('[data-expcancel]')){ var was=expEdit; expEdit=null; keepScroll(renderDetail); var pb=drawer.querySelector('[data-expedit="'+was+'"]'); if(pb) pb.focus({preventScroll:true}); return; }

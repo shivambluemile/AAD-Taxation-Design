@@ -956,7 +956,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-ver .ds-files{margin-top:0}
 .ds-vi{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:4px;font-size:12px;color:var(--faint)}
 /* documents as a grid of compact cards */
-.ds-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start;border:0;background:none}
+.ds-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch;border:0;background:none}
 .ds-list+.ds-glabel{margin-top:22px}
 .ds-card{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px!important;background:#fff;padding:14px 16px 0;min-width:0;transition:border-color .15s,box-shadow .15s}
 .ds-card+.ds-card{border-top:1px solid var(--line)}
@@ -966,7 +966,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-ch{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .ds-ch .ds-name{min-width:0;font-size:14px;line-height:1.35}
 .ds-ch .state{flex-shrink:0;padding-top:1px;white-space:nowrap}
-.ds-card .ds-exp{margin:2px 0 0;font-size:12px}
+.ds-card .ds-exp{margin:2px 0 0;font-size:12px;line-height:18px;min-height:18px}
 .ds-cb{flex:1;padding:10px 0 12px;min-width:0}
 .ds-cb .ds-files{margin-top:0}
 .ds-cb .ds-by{margin-top:6px}
@@ -1498,7 +1498,7 @@ function docCard(d){
   var h='<div class="ds-item ds-card'+(gone?' is-exp':soon?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     /* name and status */
     '<div class="ds-ch"><b class="ds-name">'+t.name+'</b>'+stDot(st,stLabel(d))+'</div>'+
-    (exp?'<div class="ds-exp'+(gone?' bad':soon?' soon':'')+'">'+(gone?'Expired on ':'Expires ')+exp+'</div>':'')+
+    (exp?'<div class="ds-exp'+(gone?' bad':soon?' soon':'')+'">'+(gone?'Expired on ':'Expires ')+exp+'</div>':'<div class="ds-exp" aria-hidden="true">&nbsp;</div>')+
     /* the files, or what's missing */
     '<div class="ds-cb">'+(gone?'<div class="ds-none">No active document. The expired version is in Version history.</div>':
       fileChips(d,t,0,d.cur.files)+'<div class="ds-by">Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</div>')+'</div>'+

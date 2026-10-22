@@ -1739,7 +1739,7 @@ function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
   var shut=docShut[d.k]!=null?docShut[d.k]:!(gone||soon||open||flashK===d.k), nHist=versionsOf(d).length-(gone?0:1);
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
-  var line=gone?'Expired on '+exp:soon?(dl===0?'Expiring today':'Expiring within '+dl+' day'+(dl===1?'':'s')):exp?'Until '+exp:'No expiry';
+  var line=gone?'Expired on '+exp:soon?(dl===0?'Expiring today':'Expiring within '+dl+' day'+(dl===1?'':'s')):exp?'Valid until '+exp:'No expiry';
   var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
   var expRow=expEdit===d.k
     ?'<div class="dc2-exp edit"><label class="dc2-elbl" for="dx-'+d.k+'">Expiry</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+

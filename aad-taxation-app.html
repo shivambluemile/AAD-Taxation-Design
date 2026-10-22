@@ -1737,7 +1737,7 @@ function versionTimeline(d){
 function isoDate(x){ return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()); }
 function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
-  var shut=docShut[d.k]!=null?docShut[d.k]:!(gone||soon||open||flashK===d.k), nHist=versionsOf(d).length-(gone?0:1);
+  var shut=docShut[d.k]!=null?docShut[d.k]:!(open||flashK===d.k), nHist=versionsOf(d).length-(gone?0:1);
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
   var line=gone?'Expired on '+exp:soon?(dl===0?'Expiring today':'Expiring within '+dl+' day'+(dl===1?'':'s')):exp?'Valid until '+exp:'No expiry';
   var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
@@ -1822,7 +1822,7 @@ function docsBody(s){
   var parts=[], need=missing.concat(gone.map(function(d){ return d.k; }));
   if(missing.length) parts.push(join(missing.map(low))+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded');
   if(gone.length) parts.push(join(gone.map(function(d){ return low(d.k); }))+(gone.length>1?' have':' has')+' expired');
-  if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(who)+'’s '+parts.join(', and ')+'. Please click Upload to provide '+(need.length>1?'the required documents':gone.length?'a new copy':'it')+'.</span>'+
+  if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action Required:</b> '+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click Upload to provide the required document'+(need.length>1?'s':'')+'.</span>'+
     '<button type="button" class="dx-up" data-needpop aria-haspopup="dialog">'+I.upsm+'Upload</button></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';

@@ -782,6 +782,7 @@ body.gridmode .listview{display:none}
 .ds-cap{font-size:11.5px;font-weight:600;color:var(--faint);padding:1px 8px;border-radius:999px;background:#F3F4F6}.ds-cap.full{background:#FFF6E8;color:#B4690E}
 .ds-pnote{display:flex;align-items:center;gap:6px;margin:4px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:12px;color:var(--mute)}.ds-pnote svg{width:13px;height:13px}
 .up-cur-n.warn{background:#FFF6E8;color:#92400E}
+.up-hl{padding:0;font:inherit;font-weight:600;color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
 .up-cur-n.up-exp{border:1px solid var(--line);border-radius:10px;background:#F8FAFC;margin-bottom:16px}.up-cur-n.warn.up-exp{background:#FFF6E8;border-color:#FBE3BF}.up-cur-n.warn b{color:#92400E}
 .ds-act{display:inline-flex;align-items:center;gap:6px;padding:6px 4px;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
 .ds-act svg{width:13px;height:13px}
@@ -1782,19 +1783,15 @@ function docsBody(s){
   var h='<div class="ds-bar">'+
     '<div class="ds-search">'+I.srch+'<input id="sd-q" type="search" placeholder="Search documents" aria-label="Search documents" value="'+esc(docQ)+'"></div></div>';
   var gone=docs.filter(function(d){ return stOf(d)==='expired'; });
-  /* action required: mandatory documents not uploaded yet, then any document that has expired */
+  /* action required: one sentence naming what isn't on file (mandatory documents never uploaded, documents that expired), with Upload */
   var have=docs.map(function(d){ return d.k; }), missing=REQUIRED_DOCS.filter(function(k){ return have.indexOf(k)<0; }), lines='';
-  if(missing.length){
-    var who=String(detailStaff.n||'').trim().split(' ')[0], names=missing.map(function(k){ return typeOf(k).name.toLowerCase(); });
-    var list=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0];
-    lines+='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(who)+'’s '+esc(list)+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+
-      ' not been uploaded. Please click Upload to provide '+(missing.length>1?'the required documents':'it')+'.</span><span class="dx-ups">'+
-      missing.map(function(k){ return '<button type="button" class="dx-up" data-replace="'+k+'" aria-label="Upload '+esc(typeOf(k).name)+'">'+I.upsm+(missing.length>1?'Upload '+esc(typeOf(k).name):'Upload')+'</button>'; }).join('')+'</span></div>';
-  }
-  lines+=gone.map(function(d){ var x=typeOf(d.k), hv=versionsOf(d).length;
-    return '<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(x.name)+' expired on '+fmtD(d.cur.exp)+'. Please click Upload to provide a new copy.</span>'+
-      '<button type="button" class="dx-hist" data-histpop="'+d.k+'" aria-haspopup="dialog">History<span class="dc2-hn">'+hv+'</span></button>'+
-      '<button type="button" class="dx-up" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload</button></div>'; }).join('');
+  var who=String(detailStaff.n||'').trim().split(' ')[0], low=function(k){ return esc(typeOf(k).name.toLowerCase()); };
+  var join=function(a){ return a.length>1?a.slice(0,-1).join(', ')+' and '+a[a.length-1]:a[0]; };
+  var parts=[], need=missing.concat(gone.map(function(d){ return d.k; }));
+  if(missing.length) parts.push(join(missing.map(low))+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded');
+  if(gone.length) parts.push(join(gone.map(function(d){ return low(d.k); }))+(gone.length>1?' have':' has')+' expired');
+  if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action required:</b> '+esc(who)+'’s '+parts.join(', and ')+'. Please click Upload to provide '+(need.length>1?'the required documents':gone.length?'a new copy':'it')+'.</span>'+
+    '<span class="dx-ups">'+need.map(function(k){ return '<button type="button" class="dx-up" data-replace="'+k+'" aria-label="Upload '+esc(typeOf(k).name)+'">'+I.upsm+(need.length>1?'Upload '+esc(typeOf(k).name):'Upload')+'</button>'; }).join('')+'</span></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
@@ -1865,7 +1862,7 @@ function paintUpd(){
       '<div class="sd-ferr" id="err-type">Choose a document type</div></div>';
   }
   if(d&&st==='expired'){
-    h+='<div class="up-cur-n up-exp">'+I.hist+'<span>The expired '+esc(t.name.toLowerCase())+' ('+d.cur.files.map(function(f){ return esc(f.n); }).join(', ')+', expired '+fmtD(d.cur.exp)+') is already kept in the history.</span></div>'+
+    h+='<div class="up-cur-n up-exp">'+I.hist+'<span>The expired '+esc(t.name.toLowerCase())+' ('+d.cur.files.map(function(f){ return esc(f.n); }).join(', ')+', expired '+fmtD(d.cur.exp)+') is already kept in the <button type="button" class="up-hl" data-histpop="'+d.k+'">history</button>.</span></div>'+
       (versionsOf(d).length>=KEEP_VERSIONS?'<div class="up-cur-n warn up-exp">'+I.hist+'<span>This document already has '+KEEP_VERSIONS+' versions. Saving <b>permanently deletes Version '+versionsOf(d)[versionsOf(d).length-1].ver+'</b>, the oldest.</span></div>':'');
   } else if(d){
     h+='<div class="up-cur">'+
@@ -2166,6 +2163,8 @@ document.addEventListener('click',function(e){
   var dm=b&&b.getAttribute('data-dmenu');
   if(dm){ docMenu=docMenu===dm?null:dm; keepScroll(renderDetail); var fi=drawer.querySelector('.ds-menu [role=menuitem]'); if(fi) fi.focus(); else { var kb=drawer.querySelector('[data-dmenu="'+dm+'"]'); if(kb) kb.focus(); } return; }
   if(docMenu&&!(t.closest&&t.closest('.ds-menu'))){ var was=docMenu; docMenu=null; keepScroll(renderDetail); var kb2=drawer.querySelector('[data-dmenu="'+was+'"]'); if(kb2&&!b) kb2.focus({preventScroll:true}); if(!b) return; }
+  var hp2=b&&b.closest('#m-upd')&&b.getAttribute('data-histpop');
+  if(hp2){ document.getElementById('hist-title').textContent=typeOf(hp2).name+' · History'; document.getElementById('hist-body').innerHTML=versionTimeline(findDoc(hp2)); openModal('m-hist'); return; }
   var rp=b&&b.getAttribute('data-replace');
   if(rp){ if(docMenu){ docMenu=null; keepScroll(renderDetail); } openUpd(rp); return; }
   if(b&&b.id==='sd-upload'){ openUpd(null); return; }

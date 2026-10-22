@@ -1037,6 +1037,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-hn{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
 .dc2-hbtn svg{transition:transform .15s}.dc2-hbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
 .dc2-fn small em{font-style:normal;font-weight:600;color:var(--slate)}
+.dc2-fn small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dc2.open{border-color:var(--line);box-shadow:none}
 .vh{margin-top:12px;padding-top:14px;border-top:1px dashed var(--line)}
 .vh-none{margin:0;font-size:12.5px;color:var(--faint)}
@@ -1680,7 +1681,7 @@ function versionTimeline(d){
           '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
           '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
             '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+
-          '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
+          '<span class="dc2-fa">'+
           '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</li>');
   }
   return '<div class="vh">'+(items.length?'<ol class="vh-list">'+items.join('')+'</ol>':'<p class="vh-none">No previous versions</p>')+'</div>';
@@ -1701,7 +1702,7 @@ function docCard(d){
       return '<div class="dc2-cell">'+(sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
         '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
         '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by <em>'+esc(d.cur.by)+'</em> · '+fmtD(d.cur.on)+' '+fmtT(d.cur.on)+'</small></div>'+
-        '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|0|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
+        '<span class="dc2-fa">'+
         '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div></div>'; }).join('')+
       (fl.length>3?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-3)+' more file'+(fl.length-3===1?'':'s'))+'</button>':'');
   return '<div class="dc2'+(open?' open':'')+(shut?' shut':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+

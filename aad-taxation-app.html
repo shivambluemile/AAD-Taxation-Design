@@ -1020,7 +1020,40 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .acc-chev{margin-left:auto;display:flex;color:var(--mute)}.acc-chev svg{transition:transform .15s}.acc-h[aria-expanded="true"] .acc-chev svg{transform:rotate(180deg)}
 .acc-h:hover b{color:var(--orange-ink)}
 .acc-b{padding-top:10px;margin-bottom:8px}
-.dt-tile.is-exp{border-left:3px solid #EF4444;background:#FFFBFB}.dt-tile.is-soon{border-left:3px solid #F59E0B;background:#FFFDF7}
+.dc2-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.dc2{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px 18px 14px;min-width:0}
+.dc2.open{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}.dc2.flash{animation:dvflash 2.4s ease-out}
+.dc2-h{display:flex;align-items:center;gap:8px}
+.dc2-tg{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left;background:none;padding:0}
+.dc2 .dt-ic{width:40px;height:40px;border-radius:10px;flex-shrink:0}
+.dc2-name{font-size:15px;font-weight:700;color:var(--ink);min-width:0;overflow-wrap:anywhere}
+.dc2-chev{display:flex;color:var(--faint)}.dc2-chev svg{transition:transform .15s}.dc2.shut .dc2-chev svg{transform:rotate(-90deg)}
+.dc2-tg:hover .dc2-name{color:var(--orange-ink)}
+.dc2-mw{position:relative;flex-shrink:0}
+.dc2-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute)}.dc2-more:hover,.dc2-more[aria-expanded="true"]{background:#F2F4F7;color:var(--ink)}
+.dc2-menu{position:absolute;right:0;top:36px;z-index:20;min-width:190px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(15,23,42,.14);padding:5px;display:flex;flex-direction:column}
+.dc2-menu[hidden]{display:none}
+.dc2-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--slate)}.dc2-menu button:hover,.dc2-menu button:focus-visible{background:#FFF4EA;color:var(--orange-ink);outline:none}
+.dc2-exp{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:13px;color:var(--mute)}
+.dc2-exp.warn{color:#B45309;font-weight:600}.dc2-exp.bad{color:#B91C1C;font-weight:600}
+.dc2-pen{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:var(--faint)}.dc2-pen:hover{background:#F2F4F7;color:var(--ink)}
+.dc2-exp.edit input{width:auto;height:32px;font-size:13px}
+.dc2-ok,.dc2-no{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+.dc2-ok{background:#ECFDF5;color:#059669}.dc2-ok:hover{background:#D1FAE5}.dc2-no{background:#FEF2F2;color:#DC2626}.dc2-no:hover{background:#FEE2E2}
+.dc2-b{display:flex;flex-direction:column;margin-top:14px}
+.dc2-lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:6px 0 6px}
+.dc2-lbl:first-child{margin-top:0}
+.dc2-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:8px;min-width:0}
+.dc2-fic{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#E8EEFC;color:#3B5BDB}
+.dc2-fic.e-pdf{background:#FDECEC;color:#DC2626}.dc2-fic.e-doc,.dc2-fic.e-docx{background:#E8F1FD;color:#2563EB}
+.dc2-fn{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.dc2-fn .ds-fname{text-align:left;font-size:13.5px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.dc2-fn small{font-size:12px;color:var(--faint)}.dc2-fn small b{font-weight:700;color:#3B5BDB}.dc2-fn small b.e-pdf{color:#DC2626}
+.dc2-fa{display:flex;gap:2px;flex-shrink:0}
+.dc2-empty{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px dashed #D6DBE1;border-radius:10px;margin-bottom:8px}.dc2-empty b{font-size:13px;color:var(--ink)}.dc2-empty span{font-size:12px;color:var(--mute)}
+.dc2-act{align-self:flex-start;padding:4px 0;margin-top:2px;font-size:13px}
+.dc2 .dt-fmore{margin:0 0 6px}
+@media (max-width:720px){.dc2-grid{grid-template-columns:1fr}}
 .dt-line b{font-weight:700}
 .dt-tile{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:#fff;transition:border-color .15s,box-shadow .15s}
 .dt-tile:hover{border-color:#CBD2DA}
@@ -1386,7 +1419,7 @@ var detailStaff=null, detailTab='docs';
 
 function openDetail(id){
   detailStaff=STAFF.filter(function(x){return x.id===id})[0]||STAFF[0];
-  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; filesAll={}; accOpen={}; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null; docMenu=null;
+  detailTab='docs'; editing=null; drawerMode='detail'; pend={}; docOpen={}; filesAll={}; accOpen={}; docShut={}; expEdit=null; docFilter='all'; docTab='current'; docQ=''; auditFilter='all'; flashK=null; docMenu=null;
   renderDetail(); drawer.classList.add('show'); scrim.classList.add('show'); drawer.setAttribute('aria-hidden','false');
 }
 
@@ -1594,25 +1627,42 @@ var DOC_IC={
 };
 /* a card with more than two files: the rest open inside the card (the versions table opens from the card itself) */
 var filesAll={};
+/* one document card: icon and name (click to collapse), ⋯ menu; the expiry with an edit pencil; each file in its own row under its label; Renew or Replace */
+var docShut={}, expEdit=null;                                 // document -> collapsed; the document whose expiry is being edited
+var DC_I={
+  dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+  img:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>',
+  file:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></svg>',
+  tick:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+  chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'
+};
+function isoDate(x){ return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()); }
 function docCard(d){
-  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
-  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
-  var dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
-  var line=gone?'Expired '+exp+' · <b>'+ago+' day'+(ago===1?'':'s')+' ago</b>':soon?'Expires '+exp+' · <b>'+(dl===0?'today':dl+' day'+(dl===1?'':'s')+' left')+'</b>':exp?'Valid until '+exp:'No expiry';
-  var nv='';
-  var FILES_SHOWN=filesAll[d.k]?Infinity:4, fl=gone?[]:d.cur.files, sided=t.slots.length>1;
-  var files=fl.length?'<div class="dt-files">'+fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n);
-      return '<div class="dt-fbox"><div class="dt-frow"><span class="x e-'+x+'">'+x.toUpperCase()+'</span>'+(sided?'<span class="dt-flbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'<span></span>')+
-        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></div>'+
-        '<button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button></div>'; }).join('')+
-      '':'';
-  /* expired: an empty file slot where the document would be */
-  if(gone) files='<div class="dt-files"><div class="dt-fempty"><b>No valid document</b><span>The last one expired. Upload a new copy to replace it.</span></div></div>';
-  else if(fl.length) files+=(fl.length>4?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-4)+' more file'+(fl.length-4===1?'':'s'))+'</button>':'')+'</div>';
-  return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+(gone?'no valid document, ':'')+line.replace(/<[^>]+>/g,'')+'. '+(open?'Hide':'Show')+' files and history">'+
-      '<span class="dt-hd"><span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b><span class="dt-line">'+line+'</span></span>'+nv+'</button>'+files+
-    '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
+  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], shut=!!docShut[d.k], renew=gone||soon;
+  var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
+  var line=gone?'Expired '+exp+' · '+ago+' day'+(ago===1?'':'s')+' ago':soon?'Expires '+exp+' · '+(dl===0?'today':dl+' day'+(dl===1?'':'s')+' left'):exp?'Until '+exp:'No expiry';
+  var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
+  var expRow=expEdit===d.k
+    ?'<div class="dc2-exp edit"><label class="sr" for="dx-'+d.k+'">Expiry date</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+
+      '<button type="button" class="dc2-ok" data-expsave="'+d.k+'" title="Save expiry" aria-label="Save expiry">'+DC_I.tick+'</button><button type="button" class="dc2-no" data-expcancel title="Cancel" aria-label="Cancel">'+I.close+'</button></div>'
+    :'<div class="dc2-exp'+(gone?' bad':soon?' warn':'')+'"><span>'+line+'</span>'+(t.exp?'<button type="button" class="dc2-pen" data-expedit="'+d.k+'" title="Edit expiry date" aria-label="Edit expiry date of '+esc(t.name)+'">'+I.edit+'</button>':'')+'</div>';
+  var files=gone?'<div class="dc2-empty"><b>No valid document</b><span>The last one expired. Upload a new copy to replace it.</span></div>'
+    :fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
+      return (sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
+        '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
+        '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small></div>'+
+        '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|0|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
+        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+
+      (fl.length>3?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-3)+' more file'+(fl.length-3===1?'':'s'))+'</button>':'');
+  return '<div class="dc2'+(open?' open':'')+(shut?' shut':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+    '<div class="dc2-h"><button type="button" class="dc2-tg" data-shut="'+d.k+'" aria-expanded="'+!shut+'" aria-label="'+esc(t.name)+', '+line+'. '+(shut?'Expand':'Collapse')+'">'+
+        '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dc2-name">'+t.name+'</b><span class="dc2-chev">'+DC_I.chev+'</span></button>'+
+      '<span class="dc2-mw"><button type="button" class="dc2-more" data-dmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions for '+esc(t.name)+'" title="More actions">'+DC_I.dots+'</button>'+
+        '<span class="dc2-menu" role="menu" hidden><button type="button" role="menuitem" data-toggle="'+d.k+'">'+(open?'Hide version history':'Version history')+'</button>'+
+          (t.exp?'<button type="button" role="menuitem" data-expedit="'+d.k+'">Edit expiry date</button>':'')+
+          '<button type="button" role="menuitem" data-replace="'+d.k+'">'+(renew?'Renew':'Replace')+' document</button></span></span></div>'+
+    expRow+
+    (shut?'':'<div class="dc2-b">'+files+'</div><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>')+
   '</div>';
 }
 /* the open tile's details: a compact versions table; older versions open below the history toggle.
@@ -1665,18 +1715,11 @@ function currentList(docs){
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
-  var cats=[]; DOC_TYPES.forEach(function(x){ if(cats.indexOf(x.cat)<0) cats.push(x.cat); });
-  var groups=cats.map(function(cat){ return {cat:cat,items:list.filter(function(d){ return typeOf(d.k).cat===cat; })}; }).filter(function(g){ return g.items.length; });
-  var anyNeed=need.length>0, narrowed=!!q||docFilter!=='all';
-  return groups.map(function(g,gi){
-    var ex=g.items.filter(function(d){ return stOf(d)==='expired'; }).length, so=g.items.filter(function(d){ return stOf(d)==='soon'; }).length;
-    var open=accOpen[g.cat]!=null?accOpen[g.cat]:(narrowed||ex+so>0||(!anyNeed&&gi===0)||g.items.some(function(d){ return d.k===flashK||docOpen[d.k]; }));
-    var flags=(ex?'<span class="acc-f bad">'+ex+' expired</span>':'')+(so?'<span class="acc-f warn">'+so+' expiring soon</span>':'');
-    return '<section class="acc"><button type="button" class="acc-h" data-acc="'+esc(g.cat)+'" aria-expanded="'+open+'"><b>'+esc(g.cat)+'</b><span class="acc-n">'+g.items.length+'</span>'+flags+'<span class="acc-chev">'+I.chev+'</span></button>'+
-      (open?'<div class="dt-grid acc-b">'+g.items.map(function(d){ return docCard(d)+(docOpen[d.k]?docDetail(d):''); }).join('')+'</div>':'')+'</section>';
-  }).join('');
+  var PER=2, h='<div class="dt-grid dc2-grid">';
+  for(var i=0;i<list.length;i+=PER){ var row=list.slice(i,i+PER), op=row.filter(function(d){ return docOpen[d.k]; })[0];
+    h+=row.map(docCard).join('')+(op?docDetail(op):''); }
+  return h+'</div>';
 }
-var accOpen={};                                              // category -> section open (chosen by the user)
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){
   var d=findDoc(k); if(!d) return;
@@ -1837,13 +1880,13 @@ function doDelete(){
 /* ---------- audit trail ---------- */
 function auditBody(s){
   var all=storeOf(s.id).audit;
-  var tone={uploaded:'t-green',replaced:'t-blue',deleted:'t-red',purged:'t-red'};
-  var icon={uploaded:ACT.created,replaced:ACT.replaced,deleted:ACT.deleted,purged:ACT.deleted};
+  var tone={uploaded:'t-green',replaced:'t-blue',deleted:'t-red',purged:'t-red',updated:'t-blue'};
+  var icon={uploaded:ACT.created,replaced:ACT.replaced,deleted:ACT.deleted,purged:ACT.deleted,updated:ACT.replaced};
   if(!all.length) return '<div class="dl-none"><b>No document activity yet</b>Uploads, replacements and deletions will appear here.</div>';
   var seenCur={};
   return ''+
     '<div class="al">'+all.map(function(a){
-      var detail = a.act==='replaced' ? esc(a.from)+' → '+esc(a.to)+(a.expTo?' · new expiry '+fmtD(a.expTo):'')
+      var detail = a.act==='updated' ? 'Expiry date '+esc(a.from)+' → '+esc(a.to) : a.act==='replaced' ? esc(a.from)+' → '+esc(a.to)+(a.expTo?' · new expiry '+fmtD(a.expTo):'')
         : a.act==='purged' ? esc(a.files)+' deleted · '+esc(a.note)
         : esc(a.files)+(a.act==='deleted'&&a.prev?' and '+a.prev+' previous version'+(a.prev===1?'':'s'):'');
       // the files this entry added: that version can still be opened and downloaded
@@ -2045,6 +2088,20 @@ document.addEventListener('click',function(e){
   if(pv){ document.getElementById('sheet').textContent=pv.getAttribute('data-preview').toUpperCase(); openModal('m-prev'); return; }
   var vh=t.closest('[data-vh]');
   if(vh){ var vk=vh.getAttribute('data-vh'); histOpen[vk]=!histOpen[vk]; keepScroll(renderDetail); var vb=drawer.querySelector('[data-vh="'+vk+'"]'); if(vb) vb.focus({preventScroll:true}); return; }
+  [].forEach.call(drawer.querySelectorAll('.dc2-menu:not([hidden])'),function(m){ if(!m.parentNode.contains(t)){ m.hidden=true; m.previousElementSibling.setAttribute('aria-expanded','false'); } });
+  var dm=t.closest('[data-dmenu]');
+  if(dm){ var mm=dm.nextElementSibling; mm.hidden=!mm.hidden; dm.setAttribute('aria-expanded',String(!mm.hidden)); if(!mm.hidden){ var f0=mm.querySelector('button'); if(f0) f0.focus(); } return; }
+  var sh=t.closest('[data-shut]');
+  if(sh){ var sk=sh.getAttribute('data-shut'); docShut[sk]=!docShut[sk]; keepScroll(renderDetail); var sb=drawer.querySelector('[data-shut="'+sk+'"]'); if(sb) sb.focus({preventScroll:true}); return; }
+  var xe=t.closest('[data-expedit]');
+  if(xe){ expEdit=xe.getAttribute('data-expedit'); keepScroll(renderDetail); var xi=drawer.querySelector('#dx-'+expEdit); if(xi) xi.focus(); return; }
+  if(t.closest('[data-expcancel]')){ var was=expEdit; expEdit=null; keepScroll(renderDetail); var pb=drawer.querySelector('[data-expedit="'+was+'"]'); if(pb) pb.focus({preventScroll:true}); return; }
+  var xs=t.closest('[data-expsave]');
+  if(xs){ var xk=xs.getAttribute('data-expsave'), xd=findDoc(xk), xv=(drawer.querySelector('#dx-'+xk)||{}).value;
+    if(!xv){ toast('Choose the expiry date'); return; }
+    var nx=new Date(xv+'T00:00:00'), was2=xd.cur.exp;
+    if(!was2||isoDate(was2)!==xv){ xd.cur.exp=nx; storeOf(detailStaff.id).audit.unshift({act:'updated',k:xk,name:typeOf(xk).name,ver:xd.ver,on:new Date(),by:ME,from:was2?fmtD(was2):'none',to:fmtD(nx)}); toast('Expiry date updated'); }
+    expEdit=null; keepScroll(renderDetail); return; }
   var ac=t.closest('[data-acc]');
   if(ac){ var ck=ac.getAttribute('data-acc'); accOpen[ck]=ac.getAttribute('aria-expanded')!=='true'; keepScroll(renderDetail); var nb=drawer.querySelector('[data-acc="'+ck+'"]'); if(nb) nb.focus({preventScroll:true}); return; }
   var fx=t.closest('[data-fx]');

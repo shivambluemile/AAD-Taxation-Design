@@ -1031,7 +1031,12 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-chev svg{transition:transform .15s}.dc2.shut .dc2-chev svg{transform:rotate(-90deg)}
 .dc2-h .dc2-exp{margin:0 0 0 auto;flex-shrink:0}
 .dc2.shut{padding-bottom:18px}
-.dc2-foot{display:flex;align-items:center;gap:18px;margin-top:2px}
+.dc2-foot{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:4px}
+.dc2-act svg{width:13px;height:13px}
+.dc2-hbtn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate);padding:4px 0}.dc2-hbtn:hover{color:var(--orange-ink)}.dc2-hbtn.off{color:var(--faint);cursor:default}
+.dc2-hn{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#F1F2F4;color:var(--slate);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.dc2-hbtn svg{transition:transform .15s}.dc2-hbtn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.dc2-fn small em{font-style:normal;font-weight:600;color:var(--slate)}
 .dc2.open{border-color:var(--line);box-shadow:none}
 .vh{margin-top:12px;padding-top:14px;border-top:1px dashed var(--line)}
 .vh-none{margin:0;font-size:12.5px;color:var(--faint)}
@@ -1683,7 +1688,7 @@ function versionTimeline(d){
 function isoDate(x){ return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()); }
 function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
-  var shut=docShut[d.k]!=null?docShut[d.k]:!(gone||soon||open||flashK===d.k);
+  var shut=docShut[d.k]!=null?docShut[d.k]:!(gone||soon||open||flashK===d.k), nHist=versionsOf(d).length-(gone?0:1);
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
   var line=gone?'Expired '+exp+' · '+ago+' day'+(ago===1?'':'s')+' ago':soon?'Expires '+exp+' · '+(dl===0?'today':dl+' day'+(dl===1?'':'s')+' left'):exp?'Until '+exp:'No expiry';
   var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
@@ -1695,7 +1700,7 @@ function docCard(d){
     :fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
       return '<div class="dc2-cell">'+(sided?'<span class="dc2-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
         '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
-        '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small></div>'+
+        '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by <em>'+esc(d.cur.by)+'</em> · '+fmtD(d.cur.on)+' '+fmtT(d.cur.on)+'</small></div>'+
         '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|0|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
         '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div></div>'; }).join('')+
       (fl.length>3?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-3)+' more file'+(fl.length-3===1?'':'s'))+'</button>':'');
@@ -1704,8 +1709,9 @@ function docCard(d){
         '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dc2-name">'+t.name+'</b></button>'+
       expRow+
       '<button type="button" class="dc2-chev" data-shut="'+d.k+'" aria-hidden="true" tabindex="-1">'+DC_I.chev+'</button></div>'+
-    (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
-      '<button type="button" class="ds-act dc2-act" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide version history':'Version history')+'</button></div>'+(open?versionTimeline(d):''))+
+    (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button>'+
+      (nHist?'<button type="button" class="dc2-hbtn" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' history, '+nHist+' earlier version'+(nHist===1?'':'s')+'">History<span class="dc2-hn">'+nHist+'</span>'+DC_I.chev+'</button>'
+        :'<span class="dc2-hbtn off">History<span class="dc2-hn">0</span></span>')+'</div>'+(open?versionTimeline(d):''))+
   '</div>';
 }
 /* the open tile's details: a compact versions table; older versions open below the history toggle.

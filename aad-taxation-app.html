@@ -3051,6 +3051,7 @@ tbody tr:hover{background:#FCFCFD}
 .kt-tile.is-exp .kt-line{color:#B91C1C;font-weight:600}.kt-tile.is-soon .kt-line{color:#B45309;font-weight:600}
 .kt-sub{font-size:12px;color:var(--mute);padding-left:44px}.kt-sub.ok{color:#047857}.kt-sub.warn{color:#B45309}.kt-sub.bad{color:#B91C1C}
 .kt-files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 14px 4px}
+.kt-meta{margin:2px 14px 0}.kt-meta .dc-meta{margin-top:10px}.kt-meta .dc-note{margin-top:8px}
 .kt-nofile{margin:10px 14px 4px;font-size:12.5px;color:var(--faint)}
 .kt-note{margin:8px 14px 0;font-size:12.5px;color:var(--mute)}.kt-note.bad{color:#B91C1C}
 .kt-rev{margin:10px 14px 0}.kt-rev .el-review{margin:0}
@@ -6038,8 +6039,11 @@ function kycTab(c){
       '<td>Verified '+dmyOf(fromIso(r.date))+'<small>by '+esc(r.by)+'</small><small>Uploaded '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+(up&&up!==r.by?' by '+esc(up):'')+'</small></td>'+
       '<td'+(g2?' class="bad"':'')+'>'+dmyOf(e2)+'</td></tr>'; };
   var base=gone?0:1;   // an expired check is no longer current: it moves into the history
-  var tile=ktTile({key:'k',open:open,cls:gone?'is-exp':soon?'is-soon':'',name:'KYC Verification',aria:'KYC Verification, '+(gone?'expired ':soon?'expires ':'next verification ')+dmyOf(ex)+'. '+(open?'Hide':'Show')+' versions',
-    line:(gone?'Expired ':soon?'Expires ':'Next verification ')+dmyOf(ex),files:files,
+  var upBy=(cur.files&&cur.files[0]&&cur.files[0].by)||cur.by, curNote=noteOf(cur);
+  var meta=gone?'':'<div class="kt-meta">'+dcMeta([['Verified on',dmyOf(fromIso(cur.date))],['Verified by',esc(cur.by)],['Uploaded',whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'<small>by '+esc(upBy)+'</small>']])+
+    (curNote?'<p class="dc-note">Note: '+esc(curNote)+'</p>':'')+'</div>';
+  var tile=ktTile({key:'k',open:open,cls:gone?'is-exp':soon?'is-soon':'',name:'KYC Verification',aria:'KYC Verification, '+(gone?'expired ':'next verification ')+dmyOf(ex)+'. '+(open?'Hide':'Show')+' versions',
+    line:(gone?'Expired ':'Next verification ')+dmyOf(ex),files:files,extra:meta,
     foot:c._draft?'':'<button type="button" class="linkbtn kt-act" data-kyc-add>'+(st==='valid'?'Record new KYC':'Renew KYC')+'</button>'});
   var panel=open?ktPanel({key:'k',cid:c.id,head:['Version','Documents','Verified','Expiry'],cur:gone?'':row(cur,0,true),none:'No valid KYC. The last verification has expired.',
     hist:recs.slice(base).map(function(r,j){ return row(r,j+base,false); })}):'';
@@ -6136,11 +6140,14 @@ function engagementTab(c){
   var sub={draft:'Not sent yet',awaiting:'Awaiting signature'+(lastOk?' · sent '+dmyOf(lastOk.at):''),signed:'Signed '+(L.signedAt?dmyOf(L.signedAt):'')+' by '+esc(signedBy(L)||who),failed:'Email not delivered',expired:''}[st];
   var files=gone?'<div class="kt-files"><div class="dc-fempty"><b>No valid engagement letter</b><span>The FY '+fyLabel(letterFy(L))+' letter has expired. Start the renewal to send this year’s letter.</span></div></div>'
     :'<div class="kt-files">'+dcFile(fileName(L),'data-el="'+(st==='draft'?'view':'full')+'"','data-el="pdf"',L.file&&L.file.size)+'</div>';
-  var extra=(st==='failed'?'<p class="kt-note bad">'+S[1]+'</p>':'')+(st==='draft'?'<div class="kt-rev">'+review+'</div>':'');
+  var sentOkL=lastOk, meta=gone?'':'<div class="kt-meta">'+dcMeta(st==='signed'
+      ?[['Signed by',esc(signedBy(L)||who)],['Signed on',L.method==='upload'?dmyOf(L.signedAt):whenOf(L.signedAt).replace(' · ',', ')],[L.method==='upload'?'Uploaded':'How',L.method==='upload'?(L.uploadedAt?whenOf(L.uploadedAt).replace(' · ',', '):'')+'<small>by '+esc(L.uploadedBy||'staff')+'</small>':how(L)]]
+      :[['To be signed by',esc(who)+(role?' <small>'+esc(role)+'</small>':'')],sentOkL?['Sent',whenOf(sentOkL.at).replace(' · ',', ')]:['Created',whenOf(L.created).replace(' · ',', ')+(L.by?'<small>by '+esc(L.by)+'</small>':'')],['Status',esc(S[0])]])+'</div>';
+  var extra=meta+(st==='failed'?'<p class="kt-note bad">'+S[1]+'</p>':'')+(st==='draft'?'<div class="kt-rev">'+review+'</div>':'');
   var foot=(S[3]?'<button type="button" class="linkbtn kt-act" data-el="'+S[3][0]+'">'+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="linkbtn kt-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+menu;
   var exp=gone?letterExpiresAt(L):fyEndAt;
   var tile=ktTile({key:'l',open:open,cls:gone||st==='failed'?'is-exp':'',name:'Engagement Letter',aria:'Engagement letter FY '+fyLabel(F)+', '+(gone?'expired ':'expires ')+dmyOf(exp)+'. '+(open?'Hide':'Show')+' versions',
-    line:(gone?'Expired ':'Expires ')+dmyOf(exp),sub:sub?'FY '+fyLabel(F)+' · '+sub:'FY '+fyLabel(F),subCls:st==='signed'?'ok':st==='failed'?'bad':st==='awaiting'?'warn':'',files:files,extra:extra,foot:foot});
+    line:(gone?'Expired ':'Expires ')+dmyOf(exp),sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),files:files,extra:extra,foot:foot});
 
   /* the table: this year's letter, then earlier years (an expired letter is history) */
   var row=function(l,isCur){ var y=letterFy(l), e2=l.expiredAt||letterExpiresAt(l), s2=elState(l), sentOk=(l.sends||[]).filter(function(s){ return s.ok; }).slice(-1)[0];

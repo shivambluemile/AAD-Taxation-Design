@@ -1022,8 +1022,10 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dt-name{font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
 .dt-line{font-size:12px;color:var(--faint)}.dt-tile.is-exp .dt-line{color:#B91C1C;font-weight:600}.dt-tile.is-soon .dt-line{color:#B45309;font-weight:600}
 .dt-act{align-self:flex-start;margin:0 0 10px 14px;padding:4px 0;font-size:12.5px}
-.dt-detail{grid-column:1/-1;position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;border:1px solid var(--line);border-radius:12px;background:#FAFBFC;padding:12px 44px 12px 12px}
+.dt-detail{grid-column:1/-1;position:relative;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;border:1px solid var(--line);border-radius:12px;background:#FAFBFC;padding:12px 44px 12px 12px}
 .dt-x{position:absolute;top:10px;right:10px}
+.dt-detail.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.dt-vh{margin-top:10px}.dt-vh svg:first-child{width:13px;height:13px}
 .dt-box{background:#fff;border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;min-width:0}
 .dt-box h4{display:flex;align-items:center;gap:6px;margin:0 0 10px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B}
 .dt-box h4 span{font-weight:600;letter-spacing:0;text-transform:none;color:var(--faint)}
@@ -1561,17 +1563,19 @@ function docCard(d){
     '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
   '</div>';
 }
-/* the open tile's details: the current document and its version history, as two separate blocks */
+/* the open tile's details: the current document; its version history shows beside it only when asked for */
+var histOpen={};
 function docDetail(d){
-  var t=typeOf(d.k), vs=versionsOf(d), hist=vs.slice(1), cur=vs[0];
+  var t=typeOf(d.k), vs=versionsOf(d), hist=vs.slice(1), cur=vs[0], hOpen=!!histOpen[d.k]&&hist.length>0;
   var meta=function(v,vi){ var gone2=t.exp&&v.exp&&daysTo(v.exp)<0;
     return '<span class="dg-vi">Uploaded '+fmtD(v.on)+', '+fmtT(v.on)+' by '+esc(v.by)+(t.exp&&v.exp&&vi?' · <em'+(gone2?' class="bad"':'')+'>'+(gone2?'Expired ':'Expires ')+fmtD(v.exp)+'</em>':'')+'</span>'; };
-  return '<div class="dt-detail" data-detail="'+d.k+'">'+
+  return '<div class="dt-detail'+(hOpen?' two':'')+'" data-detail="'+d.k+'">'+
     '<button type="button" class="sdt-ib dt-x" data-toggle="'+d.k+'" aria-label="Close" title="Close">'+I.close+'</button>'+
-    '<section class="dt-box"><h4>Current document <span>Version '+cur.ver+'</span></h4>'+fileChips(d,t,0,cur.files)+meta(cur,0)+'</section>'+
-    '<section class="dt-box"><h4>Version history <span>'+hist.length+'</span></h4>'+
-      (hist.length?hist.map(function(v,j){ return '<div class="dt-v"><b>Version '+v.ver+'</b>'+fileChips(d,t,j+1,v.files)+meta(v,j+1)+'</div>'; }).join(''):'<p class="dg-none">No previous versions</p>')+
-    '</section></div>';
+    '<section class="dt-box"><h4>Current document <span>Version '+cur.ver+'</span></h4>'+fileChips(d,t,0,cur.files)+meta(cur,0)+
+      (hist.length?'<button type="button" class="ds-more dt-vh" data-vh="'+d.k+'" aria-expanded="'+hOpen+'">'+I.hist+(hOpen?'Hide':'Show')+' version history ('+hist.length+')'+I.chev+'</button>':'<p class="dg-none">No previous versions</p>')+'</section>'+
+    (hOpen?'<section class="dt-box"><h4>Version history <span>'+hist.length+'</span></h4>'+
+      hist.map(function(v,j){ return '<div class="dt-v"><b>Version '+v.ver+'</b>'+fileChips(d,t,j+1,v.files)+meta(v,j+1)+'</div>'; }).join('')+'</section>':'')+
+  '</div>';
 }
 /* each document keeps its 5 most recent versions (the current one and 4 previous); older versions are deleted when a new one is uploaded */
 var KEEP_VERSIONS=5;
@@ -1967,6 +1971,8 @@ document.addEventListener('click',function(e){
   if(up){ delete pend[up]; paintUpd(); return; }
   var pv=t.closest('[data-preview]');
   if(pv){ document.getElementById('sheet').textContent=pv.getAttribute('data-preview').toUpperCase(); openModal('m-prev'); return; }
+  var vh=t.closest('[data-vh]');
+  if(vh){ var vk=vh.getAttribute('data-vh'); histOpen[vk]=!histOpen[vk]; keepScroll(renderDetail); var vb=drawer.querySelector('[data-vh="'+vk+'"]'); if(vb) vb.focus({preventScroll:true}); return; }
   var tg=t.closest('[data-toggle]');
   if(tg){ toggleDoc(tg.getAttribute('data-toggle')); return; }
 

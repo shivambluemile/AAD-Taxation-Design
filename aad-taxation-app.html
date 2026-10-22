@@ -1597,7 +1597,7 @@ function docCard(d){
   return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+(gone?'no valid document, ':'')+line+'. '+(open?'Hide':'Show')+' files and history">'+
       '<span class="dt-hd"><span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b></span>'+nv+'<span class="dt-line">'+line+'</span></button>'+files+
-    '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
+    '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="Replace '+esc(t.name)+'">Replace</button>'+
   '</div>';
 }
 /* the open tile's details: a compact versions table; older versions open below the history toggle.

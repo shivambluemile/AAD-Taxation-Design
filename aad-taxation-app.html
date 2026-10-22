@@ -985,7 +985,9 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 @media (max-width:760px){.ds-list{grid-template-columns:1fr}}
 /* documents as a calm register: one row per document, details on demand */
 .dg-tbl{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-.dg-head,.dg-row{display:grid;grid-template-columns:28px minmax(0,1fr) 160px 130px 72px;gap:14px;align-items:center;padding:0 16px 0 10px}
+.dg-head,.dg-row{display:grid;grid-template-columns:28px minmax(118px,.75fr) minmax(0,1.6fr) 118px 96px 58px;gap:12px;align-items:center;padding:0 16px 0 10px}
+.dg-file{min-width:0}.dg-file .ds-files{margin-top:0;gap:2px 12px}.dg-file .ds-file{min-height:24px}
+.dg-mh{padding:10px 0 2px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B}
 .dg-head{padding-top:10px;padding-bottom:10px;background:#FAFBFC;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#64748B}
 .dg-grp{padding:14px 16px 6px;font-size:11.5px;font-weight:700;color:var(--mute)}
 .dg-grp span{font-weight:600;color:var(--faint);margin-left:4px}.dg-grp.warn{color:#B45309}
@@ -1005,7 +1007,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dg-vn{font-size:12.5px;font-weight:600;color:var(--slate);padding-top:5px}
 .dg-vb .ds-files{margin-top:0}.dg-vi{display:block;margin-top:4px;font-size:12px;color:var(--faint)}.dg-vi em{font-style:normal}.dg-vi em.bad{color:#B91C1C}
 .dg-none{margin:0;padding:10px 0 0;font-size:12px;color:var(--faint)}
-@media (max-width:760px){.dg-head{display:none}.dg-row{grid-template-columns:28px minmax(0,1fr) auto}.dg-st{grid-column:2}.dg-up{display:none}.dg-act{grid-column:3;grid-row:1}.dg-more{padding-left:16px}}
+@media (max-width:760px){.dg-head{display:none}.dg-row{grid-template-columns:28px minmax(0,1fr) auto}.dg-file,.dg-st{grid-column:2}.dg-up{display:none}.dg-act{grid-column:3;grid-row:1}.dg-more{padding-left:16px}}
 .ds-note{display:flex;align-items:flex-start;gap:7px;margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--mute)}
 .ds-note svg{flex-shrink:0;margin-top:2px;width:13px;height:13px;color:var(--faint)}
 @media (max-width:640px){
@@ -1506,10 +1508,11 @@ function fileChip(d,t,vi,fi,f){
 }
 /* a version's files: the first 3 show, the rest sit behind "+N more" so the card stays one row tall */
 var MAX_FILES=3, filesOpen={};
-function fileChips(d,t,vi,files){
-  var key=d.k+'|'+vi, all=filesOpen[key]||files.length<=MAX_FILES, shown=all?files:files.slice(0,MAX_FILES);
+function fileChips(d,t,vi,files,max){
+  max=max||MAX_FILES;
+  var key=d.k+'|'+vi, all=filesOpen[key]||files.length<=max, shown=all?files:files.slice(0,max);
   return '<div class="ds-files">'+shown.map(function(f,fi){ return fileChip(d,t,vi,fi,f); }).join('')+
-    (files.length>MAX_FILES?'<button class="ds-fmore" data-fmore="'+key+'" aria-expanded="'+all+'">'+(all?'Show less':'+'+(files.length-MAX_FILES)+' more')+'</button>':'')+
+    (files.length>max?'<button class="ds-fmore" data-fmore="'+key+'" aria-expanded="'+all+'">'+(all?'Show less':'+'+(files.length-max)+' more')+'</button>':'')+
   '</div>';
 }
 /* one row per document type: name, files, who uploaded it | status | actions; older versions open underneath */
@@ -1526,18 +1529,18 @@ function docCard(d){
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
   var when=gone||soon?exp:exp?'Until '+exp:'';
   var h='<div class="dg-row'+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
-    '<button type="button" class="dg-open" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' files and versions of '+esc(t.name)+'">'+I.chev+'</button>'+
-    '<div class="dg-doc"><b class="ds-name">'+t.name+'</b><small title="'+esc(d.cur.files.map(function(f){ return f.n; }).join(', '))+'">'+esc(fileSummary(d,t,d.cur.files))+'</small></div>'+
+    (prev?'<button type="button" class="dg-open" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' version history of '+esc(t.name)+'" title="Version history">'+I.chev+'</button>':'<span></span>')+
+    '<div class="dg-doc"><b class="ds-name">'+t.name+'</b>'+(prev?'<small>'+prev+' previous version'+(prev===1?'':'s')+'</small>':'')+'</div>'+
+    '<div class="dg-file">'+fileChips(d,t,0,d.cur.files,2)+'</div>'+
     '<div class="dg-st">'+stDot(st,stLabel(d))+(when?'<small class="'+(gone?'bad':soon?'soon':'')+'">'+when+'</small>':'')+'</div>'+
     '<div class="dg-up"><span>'+fmtD(d.cur.on)+'</span><small>by '+esc(d.cur.by)+'</small></div>'+
     '<div class="dg-act"><button type="button" class="ds-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button></div>'+
   '</div>';
-  if(open){
+  if(open&&prev){
     var ver=function(v,vi,label){ var gone2=t.exp&&v.exp&&daysTo(v.exp)<0;
       return '<div class="dg-ver"><span class="dg-vn">'+label+'</span><div class="dg-vb">'+fileChips(d,t,vi,v.files)+
         '<span class="dg-vi">Uploaded '+fmtD(v.on)+', '+fmtT(v.on)+' by '+esc(v.by)+(t.exp&&v.exp&&vi?' · <em'+(gone2?' class="bad"':'')+'>'+(gone2?'Expired ':'Expires ')+fmtD(v.exp)+'</em>':'')+'</span></div></div>'; };
-    h+='<div class="dg-more">'+ver(vs[0],0,'Current · v'+vs[0].ver)+
-      (prev?hist.map(function(v,j){ return ver(v,j+1,'Version '+v.ver); }).join(''):'<p class="dg-none">No previous versions</p>')+'</div>';
+    h+='<div class="dg-more"><div class="dg-mh">Version history</div>'+hist.map(function(v,j){ return ver(v,j+1,'Version '+v.ver); }).join('')+'</div>';
   }
   return h;
 }
@@ -1563,7 +1566,7 @@ function currentList(docs){
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
   var group=function(label,items,cls){ return items.length?'<div class="dg-grp '+cls+'">'+label+' <span>'+items.length+'</span></div>'+items.map(docCard).join(''):''; };
-  return '<div class="dg-tbl" role="table" aria-label="Documents"><div class="dg-head" role="row"><span></span><span>Document</span><span>Status</span><span>Uploaded</span><span></span></div>'+
+  return '<div class="dg-tbl" role="table" aria-label="Documents"><div class="dg-head" role="row"><span></span><span>Document</span><span>File</span><span>Status</span><span>Uploaded</span><span></span></div>'+
     group('Needs attention',need,'warn')+group('Up to date',ok,'ok')+'</div>';
 }
 /* viewer: one version of a document, switching between its sides */

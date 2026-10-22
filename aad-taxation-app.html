@@ -13644,7 +13644,8 @@ th.r .sl-sort{flex-direction:row}
 .sl-rnote{margin:0;padding:10px 12px;border-radius:10px;background:#F6F7F9;font-size:12.5px;color:var(--slate)}
 .sl-recf{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sl-recf .sl-span{grid-column:1/-1}.sl-recf .cl-muted{margin:0;font-size:12.5px}
 tr.sl-flash td{animation:slflash 2.4s ease-out}@keyframes slflash{0%,40%{background:var(--orange-soft)}100%{background:transparent}}
-.sl-rect table{min-width:980px}.drawer.sl-sf.swap{animation:none}
+.sl-rect table{min-width:980px}
+.sd-fail{display:flex;align-items:center;gap:12px;margin:0 32px 12px;padding:10px 14px;border:1px solid #FECACA;border-radius:10px;background:#FEF2F2;color:#991B1B;font-size:13px}.sd-fail svg{flex-shrink:0;color:#DC2626}.sd-fail span{flex:1}.sd-fail .btn-ghost{background:#fff}.drawer.sl-sf.swap{animation:none}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
@@ -14919,6 +14920,11 @@ function addPayment(s){
       '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Record payment</button></div>');
   document.getElementById('m-no').onclick=closeDlg;
+  var ai=document.getElementById('p-amt'), goB=document.getElementById('m-go'), ae=document.getElementById('p-amt-e');
+  var check=function(){ var v=Number(String(ai.value).replace(/[$,\s]/g,'')), owed=pendingOf(s);
+    if(ai.value.trim()&&isFinite(v)&&r2(v)>owed){ ae.textContent='That’s more than the '+money(owed)+' still owed. Enter '+money(owed)+' or less.'; ae.classList.add('show'); ai.classList.add('bad'); goB.disabled=true; }
+    else { ae.classList.remove('show'); ai.classList.remove('bad'); goB.disabled=false; } };
+  ai.oninput=check;
   document.getElementById('m-go').onclick=function(){
     if(paying) return;
     var go=this, amt=Number(String(document.getElementById('p-amt').value).replace(/[$,\s]/g,'')), d=document.getElementById('p-date').value, type=document.getElementById('p-type').value, ref=document.getElementById('p-ref').value.trim();
@@ -14965,7 +14971,7 @@ function mailDialog(s,kind){
     deliver({email:{to:to,subject:sb,body:bd,attachment:s.id+'.pdf'}}).then(function(r){
       sending=false; reload(); var x=byId(s.id); if(!x){ closeDlg(); render(); return; }
       if(!r.ok){
-        log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(r.error||'The email service didn’t accept it'),ok:false,to:to}); save();
+        log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(r.error||'The email service didn’t accept it'),ok:false,to:to}); save(); render();   // the row shows "Email not sent" behind the dialog
         document.getElementById('e-fail').innerHTML='<div class="qs-fail">'+I.warn+'<span><b>Not sent.</b> '+esc(r.error||'The email service didn’t accept it.')+' Check the address and try again.</span></div>';
         go.disabled=false; go.textContent='Try again'; return;
       }
@@ -15155,7 +15161,9 @@ function paintDetail(keep){
       :'<p class="cl-muted">No activity has been recorded for this sale yet.</p>')+'</section>';
   }
 
-  ov.innerHTML='<div class="drawer qd-drawer sd-drawer" role="dialog" aria-modal="true" aria-labelledby="sd-t">'+head+tabsH+'<div class="cl-vbody" id="sd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
+  var lastMail=mails.slice(-1)[0], failBar=lastMail&&lastMail.ok===false&&!dis?'<div class="sd-fail" role="alert">'+I.warn+'<span><b>The last email wasn’t sent.</b> '+esc(/^reminder/.test(lastMail.type)?'Payment reminder':'Invoice')+' to '+esc(mailTo(lastMail)||'the client')+' on '+when(lastMail.t)+(mailWhy(lastMail)?': '+esc(mailWhy(lastMail).replace(/[.]+$/,'')):'')+'. Check the address and send it again.</span>'+
+      '<button type="button" class="btn-ghost btn-sm" data-sa="'+(/^reminder/.test(lastMail.type)?'remind':s.status==='sent'?'resend':'send')+'">Try again</button></div>':'';
+  ov.innerHTML='<div class="drawer qd-drawer sd-drawer" role="dialog" aria-modal="true" aria-labelledby="sd-t">'+head+failBar+tabsH+'<div class="cl-vbody" id="sd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   document.getElementById('sd-b').scrollTop=y;
   document.getElementById('sd-x').onclick=closeDetail;

@@ -1710,7 +1710,7 @@ function docCard(d){
         '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dc2-name">'+t.name+'</b></button>'+
       expRow+
       '<button type="button" class="dc2-chev" data-shut="'+d.k+'" aria-hidden="true" tabindex="-1">'+DC_I.chev+'</button></div>'+
-    (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+I.upsm+(renew?'Renew':'Replace')+'</button>'+
+    (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="Replace '+esc(t.name)+'">'+I.upsm+'Replace</button>'+
       (nHist?'<button type="button" class="dc2-hbtn" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+(open?'Hide':'Show')+' history, '+nHist+' earlier version'+(nHist===1?'':'s')+'">History<span class="dc2-hn">'+nHist+'</span>'+DC_I.chev+'</button>'
         :'<span class="dc2-hbtn off">History<span class="dc2-hn">0</span></span>')+'</div>'+(open?versionTimeline(d):''))+
   '</div>';

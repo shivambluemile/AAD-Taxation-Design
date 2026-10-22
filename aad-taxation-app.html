@@ -13606,12 +13606,33 @@ table,td,th{font-size:13.5px}
 .qf-tot .sl-pendrow{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px;font-weight:600}.qf-tot .sl-pendrow dt{color:var(--ink)}
 @media (max-width:900px){.sl-sf .qf-row{grid-template-columns:1fr 1fr}.sl-sf .sl-fee{justify-content:flex-start}}
 /* Sales uses the shared list styles (filter bar, stats, table, ⋮ menu); only what's specific to sales is here */
-.sl-stats{grid-template-columns:repeat(3,minmax(0,240px))}
+.sl-stats{grid-template-columns:repeat(4,minmax(0,240px))}
+.sl-tile{cursor:pointer;transition:border-color .12s,box-shadow .12s}.sl-tile:hover{border-color:#F8C9A2}.sl-tile.on{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.sl-tile:focus-visible{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.2)}.sl-tile dd small{display:block;margin-top:2px;font-family:Inter;font-size:12px;font-weight:500;color:var(--mute)}
+.sl-quick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-2px 0 14px}
+.sl-quick .mf-tg{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12.5px;font-weight:500;color:var(--slate)}
+.sl-quick .mf-tg:hover{border-color:#CBD2DA;color:var(--ink)}.sl-quick .mf-tg.on{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink);font-weight:600}.sl-quick .mf-tg svg{width:12px;height:12px}
+.sl-bulk{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:10px 14px;border:1px solid #F8C9A2;border-radius:12px;background:var(--orange-soft);font-size:13px;color:var(--ink)}
+.sl-bulk>span{color:var(--slate)}.sl-bulk .btn-ghost{display:inline-flex;align-items:center;gap:6px;background:#fff}.sl-bulk svg{width:14px;height:14px}
+.sl-table thead th,.sl-table tbody td{padding-left:12px;padding-right:12px}.sl-table thead th:first-child,.sl-table tbody td:first-child{padding-left:16px}
+.sl-ck{width:28px;padding-right:0!important}
+.sl-table tbody td:nth-child(2){white-space:normal;width:96px}.sl-table tbody td:nth-child(2) .ar-sub{white-space:normal;line-height:1.35}
+.sl-table .qt-clip.sm{max-width:80px}.sl-table .qt-person .qt-clip.qt-cname{max-width:82px}.sl-table .qt-meta{font-size:12px}.sl-table .qt-meta .qt-clip{max-width:96px}
+.sl-table thead th{letter-spacing:.7px}.sl-table td.num{font-size:13px}.sl-table table{min-width:1040px}
+.sl-table thead th:last-child,.sl-table tbody td:last-child{width:52px;padding-left:6px;padding-right:12px}
+.sl-table thead th.sl-wrap{width:92px}.sl-ck input{vertical-align:middle}tr.sl-on td{background:#FFFAF5}
+.sl-sort{display:inline-flex;align-items:center;gap:5px;font:inherit;color:inherit;letter-spacing:inherit;text-transform:inherit;padding:0}.sl-sort i{font-style:normal;font-size:9px;color:#CBD2DA}.sl-sort.on i{color:var(--orange-ink)}.sl-sort:hover{color:var(--ink)}
+th.r .sl-sort{flex-direction:row}
+.sl-due{color:var(--mute)}.sl-due.late{color:#B91C1C;font-weight:600}.sl-fail{color:#B91C1C!important;font-weight:600}
+.sl-rtag{display:inline-flex;margin-left:6px;height:18px;align-items:center;padding:0 7px;border-radius:999px;background:#EEF2FF;color:#4338CA;font-size:10.5px;font-weight:700;vertical-align:1px}.sl-rtag:hover{background:#E0E7FF}
+.sl-per{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);margin-left:auto}.sl-per .sel select{height:32px;padding:0 28px 0 10px;font-size:12.5px}
+.tfoot .pager{margin-left:12px}.sl-gap{display:inline-flex;align-items:center;padding:0 4px;color:var(--faint)}
+.sl-sum{font-size:14px;color:var(--ink)}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
 .sl-ferr{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--red);margin:-6px 0 12px 4px}
-.sl-table table{min-width:1120px}
+.sl-table table{min-width:1040px}
 .sl-table th.r,.sl-table td.r{text-align:right}
 .sl-table .ar-sub{display:block;font-size:11px;color:var(--faint);margin-top:3px;white-space:nowrap}
 .sl-pend .ar-sub{display:flex;justify-content:flex-end}
@@ -13895,9 +13916,10 @@ var DevData={
 
 /* ---------- load ---------- */
 var st=null, loadErr=null, clients=[];
-function reload(){ try{ st=SaleStore.load(); clients=loadClients(); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
+var CMAP={};
+function reload(){ try{ st=SaleStore.load(); clients=loadClients(); CMAP={}; clients.forEach(function(c){ CMAP[String(c.id)]=c; }); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
 function save(){ return SaleStore.save(st); }
-function client(s){ var c=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0]; return c?{id:c.id,name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
+function client(s){ var c=CMAP[String(s.clientId)]; return c?{id:c.id,name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
 function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
 
 /* ---------- money: payments and client credit reduce what's owed, each counted once ---------- */
@@ -13906,21 +13928,44 @@ function receivedOf(s){ return r2((s.payments||[]).filter(function(p){ return !p
 function pendingOf(s){ return s.status==='disabled'?0:Math.max(0,r2(s.amount-paidOf(s))); }
 function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); if(p<=0) return 'paid'; if(isoDay(s.due)<isoDay(Date.now())) return 'overdue'; return paidOf(s)>0?'partial':'unpaid'; }
 
+/* ---------- follow-up: when it's due, the last reminder, the last email ---------- */
+function dayDiff(t){ var a=new Date(t), b=new Date(); a.setHours(0,0,0,0); b.setHours(0,0,0,0); return Math.round((a-b)/DAY); }
+function dueText(s){ if(s.status==='disabled'||pendingOf(s)<=0) return ''; var d=dayDiff(s.due);
+  return d>1?'Due in '+d+' days':d===1?'Due tomorrow':d===0?'Due today':(-d)+' day'+(d===-1?'':'s')+' overdue'; }
+function agoText(t){ var d=-dayDiff(t); return d<=0?'today':d===1?'yesterday':d+' days ago'; }
+function lastOf(s,types,ok){ var h=(s.history||[]).filter(function(e){ return types.indexOf(e.type)>=0&&(ok==null||(e.ok!==false)===ok); }); return h.length?h[h.length-1]:null; }
+function lastReminder(s){ return lastOf(s,['reminder'],true); }
+/* the last email attempt failed and nothing went through after it */
+function mailFailed(s){ var m=(s.history||[]).filter(function(e){ return MAIL_EV.indexOf(e.type)>=0; }), x=m[m.length-1]; return !!x&&x.ok===false; }
+var QUICK=[['','All'],['mine','My sales'],['mybranch','My branch'],['owing','Unpaid & partly paid'],['overdue','Overdue'],['notsent','Not sent']];
+
 /* ---------- filters: chosen above the table, applied with Filter ---------- */
 var DEFAULT_RANGE='this_month';
-function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',pay:'',acc:[],branch:[],svc:[],range:DEFAULT_RANGE,from:d[0],to:d[1],ptype:[],status:'',min:'',max:''}; }
+function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',pay:'',acc:[],branch:[],svc:[],range:DEFAULT_RANGE,from:d[0],to:d[1],ptype:[],status:'',min:'',max:'',quick:'',rec:''}; }
 /* the filters in the More Filters panel */
 var ADV=['ptype','acc','branch','svc','min','max'];
 function advCount(f){ return f.ptype.length+f.acc.length+f.branch.length+f.svc.length+(f.min!==''?1:0)+(f.max!==''?1:0); }
 function svcOptions(){ var n=[]; try{ n=loadCatalog().services.map(function(x){ return x.name; }); }catch(x){}
   (st?st.list.filter(inScope):[]).forEach(function(s){ (s.items||[]).forEach(function(x){ if(n.indexOf(x.name)<0) n.push(x.name); }); }); return n.sort(); }
-var state={f:null,applied:null,page:1,per:10,errs:{}};
+var state={f:null,applied:null,page:1,per:10,errs:{},sort:{k:'date',dir:-1},sel:{},cols:{svc:false}};
+/* the list remembers where you were (page, filters, sort, page size) for this browser session */
+var VIEW_KEY='aad-sales-view';
+function keepView(){ try{ sessionStorage.setItem(VIEW_KEY,JSON.stringify({f:state.f,page:state.page,per:state.per,sort:state.sort,cols:state.cols,tab:state.tab||'sales'})); }catch(e){} }
+function restoreView(){ try{ var v=JSON.parse(sessionStorage.getItem(VIEW_KEY)||'null'); if(!v) return false; var b=blank(); for(var k in b) if(v.f&&v.f[k]!=null) b[k]=v.f[k];
+  state.f=b; state.applied=b; state.page=v.page||1; state.per=[10,25,50,100].indexOf(v.per)>=0?v.per:10; state.sort=v.sort||state.sort; state.cols=v.cols||state.cols; state.tab=v.tab||'sales'; return true; }catch(e){ return false; } }
 function copyF(f){ return JSON.parse(JSON.stringify(f)); }
 function anyFilter(f){ var b=blank(); return Object.keys(b).some(function(k){ return String(f[k])!==String(b[k]); }); }
 var has=function(list,v){ return list.indexOf(v)>=0; };
 function filtered(){
   var f=state.applied, q=f.q.trim().toLowerCase(), bad=Object.keys(state.errs).length, lo=bad||f.min===''?null:+f.min, hi=bad||f.max===''?null:+f.max;
-  return st.list.filter(inScope).filter(function(s){
+  var today=isoDay(Date.now());
+  var rows=st.list.filter(inScope).filter(function(s){
+    if(f.quick==='mine'&&s.accountant!==ME.name&&s.accountant2!==ME.name&&s.by!==ME.name) return false;
+    if(f.quick==='mybranch'&&s.branch!==ME.branch) return false;
+    if(f.quick==='owing'&&!(s.status!=='disabled'&&pendingOf(s)>0)) return false;
+    if(f.quick==='overdue'&&payStatus(s)!=='overdue') return false;
+    if(f.quick==='notsent'&&s.status!=='draft') return false;
+    if(f.rec&&s.recurringId!==f.rec) return false;
     if(f.status&&s.status!==f.status) return false;
     if(f.pay&&payStatus(s)!==f.pay) return false;
     if(f.acc.length&&!has(f.acc,s.accountant)&&!has(f.acc,s.accountant2)) return false;
@@ -13930,7 +13975,10 @@ function filtered(){
     if(f.from||f.to){ var d=isoDay(s.date); if(f.from&&d<f.from||f.to&&d>f.to) return false; }
     if(lo!=null&&s.amount<lo||hi!=null&&s.amount>hi) return false;
     if(!q) return true; var c=client(s); return (s.id+' '+c.name+' '+(c.entity||'')).toLowerCase().indexOf(q)>=0;
-  }).sort(function(a,b){ return b.date-a.date; });
+  });
+  var k=state.sort.k, dir=state.sort.dir, val=k==='amount'?function(s){ return s.amount; }:k==='pending'?function(s){ return pendingOf(s); }:k==='client'?function(s){ return client(s).name.toLowerCase(); }:function(s){ return s.date; };
+  rows.forEach(function(s){ s._v=val(s); });                               // worked out once per row, not on every comparison
+  return rows.sort(function(a,b){ return (a._v<b._v?-1:a._v>b._v?1:b.date-a.date)*dir; });
 }
 function checkFilters(f){
   var e={}, lo=f.min===''?null:Number(f.min), hi=f.max===''?null:Number(f.max);
@@ -13950,9 +13998,12 @@ function render(){
   }
   var f=state.f, e=state.errs, rows=filtered(), live=rows.filter(function(s){ return s.status!=='disabled'; }), page=rows.slice((state.page-1)*state.per,state.page*state.per);
   var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0)), owed=r2(live.reduce(function(a,s){ return a+pendingOf(s); },0));
+  var over=live.filter(function(s){ return payStatus(s)==='overdue'; }), overAmt=r2(over.reduce(function(a,s){ return a+pendingOf(s); },0));
+  var tile=function(k,label,val,tip,sub){ var on=f.quick===k; return '<div class="stat sl-tile'+(on?' on':'')+'" role="button" tabindex="0" data-tile="'+k+'" aria-pressed="'+on+'" title="'+tip+'"><dt>'+label+'</dt><dd>'+val+(sub?'<small>'+sub+'</small>':'')+'</dd></div>'; };
   var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
     '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div>'+
-    '<div class="stat" title="Still owed on the sales below, after payments and client credit"><dt>Pending Amount</dt><dd>'+money(owed)+'</dd></div></dl>';
+    tile('owing','Pending Amount',money(owed),'Still owed after payments and client credit. Click to show unpaid and partly paid sales.')+
+    tile('overdue','Overdue',money(overAmt),'Past the due date and still owed. Click to show them.',over.length+' sale'+(over.length===1?'':'s'))+'</dl>';
   h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
@@ -13960,27 +14011,47 @@ function render(){
     selF('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
     '<button type="button" class="rbtn mf-btn'+(advCount(f)?' set':'')+'" id="f-more" aria-haspopup="dialog">'+I.filter+'<span>More Filters</span>'+(advCount(f)?'<b class="mf-n">'+advCount(f)+'</b>':'')+'</button>'+
     '</div></div>'+
-    chipsHtml(f);
+    chipsHtml(f)+
+    '<div class="sl-quick" role="group" aria-label="Quick filters">'+QUICK.map(function(x){ var on=(f.quick||'')===x[0]; return '<button type="button" class="mf-tg'+(on?' on':'')+'" data-quick="'+x[0]+'" aria-pressed="'+on+'">'+(on&&x[0]?I.tick:'')+x[1]+'</button>'; }).join('')+
+      '<span class="sp-grow"></span><button type="button" class="mf-tg'+(state.cols.svc?' on':'')+'" id="sl-colsvc" aria-pressed="'+state.cols.svc+'">'+(state.cols.svc?I.tick:'')+'Services column</button></div>';
+  var selIds=Object.keys(state.sel).filter(function(id){ return state.sel[id]; });
+  if(selIds.length){ var selPend=r2(selIds.reduce(function(a,id){ var x=byId(id); return a+(x?pendingOf(x):0); },0));
+    h+='<div class="sl-bulk" role="region" aria-label="Selected sales"><b>'+selIds.length+' selected</b><span>'+money(selPend)+' pending</span><span class="sp-grow"></span>'+
+      '<button type="button" class="btn-ghost btn-sm" data-bulk="send">'+MI.send+'Send invoice</button><button type="button" class="btn-ghost btn-sm" data-bulk="remind">'+MI.remind+'Send reminder</button>'+
+      '<button type="button" class="btn-ghost btn-sm" data-bulk="export">'+SI.csv+'Export selected</button><button type="button" class="linkbtn" data-bulk="clear">Clear</button></div>'; }
   if(state.loading){ content.innerHTML=h+'<div class="card"><div class="empty"><h3>Loading sales…</h3><p>Applying your filters.</p></div></div>'; wireHead(); wireFilters(); return; }
-  h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th>Sale ID</th><th>Client</th><th>Date</th><th class="r">Sale</th><th class="r">Pending</th><th>Branch</th><th>Accountant</th><th class="sl-wrap">Additional Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
-  if(!st.list.filter(inScope).length) h+='<tr><td colspan="10"><div class="empty"><h3>No sales yet</h3><p>Sales appear here once they’re added, or when a quotation is converted to a sale.</p><button class="btn-primary" id="sl-add2">'+I.plus+'Add Sale</button></div></td></tr>';
-  else if(!page.length) h+='<tr><td colspan="10"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="sl-clear2">Clear Filter</button></div></td></tr>';
+  var sortTh=function(k,label,cls){ var on=state.sort.k===k, dir=on?state.sort.dir:0;
+    return '<th class="'+(cls||'')+'" aria-sort="'+(dir>0?'ascending':dir<0?'descending':'none')+'"><button type="button" class="sl-sort'+(on?' on':'')+'" data-sort="'+k+'">'+label+'<i>'+(dir>0?'▲':dir<0?'▼':'↕')+'</i></button></th>'; };
+  var cols=10+(state.cols.svc?1:0)+1, pageIds=page.map(function(s){ return s.id; }), allOn=pageIds.length&&pageIds.every(function(id){ return state.sel[id]; });
+  h+='<div class="card ar-table qt-table sl-table"><table><thead><tr><th class="sl-ck"><input type="checkbox" id="sl-ckall" aria-label="Select all on this page"'+(allOn?' checked':'')+'></th><th>Sale ID</th>'+sortTh('client','Client')+sortTh('date','Date')+sortTh('amount','Sale','r')+sortTh('pending','Pending','r')+
+    (state.cols.svc?'<th>Services</th>':'')+'<th>Branch</th><th>Accountant</th><th class="sl-wrap">Additional Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
+  var others=f.q.trim()||f.pay||f.status||advCount(f)||f.quick||f.rec;
+  if(!st.list.filter(inScope).length) h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No sales yet</h3><p>Sales appear here once they’re added, or when a quotation is converted to a sale.</p><button class="btn-primary" id="sl-add2">'+I.plus+'Add Sale</button></div></td></tr>';
+  else if(!page.length&&!others&&(f.from||f.to)) h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>No sales in '+esc(f.range==='custom'?fmtRange(f.from,f.to):rangeName(f.range).toLowerCase())+'</h3><p>Nothing was billed in this period. Choose another period, or show every date.</p><button class="btn-ghost" id="sl-alldates">Show all dates</button></div></td></tr>';
+  else if(!page.length) h+='<tr><td colspan="'+cols+'"><div class="empty"><h3>'+(f.q.trim()?'No sales match “'+esc(f.q.trim())+'”':'No sales match these filters')+'</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="sl-clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(s){
-    var c=client(s), ps=payStatus(s), pend=pendingOf(s), dis=s.status==='disabled';
-    h+='<tr class="'+(dis?'sl-dis':ps==='overdue'?'sl-over':'')+'">'+
-      '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button><small class="ar-sub">'+(dis?'Disabled':s.status==='sent'?'Sent':'Not sent')+(s.editRequest&&s.editRequest.status==='pending'?' · Edit requested':'')+'</small></td>'+
+    var c=client(s), ps=payStatus(s), pend=pendingOf(s), dis=s.status==='disabled', rm=lastReminder(s), due=dueText(s), fail=mailFailed(s), sv=s.items||[];
+    var sub=[dis?'Disabled':s.status==='sent'?'Sent':'Not sent'];
+    if(s.editRequest&&s.editRequest.status==='pending') sub.push('Edit requested');
+    var rmTxt=rm&&!dis?'Reminded '+agoText(rm.t):'';
+    h+='<tr class="'+(dis?'sl-dis':ps==='overdue'?'sl-over':'')+(state.sel[s.id]?' sl-on':'')+'">'+
+      '<td class="sl-ck"><input type="checkbox" data-ck="'+s.id+'" aria-label="Select '+esc(s.id)+'"'+(state.sel[s.id]?' checked':'')+'></td>'+
+      '<td class="nowrap"><button class="name-link" data-do="open" data-s="'+s.id+'" title="Open the sale"><span class="name">'+esc(s.id)+'</span></button>'+
+        (s.recurringId?'<button type="button" class="sl-rtag" data-rec="'+esc(s.recurringId)+'" title="Created by recurring '+esc(s.recurringId)+'">Recurring</button>':'')+
+        '<small class="ar-sub">'+sub.join(' · ')+'</small>'+(rmTxt?'<small class="ar-sub">'+rmTxt+'</small>':'')+(fail&&!dis?'<small class="ar-sub sl-fail">Email not sent</small>':'')+'</td>'+
       '<td><div class="qt-person">'+clAv(c)+'<span class="qt-pn"><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span>'+(c.entity&&c.entity!=='Individual'?'<small class="ar-sub">'+esc(c.entity)+'</small>':'')+'</span></div></td>'+
       '<td class="num nowrap">'+dmyOf(s.date)+'</td>'+
       '<td class="num r">'+money(s.amount)+(dis?'':'<small class="ar-sub">Paid '+money(paidOf(s))+'</small>')+'</td>'+
-      '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'"'+(ps==='overdue'?' title="Due '+dmyOf(s.due)+'"':'')+'><i></i>'+PAY[ps]+'</span></small>')+'</td>'+
+      '<td class="num r sl-pend">'+(dis?'<span class="ar-dash">—</span>':money(pend)+'<small class="ar-sub"><span class="state p-'+ps+'" title="Due '+dmyOf(s.due)+'"><i></i>'+PAY[ps]+'</span></small>'+(due?'<small class="ar-sub sl-due'+(ps==='overdue'?' late':'')+'">'+due+'</small>':''))+'</td>'+
+      (state.cols.svc?'<td><span class="qt-clip sm" title="'+esc(sv.map(function(x){ return x.name; }).join(', '))+'">'+(sv.length?esc(sv[0].name):'<span class="ar-dash">—</span>')+'</span>'+(sv.length>1?'<small class="ar-sub">+'+(sv.length-1)+' more</small>':'')+'</td>':'')+
       '<td><span class="qt-clip sm" title="'+esc(s.branch)+'">'+esc(s.branch||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant)+'">'+esc(s.accountant||'—')+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(s.accountant2)+'">'+(s.accountant2?esc(s.accountant2):'<span class="ar-dash">—</span>')+'</span></td>'+
-      '<td><div class="qt-meta">'+whenOf(s.at||s.date).replace(' · ',', ')+'<span class="qt-clip" title="'+esc(s.by)+'">by '+esc(s.by)+'</span></div></td>'+
+      '<td><div class="qt-meta" title="'+whenOf(s.at||s.date).replace(' · ',', ')+'">'+dmyOf(s.at||s.date)+'<span class="qt-clip" title="'+esc(s.by)+'">by '+esc(s.by)+'</span></div></td>'+
       '<td class="c"><button class="qt-more" data-menu="'+s.id+'" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for '+esc(s.id)+'" title="Actions">'+I.dots+'</button></td></tr>';
   });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
-  content.innerHTML=h; wireHead(); wireFilters();
+  content.innerHTML=h; wireHead(); wireFilters(); keepView();
   if(detailId) paintDetail(true);   // the open sale follows every change
 }
 function wireHead(){
@@ -13998,7 +14069,19 @@ function wireFilters(){
   var clear=function(){ state.f=blank(); state.applied=state.f; state.errs={}; state.page=1; render(); };
   var cf=document.getElementById('clearf'); if(cf) cf.onclick=function(){ clear(); document.getElementById('f-more').focus(); }; var c2=document.getElementById('sl-clear2'); if(c2) c2.onclick=clear;
   var a2=document.getElementById('sl-add2'); if(a2) a2.onclick=function(){ openSaleForm(); };
-  [].forEach.call(content.querySelectorAll('.pager button'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
+  [].forEach.call(content.querySelectorAll('.pager button[data-p]'),function(b){ b.onclick=function(){ if(b.disabled) return; state.page=+b.getAttribute('data-p'); render(); }; });
+  var pp=document.getElementById('sl-per'); if(pp) pp.onchange=function(){ state.per=+pp.value; state.page=1; render(); var n=document.getElementById('sl-per'); if(n) n.focus(); };
+  var setQuick=function(k){ f.quick=f.quick===k?'':k; state.page=1; state.sel={}; render(); };
+  [].forEach.call(content.querySelectorAll('[data-tile]'),function(t){ t.onclick=function(){ setQuick(t.getAttribute('data-tile')); };
+    t.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); setQuick(t.getAttribute('data-tile')); var n=content.querySelector('[data-tile="'+t.getAttribute('data-tile')+'"]'); if(n) n.focus(); } }; });
+  [].forEach.call(content.querySelectorAll('[data-quick]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-quick'); f.quick=k; state.page=1; state.sel={}; render(); var n=content.querySelector('[data-quick="'+k+'"]'); if(n) n.focus(); }; });
+  var cs=document.getElementById('sl-colsvc'); if(cs) cs.onclick=function(){ state.cols.svc=!state.cols.svc; render(); var n=document.getElementById('sl-colsvc'); if(n) n.focus(); };
+  [].forEach.call(content.querySelectorAll('[data-sort]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-sort'); state.sort=state.sort.k===k?{k:k,dir:-state.sort.dir}:{k:k,dir:k==='client'?1:-1}; state.page=1; render(); var n=content.querySelector('[data-sort="'+k+'"]'); if(n) n.focus(); }; });
+  [].forEach.call(content.querySelectorAll('[data-ck]'),function(x){ x.onchange=function(){ state.sel[x.getAttribute('data-ck')]=x.checked; render(); var n=content.querySelector('[data-ck="'+x.getAttribute('data-ck')+'"]'); if(n) n.focus(); }; });
+  var ca=document.getElementById('sl-ckall'); if(ca) ca.onchange=function(){ [].forEach.call(content.querySelectorAll('[data-ck]'),function(x){ state.sel[x.getAttribute('data-ck')]=ca.checked; }); render(); var n=document.getElementById('sl-ckall'); if(n) n.focus(); };
+  [].forEach.call(content.querySelectorAll('[data-bulk]'),function(b){ b.onclick=function(){ bulkAction(b.getAttribute('data-bulk')); }; });
+  var ad=document.getElementById('sl-alldates'); if(ad) ad.onclick=function(){ f.range='custom'; f.from=''; f.to=''; state.page=1; render(); };
+  [].forEach.call(content.querySelectorAll('[data-rec]'),function(b){ b.onclick=function(){ if(window.openRecurring) openRecurring(b.getAttribute('data-rec')); }; });
 }
 /* the advanced filters in use, one chip per value, each removable */
 function chipsHtml(f){
@@ -14085,11 +14168,54 @@ function applyFilters(){
 }
 function pager(total){
   var pages=Math.max(1,Math.ceil(total/state.per)); if(state.page>pages) state.page=pages;
-  var from=total?((state.page-1)*state.per+1):0, to=Math.min(state.page*state.per,total);
-  var h='<div class="tfoot"><p>Showing '+from+' to '+to+' of '+total+' entries</p><div class="pager">';
-  h+='<button data-p="'+(state.page-1)+'"'+(state.page===1?' disabled':'')+' aria-label="Previous">‹</button>';
-  for(var i=1;i<=pages;i++) h+='<button data-p="'+i+'" class="'+(i===state.page?'on':'')+'"'+(i===state.page?' aria-current="page"':'')+'>'+i+'</button>';
-  return h+'<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
+  var p=state.page, from=total?((p-1)*state.per+1):0, to=Math.min(p*state.per,total), nums=[];
+  for(var i=1;i<=pages;i++){ if(i===1||i===pages||Math.abs(i-p)<=1) nums.push(i); else if(nums[nums.length-1]!=='…') nums.push('…'); }   // 1 … 4 5 6 … 120
+  var h='<div class="tfoot"><p>Showing '+from+' to '+to+' of '+total.toLocaleString('en-AU')+' entries</p><label class="sl-per">Rows per page <div class="sel"><select id="sl-per" aria-label="Rows per page">'+
+    [10,25,50,100].map(function(n){ return '<option value="'+n+'"'+(n===state.per?' selected':'')+'>'+n+'</option>'; }).join('')+'</select>'+I.chev+'</div></label><div class="pager">';
+  h+='<button data-p="'+(p-1)+'"'+(p===1?' disabled':'')+' aria-label="Previous">‹</button>';
+  nums.forEach(function(i){ h+=i==='…'?'<span class="sl-gap">…</span>':'<button data-p="'+i+'" class="'+(i===p?'on':'')+'"'+(i===p?' aria-current="page"':'')+'>'+i+'</button>'; });
+  return h+'<button data-p="'+(p+1)+'"'+(p===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
+}
+/* ---------- bulk actions on the ticked sales: a summary first, then one email each ---------- */
+function bulkAction(k){
+  var ids=Object.keys(state.sel).filter(function(id){ return state.sel[id]; }); reload();
+  var list=ids.map(byId).filter(Boolean);
+  if(k==='clear'){ state.sel={}; return render(); }
+  if(k==='export') return exportCsv(list);
+  var rem=k==='remind', ok=[], skip={dis:0,mail:0,notdue:0,notsent:0};
+  list.forEach(function(s){ var c=client(s);
+    if(s.status==='disabled') return skip.dis++;
+    if(!validEmail(c.email||'')) return skip.mail++;
+    if(rem&&pendingOf(s)<=0) return skip.notdue++;
+    if(rem&&s.status!=='sent') return skip.notsent++;
+    ok.push(s); });
+  var people={}; ok.forEach(function(s){ people[String(s.clientId)]=1; }); var nc=Object.keys(people).length, amt=r2(ok.reduce(function(a,s){ return a+pendingOf(s); },0));
+  var why=[]; if(skip.dis) why.push(skip.dis+' disabled'); if(skip.mail) why.push(skip.mail+' with no client email'); if(skip.notdue) why.push(skip.notdue+' already paid'); if(skip.notsent) why.push(skip.notsent+' not sent yet (send the invoice first)');
+  modal('<div class="confirm-body"><h3 id="m-t">'+(rem?'Send payment reminders':'Send invoices')+'</h3>'+
+    (ok.length?'<p class="sl-sum">'+(rem?'Send reminders to <b>'+nc+' client'+(nc===1?'':'s')+'</b>, <b>'+money(amt)+'</b> pending.':'Send <b>'+ok.length+' invoice'+(ok.length===1?'':'s')+'</b> to <b>'+nc+' client'+(nc===1?'':'s')+'</b>, '+money(amt)+' pending.')+'</p>':'<p>None of the selected sales can be '+(rem?'reminded':'sent')+'.</p>')+
+    (why.length?'<p class="cl-muted">Skipped: '+why.join(', ')+'.</p>':'')+
+    (ok.length?'<p class="cl-muted">Each client gets their own email with the invoice attached, using the standard '+(rem?'reminder':'invoice')+' message.</p>':'')+'<div id="bk-res"></div></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">'+(ok.length?'Cancel':'Close')+'</button>'+(ok.length?'<button class="btn-primary" id="m-go">'+(rem?'Send '+ok.length+' reminder'+(ok.length===1?'':'s'):'Send '+ok.length+' invoice'+(ok.length===1?'':'s'))+'</button>':'')+'</div>');
+  document.getElementById('m-no').onclick=closeDlg;
+  var go=document.getElementById('m-go'); if(!go) return;
+  go.onclick=function(){ if(sending) return; sending=true; go.disabled=true; go.textContent='Sending…'; document.getElementById('m-no').disabled=true;
+    var done=0, failed=[];
+    var next=function(i){
+      if(i>=ok.length){ sending=false; save(); state.sel={}; render();
+        if(!failed.length){ closeDlg(); return toast((rem?'Reminders':'Invoices')+' sent to '+done+' client'+(done===1?'':'s')); }
+        document.getElementById('bk-res').innerHTML='<div class="qs-fail">'+I.warn+'<span><b>'+done+' sent, '+failed.length+' not sent.</b> '+failed.map(function(x){ return esc(x[0])+' ('+esc(x[1])+')'; }).join(', ')+'. Open each sale to check the email address and try again.</span></div>';
+        go.remove(); var no=document.getElementById('m-no'); no.disabled=false; no.textContent='Close'; return; }
+      var s=byId(ok[i].id), c=client(s), to=c.email, pend=pendingOf(s);
+      var subj=rem?'Payment reminder: invoice '+s.id+' from '+FIRM.name:'Invoice '+s.id+' from '+FIRM.name;
+      var body=rem?'Hi '+c.name+',\n\nThis is a friendly reminder that '+money(pend)+' is still owing on invoice '+s.id+', due '+dmyOf(s.due)+'.\n\nThe invoice is attached. If you’ve already paid, thank you and please ignore this email.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name
+        :'Hi '+c.name+',\n\nPlease find attached invoice '+s.id+' for '+money(s.amount)+', due '+dmyOf(s.due)+'.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name;
+      deliver({email:{to:to,subject:subj,body:body,attachment:s.id+'.pdf'}}).then(function(res){
+        if(!res.ok){ failed.push([s.id,res.error||'not accepted']); log(s,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(res.error||'The email service didn’t accept it')+' · bulk',ok:false,to:to}); }
+        else if(rem){ done++; log(s,'reminder',{note:'To '+to+' · '+money(pend)+' owing · bulk',to:to}); }
+        else { done++; var was=s.status; s.status='sent'; s.sentAt=Date.now(); log(s,was==='sent'?'resent':'sent',{note:'To '+to+' · invoice '+s.id+'.pdf attached · bulk',to:to}); }
+        next(i+1); });
+    };
+    next(0); };
 }
 
 /* ---------- row actions: only what applies to the sale and what you may do ---------- */
@@ -14744,10 +14870,11 @@ function printPage(title,inner,extraCss){
 function printInvoice(s){ return printPage('Invoice '+s.id+' · '+FIRM.name,invoiceHtml(s)); }
 
 /* ---------- exports: the sales matching the applied filters ---------- */
-function exportRows(){ return filtered().map(function(s){ var c=client(s); return [s.id,c.name,dmyOf(s.date),s.amount.toFixed(2),paidOf(s).toFixed(2),pendingOf(s).toFixed(2),s.status==='disabled'?'':PAY[payStatus(s)],STATUS[s.status][0],s.branch||'',s.accountant||'',s.accountant2||'',s.by||'',dmyOf(s.due)]; }); }
+function exportRows(list){ return (list||filtered()).map(function(s){ var c=client(s); return [s.id,c.name,dmyOf(s.date),s.amount.toFixed(2),paidOf(s).toFixed(2),pendingOf(s).toFixed(2),s.status==='disabled'?'':PAY[payStatus(s)],STATUS[s.status][0],s.branch||'',s.accountant||'',s.accountant2||'',s.by||'',dmyOf(s.due)]; }); }
 var EXPORT_HEAD=['Sale ID','Client','Date','Sale','Paid','Pending','Payment Status','Status','Branch','Accountant','Additional Accountant','Created By','Due Date'];
-function exportCsv(){
-  var rows=exportRows(); if(!rows.length) return toast('There are no sales to export with these filters.',true);
+function exportCsv(list){
+  if(list&&!Array.isArray(list)) list=null;   // called from the button with a click event
+  var rows=exportRows(list); if(!rows.length) return toast('There are no sales to export with these filters.',true);
   var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
   try{
     var csv='﻿'+[EXPORT_HEAD].concat(rows).map(function(r){ return r.map(q).join(','); }).join('\r\n');
@@ -14774,7 +14901,7 @@ function exportPdf(){
 /* ---------- start ---------- */
 RANGES=[[['today','Today'],['this_week','This Week'],['this_month','This Month'],['last_month','Last Month'],['this_year','This Year']]];
 /* the date range above writes into the filters being chosen; Filter applies them */
-state.f=blank(); state.applied=state.f;
+if(!restoreView()){ state.f=blank(); state.applied=state.f; }
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
 setTimeout(function(){ reload(); render(); },0);
 window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });

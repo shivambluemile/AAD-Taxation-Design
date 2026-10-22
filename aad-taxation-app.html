@@ -1028,6 +1028,14 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#7F1D1D}.dx-tx b{font-size:13.5px;color:#991B1B}
 .dx-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
 @media (max-width:560px){.dx-alert{flex-wrap:wrap}.dx-btn{margin-left:44px}}
+.dt-files{list-style:none;margin:6px 14px 4px;padding:8px 0 0;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:2px}
+.dt-files li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;min-height:26px;font-size:12.5px}
+.dt-files .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB;justify-self:start}.dt-files .x.e-pdf{background:#FDECEC;color:#C2410C}
+.dt-files .ds-fname{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:600}
+.dt-files .sdt-ib{width:24px;height:24px}
+.dt-files .dt-more{display:block;min-height:0}
+.dt-fmore{font-size:12px;font-weight:600;color:var(--mute);padding:3px 0}.dt-fmore:hover{color:var(--orange-ink);text-decoration:underline}
+.dt-tile .dt-act{margin-top:auto}
 .dt-act{align-self:flex-start;margin:0 0 10px 14px;padding:4px 0;font-size:12.5px}
 .dt-detail{grid-column:1/-1}
 .vt-box{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
@@ -1575,9 +1583,13 @@ function docCard(d){
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
   var line=gone?'Expired '+exp:soon?'Expires '+exp:exp?'Until '+exp:'No expiry';
   var nv=gone?'<span class="dt-nv"><i></i>No valid document</span>':'';
+  var FILES_SHOWN=2, fl=gone?[]:d.cur.files, files=fl.length?'<ul class="dt-files">'+fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n);
+      return '<li><span class="x e-'+x+'">'+x.toUpperCase()+'</span><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button>'+
+        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></li>'; }).join('')+
+      (fl.length>FILES_SHOWN?'<li class="dt-more"><button type="button" class="dt-fmore" data-toggle="'+d.k+'">+'+(fl.length-FILES_SHOWN)+' more file'+(fl.length-FILES_SHOWN===1?'':'s')+'</button></li>':'')+'</ul>':'';
   return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+(gone?'no valid document, ':'')+line+'. '+(open?'Hide':'Show')+' files and history">'+
-      '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b>'+nv+'<span class="dt-line">'+line+'</span></button>'+
+      '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b>'+nv+'<span class="dt-line">'+line+'</span></button>'+files+
     '<button type="button" class="ds-act dt-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
   '</div>';
 }
@@ -10934,10 +10946,18 @@ table,td,th{font-size:13.5px}
 <style id="qt-css">
 .page-head .page-sub{color:var(--mute);margin-top:4px}
 .qt-dev{display:inline-flex;align-items:center;height:22px;padding:0 9px;margin-left:8px;border-radius:999px;background:#FFF7EC;color:#B45309;font-family:'Inter';font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:4px;cursor:help}
-.qt-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 14px}
-.qt-stats .stat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;cursor:help}
-.qt-stats dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#94A3B8;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.qt-stats dd{margin:0;font-family:'Manrope';font-size:20px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.qt-sbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.qt-sb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 5px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
+.qt-sb:hover{border-color:#CBD2DA;color:var(--ink)}
+.qt-sb i{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0}
+.qt-sb i.q-draft{background:#94A3B8}.qt-sb i.q-sent{background:#3B82F6}.qt-sb i.q-acc{background:#10B981}.qt-sb i.q-conv{background:#8B5CF6}.qt-sb i.q-rej{background:#EF4444}.qt-sb i.q-exp{background:#F59E0B}.qt-sb i.q-can{background:#CBD5E1}
+.qt-n{min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#F3F4F6;color:var(--slate);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.qt-sb.zero{color:var(--faint)}.qt-sb.zero .qt-n{color:var(--faint)}
+.qt-sb[aria-pressed=true]{border-color:var(--orange);background:var(--orange-soft);color:var(--orange-ink)}.qt-sb[aria-pressed=true] .qt-n{background:#fff;color:var(--orange-ink)}
+.qt-chips{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 12px}
+.qt-chip{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 4px 0 11px;border-radius:999px;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:500}
+.qt-chip b{font-weight:700}
+.qt-chip button{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--orange-ink);margin-left:2px}.qt-chip button:hover{background:#fff}.qt-chip svg{width:11px;height:11px}
 .qt-table table{min-width:1080px}
 .qt-table thead th,.qt-table tbody td{padding-left:8px;padding-right:8px}.qt-table tbody td{padding-top:10px;padding-bottom:10px}
 .qt-table thead th:first-child,.qt-table tbody td:first-child{padding-left:18px}.qt-table thead th:last-child,.qt-table tbody td:last-child{padding-right:14px}
@@ -10959,8 +10979,7 @@ table,td,th{font-size:13.5px}
 .qh-list li.bad i{background:#FF5966;box-shadow:0 0 0 3px #FEE2E2}
 .qh-list b{font-size:13.5px;color:var(--ink);margin-right:8px}.qh-tr{font-size:12px;color:var(--faint)}
 .qh-note{display:block;font-size:12.5px;color:var(--slate);margin-top:2px}.qh-list small{display:block;font-size:12px;color:var(--faint);margin-top:2px}
-@media (max-width:1180px){.qt-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:640px){.qt-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 .rsel{position:relative}
 .rbtn{
   display:inline-flex;align-items:center;gap:8px;height:42px;min-width:168px;background:var(--field);border:1px solid var(--field);
@@ -11275,17 +11294,10 @@ function attrLine(q){
 }
 
 /* ---------- summary: counted over every quotation you can see, not the current filters ---------- */
-function summary(list){
-  var by=function(s){ return list.filter(function(q){ return q.status===s; }); }, open=by('sent').concat(by('accepted'));
-  return [['Total Quotations',list.length,'Every quotation you have access to'],['Draft',by('draft').length,'Created, not sent yet'],
-    ['Sent — Awaiting Response',by('sent').length,'Sent, still within their validity, with no answer recorded yet'],['Invoiced',by('converted').length,'Converted to an invoice'],
-    ['Open Quotation Value',money(open.reduce(function(a,q){ return a+q.amount; },0)),'Total of sent and accepted quotations not yet invoiced. Excludes drafts and invoiced, rejected, expired and cancelled quotations.']];
-}
-
 /* ---------- filters and sorting ---------- */
 var state={f:blank(),page:1,per:10,sort:{k:'created',d:-1}};
-function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',status:'',range:DEFAULT_RANGE,from:d[0],to:d[1],branch:''}; }
-function anyFilter(f){ return !!(f.q.trim()||f.status||f.range!==DEFAULT_RANGE||f.branch); }
+function blank(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',status:'',range:DEFAULT_RANGE,from:d[0],to:d[1],branch:'',accountant:''}; }
+function anyFilter(f){ return !!(f.q.trim()||f.status||f.range!==DEFAULT_RANGE||f.branch||f.accountant); }
 /* the client's avatar: the same initials and colours as the Clients list */
 var CL_AV=[['#FFE6D2','#D4751C'],['#FBD9DD','#C2415B'],['#D9E6FA','#3A6FB0'],['#DDF0E4','#2F7D54'],['#EDE2FA','#6B4BA8']];
 function clAv(c){ var p=String(c.name||'?').trim().split(' ').filter(Boolean), ini=((p[0]||'?')[0]+(p[1]?p[1][0]:(p[0]||'')[1]||'')).toUpperCase(),
@@ -11391,11 +11403,13 @@ document.addEventListener('mousedown',function(e){
 
 var SORTS={id:function(q){ return +q.id.replace(/\D/g,''); },client:function(q){ return client(q).name.toLowerCase(); },created:function(q){ return q.created; },expiry:function(q){ return q.validUntil; },
   amount:function(q){ return q.amount; },branch:function(q){ return q.branch.toLowerCase(); },acc:function(q){ return q.accountant.toLowerCase(); },status:function(q){ return STATUS[q.status][0]; },by:function(q){ return String(q.by).toLowerCase(); }};
-function filtered(){
+/* anyStatus: every filter except the status, for the counts on the status badges */
+function filtered(anyStatus){
   var f=state.f, q=f.q.trim().toLowerCase(), k=SORTS[state.sort.k], d=state.sort.d;
   return scoped().filter(function(x){
-    if(f.status&&x.status!==f.status) return false;
+    if(!anyStatus&&f.status&&x.status!==f.status) return false;
     if(f.branch&&x.branch!==f.branch) return false;
+    if(f.accountant&&x.accountant!==f.accountant&&x.accountant2!==f.accountant) return false;
     if(f.from||f.to){ var a=isoDay(x.created); if(f.from&&a<f.from||f.to&&a>f.to) return false; }
     if(!q) return true; var c=client(x); return (x.id+' '+c.name+' '+c.email).toLowerCase().indexOf(q)>=0;
   }).sort(function(a,b){ var A=k(a), B=k(b); return A<B?-d:A>B?d:(b.created-a.created); });
@@ -11420,14 +11434,24 @@ function render(){
     document.getElementById('qt-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
   }
   var f=state.f, all=scoped(), rows=filtered(), page=rows.slice((state.page-1)*state.per,state.page*state.per);
-  var h=head()+'<dl class="qt-stats">'+summary(all).map(function(c){ return '<div class="stat" title="'+esc(c[2])+'"><dt>'+esc(c[0])+'</dt><dd>'+c[1]+'</dd></div>'; }).join('')+'</dl>';
+  /* status badges: each one filters the list; the counts follow every other filter */
+  var base=filtered(true), cnt=function(s){ return base.filter(function(x){ return !s||x.status===s; }).length; };
+  var sb=function(s,label,dot){ var on=(f.status||'')===s, n=cnt(s);
+    return '<button type="button" class="qt-sb'+(n?'':' zero')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+'<span class="qt-n">'+n+'</span></button>'; };
+  var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
+  var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });
   h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
     selHtml('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
+    selHtml('f-acc','All Accountants',people(accts.sort()),f.accountant)+
     selHtml('f-branch','All Branches',people(BRANCHES),f.branch)+
     '<button class="clearf" id="clearf"'+(anyFilter(f)?'':' hidden')+'>'+I.close+'Clear filters</button></div></div>';
+  /* the chosen filter values, each removable on its own */
+  var chips=[['status','Status',f.status&&STATUS[f.status]?STATUS[f.status][0]:''],['accountant','Accountant',f.accountant],['branch','Branch',f.branch]].filter(function(c){ return c[2]; });
+  if(chips.length) h+='<div class="qt-chips" aria-label="Active filters">'+chips.map(function(c){
+    return '<span class="qt-chip">'+c[1]+': <b>'+esc(c[2])+'</b><button type="button" data-unf="'+c[0]+'" aria-label="Remove '+c[1].toLowerCase()+' filter '+esc(c[2])+'" title="Remove">'+I.close+'</button></span>'; }).join('')+'</div>';
   h+='<div class="card ar-table qt-table"><table><thead><tr><th>Quotation ID</th><th>Client</th><th>Date</th><th class="r">Amount</th><th>Status</th><th>Branch</th><th>Accountant</th><th>Created By</th><th class="c">Actions</th></tr></thead><tbody>';
   if(!all.length) h+='<tr><td colspan="9"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="9"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
@@ -11448,7 +11472,9 @@ function render(){
   content.innerHTML=h; wireHead();
   var qi=document.getElementById('q');
   qi.oninput=function(){ state.f.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
-  [['f-status','status'],['f-branch','branch']].forEach(function(p){
+  [].forEach.call(content.querySelectorAll('[data-sb]'),function(x){ x.onclick=function(){ state.f.status=x.getAttribute('data-sb'); state.page=1; render(); var n=content.querySelector('[data-sb="'+state.f.status+'"]'); if(n) n.focus(); }; });
+  [].forEach.call(content.querySelectorAll('[data-unf]'),function(x){ x.onclick=function(){ state.f[x.getAttribute('data-unf')]=''; state.page=1; render(); }; });
+  [['f-status','status'],['f-acc','accountant'],['f-branch','branch']].forEach(function(p){
     var el=document.getElementById(p[0]); if(el) el.onchange=function(){ state.f[p[1]]=this.value; state.page=1; render(); };
   });
   bindRange();
@@ -11586,12 +11612,12 @@ function openForm(id){
       clientId:q.clientId,onName:q.onName||q.clientName||'',companies:(q.companies||(q.company?[q.company]:[])).slice(),toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):'',gst:x.gst!=null?x.gst!==false:q.gstMode!=='none'}; }),
-      contactName:q.contactName!=null?q.contactName:'',contactPhone:q.contactPhone!=null?q.contactPhone:'',abn:q.abn!=null?q.abn:'',
+      contactPhone:q.contactPhone!=null?q.contactPhone:'',abn:q.abn!=null?q.abn:'',
       customerNotes:q.customerNotes||'',terms:q.terms||'',termsDefault:!!q.terms&&q.terms===defaultTerms(),
       showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
-    }:{clientId:null,onName:'',toName:'',contactName:'',contactPhone:'',abn:'',companies:[],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+    }:{clientId:null,onName:'',toName:'',contactPhone:'',abn:'',companies:[],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:defaultTerms(),termsDefault:!!defaultTerms(),showDisc:false,discType:'$',discount:''}};
-  if(q&&q.contactName==null){ var cq=formClient(); if(cq) fillContact(cq); }   // older quotations: taken from the client's record
+  if(q&&q.contactPhone==null&&q.abn==null){ var cq=formClient(); if(cq) fillContact(cq); }   // older quotations: taken from the client's record
   if(!QF.d.companies.length){ var c0=branchCos(QF.d.branch); if(c0.length===1) QF.d.companies=[c0[0]]; }   // one company for the branch: chosen for you
   paintForm();
 }
@@ -11606,7 +11632,7 @@ function confirmReopen(q){
   document.getElementById('qr-go').onclick=function(){ closeDlg(); openForm.ok=true; openForm(q.id); };
 }
 /* Name, Phone Number and ABN come from the client's record when the client is chosen; they can be changed for this quotation */
-function fillContact(c){ var d=QF.d; d.contactName=clientName(c)||c.name||''; d.contactPhone=c.phone||c.commPhone||''; d.abn=c.abn||''; }
+function fillContact(c){ var d=QF.d; d.contactPhone=c.phone||c.commPhone||''; d.abn=c.abn||''; }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
 function paintForm(focusId){
   var d=QF.d, e=QF.errs, T=totalsOf(d), c=formClient(), cat=catalogAll(), cats=cat.categories.filter(function(x){ return x.active!==false; }), svc=cat.services.filter(function(s){ return s.active; });
@@ -11641,12 +11667,11 @@ function paintForm(focusId){
   ov.innerHTML='<div class="drawer sf qf qf2'+(again?' qs-swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body"><div class="qf-card qf-one">'+
-      card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
-        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>'+
+      card('Client','','<div class="stack">'+field('Select client',true,clientField,'client')+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,'<div class="qf-ms" id="qf-ms"><div class="qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Internal companies"></div>'+
             '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div>'+
-        '<div class="g3">'+field('Name',false,'<input class="fin plain sm" id="qf-cn1" data-qf="contactName" maxlength="80" autocomplete="off" value="'+esc(d.contactName)+'"'+(c?'':' placeholder="Choose the client first" disabled')+'>')+
+        '<div class="g3">'+field('On the name of',true,'<input class="fin plain sm'+(e.onName?' bad':'')+'" id="qf-on" data-qf="onName" maxlength="120" autocomplete="off" value="'+esc(d.onName)+'"'+(c?'':' placeholder="Choose the client first" disabled')+'>','onName')+
           field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" maxlength="20" autocomplete="off" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
           field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g2">'+
@@ -11726,7 +11751,7 @@ function wireForm(focusId){
     list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
   }
   function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.toName=c.name; fillContact(c); QF.pick=''; delete QF.errs.client; delete QF.errs.onName; delete QF.errs.toName; touch(); repaint('qf-on'); }
-  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.toName=''; d.contactName=''; d.contactPhone=''; d.abn=''; touch(); repaint('qf-q'); };
+  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.toName=''; d.contactPhone=''; d.abn=''; touch(); repaint('qf-q'); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
     var s=x.svcId?svcById(x.svcId):null; if(s&&x.cat&&(s.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }   // the item no longer fits the category
     touch(); repaint('qf-s'+i); }; });
@@ -11774,7 +11799,7 @@ function wireForm(focusId){
 function checkForm(full){
   var d=QF.d, e={}, T=totalsOf(d), filled=d.items.filter(function(x){ return x.svcId; });
   if(d.clientId==null||!formClient()) e.client='Choose the client this quotation is for';
-  else { if(full&&!d.onName) e.onName='Choose who the quotation is made out to'; }
+  else { if(full&&!d.onName.trim()) e.onName='Enter the name the quotation is made out to'; }
   if(full&&!d.branch) e.branch='Choose the branch';
   if(full&&!d.companies.length) e.company='Choose at least one internal company';
   if(full&&!d.accountant) e.accountant='Choose the accountant';
@@ -11809,7 +11834,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',contactName:d.contactName.trim(),contactPhone:d.contactPhone.trim(),abn:d.abn.trim(),branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName.trim()||c.name,toName:'',contactPhone:d.contactPhone.trim(),abn:d.abn.trim(),branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price)),gst:x.gst!==false}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
@@ -11851,7 +11876,7 @@ function previewForm(){ showDoc(formModel()); }
 function formModel(sign){
   var d=QF.d, c=formClient();
   var to=c?(d.onName||c.name):'';
-  return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.contactName.trim()&&d.contactName.trim()!==to?d.contactName.trim():'',phone:c?d.contactPhone.trim():'',abn:c?d.abn.trim():'',sign:null,
+  return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:'',phone:c?d.contactPhone.trim():'',abn:c?d.abn.trim():'',sign:null,
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
     T:totalsOf(d),noGst:!totalsOf(d).anyGst,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
 }

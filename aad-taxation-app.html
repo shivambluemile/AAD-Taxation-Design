@@ -71,7 +71,7 @@ body.portal-mode .shell{display:none}
       <button data-mod="dashboard" class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></button>
       <button data-mod="staff"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M17 11a3 3 0 1 0 0-6"/><path d="M18 20c0-2.4-.9-4.2-2.4-5.3"/></svg><span>Staff</span></button>
       <button data-mod="clients"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 20v-1.5C3 16 5.2 14 8 14h2c2.8 0 5 2 5 4.5V20"/><circle cx="9" cy="8" r="3.4"/><path d="M16.5 20v-1.2c0-1.8-.9-3.3-2.3-4.1"/><path d="M21 9.5 19 11.5 17.5 10"/></svg><span>Clients</span></button>
-      <button data-mod="quotations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotations</span></button>
+      <button data-mod="quotations"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg><span>Quotations</span><b class="nav-badge" id="nb-quotations" aria-label="quotations awaiting a reply"></b></button>
       <button data-mod="sales"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Sales</span></button>
       <button data-mod="tasks"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8M14 9.5h2M8 15l1.5 1.5L12 14M14 15.5h2"/></svg><span>Tasks</span></button>
       <button data-mod="leave"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9.5 15 2 2 3.5-3.5"/></svg><span>Leave</span><b class="nav-badge" id="nb-leave" aria-label="pending leave requests"></b></button>
@@ -1656,7 +1656,7 @@ function currentList(docs){
     for(var i=0;i<items.length;i+=PER){ var row=items.slice(i,i+PER), op=row.filter(function(d){ return docOpen[d.k]; })[0];
       h+=row.map(docCard).join('')+(op?docDetail(op):''); }
     return h+'</div>'; };
-  return group('Needs attention',need,'warn')+group('',ok,'ok');
+  return group('',need.concat(ok),'');   // one grid, the ones that need attention first
 }
 /* viewer: one version of a document, switching between its sides */
 function viewDoc(k,vi,fi){
@@ -11019,7 +11019,7 @@ table,td,th{font-size:13.5px}
 .qt-dev{display:inline-flex;align-items:center;height:22px;padding:0 9px;margin-left:8px;border-radius:999px;background:#FFF7EC;color:#B45309;font-family:'Inter';font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:4px;cursor:help}
 .qt-sbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .qt-sb{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 5px 0 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);white-space:nowrap}
-.qt-sb:hover{border-color:#CBD2DA;color:var(--ink)}
+.qt-sb:hover{border-color:#CBD2DA;color:var(--ink)}.qt-sb.all{padding-right:14px}
 .qt-sb i{width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0}
 .qt-sb i.q-draft{background:#94A3B8}.qt-sb i.q-sent{background:#3B82F6}.qt-sb i.q-acc{background:#10B981}.qt-sb i.q-conv{background:#8B5CF6}.qt-sb i.q-rej{background:#EF4444}.qt-sb i.q-exp{background:#F59E0B}.qt-sb i.q-can{background:#CBD5E1}
 .qt-n{min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#F3F4F6;color:var(--slate);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
@@ -11509,7 +11509,7 @@ function render(){
   /* status badges: each one filters the list; the counts follow every other filter */
   var base=filtered(true), cnt=function(s){ return base.filter(function(x){ return !s||x.status===s; }).length; };
   var sb=function(s,label,dot){ var on=(f.status||'')===s, n=cnt(s);
-    return '<button type="button" class="qt-sb'+(n?'':' zero')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+'<span class="qt-n">'+n+'</span></button>'; };
+    return '<button type="button" class="qt-sb'+(n||!s?'':' zero')+(s?'':' all')+'" data-sb="'+s+'" aria-pressed="'+on+'">'+(dot?'<i class="'+dot+'"></i>':'')+esc(label)+(s?'<span class="qt-n">'+n+'</span>':'')+'</button>'; };   // All carries no count
   var h=head()+'<div class="qt-sbar" role="group" aria-label="Filter by status">'+sb('','All','')+Object.keys(STATUS).filter(function(k){ return k!=='cancelled'; }).map(function(k){ return sb(k,STATUS[k][0],STATUS[k][1]); }).join('')+'</div>';
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });
@@ -21353,8 +21353,13 @@ function submit(){
     if(!Array.isArray(list)){ make('leave'); return; }          // first visit: the Leave page loads in the background and saves its records
     list.forEach(function(l){ if(l.status === 'pending') n++; });
     var bd = document.getElementById('nb-leave'); if(staffView()) n = 0; bd.textContent = n ? n : ''; bd.title = n + ' pending leave request' + (n === 1 ? '' : 's');
+    /* Quotations: sent and still waiting for the client's reply (not past the valid-until date); staff count only their own */
+    var qv = null, qn = 0, now = Date.now(); try{ qv = JSON.parse(localStorage.getItem('aad-quotations-v1') || 'null'); }catch(e){}
+    (qv && Array.isArray(qv.list) ? qv.list : []).forEach(function(q){ if(q.status !== 'sent' || new Date(q.validUntil).setHours(23, 59, 59, 999) < now) return;
+      if(staffView() && q.accountant !== 'John Doe' && q.by !== 'John Doe') return; qn++; });
+    var qb = document.getElementById('nb-quotations'); qb.textContent = qn ? qn : ''; qb.title = qn + ' quotation' + (qn === 1 ? '' : 's') + ' awaiting a reply';
   };
-  window.addEventListener('storage', function(e){ if(e.key === 'aad-leave-v1') window.AADBadges(); });
+  window.addEventListener('storage', function(e){ if(e.key === 'aad-leave-v1' || e.key === 'aad-quotations-v1') window.AADBadges(); });
 
   /* ---------- notifications: one store for the whole app, a panel under every module's bell, and a full page ----------
      Prototype: events are collected from the records saved in this browser (leave, quotations, sales) plus a few samples.

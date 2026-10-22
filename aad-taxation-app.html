@@ -2756,6 +2756,7 @@ tbody tr:hover{background:#FCFCFD}
 .dir-acts{margin-left:auto;display:flex;align-items:center;gap:14px}
 .dir-rm{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--mute);border:1px solid var(--line);background:#fff;flex-shrink:0}.dir-rm:hover,.dir-rm:focus-visible{color:var(--red);border-color:#FECACA;background:#FEF2F2;outline:none}
 .dir-body{padding:16px}
+.dir-save{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}.dir-save .cl-err{margin:0}
 .copychk{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--ink)}
 .copychk input,.el-review input{appearance:none;-webkit-appearance:none;width:18px;height:18px;border:1.5px solid #CBD5E1;border-radius:5px;background:#fff;display:inline-grid;place-content:center;cursor:pointer;flex-shrink:0;margin:0}
 .copychk input:checked,.el-review input:checked{background:var(--orange);border-color:var(--orange)}
@@ -4299,6 +4300,8 @@ function renderForm(){
              field('dir.'+i+'.abn','ABN',x.abn,{req:true,ph:'e.g. 51 824 753 556',mode:'numeric',max:14})+
              field('dir.'+i+'.tfn','TFN',x.tfn,{req:true,ph:'e.g. 123 456 789',mode:'numeric',max:11})+
            '</div>'+(saved?'<div class="dir-login">'+loginState(x)+'</div>':'')+
+           (x.id==null?'<div class="dir-save">'+(f.errs['dir.'+i+'.save']?'<span class="cl-err">'+I.info+esc(f.errs['dir.'+i+'.save'])+'</span>':'')+
+             '<button type="button" class="btn-primary btn-sm" data-dsave="'+i+'">Save individual</button></div>':'')+
          '</div></div>';
     });
     h+=full
@@ -4389,6 +4392,25 @@ function wireForm(){
   body.querySelectorAll('[data-remove]').forEach(function(b){
     b.onclick=function(){ if(b.disabled) return; readForm(); removeDirector(+b.dataset.remove); };
   });
+  body.querySelectorAll('[data-dsave]').forEach(function(b){
+    b.onclick=function(){
+      readForm(); var i=+b.dataset.dsave, x=d.directors[i], p='dir.'+i+'.', all=validate(), bad=null, t=function(v){ return String(v||'').trim(); };
+      Object.keys(f.errs).forEach(function(k){ if(k.indexOf(p)===0) delete f.errs[k]; });
+      Object.keys(all).forEach(function(k){ if(k.indexOf(p)===0&&k!==p+'save'){ f.errs[k]=all[k]; if(!bad) bad=k; } });
+      if(bad){ repaint('#f-'+bad.replace(/\./g,'-')); toast('Please fix the highlighted fields',true); return; }
+      var em=t(x.email).toLowerCase(), now=Date.now();
+      var cl=CLIENTS.filter(function(c){ return c.type==='individual'&&!c._draft&&String(c.email||'').toLowerCase()===em; })[0], found=!!cl;
+      if(!cl){
+        cl={id:clientSeq++,type:'individual',entity:'Individual',name:t(x.name),email:em,phone:fmtPhone(x.phone),abn:numText(x.abn),tfn:numText(x.tfn),acn:'',commEmail:'',commPhone:'',
+          address:{street:'',suburb:'',state:'',postcode:'',country:'Australia'},directors:[],active:true,created:now,login:false,lastReset:null,services:[],kyc:[],kycRecords:[],notes:[],
+          history:[{t:now,kind:'created',title:'Client created',detail:'Added as a director'+(t(d.name)?' of '+t(d.name):''),by:ME}]};
+        CLIENTS.unshift(cl); saveClients();
+      }
+      x.personId=cl.id; delete x.pick; x.name=cl.name; x.email=cl.email||''; x.phone=cl.phone||''; x.abn=cl.abn?fmtABN(cl.abn):''; x.tfn=cl.tfn?fmtTFN(cl.tfn):'';
+      f.dirty=true; repaint(); refreshList();
+      toast(found?cl.name+' is already an individual client, so they’ve been added':cl.name+' saved as an individual client');
+    };
+  });
   body.querySelectorAll('[data-dir] [data-reset]').forEach(function(b){
     b.onclick=function(){
       readForm();
@@ -4477,6 +4499,7 @@ function validate(){
       if(isPicked(x)) return;
       req(p+'name','Full name'); req(p+'email','Email address'); req(p+'phone','Phone number');
       req(p+'abn','ABN'); req(p+'tfn','TFN');
+      if(x.id==null) e[p+'save']='Save this individual first';
       var em=x.email.trim().toLowerCase();
       if(em && !e[p+'email']){ if(seen[em]!=null) e[p+'email']='Director '+(seen[em]+1)+' already uses this email'; else seen[em]=i; }
     });

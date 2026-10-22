@@ -13628,6 +13628,14 @@ th.r .sl-sort{flex-direction:row}
 .sl-per{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);margin-left:auto}.sl-per .sel select{height:32px;padding:0 28px 0 10px;font-size:12.5px}
 .tfoot .pager{margin-left:12px}.sl-gap{display:inline-flex;align-items:center;padding:0 4px;color:var(--faint)}
 .sl-sum{font-size:14px;color:var(--ink)}
+.sl-tabs{display:flex;gap:4px;margin:-4px 0 16px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.sl-tabs button{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.sl-tabs button:hover{color:var(--ink)}.sl-tabs button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}
+.sl-tn{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--orange);color:#fff;font-size:11px;font-weight:700}
+.sl-prow{cursor:pointer}.sl-prow:hover td{background:#FAFBFC}.sl-prow:focus-visible{outline:2px solid var(--orange);outline-offset:-2px}
+.sl-ptable table,.sl-rtable table{min-width:900px}.sl-reason{white-space:normal!important;max-width:320px;color:var(--slate);font-size:13px}
+.sl-h3{margin:22px 0 10px;font-family:Manrope;font-size:15px;font-weight:800;color:var(--ink)}
+.sl-quote{color:var(--ink)}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
@@ -13786,14 +13794,15 @@ function rangeHtml(f){
     '</div></div>';
   return h;
 }
+function curF(){ return state.tab==='payments'?state.pf:state.f; }
 function bindRange(){
   var btn=document.getElementById('rbtn'), pop=document.getElementById('rpop'), list=pop.querySelector('.rlist'), cust=document.getElementById('rcustom');
   var from=document.getElementById('rc-from'), to=document.getElementById('rc-to'), err=document.getElementById('rc-err');
   function open(){ pop.hidden=false; btn.setAttribute('aria-expanded','true'); list.hidden=false; cust.hidden=true; var on=pop.querySelector('.ropt.on')||pop.querySelector('.ropt'); on.focus(); }
   function close(focus){ pop.hidden=true; btn.setAttribute('aria-expanded','false'); if(focus) btn.focus(); }
-  function apply(key,a,b){ var f=state.f; f.range=key; f.from=a; f.to=b; state.page=1; render(); document.getElementById('rbtn').focus(); }
+  function apply(key,a,b){ var f=curF(); f.range=key; f.from=a; f.to=b; state.page=1; state.pp=1; render(); document.getElementById('rbtn').focus(); }
   function showCustom(){
-    var f=state.f, t=rIso(new Date());
+    var f=curF(), t=rIso(new Date());
     from.value=f.from||t; to.value=f.to||f.from||t; to.min=from.value;
     err.classList.remove('show'); list.hidden=true; cust.hidden=false; from.focus();
   }
@@ -13837,7 +13846,7 @@ var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disab
 var PAY={unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid',overdue:'Overdue'};
 var PAY_TYPES=['Bank Transfer','Card','Cash','Cheque','Direct Debit','Client Credit'];
 var EV={created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
-  payment:'Payment recorded',disabled:'Sale disabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
+  payment:'Payment recorded',disabled:'Sale disabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request rejected'};
 var DUE_DAYS=14, DAY=864e5;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function canManage(s){ return isManager()||s.accountant===ME.name||s.by===ME.name; }
@@ -13989,9 +13998,21 @@ function checkFilters(f){
 }
 
 /* ---------- the page ---------- */
+function pendingRequests(){ return st?st.list.filter(function(x){ return x.status!=='disabled'&&x.editRequest&&x.editRequest.status==='pending'; }):[]; }
+function tabsHtml(){
+  var t=state.tab||'sales', n=isManager()?pendingRequests().length:0;
+  var list=[['sales','Sales'],['recurring','Recurring'],['payments','Payments']].concat(isManager()?[['requests','Edit requests']]:[]);
+  if(!window.openRecurring) list=list.filter(function(x){ return x[0]!=='recurring'; });
+  return '<div class="sl-tabs" role="tablist" aria-label="Sales views">'+list.map(function(x){ var on=x[0]===t;
+    return '<button type="button" role="tab" aria-selected="'+on+'" class="'+(on?'on':'')+'" data-tab="'+x[0]+'">'+x[1]+(x[0]==='requests'&&n?'<span class="sl-tn" title="'+n+' pending edit request'+(n===1?'':'s')+'">'+n+'</span>':'')+'</button>'; }).join('')+'</div>';
+}
 function head(){ return '<div class="page-head"><h1>Sales</h1><div class="ph-acts"><button class="btn-ghost" id="sl-pdf">'+SI.pdf+'PDF</button><button class="btn-ghost" id="sl-csv">'+SI.csv+'CSV</button><button class="btn-primary" id="sl-add">'+I.plus+'Add Sale</button></div></div>'; }
 function selF(id,all,opts,val){ return '<label class="sr" for="'+id+'">'+esc(all)+'</label>'+selHtml(id,all,opts,val); }
 function render(){
+  if(st&&state.tab==='payments') return renderPayments();
+  if(st&&state.tab==='requests'){ if(isManager()) return renderRequests(); state.tab='sales'; }
+  if(st&&state.tab==='recurring'&&window.renderRecurring) return renderRecurring();
+  if(state.tab==='recurring'&&!window.renderRecurring) state.tab='sales';
   if(loadErr||!st){
     content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Sales couldn’t be loaded</h3><p>Something went wrong while reading the sales. Try again.</p><button class="btn-ghost" id="sl-retry">Try again</button></div></div>';
     document.getElementById('sl-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
@@ -14000,7 +14021,7 @@ function render(){
   var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0)), owed=r2(live.reduce(function(a,s){ return a+pendingOf(s); },0));
   var over=live.filter(function(s){ return payStatus(s)==='overdue'; }), overAmt=r2(over.reduce(function(a,s){ return a+pendingOf(s); },0));
   var tile=function(k,label,val,tip,sub){ var on=f.quick===k; return '<div class="stat sl-tile'+(on?' on':'')+'" role="button" tabindex="0" data-tile="'+k+'" aria-pressed="'+on+'" title="'+tip+'"><dt>'+label+'</dt><dd>'+val+(sub?'<small>'+sub+'</small>':'')+'</dd></div>'; };
-  var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
+  var h=head()+tabsHtml()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
     '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div>'+
     tile('owing','Pending Amount',money(owed),'Still owed after payments and client credit. Click to show unpaid and partly paid sales.')+
     tile('overdue','Overdue',money(overAmt),'Past the due date and still owed. Click to show them.',over.length+' sale'+(over.length===1?'':'s'))+'</dl>';
@@ -14056,7 +14077,9 @@ function render(){
 }
 function wireHead(){
   document.getElementById('sl-add').onclick=function(){ openSaleForm(); };
-  var p=document.getElementById('sl-pdf'); if(p) p.onclick=exportPdf; var c=document.getElementById('sl-csv'); if(c) c.onclick=exportCsv;
+  var p=document.getElementById('sl-pdf'); if(p) p.onclick=function(){ state.tab==='payments'?exportPayPdf():exportPdf(); };
+  var c=document.getElementById('sl-csv'); if(c) c.onclick=function(){ state.tab==='payments'?exportPayCsv():exportCsv(); };
+  [].forEach.call(content.querySelectorAll('[data-tab]'),function(b){ b.onclick=function(){ closeMenu(); state.tab=b.getAttribute('data-tab'); state.sel={}; render(); var n=content.querySelector('[data-tab="'+state.tab+'"]'); if(n) n.focus(); }; });
 }
 function wireFilters(){
   var f=state.f, qi=document.getElementById('q');
@@ -14176,6 +14199,117 @@ function pager(total){
   nums.forEach(function(i){ h+=i==='…'?'<span class="sl-gap">…</span>':'<button data-p="'+i+'" class="'+(i===p?'on':'')+'"'+(i===p?' aria-current="page"':'')+'>'+i+'</button>'; });
   return h+'<button data-p="'+(p+1)+'"'+(p===pages?' disabled':'')+' aria-label="Next">›</button></div></div>';
 }
+/* ---------- Payments: every payment across the sales you can see, with the Sales filters ---------- */
+function blankPay(){ var d=rangeOf(DEFAULT_RANGE); return {q:'',range:DEFAULT_RANGE,from:d[0],to:d[1],branch:'',by:'',type:''}; }
+function payRows(){
+  var f=state.pf, q=f.q.trim().toLowerCase(), out=[];
+  st.list.filter(inScope).forEach(function(s){ var c=null;
+    (s.payments||[]).forEach(function(p){
+      if(p.void) return;
+      if(f.type&&p.type!==f.type) return; if(f.branch&&s.branch!==f.branch) return; if(f.by&&p.by!==f.by) return;
+      if(f.from||f.to){ var d=isoDay(p.at); if(f.from&&d<f.from||f.to&&d>f.to) return; }
+      c=c||client(s);
+      if(q&&(s.id+' '+c.name+' '+(p.ref||'')).toLowerCase().indexOf(q)<0) return;
+      out.push({p:p,s:s,c:c}); }); });
+  return out.sort(function(a,b){ return b.p.at-a.p.at; });
+}
+function renderPayments(){
+  if(!state.pf) state.pf=blankPay();
+  var f=state.pf, rows=payRows(), per=state.per, pages=Math.max(1,Math.ceil(rows.length/per)); state.pp=Math.min(state.pp||1,pages);
+  var page=rows.slice((state.pp-1)*per,state.pp*per);
+  var rec=r2(rows.filter(function(x){ return x.p.type!=='Client Credit'; }).reduce(function(a,x){ return a+x.p.amount; },0)), cr=r2(rows.filter(function(x){ return x.p.type==='Client Credit'; }).reduce(function(a,x){ return a+x.p.amount; },0));
+  var by=[]; st.list.filter(inScope).forEach(function(s){ (s.payments||[]).forEach(function(p){ if(p.by&&by.indexOf(p.by)<0) by.push(p.by); }); }); by.sort();
+  var h=head()+tabsHtml()+'<dl class="qt-stats sl-stats"><div class="stat" title="Money received in the payments below. Client credit is listed separately."><dt>Total Received</dt><dd>'+money(rec)+'</dd></div>'+
+    '<div class="stat" title="Client credit used to pay invoices in the payments below"><dt>Client Credit Applied</dt><dd>'+money(cr)+'</dd></div>'+
+    '<div class="stat" title="How many payments match the filters"><dt>Payments</dt><dd>'+rows.length.toLocaleString('en-AU')+'</dd></div></dl>';
+  h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="pq" placeholder="Search by client, sale ID or reference" aria-label="Search payments" value="'+esc(f.q)+'"></div><div class="filters">'+
+    '<span class="lbl">'+I.filter+'Filter By:</span>'+rangeHtml(f)+
+    selF('pf-branch','All Branches',BRANCHES.map(function(b){ return [b,b]; }),f.branch)+
+    selF('pf-by','All Staff',by.map(function(b){ return [b,b]; }),f.by)+
+    selF('pf-type','All Payment Types',PAY_TYPES.map(function(t){ return [t,t]; }),f.type)+'</div></div>';
+  var any=f.q.trim()||f.branch||f.by||f.type||f.range!==DEFAULT_RANGE;
+  if(any) h+='<div class="mf-chips"><button type="button" class="clearf" id="pf-clear">'+I.close+'Clear filters</button></div>';
+  h+='<div class="card ar-table qt-table sl-table sl-ptable"><table><thead><tr><th>Payment date</th><th>Sale ID</th><th>Client</th><th>Payment type</th><th>Reference</th><th class="r">Amount</th><th>Recorded by</th><th>Branch</th></tr></thead><tbody>';
+  if(!rows.length) h+='<tr><td colspan="8"><div class="empty"><h3>'+(f.q.trim()?'No payments match “'+esc(f.q.trim())+'”':any?'No payments match these filters':'No payments in this period')+'</h3><p>'+(any?'Try a different search term, or clear the filters.':'Payments appear here once they’re recorded on a sale.')+'</p>'+(any?'<button class="btn-ghost" id="pf-clear2">Clear filters</button>':'')+'</div></td></tr>';
+  page.forEach(function(x){ var p=x.p, sl=x.s, c=x.c, cred=p.type==='Client Credit';
+    h+='<tr class="sl-prow" data-pay="'+esc(sl.id)+'" tabindex="0" title="Open '+esc(sl.id)+' on its Payments tab"><td class="num nowrap">'+dmyOf(p.at)+'</td>'+
+      '<td class="nowrap"><span class="name-link"><span class="name">'+esc(sl.id)+'</span></span></td>'+
+      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
+      '<td>'+(cred?'<span class="state p-partial"><i></i>Client Credit</span>':esc(p.type))+'</td><td>'+(p.ref?'<span class="qt-clip sm" title="'+esc(p.ref)+'">'+esc(p.ref)+'</span>':'<span class="ar-dash">—</span>')+'</td>'+
+      '<td class="num r"><b>'+money(p.amount)+'</b></td><td><span class="qt-clip sm" title="'+esc(p.by||'')+'">'+esc(p.by||'—')+'</span></td><td><span class="qt-clip sm" title="'+esc(sl.branch||'')+'">'+esc(sl.branch||'—')+'</span></td></tr>'; });
+  var save0=state.page; state.page=state.pp; h+='</tbody></table>'+pager(rows.length)+'</div>'; state.page=save0;
+  content.innerHTML=h; wireHead(); keepView();
+  var qi=document.getElementById('pq'); qi.oninput=function(){ f.q=qi.value; state.pp=1; render(); var n=document.getElementById('pq'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
+  [['pf-branch','branch'],['pf-by','by'],['pf-type','type']].forEach(function(p){ var el=document.getElementById(p[0]); el.onchange=function(){ f[p[1]]=this.value; state.pp=1; render(); var n=document.getElementById(p[0]); if(n) n.focus(); }; });
+  bindRange();
+  var clr=function(){ state.pf=blankPay(); state.pp=1; render(); };
+  var c1=document.getElementById('pf-clear'); if(c1) c1.onclick=clr; var c2=document.getElementById('pf-clear2'); if(c2) c2.onclick=clr;
+  [].forEach.call(content.querySelectorAll('.pager button[data-p]'),function(b){ b.onclick=function(){ if(b.disabled) return; state.pp=+b.getAttribute('data-p'); render(); }; });
+  var pp=document.getElementById('sl-per'); if(pp) pp.onchange=function(){ state.per=+pp.value; state.pp=1; render(); };
+  [].forEach.call(content.querySelectorAll('[data-pay]'),function(tr){ var go=function(){ openDetail(tr.getAttribute('data-pay'),'payments'); }; tr.onclick=go; tr.onkeydown=function(ev){ if(ev.key==='Enter'){ ev.preventDefault(); go(); } }; });
+  if(detailId) paintDetail(true);
+}
+function payExportRows(){ return payRows().map(function(x){ return [dmyOf(x.p.at),x.s.id,x.c.name,x.p.type,x.p.ref||'',x.p.amount.toFixed(2),x.p.by||'',x.s.branch||'']; }); }
+var PAY_HEAD=['Payment date','Sale ID','Client','Payment type','Reference','Amount','Recorded by','Branch'];
+function exportPayCsv(){
+  var rows=payExportRows(); if(!rows.length) return toast('There are no payments to export with these filters.',true);
+  var q=function(v){ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  try{ var csv='\ufeff'+[PAY_HEAD].concat(rows).map(function(r){ return r.map(q).join(','); }).join('\r\n');
+    var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download='payments-'+dmyOf(Date.now())+'.csv';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); },1500); toast('Exported '+rows.length+' payment'+(rows.length===1?'':'s')+' to CSV');
+  }catch(e){ toast('The CSV couldn’t be created. Try again.',true); }
+}
+function exportPayPdf(){
+  var rows=payRows(); if(!rows.length) return toast('There are no payments to export with these filters.',true);
+  var f=state.pf, tot=r2(rows.reduce(function(a,x){ return a+x.p.amount; },0));
+  var tbl='<div class="ex"><h1>Payments</h1><p>'+escH(f.range==='custom'||f.from||f.to?fmtRange(f.from,f.to):'All dates')+' · '+rows.length+' payment'+(rows.length===1?'':'s')+' · '+money(tot)+' · exported '+whenOf(Date.now())+' by '+escH(ME.name)+'</p>'+
+    '<table><thead><tr>'+PAY_HEAD.map(function(x){ return '<th>'+x+'</th>'; }).join('')+'</tr></thead><tbody>'+
+    rows.map(function(x){ return '<tr><td>'+dmyOf(x.p.at)+'</td><td>'+escH(x.s.id)+'</td><td>'+escH(x.c.name)+'</td><td>'+escH(x.p.type)+'</td><td>'+escH(x.p.ref||'—')+'</td><td class="r">'+money(x.p.amount)+'</td><td>'+escH(x.p.by||'')+'</td><td>'+escH(x.s.branch||'')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+  var css='.ex{background:#fff;max-width:1100px;margin:0 auto;padding:28px 32px;font-size:12px;color:#111}.ex h1{font-family:Manrope;font-size:22px;margin:0 0 4px}.ex p{color:#555;margin:0 0 14px}'+
+    '.ex table{width:100%;border-collapse:collapse}.ex th{background:#3A3F44;color:#fff;text-align:left;padding:7px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}.ex td{padding:7px 8px;border-bottom:1px solid #E5E7EB}.ex .r{text-align:right}@page{size:A4 landscape;margin:12mm}@media print{.ex{padding:0;max-width:none}}';
+  if(!printPage('Payments · '+FIRM.name,tbl,css)) return toast('Allow pop-ups to export the PDF',true);
+  toast('PDF ready: save it from the print dialog');
+}
+/* ---------- Edit requests (admins): every pending request, approve or reject with a reason ---------- */
+function renderRequests(){
+  var list=pendingRequests().sort(function(a,b){ return b.editRequest.at-a.editRequest.at; });
+  var done=st.list.filter(function(x){ return x.editRequest&&x.editRequest.status!=='pending'&&x.editRequest.decidedAt; }).sort(function(a,b){ return b.editRequest.decidedAt-a.editRequest.decidedAt; }).slice(0,20);
+  var h=head()+tabsHtml();
+  h+='<div class="card ar-table qt-table sl-table sl-rtable"><table><thead><tr><th>Sale ID</th><th>Client</th><th>Requested by</th><th>Date</th><th>Change requested</th><th class="r">Actions</th></tr></thead><tbody>';
+  if(!list.length) h+='<tr><td colspan="6"><div class="empty"><h3>No pending edit requests</h3><p>When staff ask to change a sale that’s been sent or paid, the request shows here for you to approve or reject.</p></div></td></tr>';
+  list.forEach(function(x){ var r0=x.editRequest, c=client(x);
+    h+='<tr><td class="nowrap"><button class="name-link" data-do="open" data-s="'+x.id+'"><span class="name">'+esc(x.id)+'</span></button><small class="ar-sub">'+money(x.amount)+'</small></td>'+
+      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
+      '<td>'+esc(r0.by)+'</td><td class="num nowrap">'+dmyOf(r0.at)+'<small class="ar-sub">'+whenOf(r0.at).split(' · ')[1]+'</small></td>'+
+      '<td class="sl-reason">“'+esc(r0.reason)+'”</td>'+
+      '<td class="r nowrap"><button type="button" class="btn-ghost btn-sm" data-rj="'+x.id+'">Reject</button> <button type="button" class="btn-primary btn-sm" data-ap="'+x.id+'">Approve</button></td></tr>'; });
+  h+='</tbody></table></div>';
+  if(done.length) h+='<h3 class="sl-h3">Recently decided</h3><div class="card ar-table qt-table sl-table sl-rtable"><table><thead><tr><th>Sale ID</th><th>Requested by</th><th>Change requested</th><th>Decision</th></tr></thead><tbody>'+
+    done.map(function(x){ var r0=x.editRequest, ok=r0.status==='approved'||r0.status==='used';
+      return '<tr><td><button class="name-link" data-do="open" data-s="'+x.id+'"><span class="name">'+esc(x.id)+'</span></button></td><td>'+esc(r0.by)+'</td><td class="sl-reason">“'+esc(r0.reason)+'”</td>'+
+        '<td><span class="state '+(ok?'p-paid':'p-overdue')+'"><i></i>'+(ok?'Approved':'Rejected')+'</span><small class="ar-sub">by '+esc(r0.decidedBy||'')+' · '+dmyOf(r0.decidedAt)+(r0.note?' · “'+esc(r0.note)+'”':'')+'</small></td></tr>'; }).join('')+'</tbody></table></div>';
+  content.innerHTML=h; wireHead(); keepView();
+  [].forEach.call(content.querySelectorAll('[data-ap]'),function(b){ b.onclick=function(){ decideEdit(b.getAttribute('data-ap'),true,''); }; });
+  [].forEach.call(content.querySelectorAll('[data-rj]'),function(b){ b.onclick=function(){ rejectEdit(b.getAttribute('data-rj')); }; });
+  if(detailId) paintDetail(true);
+}
+function notify(n){ try{ parent.AADNotify&&parent.AADNotify(n); }catch(e){} }
+function decideEdit(id,ok,note){
+  reload(); var x=byId(id); if(!x||!x.editRequest||x.editRequest.status!=='pending'){ render(); return toast('This request has already been decided.',true); }
+  var rq=x.editRequest; rq.status=ok?'approved':'declined'; rq.decidedBy=ME.name; rq.decidedAt=Date.now(); rq.note=note||'';
+  log(x,ok?'edit_approved':'edit_declined',{note:'Requested by '+rq.by+(note?' · '+note:'')});
+  notify({to:rq.by,title:'Edit request '+(ok?'approved':'rejected')+' · '+x.id,body:ok?ME.name+' approved your request. You can edit '+x.id+' once.':ME.name+' rejected it: “'+note+'”',mod:'sales',hash:'#/sales/'+x.id});
+  commit(x,ok?'Approved. '+rq.by+' can edit '+x.id+' once':'Request rejected. '+rq.by+' has been told why');
+}
+function rejectEdit(id){
+  var x=byId(id); if(!x) return;
+  modal('<div class="confirm-body"><h3 id="m-t">Reject the edit request · '+esc(x.id)+'</h3><p><strong>'+esc(x.editRequest.by)+'</strong> asked: <span class="sl-quote">“'+esc(x.editRequest.reason)+'”</span></p>'+
+    '<label class="flabel" for="r-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="r-n" rows="3" maxlength="300" placeholder="Tell them why, e.g. the invoice is already paid"></textarea><span class="ferr" id="r-e">Add a reason so they know why</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-danger" id="m-go">Reject request</button></div>');
+  document.getElementById('m-no').onclick=closeDlg;
+  document.getElementById('m-go').onclick=function(){ var n=document.getElementById('r-n').value.trim(); if(!n) return document.getElementById('r-e').classList.add('show'); decideEdit(id,false,n); };
+}
+
 /* ---------- bulk actions on the ticked sales: a summary first, then one email each ---------- */
 function bulkAction(k){
   var ids=Object.keys(state.sel).filter(function(id){ return state.sel[id]; }); reload();
@@ -14639,17 +14773,17 @@ function requestEdit(s){
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Send request</button></div>');
   document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){ var n=document.getElementById('r-n').value.trim(); if(!n) return document.getElementById('r-e').classList.add('show');
-    reload(); var x=byId(s.id); x.editRequest={by:ME.name,at:Date.now(),reason:n,status:'pending'}; log(x,'edit_requested',{note:n}); commit(x,'Edit request sent'); };
+    reload(); var x=byId(s.id); x.editRequest={by:ME.name,at:Date.now(),reason:n,status:'pending'}; log(x,'edit_requested',{note:n});
+    notify({to:'admins',title:'Edit request · '+x.id,body:ME.name+' asked: “'+n+'”',mod:'sales',hash:'#/sales/requests'});
+    commit(x,'Edit request sent. An admin will approve or reject it'); };
 }
 function reviewEdit(s){
   var r=s.editRequest;
   modal('<div class="confirm-body"><h3 id="m-t">Edit request · '+esc(s.id)+'</h3><p><strong>'+esc(r.by)+'</strong> asked on '+whenOf(r.at)+':</p><p class="sl-quote">“'+esc(r.reason)+'”</p>'+
-    '<label class="flabel" for="r-n" style="margin-top:12px">Note <span class="opt">(required to decline)</span></label><textarea class="ftext" id="r-n" rows="2" maxlength="300"></textarea><span class="ferr" id="r-e">Say why it’s declined</span></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-danger" id="m-dec">Decline</button><button class="btn-primary" id="m-ok">Approve</button></div>');
+    '<label class="flabel" for="r-n" style="margin-top:12px">Reason <span class="opt">(required to reject)</span></label><textarea class="ftext" id="r-n" rows="2" maxlength="300"></textarea><span class="ferr" id="r-e">Say why it’s rejected</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-danger" id="m-dec">Reject</button><button class="btn-primary" id="m-ok">Approve</button></div>');
   document.getElementById('m-no').onclick=closeDlg;
-  var decide=function(ok){ var n=document.getElementById('r-n').value.trim(); if(!ok&&!n) return document.getElementById('r-e').classList.add('show');
-    reload(); var x=byId(s.id); x.editRequest.status=ok?'approved':'declined'; x.editRequest.decidedBy=ME.name; x.editRequest.decidedAt=Date.now();
-    log(x,ok?'edit_approved':'edit_declined',{note:'Requested by '+x.editRequest.by+(n?' · '+n:'')}); commit(x,ok?'Edit approved. '+x.editRequest.by+' can edit '+x.id:'Edit request declined'); };
+  var decide=function(ok){ var n=document.getElementById('r-n').value.trim(); if(!ok&&!n) return document.getElementById('r-e').classList.add('show'); decideEdit(s.id,ok,n); };
   document.getElementById('m-ok').onclick=function(){ decide(true); }; document.getElementById('m-dec').onclick=function(){ decide(false); };
 }
 
@@ -14902,8 +15036,13 @@ function exportPdf(){
 RANGES=[[['today','Today'],['this_week','This Week'],['this_month','This Month'],['last_month','Last Month'],['this_year','This Year']]];
 /* the date range above writes into the filters being chosen; Filter applies them */
 if(!restoreView()){ state.f=blank(); state.applied=state.f; }
+state.pf=state.pf||blankPay(); state.pp=1;
+function route(){ var m=/^#\/sales\/(.+)$/.exec(location.hash||''); if(!m||!st) return;
+  if(m[1]==='requests'){ if(isManager()){ state.tab='requests'; render(); } return; }
+  var id=decodeURIComponent(m[1]); if(byId(id)) openDetail(id); }
+window.addEventListener('hashchange',function(){ reload(); route(); });
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
-setTimeout(function(){ reload(); render(); },0);
+setTimeout(function(){ reload(); render(); route(); },0);
 window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });
 
 })();
@@ -21054,7 +21193,7 @@ function submit(){
       f.className = 'frame';
       f.title = mod;
       f.setAttribute('allow', 'camera');
-      f.addEventListener('load', function(){ paintPill(mod, f); paintUser(f); });
+      f.addEventListener('load', function(){ paintPill(mod, f); paintUser(f); paintBell(f); });
       f.setAttribute('srcdoc', page(mod));
       main.appendChild(f);
       frames[mod] = f;
@@ -21078,9 +21217,63 @@ function submit(){
   /* open a module at one of its own addresses, e.g. AADOpen('clients', '#/clients/12') from a quotation's client */
   window.AADOpen = function(mod, hash){
     var fresh = !frames[mod]; select(mod); var f = frames[mod];
-    var to = function(){ try{ f.contentWindow.location.hash = hash; }catch(e){} };
+    var to = function(){ try{ var w = f.contentWindow; if(w.location.hash === hash) w.dispatchEvent(new HashChangeEvent('hashchange')); else w.location.hash = hash; }catch(e){} };
     if(fresh) f.addEventListener('load', function(){ setTimeout(to, 0); }, { once: true }); else to();
   };
+
+  /* ---------- notifications: kept in localStorage (aad-notifications-v1); 'admins' or a person's name; the bell in every module lists them ---------- */
+  var NT_KEY = 'aad-notifications-v1', VIEWER = 'John Doe';
+  function ntLoad(){ try{ var v = JSON.parse(localStorage.getItem(NT_KEY) || '[]'); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+  function ntMine(){ var sv = staffView(); return ntLoad().filter(function(n){ return n.to === 'admins' ? !sv : n.to === VIEWER; }); }
+  window.AADNotify = function(n){
+    var list = ntLoad(); list.unshift({ id: 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), to: n.to, title: n.title, body: n.body || '', at: Date.now(), mod: n.mod || '', hash: n.hash || '', read: false });
+    try{ localStorage.setItem(NT_KEY, JSON.stringify(list.slice(0, 200))); }catch(e){}
+    Object.keys(frames).forEach(function(m){ paintBell(frames[m]); });
+  };
+  var NT_CSS =
+    '.aad-bell{position:relative}.aad-bell .aad-bn{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#E11D48;color:#fff;font:700 10px/16px Inter,system-ui,sans-serif;text-align:center}'+
+    '.aad-np{position:fixed;z-index:210;width:340px;max-height:440px;display:flex;flex-direction:column;background:#fff;border:1px solid #EBEEF0;border-radius:12px;box-shadow:0 12px 32px rgba(15,23,42,.14);font:13px Inter,system-ui,sans-serif}'+
+    '.aad-np .h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #F1F2F4}.aad-np .h b{font:800 14px Manrope,Inter,sans-serif;color:#0F172A}'+
+    '.aad-np .h button{background:none;border:0;color:#C2630F;font:600 12px Inter,system-ui,sans-serif;cursor:pointer}.aad-np .l{overflow-y:auto}'+
+    '.aad-np .i{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #F6F7F9;padding:11px 14px 11px 26px;cursor:pointer;position:relative}.aad-np .i:hover{background:#FFF8F1}'+
+    '.aad-np .i.u::before{content:"";position:absolute;left:11px;top:16px;width:7px;height:7px;border-radius:50%;background:#F18934}'+
+    '.aad-np .i b{display:block;font-size:13px;color:#0F172A}.aad-np .i span{display:block;margin-top:2px;color:#475569;font-size:12.5px;line-height:1.4}.aad-np .i small{display:block;margin-top:4px;color:#94A3B8;font-size:11.5px}'+
+    '.aad-np .e{padding:22px 14px;text-align:center;color:#94A3B8}';
+  function ntAgo(t){ var m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; }
+  function paintBell(f){
+    var doc; try{ doc = f.contentDocument; }catch(e){ return; }
+    var bell = doc && doc.querySelector('.icon-btn[aria-label="Notifications"]'); if(!bell) return;
+    if(!bell.dataset.nt){
+      bell.dataset.nt = '1'; bell.classList.add('aad-bell'); bell.setAttribute('aria-haspopup', 'dialog');
+      var st = doc.createElement('style'); st.textContent = NT_CSS; doc.head.appendChild(st);
+      var panel = null;
+      var close = function(){ if(panel){ panel.remove(); panel = null; bell.setAttribute('aria-expanded', 'false'); } };
+      bell.addEventListener('click', function(e){
+        e.stopPropagation(); if(panel) return close();
+        var mine = ntMine().slice(0, 30), r = bell.getBoundingClientRect();
+        panel = doc.createElement('div'); panel.className = 'aad-np'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Notifications');
+        panel.innerHTML = '<div class="h"><b>Notifications</b>' + (mine.some(function(n){ return !n.read; }) ? '<button type="button" data-all>Mark all as read</button>' : '') + '</div><div class="l">' +
+          (mine.length ? mine.map(function(n){ return '<button type="button" class="i' + (n.read ? '' : ' u') + '" data-n="' + n.id + '"><b>' + escT(n.title) + '</b>' + (n.body ? '<span>' + escT(n.body) + '</span>' : '') + '<small>' + ntAgo(n.at) + '</small></button>'; }).join('') : '<div class="e">You’re all caught up</div>') + '</div>';
+        panel.style.top = (r.bottom + 6) + 'px'; panel.style.right = Math.max(8, doc.documentElement.clientWidth - r.right) + 'px';
+        doc.body.appendChild(panel); bell.setAttribute('aria-expanded', 'true');
+        var markAll = panel.querySelector('[data-all]'); if(markAll) markAll.onclick = function(){ var l = ntLoad(), ids = ntMine().map(function(n){ return n.id; }); l.forEach(function(n){ if(ids.indexOf(n.id) >= 0) n.read = true; }); try{ localStorage.setItem(NT_KEY, JSON.stringify(l)); }catch(x){} close(); Object.keys(frames).forEach(function(m){ paintBell(frames[m]); }); };
+        Array.prototype.forEach.call(panel.querySelectorAll('[data-n]'), function(b){ b.onclick = function(){
+          var l = ntLoad(), n = l.filter(function(x){ return x.id === b.dataset.n; })[0]; if(!n) return close();
+          n.read = true; try{ localStorage.setItem(NT_KEY, JSON.stringify(l)); }catch(x){} close(); Object.keys(frames).forEach(function(m){ paintBell(frames[m]); });
+          if(n.mod) window.AADOpen(n.mod, n.hash); }; });
+      });
+      doc.addEventListener('click', function(e){ if(panel && !panel.contains(e.target)) close(); });
+      doc.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+    }
+    var n = ntMine().filter(function(x){ return !x.read; }).length, bd = bell.querySelector('.aad-bn');
+    if(!bd){ bd = doc.createElement('span'); bd.className = 'aad-bn'; bell.appendChild(bd); }
+    bd.textContent = n > 9 ? '9+' : n; bd.style.display = n ? '' : 'none';
+    bell.setAttribute('aria-label', 'Notifications' + (n ? ', ' + n + ' unread' : ''));
+    bell.setAttribute('aria-label', 'Notifications');   // keep the selector stable; the count is in the badge
+    bell.title = n ? n + ' unread notification' + (n === 1 ? '' : 's') : 'Notifications';
+  }
+  function escT(v){ return String(v == null ? '' : v).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  window.addEventListener('storage', function(e){ if(e.key === NT_KEY) Object.keys(frames).forEach(function(m){ paintBell(frames[m]); }); });
 
   /* ---------- profile menu: the admin can preview the app as a staff member and switch back ---------- */
   var VIEW_KEY = 'aad-view-as', ADMIN_ONLY = ['staff', 'settings'], cur = 'dashboard';

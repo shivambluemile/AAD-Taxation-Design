@@ -2864,7 +2864,9 @@ tbody tr:hover{background:#FCFCFD}
 .ky-sm{font-size:12px;color:var(--faint)}
 .ky-card .el-dt>b{font-size:12.5px;font-weight:600;color:var(--mute)}
 .ky-files{display:flex;flex-direction:column;gap:8px;margin-top:0}
-.ky-cur{padding:14px 18px}.ky-none{margin:0;padding:14px 18px}
+.ky-cur{padding:14px 18px}
+.ky-meta{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:8px;font-size:12px;color:var(--faint)}.ky-meta .ky-note{flex-basis:100%}
+.ky-hrow .ky-meta{flex-basis:100%}.ky-none{margin:0;padding:14px 18px}
 .ky-hact{display:flex;align-items:center;gap:10px;flex-shrink:0}
 .ky-file{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .ky-file .x{font-size:10px;font-weight:800;padding:4px 7px;border-radius:5px;background:#E8F1FD;color:#2563EB;flex-shrink:0}.ky-file .x.e-pdf{background:#FDECEC;color:#C2410C}
@@ -5748,13 +5750,17 @@ function kycTab(c){
   var A={none:[null,'Record KYC'],valid:['Record new KYC',null],expiring:[null,'Renew KYC'],expired:[null,'Renew KYC']}[st];   // one action, in the card header
   var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x+'</button>':''; };
   var act=btn(A[0],'btn-ghost')+btn(A[1],'btn-primary');
-  var doc=cur?'<div class="ky-cur">'+kycChips(cur.files||[],0)+'</div>':'<p class="cl-muted ky-none">No KYC recorded yet.</p>';
+  /* under the files, in small muted text: verified, uploaded (by, date, time), expiry, note */
+  var meta=function(r){ var ex=kycExpiresAt(r), gone=now>=ex;
+    return '<div class="ky-meta"><span>Verified '+dmyOf(fromIso(r.date))+'</span><span>Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+'</span>'+
+      '<span>'+(gone?'Expired on ':'Expires on ')+whenOf(ex).replace(' · ',', ')+'</span>'+(r.note?'<span class="ky-note">Note: '+esc(r.note)+'</span>':'')+'</div>'; };
+  var doc=cur?'<div class="ky-cur">'+kycChips(cur.files||[],0)+meta(cur)+'</div>':'<p class="cl-muted ky-none">No KYC recorded yet.</p>';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown
   var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
-      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+meta(r)+'</div></div>'; }).join('')+'</div>':'');
   var card='<article class="el-card ky-card">'+
     '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div><div class="ky-hact">'+(st==='none'?'':pill(KYC_STATUS,st))+act+'</div></header>'+
     doc+hist+'</article>';

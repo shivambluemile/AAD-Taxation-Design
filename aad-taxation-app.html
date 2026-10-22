@@ -1067,9 +1067,10 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-exp{display:flex;align-items:center;gap:8px;margin:14px 0 0;font-size:13px;color:var(--mute)}
 .dc2-exp.warn{color:#B45309;font-weight:600}.dc2-exp.bad{color:#B91C1C;font-weight:600}
 .dc2-pen{width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;color:var(--faint)}.dc2-pen:hover{background:#F2F4F7;color:var(--ink)}
-.dc2-exp.edit input{width:auto;height:32px;font-size:13px}
-.dc2-ok,.dc2-no{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
-.dc2-ok{background:#ECFDF5;color:#059669}.dc2-ok:hover{background:#D1FAE5}.dc2-no{background:#FEF2F2;color:#DC2626}.dc2-no:hover{background:#FEE2E2}
+.dc2-exp.edit input{width:auto;height:32px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;font-weight:500;color:var(--ink);box-shadow:none}.dc2-exp.edit input:hover{border-color:#CBD2DA}.dc2-exp.edit input:focus,.dc2-exp.edit input:focus-visible{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.15)}
+.dc2-elbl{font-size:12px;font-weight:600;color:var(--mute)}
+.dc2-ok{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 12px;border-radius:8px;background:var(--orange);color:#fff;font-size:12.5px;font-weight:700}.dc2-ok:hover{background:var(--orange-ink)}.dc2-ok svg{width:12px;height:12px}
+.dc2-no{height:32px;padding:0 8px;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--mute)}.dc2-no:hover{background:#F2F4F7;color:var(--ink)}
 .dc2-b{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px 12px;margin-top:14px;align-items:end}
 .dc2-cell{min-width:0;display:flex;flex-direction:column}.dc2-cell .dc2-file{margin-bottom:0}
 .dc2-b>.dc2-empty,.dc2-b>.dt-fmore{grid-column:1/-1}
@@ -1712,8 +1713,8 @@ function docCard(d){
   var line=gone?'Expired '+exp+' · '+ago+' day'+(ago===1?'':'s')+' ago':soon?'Expires '+exp+' · '+(dl===0?'today':dl+' day'+(dl===1?'':'s')+' left'):exp?'Until '+exp:'No expiry';
   var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
   var expRow=expEdit===d.k
-    ?'<div class="dc2-exp edit"><label class="sr" for="dx-'+d.k+'">Expiry date</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+
-      '<button type="button" class="dc2-ok" data-expsave="'+d.k+'" title="Save expiry" aria-label="Save expiry">'+DC_I.tick+'</button><button type="button" class="dc2-no" data-expcancel title="Cancel" aria-label="Cancel">'+I.close+'</button></div>'
+    ?'<div class="dc2-exp edit"><label class="dc2-elbl" for="dx-'+d.k+'">Expiry</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+
+      '<button type="button" class="dc2-ok" data-expsave="'+d.k+'">'+DC_I.tick+'Save</button><button type="button" class="dc2-no" data-expcancel>Cancel</button></div>'
     :'<div class="dc2-exp'+(gone?' bad':soon?' warn':'')+'"><span>'+line+'</span>'+(t.exp?'<button type="button" class="dc2-pen" data-expedit="'+d.k+'" title="Edit expiry date" aria-label="Edit expiry date of '+esc(t.name)+'">'+I.edit+'</button>':'')+'</div>';
   var files=gone?'<div class="dc2-need"><span class="dc2-nlbl">Upload needed</span>'+t.slots.map(function(s){ return '<button type="button" class="dc2-nb" data-replace="'+d.k+'" title="Upload '+esc(s.label)+'">'+I.upsm+esc(s.label)+'</button>'; }).join('')+'</div>'
     :fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);

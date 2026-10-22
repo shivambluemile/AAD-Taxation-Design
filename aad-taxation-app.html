@@ -1099,10 +1099,15 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dt-line{font-size:12px;color:var(--faint)}.dt-tile.is-exp .dt-line{color:#B91C1C;font-weight:600}.dt-tile.is-soon .dt-line{color:#B45309;font-weight:600}
 .dt-nv{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:#FEF2F2;color:#B91C1C;font-size:11.5px;font-weight:700}.dt-nv i{width:6px;height:6px;border-radius:50%;background:currentColor}
 .dt-tile.is-exp .dt-nv+.dt-line{color:var(--faint);font-weight:500}
-.dx-alert{display:flex;align-items:center;gap:12px;padding:12px 14px;margin-bottom:14px;border:1px solid #FECACA;border-radius:12px;background:#FEF2F2}
+.dx-alert{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;margin-bottom:14px;border:1px solid #FECACA;border-radius:12px;background:#FEF2F2}
 .dx-ic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;color:#DC2626}
 .dx-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#7F1D1D}.dx-tx b{font-size:13.5px;color:#991B1B}
 .dx-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
+.dx-list{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.dx-row{display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #FDE2E2}
+.dx-rt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.dx-rt b{font-size:13.5px;color:var(--ink)}.dx-rt span{font-size:12px;color:#B91C1C}
+.dx-hist{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--slate);padding:4px 0;flex-shrink:0}.dx-hist:hover{color:var(--orange-ink)}
+@media (max-width:560px){.dx-row{flex-wrap:wrap}.dx-rt{flex-basis:100%}}
 @media (max-width:560px){.dx-alert{flex-wrap:wrap}.dx-btn{margin-left:44px}}
 .dt-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:10px 14px 4px}
 .dt-fempty{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px dashed #FCA5A5;border-radius:10px;background:#FFF8F8}.dt-fempty b{font-size:12.5px;font-weight:700;color:#B91C1C}.dt-fempty span{font-size:12px;color:var(--mute)}
@@ -1756,7 +1761,7 @@ function docsBody(s){
   var docs=storeOf(s.id).docs;
   // one status filter
   var filter='<div class="sel ds-sel"><select id="sd-f" aria-label="Filter by status">'+
-    [['all','All status'],['expired','Expired'],['soon','Expiring soon'],['valid','Valid'],['none','No expiry']].map(function(c){
+    [['all','All status'],['soon','Expiring soon'],['valid','Valid'],['none','No expiry']].map(function(c){
       return '<option value="'+c[0]+'"'+(docFilter===c[0]?' selected':'')+'>'+c[1]+'</option>';
     }).join('')+'</select></div>';
   var h='<div class="ds-bar">'+
@@ -1764,17 +1769,20 @@ function docsBody(s){
     '<button class="btn btn-pri xs" id="sd-upload">'+I.upsm+'Upload</button></div>';
   var gone=docs.filter(function(d){ return stOf(d)==='expired'; });
   if(gone.length){
-    var names=gone.map(function(d){ return typeOf(d.k).name; }), list=names.length>1?names.slice(0,-1).join(', ')+' and '+names[names.length-1]:names[0];
-    h='<div class="dx-alert" role="alert"><span class="dx-ic">'+I.warn+'</span><div class="dx-tx"><b>'+(gone.length>1?gone.length+' documents have expired':esc(list)+' has expired')+'</b>'+
-      '<span>'+(gone.length>1?esc(list)+' are no longer valid. Upload new copies to replace them.':'There’s no valid copy on file. Upload a new one to replace it.')+'</span></div>'+
-      (gone.length===1?'<button type="button" class="btn btn-pri xs dx-btn" data-replace="'+gone[0].k+'">'+I.upsm+'Upload new</button>':'')+'</div>'+h;
+    var row=function(d){ var x=typeOf(d.k), n=Math.abs(daysTo(d.cur.exp)), hv=versionsOf(d).length;
+      return '<li class="dx-row"><div class="dx-rt"><b>'+esc(x.name)+'</b><span>Expired '+fmtD(d.cur.exp)+' · '+n+' day'+(n===1?'':'s')+' ago · needs '+x.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
+        '<button type="button" class="dx-hist" data-histpop="'+d.k+'" aria-haspopup="dialog">History<span class="dc2-hn">'+hv+'</span></button>'+
+        '<button type="button" class="btn btn-pri xs dx-btn" data-replace="'+d.k+'" aria-label="Upload a new '+esc(x.name)+'">'+I.upsm+'Upload new</button></li>'; };
+    h='<div class="dx-alert" role="alert"><span class="dx-ic">'+I.warn+'</span><div class="dx-tx"><b>'+(gone.length>1?gone.length+' documents have expired':esc(typeOf(gone[0].k).name)+' has expired')+'</b>'+
+      '<span>There’s no valid copy on file. Upload a new one to replace '+(gone.length>1?'each':'it')+'. Earlier versions stay in the history.</span>'+
+      '<ul class="dx-list">'+gone.map(row).join('')+'</ul></div></div>'+h;
   }
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
 }
 function currentList(docs){
   var q=docQ.trim().toLowerCase(), order={expired:0,soon:1,valid:2,none:3};
   if(!docs.length) return '<div class="dl-none"><b>No documents yet</b>Upload this staff member’s first document.</div>';
-  var list=docs.filter(function(d){ var t=typeOf(d.k); return (!q||(t.name+' '+t.cat).toLowerCase().indexOf(q)>=0)&&(docFilter==='all'||stOf(d)===docFilter); })
+  var list=docs.filter(function(d){ var t=typeOf(d.k); return stOf(d)!=='expired'&&(!q||(t.name+' '+t.cat).toLowerCase().indexOf(q)>=0)&&(docFilter==='all'||stOf(d)===docFilter); })
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });

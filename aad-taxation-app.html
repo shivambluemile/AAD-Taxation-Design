@@ -11702,6 +11702,16 @@ function confirmReopen(q){
   document.getElementById('qr-go').onclick=function(){ closeDlg(); openForm.ok=true; openForm(q.id); };
 }
 /* Name, Phone Number and ABN come from the client's record when the client is chosen; they can be changed for this quotation */
+/* the phone and ABN of whoever the quotation is made out to: the client, one of the company's directors, or a company the person directs */
+function recipientOf(c,name){
+  if(!c) return {phone:'',abn:''};
+  if(!name||name===c.name) return {phone:c.phone||c.commPhone||'',abn:c.abn||''};
+  if(c.type==='company'){ var x=(c.directors||[]).filter(function(y){ return y.name===name; })[0]; if(x){ var em=String(x.email||'').trim().toLowerCase();
+    var p=clients.filter(function(y){ return y.type==='individual'&&(String(y.id)===String(x.personId)||(em&&String(y.email||'').trim().toLowerCase()===em)); })[0];
+    return {phone:x.phone||(p&&(p.phone||p.commPhone))||'',abn:x.abn||(p&&p.abn)||''}; } }
+  var co=clients.filter(function(y){ return y.type==='company'&&y.name===name; })[0];
+  return co?{phone:co.phone||'',abn:co.abn||''}:{phone:'',abn:''};
+}
 function fillContact(c){ var d=QF.d; d.contactPhone=c.phone||c.commPhone||''; d.abn=c.abn||''; }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
 function paintForm(focusId){
@@ -11741,7 +11751,7 @@ function paintForm(focusId){
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,'<div class="qf-ms" id="qf-ms"><div class="qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Internal companies"></div>'+
             '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div>'+
-        '<div class="g3">'+field('On the name of',true,'<input class="fin plain sm'+(e.onName?' bad':'')+'" id="qf-on" data-qf="onName" maxlength="120" autocomplete="off" value="'+esc(d.onName)+'"'+(c?'':' placeholder="Choose the client first" disabled')+'>','onName')+
+        '<div class="g3">'+field('On the name of',true,c?sel('qf-on','onName',names.concat(d.onName&&!names.some(function(o){ return o[0]===d.onName; })?[[d.onName,d.onName]]:[]),d.onName,'Select'):noClient,'onName')+
           field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" maxlength="20" autocomplete="off" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
           field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g2">'+
@@ -11808,7 +11818,8 @@ function wireForm(focusId){
   var repaint=function(fid){ var keep=document.getElementById('qf-body').scrollTop; paintForm(); document.getElementById('qf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-qf]'),function(el){
     var k=el.getAttribute('data-qf'), live=el.tagName==='TEXTAREA';
-    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2='';
+    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete QF.errs[k]; touch();
+      if(k==='onName'){ var rc=recipientOf(formClient(),d.onName); d.contactPhone=rc.phone; d.abn=rc.abn; } if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2='';
       if(k==='branch'){ var cos=branchCos(d.branch); d.companies=d.companies.filter(function(n){ return cos.indexOf(n)>=0; }); if(!d.companies.length&&cos.length===1) d.companies=[cos[0]]; delete QF.errs.company; } if(!live) repaint(el.id); };
   });
   var pick=document.getElementById('qf-q');

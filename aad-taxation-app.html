@@ -5364,6 +5364,7 @@ function finalizeClient(o){
     var at=old?CLIENTS.indexOf(old):-1; if(at>=0) CLIENTS[at]=rec; else CLIENTS.unshift(rec); saveClients();
     form=null; wiz=null; refreshList();
     toast(o.mode==='signed'?'Client added with a signed engagement letter':'Client added · engagement letter sent for signature');
+    if(o.mode!=='signed') return wzLinkDone(rec,letter);
     setHash('#/clients/'+rec.id); currentHash=location.hash; openDetail(rec.id,true,'services');
   }
 }
@@ -5483,6 +5484,21 @@ function rqDone(r){
   document.getElementById('rq-copy').onclick=function(){ copyText(link,'Link copied'); };
   document.getElementById('rq-close').onclick=function(){ rq=null; closeDrawer(); };
   document.getElementById('rq-view').onclick=function(){ rq=null; openRequestDetail(r.id); };
+}
+/* after Send in Add Client: the signing link, like the Request Client panel */
+function wzLinkDone(rec,letter){
+  var body=formBody(), foot=document.getElementById('wz-foot'), link=portalLink('sign',letter.token), st=document.getElementById('wz-steps');
+  if(!body||!foot){ setHash('#/clients/'+rec.id); currentHash=location.hash; openDetail(rec.id,true,'services'); return; }
+  if(st) st.innerHTML=WZ.map(function(x){ return '<li class="done"><span>'+I.tick+'</span>'+x[0]+'</li>'; }).join('');
+  overlay._guard=null; var x=document.getElementById('cf-x'); if(x) x.onclick=function(){ closeDrawer(); };
+  // PROTOTYPE ONLY: this panel exists so the team can open the client's signing page; it isn't part of the real product
+  body.innerHTML='<div class="rq-done"><p>Please copy the below link on the next browser tab to view the engagement letter the client will review and sign, as shared on the client’s email/SMS:</p>'+
+    '<div class="rq-link"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="wz-copy" title="Copy link" aria-label="Copy link">'+I.copy+'</button></div>'+
+    '<p class="rq-proto">This panel won’t be shown in the real design. It’s only here in the prototype to give you the link to preview what the client will receive.</p></div>';
+  foot.innerHTML='<button class="btn-ghost" id="wz-done-x">Close</button><span class="sp-grow"></span><button class="btn-primary" id="wz-done-v">View client</button>';
+  document.getElementById('wz-copy').onclick=function(){ copyText(link,'Link copied'); };
+  document.getElementById('wz-done-x').onclick=function(){ closeDrawer(); };
+  document.getElementById('wz-done-v').onclick=function(){ setHash('#/clients/'+rec.id); currentHash=location.hash; openDetail(rec.id,true,'engagement'); };
 }
 function copyText(t,msg){ try{ navigator.clipboard.writeText(t).then(function(){ toast(msg); },function(){ toast(msg); }); }catch(e){ toast(msg); } }
 

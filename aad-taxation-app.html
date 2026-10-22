@@ -10679,7 +10679,7 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .cl-dhead{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:24px 32px 18px}
 .qd-drawer .dpmain{min-width:0;flex:1}
 .qd-drawer .cl-dhead h2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:'Manrope';font-size:22px;font-weight:800;letter-spacing:-.3px;line-height:1.25;color:var(--ink)}
-.qd-drawer .cl-dhead h2 .state{padding:3px 9px;border-radius:5px;background:#F3F4F6;font-family:'Inter';font-size:12px;font-weight:500;white-space:nowrap}
+.qd-drawer .cl-dhead h2 .state{padding:3px 0;border-radius:5px;background:none;font-family:'Inter';font-size:12px;font-weight:500;white-space:nowrap}
 .qd-drawer .dmetaline{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-top:7px}
 .qd-drawer .dc{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--slate);min-width:0}
 .qd-drawer .dci{display:inline-flex;color:var(--faint);flex-shrink:0}.qd-drawer .dci svg{width:14px;height:14px;display:block}
@@ -10726,9 +10726,12 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .qd-head .btn-primary.qd-main{height:34px;padding:0 16px;font-size:13px}
 .qd-drawer .dhead-acts .btn-ghost svg{flex-shrink:0}
 .qd-drawer .dhead-acts .qd-more{width:34px;height:34px;padding:0;justify-content:center}
-.qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#F7F8FA;min-height:100%}
-.qd-paper{background:#E9EBEE;border-radius:12px;padding:20px;min-width:0}
-.qd-paper .qf-doc{max-width:760px;margin:0 auto}
+.qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
+.qd-paper{min-width:0}
+.qd-paper .qf-doc{max-width:760px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qd-paper .qf-doc-t th{background:none}
+.qd-cmt p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink);white-space:pre-wrap;overflow-wrap:anywhere;padding-left:12px;border-left:3px solid #A7F3D0}
+.qd-cmt.bad p{border-left-color:#FECACA}
 .qd-side{display:flex;flex-direction:column;gap:14px;position:sticky;top:24px}
 .qd-grp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
 .qd-grp h4{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin:0 0 12px}
@@ -11034,7 +11037,8 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-one{padding:0}.qf2 .qf-sec{padding:20px 22px;min-width:0}.qf2 .qf-one>.qf-sec+.qf-sec,.qf2 .qf-one>.qf-bottom{padding-top:4px}
 .qf2 .qf-one .qf-bottom{gap:0}
 .qf2 .qf-one>.ferr{margin:0 22px 16px}
-.qf-lgst{display:flex;justify-content:center;align-items:center;min-height:40px}
+.qf-rate{display:flex;flex-direction:column;gap:7px;min-width:0}
+.qf-lgst{display:flex;justify-content:flex-end;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--mute)}
 .qf-thead .c{text-align:center}
 .qf-tdef{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13px;color:var(--slate);cursor:pointer}
 .qf2 .qf-ch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:30px}
@@ -11106,7 +11110,7 @@ table,td,th{font-size:13.5px}
 .qf-row input[type=number]{text-align:right}
 .qf-row .qf-line{font-weight:700}
 .qf-tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.qf-thead,.qf-row{display:grid;grid-template-columns:16px 166px minmax(0,1.7fr) minmax(0,1.2fr) 64px 104px 44px 84px 32px;gap:10px;align-items:start}
+.qf-thead,.qf-row{display:grid;grid-template-columns:16px 166px minmax(0,1.7fr) minmax(0,1.2fr) 64px 112px 84px 32px;gap:10px;align-items:start}
 .qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line);padding:11px 12px;align-items:center}.qf-thead .r{text-align:right}
 .qf-rows{display:flex;flex-direction:column}
 .qf-row{padding:10px 12px;border-bottom:1px solid #F1F2F4}.qf-row:last-child{border-bottom:0}.qf-row:hover{background:#FCFCFD}
@@ -11184,7 +11188,7 @@ var I={
 };
 var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
-  send_failed:['Email not sent',''],accepted:['Accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
+  send_failed:['Email not sent',''],accepted:['Quotation accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function esc(s){ return escH(s); }
@@ -11221,7 +11225,6 @@ function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.
 var EDITABLE=['draft','sent','accepted','rejected','expired'];
 function canEdit(q){ return EDITABLE.indexOf(q.status)>=0&&!q.invoiceId&&(isManager()||q.accountant===ME.name||q.by===ME.name); }
 function canDelete(q){ return q.status==='draft'&&!q.invoiceId&&!(q.history||[]).some(function(e){ return e.type==='sent'&&e.ok; })&&(isManager()||q.by===ME.name); }
-function canCancel(q){ return (q.status==='sent'||q.status==='accepted')&&!q.invoiceId&&(isManager()||q.accountant===ME.name||q.by===ME.name); }
 function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to; log(q,type,o); }
 
 /* ---------- DEVELOPMENT DATA (temporary): sample quotations for the clients in this browser. Remove when the API is connected. ---------- */
@@ -11263,6 +11266,7 @@ function scoped(){ return st.list.filter(inScope); }
 function badge(s){ var x=STATUS[s]||[s,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
 /* under the badge: who did the latest action and when (the badge says what it was) */
 function attrLine(q){
+  if(q.status==='draft') return '';
   var h=(q.history||[]).filter(function(e){ return e.ok&&e.type!=='send_failed'; }), e=h[h.length-1];
   var when=function(x){ return whenOf(x).replace(' · ',', '); };   // dd-mm-yyyy, hh:mm AM
   if(!e) return when(q.created);   // older records without history: when it was created
@@ -11431,7 +11435,7 @@ function render(){
     var c=client(q), at=attrLine(q);
     h+='<tr>'+
       '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the quotation details"><span class="name">'+esc(q.id)+'</span></button></td>'+
-      '<td><div class="qt-person">'+clAv(c)+'<span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
+      '<td><div class="qt-person"><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="num r">'+money(q.amount)+'</td>'+
       '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
@@ -11486,7 +11490,6 @@ function menuFor(q){
   if((s==='draft'||s==='sent')&&edit) a.push(['send',s==='sent'?'Send again':'Send']);
   a.push(['pdf','Download PDF']);
   if(s==='accepted'&&isManager()&&!q.invoiceId) a.push(['convert','Convert to sale']);
-  if(canCancel(q)) risky.push(['cancel','Cancel quotation','danger']);
   if(canDelete(q)) risky.push(['delete','Delete draft','danger']);
   return risky.length?[a,risky]:[a];
 }
@@ -11522,7 +11525,6 @@ function openMenu(btn){
 function act(k,id){
   reload(); var q=byId(id); if(!q) return toast('This quotation no longer exists.',true);
   if(k==='history') return openHistory(id);
-  if(k==='cancel') return confirmCancel(id);
   if(k==='accept'||k==='reject') return confirmOutcome(id,k==='accept'?'accepted':'rejected');
   if(k==='delete') return confirmDelete(id);
   if(k==='link') return showClientLink(q);
@@ -11584,10 +11586,12 @@ function openForm(id){
       clientId:q.clientId,onName:q.onName||q.clientName||'',companies:(q.companies||(q.company?[q.company]:[])).slice(),toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):'',gst:x.gst!=null?x.gst!==false:q.gstMode!=='none'}; }),
+      contactName:q.contactName!=null?q.contactName:'',contactPhone:q.contactPhone!=null?q.contactPhone:'',abn:q.abn!=null?q.abn:'',
       customerNotes:q.customerNotes||'',terms:q.terms||'',termsDefault:!!q.terms&&q.terms===defaultTerms(),
       showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
-    }:{clientId:null,onName:'',toName:'',companies:[],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+    }:{clientId:null,onName:'',toName:'',contactName:'',contactPhone:'',abn:'',companies:[],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:defaultTerms(),termsDefault:!!defaultTerms(),showDisc:false,discType:'$',discount:''}};
+  if(q&&q.contactName==null){ var cq=formClient(); if(cq) fillContact(cq); }   // older quotations: taken from the client's record
   if(!QF.d.companies.length){ var c0=branchCos(QF.d.branch); if(c0.length===1) QF.d.companies=[c0[0]]; }   // one company for the branch: chosen for you
   paintForm();
 }
@@ -11601,9 +11605,10 @@ function confirmReopen(q){
   document.getElementById('qr-no').onclick=closeDlg;
   document.getElementById('qr-go').onclick=function(){ closeDlg(); openForm.ok=true; openForm(q.id); };
 }
+/* Name, Phone Number and ABN come from the client's record when the client is chosen; they can be changed for this quotation */
+function fillContact(c){ var d=QF.d; d.contactName=clientName(c)||c.name||''; d.contactPhone=c.phone||c.commPhone||''; d.abn=c.abn||''; }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }
 function paintForm(focusId){
-  if(QF&&QF.step===2) return paintSignStep();
   var d=QF.d, e=QF.errs, T=totalsOf(d), c=formClient(), cat=catalogAll(), cats=cat.categories.filter(function(x){ return x.active!==false; }), svc=cat.services.filter(function(s){ return s.active; });
   var err=function(k){ return e[k]?'<span class="ferr show">'+esc(e[k])+'</span>':''; };
   var sel=function(id,k,opts,val,ph){ return '<div class="sf-sel"><select class="fin plain sm'+(e[k]?' bad':'')+'" id="'+id+'" data-qf="'+k+'"><option value="">'+ph+'</option>'+
@@ -11624,8 +11629,8 @@ function paintForm(focusId){
         list.map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="sr" for="qf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="qf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
       '<div><label class="sr" for="qf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="qf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
-      '<div class="qf-price"><label class="sr" for="qf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
-      '<div class="qf-lgst"><button type="button" class="toggle sm'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="switch" aria-checked="'+(x.gst!==false)+'" aria-label="Include GST, line '+(i+1)+'" title="'+(x.gst!==false?'Rate includes GST':'No GST on this line')+'"><i></i></button></div>'+
+      '<div class="qf-rate"><div class="qf-price"><label class="sr" for="qf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
+      '<div class="qf-lgst"><button type="button" class="toggle sm'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="switch" aria-checked="'+(x.gst!==false)+'" aria-label="Include GST, line '+(i+1)+'" title="'+(x.gst!==false?'Rate includes GST':'No GST on this line')+'"><i></i></button><span aria-hidden="true">GST</span></div></div>'+
       '<div class="qf-line num">'+money(amt)+'</div>'+
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
@@ -11640,14 +11645,17 @@ function paintForm(focusId){
         field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>'+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,'<div class="qf-ms" id="qf-ms"><div class="qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Internal companies"></div>'+
-            '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div></div>')+
+            '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div>'+
+        '<div class="g3">'+field('Name',false,'<input class="fin plain sm" id="qf-cn1" data-qf="contactName" maxlength="80" autocomplete="off" value="'+esc(d.contactName)+'"'+(c?'':' placeholder="Choose the client first" disabled')+'>')+
+          field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" maxlength="20" autocomplete="off" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
+          field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g2">'+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
           field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+
         '<div class="g2">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+'</div></div>')+
       card('Services','',
-        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="c">GST</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>')+
       '<div class="qf-bottom">'+
@@ -11662,7 +11670,7 @@ function paintForm(focusId){
           '<div><dt>'+(T.anyGst?'GST (included)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Next</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Save &amp; send</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
 }
@@ -11717,8 +11725,8 @@ function wireForm(focusId){
       if(ev.key==='Enter'&&i>=0){ ev.preventDefault(); choose(it[i].getAttribute('data-cid')); } };
     list.onmousedown=function(ev){ var li=ev.target.closest('[data-cid]'); if(li){ ev.preventDefault(); choose(li.getAttribute('data-cid')); } };
   }
-  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.toName=c.name; QF.pick=''; delete QF.errs.client; delete QF.errs.onName; delete QF.errs.toName; touch(); repaint('qf-on'); }
-  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.toName=''; touch(); repaint('qf-q'); };
+  function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.toName=c.name; fillContact(c); QF.pick=''; delete QF.errs.client; delete QF.errs.onName; delete QF.errs.toName; touch(); repaint('qf-on'); }
+  var chg=document.getElementById('qf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.toName=''; d.contactName=''; d.contactPhone=''; d.abn=''; touch(); repaint('qf-q'); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
     var s=x.svcId?svcById(x.svcId):null; if(s&&x.cat&&(s.cats||[]).map(String).indexOf(x.cat)<0){ d.items[i]=blankLine(); d.items[i].cat=el.value; }   // the item no longer fits the category
     touch(); repaint('qf-s'+i); }; });
@@ -11759,7 +11767,7 @@ function wireForm(focusId){
   document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;
   document.getElementById('qf-draft').onclick=function(){ submitForm('draft'); };
-  document.getElementById('qf-send').onclick=function(){ submitForm('next'); };
+  document.getElementById('qf-send').onclick=function(){ submitForm('send'); };
   if(focusId){ var f=document.getElementById(focusId); if(f) f.focus(); }
 }
 /* checks: a draft needs a client and only valid numbers; sending needs everything */
@@ -11789,10 +11797,9 @@ function checkForm(full){
   return e;
 }
 function submitForm(mode){
-  var full=mode==='send'||mode==='next', e=checkForm(full);
+  var full=mode==='send', e=checkForm(full);
   QF.errs=e;
   if(Object.keys(e).length){ paintForm(); var b=ov.querySelector('.bad, .ferr.show'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } toast(full?'Fix the highlighted fields before sending':'Fix the highlighted fields to save the draft',true); return; }
-  if(mode==='next'){ QF.step=2; QF.signErr={}; return paintSignStep(); }
   var saved=saveForm(); if(!saved) return;
   var wasNew=QF.wasNew; QF=null; closeOv(); render();
   if(full) openSend(saved.id); else toast(wasNew?saved.id+' saved as a draft':saved.id+' saved');
@@ -11802,7 +11809,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',contactName:d.contactName.trim(),contactPhone:d.contactPhone.trim(),abn:d.abn.trim(),branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price)),gst:x.gst!==false}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
@@ -11844,95 +11851,12 @@ function previewForm(){ showDoc(formModel()); }
 function formModel(sign){
   var d=QF.d, c=formClient();
   var to=c?(d.onName||c.name):'';
-  return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.toName&&d.toName!==to?d.toName:'',sign:null,
+  return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.contactName.trim()&&d.contactName.trim()!==to?d.contactName.trim():'',phone:c?d.contactPhone.trim():'',abn:c?d.abn.trim():'',sign:null,
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
     T:totalsOf(d),noGst:!totalsOf(d).anyGst,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
 }
-/* ---------- step 2: the quotation as the client sees it, reviewed, then sent for signature or signed manually (as in Add Client) ---------- */
 function dmyTxt(t){ var x=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(x.getDate())+'-'+p(x.getMonth()+1)+'-'+x.getFullYear(); }
 function isoOfDmy(v){ var m=/^(\d{2})-(\d{2})-(\d{4})$/.exec(v||''); if(!m) return ''; var x=new Date(+m[3],+m[2]-1,+m[1]); return x.getDate()===+m[1]&&x.getMonth()===+m[2]-1?m[3]+'-'+m[2]+'-'+m[1]:''; }
-function ensureSignCss(){ if(document.getElementById('qs-css')) return; var el=document.createElement('style'); el.id='qs-css';
-  el.textContent=LETTER_CSS+
-    '.qs-sec+.qs-sec{margin-top:20px;padding-top:20px;border-top:1px solid var(--line)}.qs-h{display:block;font-family:Manrope;font-size:15px;font-weight:800;color:var(--ink);margin:0 0 12px}'+
-    '.qs-acts{display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px}.qs-pv{background:#E9EBEE;border-radius:12px;padding:18px;overflow:auto;max-height:560px;margin-bottom:14px}'+
-    '.qs-rev{display:flex;gap:12px;align-items:center;cursor:pointer;font-size:13.5px;color:var(--ink);line-height:1.45}.qs-rev.bad span{color:#C2415B}'+
-    '.qs-opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.qs-opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}'+
-    '.qs-opt:hover{border-color:#F8C9A2}.qs-opt.on{border-color:var(--orange);background:var(--orange-soft)}.qs-opt input{accent-color:var(--orange);margin-top:2px}.qs-opt b{display:block;font-size:13.5px;color:var(--ink)}.qs-opt small{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}'+
-    '.qs-sub{margin-top:16px}.qs-sub .g2{margin-bottom:14px}.qs-foot{display:flex;justify-content:flex-end;margin-top:10px}.qs-err{display:block;margin-top:6px;font-size:12.5px;color:#C2415B;font-weight:600}'+
-    '.qs-signed{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}'+
-    '.qs-sigimg{min-width:160px;max-width:260px;height:64px;display:flex;align-items:center;border-bottom:1px solid #CBD5E1}.qs-sigimg img{max-height:60px;max-width:100%;object-fit:contain}.qs-sigimg .el-typed{font-size:32px;line-height:60px}'+
-    '.drawer.qs-swap{animation:none}.qs-sigline{font-size:12px;color:var(--mute)}@media (max-width:640px){.qs-opts{grid-template-columns:1fr}}';
-  document.head.appendChild(el);
-  if(typeof SIG_FONT_URL!=='undefined'&&!document.getElementById('qs-fonts')){ var l=document.createElement('link'); l.id='qs-fonts'; l.rel='stylesheet'; l.href=SIG_FONT_URL; document.head.appendChild(l); }
-}
-function paintSignStep(){
-  ensureSignCss();
-  var d=QF.d, c=formClient(), e=QF.signErr||{}, who=(d.onName||(c&&c.name)||'').trim(), sv=QF.sig;
-  var sign=sv?{name:sv.name,sig:sv.v,at:sv.at}:null;
-  var err=function(k){ return e[k]?'<span class="qs-err">'+esc(e[k])+'</span>':''; };
-  var h='<section class="qs-sec"><span class="qs-h">Quotation</span>'+
-    '<div class="qs-acts"><button type="button" class="btn-ghost btn-sm" id="qs-pdf">'+(AI.pdf||'')+'Download PDF</button></div>'+
-    '<div class="qs-pv">'+docHtml(formModel(sign))+'</div>'+
-    '<label class="qs-rev'+(e.review?' bad':'')+'"><input type="checkbox" id="qs-rev"'+(QF.reviewed?' checked':'')+'><span>I confirm that I have reviewed this quotation and verified the client details, services, and fees.</span></label>'+err('review')+'</section>'+
-    '<section class="qs-sec"><span class="qs-h">How should this be signed?</span><div class="qs-opts" role="radiogroup" aria-label="Signing method">'+
-      [['request','Request Signature','Send a secure link to '+esc(who||'the client')+' to sign and accept'],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=QF.method===m[0];
-        return '<label class="qs-opt'+(on?' on':'')+'"><input type="radio" name="qs-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div>'+err('method');
-  if(QF.method==='manual'){
-    if(sv) h+='<div class="qs-sub"><span class="flabel">Signature of '+esc(sv.name)+'</span><div class="qs-signed"><div class="qs-sigimg">'+
-        (sv.v.method==='type'?'<em class="el-typed"'+(sv.v.font?' style="font-family:'+esc(sv.v.font)+'"':'')+'>'+esc(sv.v.text)+'</em>':'<img src="'+sv.v.data+'" alt="Signature of '+esc(sv.name)+'">')+'</div>'+
-        '<span class="qs-sigline">Signed on '+dmyTxt(sv.at)+' · recorded by '+esc(ME.name)+'</span><button type="button" class="linkbtn" id="qs-resign">Change</button></div></div>';
-    else h+='<div class="qs-sub"><div class="g2"><div><label class="flabel" for="qs-name">Signer name</label><input class="fin plain sm'+(e.name?' bad':'')+'" id="qs-name" maxlength="80" value="'+esc(QF.signName!=null?QF.signName:who)+'" autocomplete="off">'+err('name')+'</div>'+
-        '<div><label class="flabel" for="qs-date">Signing date</label><input class="fin plain sm'+(e.date?' bad':'')+'" id="qs-date" inputmode="numeric" maxlength="10" placeholder="dd-mm-yyyy" autocomplete="off" value="'+esc(QF.signDate!=null?QF.signDate:dmyTxt(Date.now()))+'">'+err('date')+'</div></div>'+
-        '<span class="flabel">Signature</span><div id="qs-pad"></div>'+err('sig')+
-        '<div class="qs-foot"><button type="button" class="btn-primary btn-sm" id="qs-sigok">Submit signature</button></div></div>';
-  }
-  h+='</section>';
-  var body=document.getElementById('qf-body'), keep=body?body.scrollTop:0, again=!!ov.querySelector('.drawer.qf');   // already open: no slide-in again
-  ov.innerHTML='<div class="drawer sf qf qf2'+(again?' qs-swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
-    '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body" id="qf-body">'+h+'</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qs-back">Back</button><span class="sp-grow"></span><button class="btn-ghost" id="qf-draft">Save as draft</button>'+
-      '<button class="btn-primary" id="qs-go">'+(QF.method==='manual'?'Save':'Send')+'</button></div></div>';
-  ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
-  document.getElementById('qf-body').scrollTop=keep;
-  var pad=QF.method==='manual'&&!sv?sigPad(document.getElementById('qs-pad'),QF.signName!=null?QF.signName:who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}):null;
-  document.getElementById('qf-x').onclick=leaveForm;
-  document.getElementById('qs-back').onclick=function(){ QF.step=1; paintForm(); };
-  document.getElementById('qf-draft').onclick=function(){ QF.step=1; submitForm('draft'); };
-  document.getElementById('qs-pdf').onclick=function(){ if(!printQuote(formModel(sign))) toast('Allow pop-ups to download the PDF',true); };
-  document.getElementById('qs-rev').onchange=function(){ QF.reviewed=this.checked; QF.dirty=true; if(this.checked&&e.review){ delete e.review; paintSignStep(); } };
-  [].forEach.call(ov.querySelectorAll('input[name=qs-how]'),function(x){ x.onchange=function(){ QF.method=x.value; QF.dirty=true; delete e.method; paintSignStep(); }; });
-  var nm=document.getElementById('qs-name'); if(nm) nm.oninput=function(){ QF.signName=nm.value; if(pad&&pad.setName) pad.setName(nm.value); };
-  var dt=document.getElementById('qs-date'); if(dt) dt.oninput=function(){ var g=dt.value.replace(/\D/g,'').slice(0,8), v=g.slice(0,2)+(g.length>2?'-'+g.slice(2,4):'')+(g.length>4?'-'+g.slice(4):''); if(v!==dt.value) dt.value=v; QF.signDate=v; };
-  var rs=document.getElementById('qs-resign'); if(rs) rs.onclick=function(){ QF.sig=null; paintSignStep(); };
-  var ok=document.getElementById('qs-sigok'); if(ok) ok.onclick=function(){
-    var n=String(QF.signName!=null?QF.signName:who).trim(), dv=QF.signDate!=null?QF.signDate:dmyTxt(Date.now()), iso=isoOfDmy(dv), today=isoDay(Date.now()), er={};
-    if(!n) er.name='Enter the signer’s name';
-    if(!iso) er.date=dv?'Enter a real date as dd-mm-yyyy':'Enter the signing date'; else if(iso>today) er.date='The signing date can’t be in the future';
-    var v=pad&&pad.value(n); if(!v) er.sig='Draw the signature, select a style, or upload a signature image';
-    delete e.name; delete e.date; delete e.sig; for(var k in er) e[k]=er[k];
-    if(Object.keys(er).length) return paintSignStep();
-    var now=new Date(), at=new Date(iso+'T00:00:00'); at.setHours(now.getHours(),now.getMinutes(),now.getSeconds(),0);
-    QF.sig={v:v,name:n,at:at.getTime()}; QF.dirty=true; paintSignStep();
-  };
-  document.getElementById('qs-go').onclick=finishSignStep;
-}
-function finishSignStep(){
-  var e={};
-  if(!QF.reviewed) e.review='Confirm you’ve reviewed the quotation';
-  if(!QF.method) e.method='Choose how the quotation will be signed';
-  else if(QF.method==='manual'&&!QF.sig) e.sig='Add the signature and click Submit signature';
-  QF.signErr=e;
-  if(Object.keys(e).length){ paintSignStep(); var b=ov.querySelector('.qs-err'); if(b) b.scrollIntoView({block:'center'}); toast('Fix the highlighted fields to continue',true); return; }
-  var manual=QF.method==='manual', sig=QF.sig, saved=saveForm(); if(!saved) return;
-  if(manual){
-    var q=byId(saved.id); q.signature=sig.v; q.signedBy=sig.name; q.signedAt=sig.at;
-    setStatus(q,'accepted','accepted',{note:'Signed manually by '+sig.name+' on '+dmyTxt(sig.at)+' · recorded by '+ME.name});
-    if(!QuoteStore.save(st)){ toast('Couldn’t save the signature. Try again.',true); return; }
-    QF=null; closeOv(); render(); toast(saved.id+' signed and accepted'); return;
-  }
-  QF=null; closeOv(); render(); openSend(saved.id);
-}
 /* a saved quotation's totals: the saved figures, worked out the same way as the form (rates include GST; GST is 1/11 of the total) */
 function savedTotals(q){
   var sub=q.subtotal!=null?q.subtotal:round2((q.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=round2(+q.discountAmt||0), total=q.amount!=null?q.amount:round2(sub-disc);
@@ -12182,21 +12106,6 @@ function convert(id){
 }
 
 /* ---------- destructive actions: confirmed first, recorded in the history ---------- */
-function confirmCancel(id){
-  var q=byId(id);
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qc-t"><div class="confirm-body"><h3 id="qc-t">Cancel '+esc(q.id)+'?</h3>'+
-    '<p>The quotation for <strong>'+esc(client(q).name)+'</strong> can no longer be accepted or converted. It stays in the list as Cancelled.</p>'+
-    '<label class="flabel" for="qc-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="qc-n" rows="3" maxlength="300"></textarea><span class="ferr" id="qc-e">Add a reason</span></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qc-no">Keep quotation</button><button class="btn-danger" id="qc-go">Cancel quotation</button></div></div>';
-  dlg.classList.add('open'); document.getElementById('qc-n').focus();
-  document.getElementById('qc-no').onclick=closeDlg;
-  document.getElementById('qc-go').onclick=function(){
-    var n=document.getElementById('qc-n').value.trim(); if(!n){ document.getElementById('qc-e').classList.add('show'); return; }
-    reload(); var x=byId(id); if(!x||!canCancel(x)){ closeDlg(); render(); return toast('This quotation can no longer be cancelled.',true); }
-    setStatus(x,'cancelled','cancelled',{note:n}); if(!QuoteStore.save(st)){ return toast('Couldn’t save the change. Try again.',true); }
-    closeDlg(); render(); toast(id+' cancelled');
-  };
-}
 /* the client's answer, recorded by staff: Sent → Accepted or Rejected */
 function confirmOutcome(id,to){
   var q=byId(id), acc=to==='accepted';
@@ -12280,7 +12189,6 @@ function detailActions(q){
   if(s==='accepted'&&isManager()&&!q.invoiceId) main=['convert','Convert to sale'];
   if(canEdit(q)) more.push(['edit','Edit quotation',AI.edit]);
   if(q.token&&s!=='draft') more.push(['link','Client link',AI.copy]);
-  if(canCancel(q)) more.push(['cancel','Cancel quotation',QD_IC.ban,'danger']);
   if(canDelete(q)) more.push(['delete','Delete draft',AI.bin,'danger']);
   return {main:main,more:more};
 }
@@ -12325,7 +12233,8 @@ function paintDetail(keep){
     var by=function(e){ return e.by==='System'?'Automatically':'by '+esc(e.by); };
     var step=function(cls,label,sub){ return '<li class="rq-st '+cls+'"><i>'+(cls==='done'?QD_IC.tick:cls==='bad'?QD_IC.x:'')+'</i><div><b>'+label+'</b><small>'+sub+'</small></div></li>'; };
     var made=ev(['created'])||hist[0], sent=ev(['sent','resent']), out=ev(['accepted','rejected','cancelled','expired']), conv=ev(['converted']);
-    var outLbl={accepted:'Accepted',rejected:'Rejected',cancelled:'Cancelled',expired:'Expired'};
+    var outLbl={accepted:'Accepted',rejected:'Declined',cancelled:'Cancelled',expired:'Expired'};
+    var cmt=q.clientComment&&q.clientComment.text&&(q.status==='accepted'||q.status==='converted'||q.status==='rejected')?q.clientComment:null;   // what the client wrote with their answer
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):when(q.created))+(q.fromSale?'<br>From sale '+esc(q.fromSale):''))+
       step(sent?'done':'todo',sent?(sent.type==='resent'?'Sent again':'Sent'):'Not sent yet',sent?by(sent)+'<br>'+when(sent.t):'Send it to the client')+
       (out?step(out.type==='accepted'?'done':'bad',outLbl[out.type],by(out)+'<br>'+when(out.t)):step('todo','Client response',sent?'Awaiting the client':'—'))+
@@ -12336,6 +12245,7 @@ function paintDetail(keep){
           row('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
           row('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+'</dl>'+
           (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
+        (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+(cmt.type==='rejected'?'Reason for declining':'Client’s comment')+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
         '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+row('Accountant',esc(q.accountant||''))+
           (q.accountant2?row('Additional accountant',esc(q.accountant2)):'')+'</dl></section>'+
         '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
@@ -20345,7 +20255,10 @@ function letterHtml(c){                               // c: {name,type,entity,em
 function quoteDocOf(q,cname){
   var r2=function(n){ return Math.round(n*100)/100; }, to=q.onName||cname;
   var sub=q.subtotal!=null?q.subtotal:r2((q.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), disc=r2(+q.discountAmt||0), total=q.amount!=null?q.amount:r2(sub-disc);
-  return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:to,toSub:q.onName&&q.onName!==cname?cname:'',attn:q.toName&&q.toName!==to?q.toName:'',
+  var acc=(q.status==='accepted'||q.status==='converted')?(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop():null;
+  var attn=q.contactName&&q.contactName!==to?q.contactName:q.toName&&q.toName!==to?q.toName:'';
+  return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:to,toSub:q.onName&&q.onName!==cname?cname:'',attn:attn,phone:q.contactPhone||'',abn:q.abn||'',
+    accepted:acc?{name:acc.by,at:acc.t}:null,
     items:(q.items||[]).map(function(x){ return {name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
     T:{sub:sub,disc:disc,gst:q.gstMode==='none'?0:q.gst!=null?q.gst:r2(total/11),total:total},noGst:q.gstMode==='none',notes:q.customerNotes||'',terms:q.terms||'',
     sign:q.signature?{name:q.signedBy||'',sig:q.signature,at:q.signedAt}:null};
@@ -20354,15 +20267,17 @@ function quoteDocHtml(m){
   var e=escH, T=m.T, sg=m.sign, sig=sg&&sg.sig;
   return '<div class="qf-doc"><img src="'+LH_HEAD+'" alt="AAD Taxation letterhead">'+
     '<div class="qf-doc-b"><div class="qf-doc-top"><h3>Quotation</h3><dl><div><dt>Quotation no.</dt><dd>'+e(m.id)+'</dd></div><div><dt>Quotation date</dt><dd>'+e(m.dateTxt)+'</dd></div><div><dt>Due date</dt><dd>'+e(m.dueTxt)+'</dd></div></dl></div>'+
-    '<p class="qf-doc-to"><span>Prepared for</span><b>'+(m.to?e(m.to):'No client chosen yet')+'</b>'+(m.toSub?e(m.toSub):'')+(m.attn?'<em>Attention: '+e(m.attn)+'</em>':'')+'</p>'+
+    '<p class="qf-doc-to"><span>Prepared for</span><b>'+(m.to?e(m.to):'No client chosen yet')+'</b>'+(m.toSub?e(m.toSub):'')+(m.attn?'<em>Attention: '+e(m.attn)+'</em>':'')+(m.phone||m.abn?'<em class="qf-doc-ids">'+[m.phone?'Phone '+e(m.phone):'',m.abn?'ABN '+e(m.abn):''].filter(Boolean).join(' · ')+'</em>':'')+'</p>'+
     '<table class="qf-doc-t"><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
       (m.items.length?m.items.map(function(x){ return '<tr><td><b>'+e(x.name)+'</b>'+(x.desc?'<small>'+e(x.desc)+'</small>':'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r">'+money(x.qty*x.price)+'</td></tr>'; }).join(''):'<tr><td colspan="4" class="qf-none">No lines added yet</td></tr>')+
     '</tbody></table><dl class="qf-tot doc"><div><dt>Sub Total</dt><dd>'+money(T.sub)+'</dd></div>'+(T.disc?'<div><dt>Discount</dt><dd>−'+money(T.disc)+'</dd></div>':'')+'<div><dt>GST'+(m.noGst?'':' (incl.)')+'</dt><dd>'+(m.noGst?'Not applicable':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl>'+
     (m.notes?'<p class="qf-doc-n">'+e(m.notes).replace(/\n/g,'<br>')+'</p>':'')+
     (m.terms?'<div class="qf-doc-tc"><span>Terms &amp; Conditions</span><p>'+e(m.terms).replace(/\n/g,'<br>')+'</p></div>':'')+
-    '<div class="qf-doc-sg"><p class="qf-doc-sgt">Acceptance</p><div><span>Name</span><b>'+(sg?e(sg.name):'')+'</b></div>'+
-      '<div><span>Signature</span><b>'+(sig?(sig.method==='type'?'<em style="font-family:'+e(sig.font||'cursive')+'">'+e(sig.text)+'</em>':'<img src="'+sig.data+'" alt="Signature">'):'')+'</b></div>'+
-      '<div><span>Date</span><b>'+(sg&&sg.at?dmyOf(sg.at):'')+'</b></div></div>'+
+    /* quotations are accepted online; one signed before that keeps its signature */
+    (sig?'<div class="qf-doc-sg"><p class="qf-doc-sgt">Acceptance</p><div><span>Name</span><b>'+e(sg.name)+'</b></div>'+
+      '<div><span>Signature</span><b>'+(sig.method==='type'?'<em style="font-family:'+e(sig.font||'cursive')+'">'+e(sig.text)+'</em>':'<img src="'+sig.data+'" alt="Signature">')+'</b></div>'+
+      '<div><span>Date</span><b>'+(sg.at?dmyOf(sg.at):'')+'</b></div></div>'
+     :m.accepted?'<p class="qf-doc-acc">Accepted online by <b>'+e(m.accepted.name)+'</b> on '+dmyOf(m.accepted.at)+'</p>':'')+
     '</div><img src="'+LH_FOOT+'" alt="AAD888 Services Pty Ltd"></div>';
 }
 var QUOTE_DOC_CSS=
@@ -20371,7 +20286,7 @@ var QUOTE_DOC_CSS=
   '.qf-doc-top{display:flex;justify-content:space-between;gap:20px;margin-bottom:16px}.qf-doc-top h3{font-family:Manrope,Inter,sans-serif;font-size:24px;font-weight:800;margin:0}'+
   '.qf-doc-top dl{margin:0}.qf-doc-top dl div{display:flex;justify-content:space-between;gap:16px}.qf-doc-top dt{color:#555}.qf-doc-top dd{margin:0;font-weight:600}'+
   '.qf-doc-to{margin:0}.qf-doc-to span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666}.qf-doc-to b{display:block}.qf-doc-to em{display:block;font-style:normal;color:#333;margin-top:2px}'+
-  '.qf-doc-t{width:100%;border-collapse:collapse;margin-top:14px}.qf-doc-t th,.qf-doc-t td{border-bottom:1px solid #E5E7EB;padding:8px 6px;text-align:left;vertical-align:top;font-size:13px}'+
+  '.qf-doc-t{width:100%;min-width:0!important;border-collapse:collapse;margin-top:14px}.qf-doc-t th,.qf-doc-t td{border-bottom:1px solid #E5E7EB;padding:8px 6px;text-align:left;vertical-align:top;font-size:13px}'+
   '.qf-doc-t th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#F3F4F6}.qf-doc-t .r{text-align:right}.qf-doc-t .c{text-align:center}'+
   '.qf-doc-t small{display:block;color:#666;margin-top:2px}.qf-doc-t .qf-none{color:#888;text-align:center;padding:16px}'+
   '.qf-doc .qf-tot.doc{margin:12px 0 0 auto;width:45%;background:none;border:0;padding:0}'+
@@ -20382,6 +20297,8 @@ var QUOTE_DOC_CSS=
   '.qf-doc-sgt{grid-column:1/-1;margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#666}'+
   '.qf-doc-sg span{display:block;font-size:11px;color:#666;margin-bottom:4px}.qf-doc-sg b{display:flex;align-items:flex-end;min-height:46px;border-bottom:1px dashed #9CA3AF;font-weight:600;padding-bottom:4px;overflow:hidden}'+
   '.qf-doc-sg b img{height:42px;width:auto;max-width:100%;object-fit:contain}.qf-doc-sg b em{font-style:normal;font-weight:400;font-size:26px;line-height:1.1;color:#1E3A8A;white-space:nowrap}'+
+  '.qf-doc-to .qf-doc-ids{color:#555;font-size:12px}'+
+  '.qf-doc-acc{margin:22px 0 0;padding-top:12px;border-top:1px solid #E5E7EB;font-size:12.5px;color:#166534}.qf-doc-acc b{color:#14532D}'+
   '@media (max-width:640px){.qf-doc-b{padding:16px}.qf-doc-top{flex-direction:column;gap:10px}.qf-doc .qf-tot.doc{width:100%}.qf-doc-sg{grid-template-columns:1fr}}';
 function ensureQuoteCss(doc){ doc=doc||document; if(doc.getElementById('qdoc-css')) return; var s=doc.createElement('style'); s.id='qdoc-css'; s.textContent=QUOTE_DOC_CSS; doc.head.appendChild(s);
   if(!doc.getElementById('qdoc-font')){ var l=doc.createElement('link'); l.id='qdoc-font'; l.rel='stylesheet'; l.href=SIG_FONT_URL; doc.head.appendChild(l); } }
@@ -20697,6 +20614,18 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qv-meta{margin-bottom:18px}
 .qv-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.qv-top h2{margin:0}
 .qv-doc{margin-bottom:22px}.qv-doc .qf-doc{max-width:794px;margin:0 auto}
+.qp-hero{margin-bottom:16px;padding:26px 32px}
+.qp-eye{font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--orange-ink);margin-bottom:6px}
+.qp-hero h1{font-family:'Manrope';font-size:24px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
+.qp-lead{font-size:14px;color:var(--mute);line-height:1.55;margin-top:6px}
+.qp-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:20px 0 0}
+.qp-sum div{background:#fff;padding:12px 16px;min-width:0}.qp-sum dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7A8597}
+.qp-sum dd{font-size:15px;font-weight:700;color:var(--ink);margin-top:4px;overflow-wrap:anywhere}
+.qp-doc .qf-doc{box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qp-resp{padding-top:4px}.qp-resp .sub{font-size:13.5px;color:var(--mute);margin:2px 0 16px;line-height:1.5}
+.qp-ta{height:auto;min-height:104px;padding:12px 14px;line-height:1.5;resize:vertical;display:block}
+.btn.qp-no:hover{border-color:#FECACA;background:#FEF2F2;color:var(--red)}
+@media (max-width:640px){.qp-hero,.qp-card{padding:20px 18px}.qp-sum{grid-template-columns:1fr}.qp-hero h1{font-size:21px}}
 .qv-note{margin-top:16px;font-size:13.5px;color:var(--slate);line-height:1.55}.qv-terms{margin-top:14px;font-size:12.5px;color:var(--mute);line-height:1.55}.qv-terms b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:4px}.qv-terms p{margin:0}
 .agree input{margin-top:2px;accent-color:var(--orange)}
 .signed{display:flex;gap:10px;align-items:center;background:#ECFDF5;border:1px solid #BBF7D0;color:#047857;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
@@ -20822,56 +20751,62 @@ function paintQuote(){
   var st=loadQuotes(), q=st&&st.list.filter(function(x){ return x.token===TOKEN; })[0];
   if(!q) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
   if(q.status==='cancelled') return closed('x','This quotation was withdrawn','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
-  if(q.status==='rejected') return closed('x','This quotation is closed','You let us know you didn’t want to go ahead. Contact '+FIRM.name+' on '+FIRM.phone+' if that’s changed.');
+  if(q.status==='rejected') return closed('x','You declined this quotation','Thanks for letting us know. Your comments were passed to your accountant. Contact '+FIRM.name+' on '+FIRM.phone+' if you change your mind.');
   ensureQuoteCss(document);
   var c=quoteClient(q), dir=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name;
-  var who=q.toName||dir||c.name, first=String(who||'').split(' ')[0], doc=quoteDocOf(q,c.name);
+  var who=q.contactName||q.toName||dir||c.name, first=String(who||'').split(' ')[0], doc=quoteDocOf(q,c.name);
   var acc=(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop();
   var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
   var done=q.status==='accepted'||q.status==='converted';
   if(done&&!qShowDoc) return quoteWelcome(q,c,who,doc,acc);
-  /* every action sits at the bottom of the page, under the document */
+  /* the summary first, then the quotation, then the answer; every action sits at the bottom of the page */
   var pdfBtn='<button class="btn sec" id="qa-pdf">Download PDF</button>';
-  app.innerHTML='<div class="hello"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1></div>'+
-    '<div class="card">'+
-      '<div class="lw qv-doc">'+quoteDocHtml(doc)+'</div>'+
+  app.innerHTML='<div class="card qp-hero">'+
+      '<h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1>'+
+      '<p class="qp-lead">'+(done?'You accepted this quotation. A copy is below for your records.':expired?'This quotation has passed its valid-until date.':'Please review the services and fees below, then let us know if you’d like to go ahead.')+(q.accountant?' Prepared by '+e(q.accountant)+', your accountant.':'')+'</p></div>'+
+
+
+    '<div class="card qp-card">'+
+      '<div class="qv-doc qp-doc">'+quoteDocHtml(doc)+'</div>'+
       (done?'<div class="foot"><button class="btn sec" id="qa-back">Back</button><span class="grow"></span>'+pdfBtn+'</div>':
-       expired?'<div class="note warn"><span>This quotation passed its valid-until date. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot"><span class="grow"></span>'+pdfBtn+'</div>':
-        '<h2>Sign to accept</h2><p class="sub">Read the quotation above, then sign below to accept it.</p>'+
-        '<label class="l" for="qa-n">Your full name <span class="req">*</span></label><input class="in" id="qa-n" value="'+e(who)+'" maxlength="80">'+
-        '<div id="qa-pad" style="margin-top:16px"></div>'+
-        '<label class="agree"><input type="checkbox" id="qa-ok"><span>I have read this quotation and accept its services, prices and terms.</span></label><span class="err" id="qa-e" hidden></span>'+
-        '<div class="foot">'+pdfBtn+'<span class="grow"></span><button class="btn pri" id="qa-go">Sign and accept</button></div>')+
+       expired?'<div class="note warn"><span>Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot"><span class="grow"></span>'+pdfBtn+'</div>':
+        '<div class="qp-resp"><h2>Your response</h2><p class="sub">Accept to go ahead, or decline and tell us why.</p>'+
+        '<label class="l" for="qa-c">Comments <span class="opt">(required if you decline)</span></label>'+
+        '<textarea class="in qp-ta" id="qa-c" rows="4" maxlength="500" placeholder="Anything you’d like us to know"></textarea><span class="err" id="qa-e" hidden></span></div>'+
+        '<div class="foot">'+pdfBtn+'<span class="grow"></span><button class="btn sec qp-no" id="qa-no">Decline</button><button class="btn pri" id="qa-go">Accept quotation</button></div>')+
     '</div>';
   document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var bk=document.getElementById('qa-back'); if(bk) bk.onclick=function(){ qShowDoc=false; paintQuote(); window.scrollTo(0,0); };
   var go=document.getElementById('qa-go'); if(!go) return;
-  var pad=sigPad(document.getElementById('qa-pad'),who), nm=document.getElementById('qa-n'); nm.oninput=function(){ pad.setName(nm.value); };
-  go.onclick=function(){
-    var n=nm.value.trim(), v=pad.value(n), er=document.getElementById('qa-e');
-    var m=!n?'Enter your full name':!v?'Add your signature: draw it, select a style or upload an image':!document.getElementById('qa-ok').checked?'Tick the box to confirm you accept':'';
-    if(m){ er.textContent=m; er.hidden=false; return; }
-    if(PREVIEW){ toast('Preview only: in the real link this signs and accepts the quotation'); return; }
+  var ta=document.getElementById('qa-c'), er=document.getElementById('qa-e');
+  ta.oninput=function(){ if(!er.hidden&&ta.value.trim()){ er.hidden=true; ta.classList.remove('bad'); } };
+  var answer=function(to){
+    var note=ta.value.trim();
+    if(to==='rejected'&&!note){ er.textContent='Tell us why you’re declining'; er.hidden=false; ta.classList.add('bad'); ta.focus(); return; }
+    if(PREVIEW){ toast('Preview only: in the real link this '+(to==='accepted'?'accepts':'declines')+' the quotation'); return; }
     var all=loadQuotes(), x=all&&all.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return paintQuote();
-    if(x.status!=='sent') return paintQuote();                      // already accepted, or changed by the firm meanwhile
-    var from=x.status; x.status='accepted'; x.signature=v; x.signedBy=n; x.signedAt=Date.now();
-    x.history.push({type:'accepted',by:n,t:x.signedAt,from:from,to:'accepted',note:'Signed and accepted through the quotation link ('+(v.method==='type'?'selected style':v.method==='draw'?'drawn':'uploaded')+' signature)',ok:true,sale:''});
-    try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ return toast('We couldn’t record your signature. Please try again.',true); }
+    if(x.status!=='sent') return paintQuote();                      // already answered, or changed by the firm meanwhile
+    var at=Date.now(), from=x.status; x.status=to;
+    x.clientComment=note?{text:note,by:who,at:at,type:to}:null; x.respondedAt=at;
+    x.history.push({type:to,by:who,t:at,from:from,to:to,note:(to==='accepted'?'Accepted':'Declined')+' through the quotation link'+(note?' · “'+note+'”':''),ok:true});
+    try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ return toast('We couldn’t record your answer. Please try again.',true); }
     qShowDoc=false; paintQuote(); window.scrollTo(0,0);
   };
+  go.onclick=function(){ answer('accepted'); };
+  document.getElementById('qa-no').onclick=function(){ answer('rejected'); };
 }
 function quoteWelcome(q,c,who,doc,acc){
-  var first=String(who||c.name||'').trim().split(' ')[0], at=q.signedAt||(acc&&acc.t)||Date.now(), mail=c.email||'';
+  var first=String(who||c.name||'').trim().split(' ')[0], at=q.respondedAt||q.signedAt||(acc&&acc.t)||Date.now(), mail=c.email||'';
   app.innerHTML='<div class="card ty qw" role="status">'+TY_ART+
     '<p class="qw-eyebrow">Quotation accepted</p>'+
     '<h1>Welcome to '+FIRM.name+(first?', '+e(first):'')+'!</h1>'+
-    '<p class="ty-lead">Thank you for choosing us. Your quotation is signed and we’re ready to get started on your services.</p>'+
+    '<p class="ty-lead">Thank you for choosing us. Your quotation is accepted and we’re ready to get started on your services.</p>'+
     '<dl class="ty-meta"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Accepted</dt><dd>'+whenOf(at)+'</dd></div><div><dt>Total (inc. GST)</dt><dd>'+money(doc.T.total)+'</dd></div></dl>'+
     '<div class="ty-next"><h2>What happens next</h2><ol>'+
       '<li><b>Your accountant will be in touch</b><span>'+(q.accountant?e(q.accountant)+' will contact you':'We’ll contact you')+(mail?' at '+e(mail):'')+', usually within one business day.</span></li>'+
       '<li><b>Get your paperwork ready</b><span>Keep receipts, statements and any ATO letters handy so we can start straight away.</span></li>'+
       '<li><b>We’ll send your invoice</b><span>It matches the quotation you accepted. You don’t need to do anything until it arrives.</span></li></ol></div>'+
-    '<div class="qw-acts"><button class="btn sec" id="qw-view">View signed quotation</button><button class="btn sec" id="qw-pdf">Download PDF</button></div>'+
+    '<div class="qw-acts"><button class="btn sec" id="qw-view">View quotation</button><button class="btn sec" id="qw-pdf">Download PDF</button></div>'+
     '<p class="ty-help">Questions? Call <a href="tel:'+FIRM.phone.replace(/ /g,'')+'">'+FIRM.phone+'</a> or email <a href="mailto:'+FIRM.email+'">'+FIRM.email+'</a>.</p></div>';
   document.getElementById('qw-view').onclick=function(){ qShowDoc=true; paintQuote(); window.scrollTo(0,0); };
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };

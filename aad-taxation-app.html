@@ -3042,6 +3042,7 @@ tbody tr:hover{background:#FCFCFD}
 .dc-tt{flex:1;min-width:0}.dc-tt h4{margin:0;font-size:14.5px;font-weight:700;color:var(--ink)}.dc-tt p{margin:2px 0 0;font-size:12.5px;color:var(--faint)}
 .dc-hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
 .dc-act{padding:0}
+.dc-exp{font-size:12.5px;color:var(--mute);white-space:nowrap}.dc-exp b{font-weight:600;color:var(--ink)}.dc-exp.bad,.dc-exp.bad b{color:#B91C1C}
 .dc-b{padding:14px 18px 16px}
 .dc-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
 .dc-fbox{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;padding:8px 6px 8px 10px;background:#fff}
@@ -3052,7 +3053,7 @@ tbody tr:hover{background:#FCFCFD}
 .dc-meta dd small{display:block;font-size:11.5px;color:var(--faint);margin-top:1px}
 .dc-fname{display:block;width:100%;margin-top:4px;text-align:left;font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.35;overflow-wrap:anywhere;padding:0}
 button.dc-fname:hover,button.dc-cn:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
-.dc-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 18px;margin:14px 0 0}
+.dc-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 18px;margin:14px 0 0}
 .dc-meta dt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
 .dc-meta dd{margin:0;font-size:13px;color:var(--ink);overflow-wrap:anywhere}.dc-meta dd.bad,.dc-ht td.bad{color:#B91C1C;font-weight:600}
 .dc-note{margin:12px 0 0;font-size:12.5px;color:var(--mute)}.dc-note.bad{color:#B91C1C}
@@ -5956,7 +5957,7 @@ function dcFile(name,openAttr,dlAttr,size){ var e=String(name||'').split('.').po
     (openAttr?'<button type="button" class="dc-fname" '+openAttr+' title="Open '+esc(name)+'">'+esc(name)+'</button>':'<b class="dc-fname" title="'+esc(name)+'">'+esc(name)+'</b>')+'</div>'; }
 function dcMeta(items){ return '<dl class="dc-meta">'+items.map(function(x){ return '<div><dt>'+x[0]+'</dt><dd'+(x[2]?' class="'+x[2]+'"':'')+'>'+x[1]+'</dd></div>'; }).join('')+'</dl>'; }
 function dcCard(o){ return '<article class="dc-card"><header class="dc-h"><span class="dc-ic">'+DC_DOC+'</span><div class="dc-tt"><h4>'+o.title+'</h4>'+(o.sub?'<p>'+o.sub+'</p>':'')+'</div>'+
-  '<div class="dc-hr">'+(o.pill||'')+(o.acts||'')+'</div></header><div class="dc-b">'+o.body+'</div>'+(o.hist||'')+'</article>'; }
+  '<div class="dc-hr">'+(o.exp?'<span class="dc-exp'+(o.expBad?' bad':'')+'">'+o.exp+'</span>':'')+(o.pill||'')+(o.acts||'')+'</div></header><div class="dc-b">'+o.body+'</div>'+(o.hist||'')+'</article>'; }
 function dcEmpty(title,text,acts){ return '<div class="dc-empty"><b>'+title+'</b><p>'+text+'</p>'+(acts?'<div class="dc-eacts">'+acts+'</div>':'')+'</div>'; }
 /* the history: open unless the user closed it; a table of earlier versions with their files */
 function dcHist(key,cid,label,n,rows,head){ var open=n>0&&!histShut[key+cid];
@@ -5979,13 +5980,13 @@ function kycTab(c){
   var ex=kycExpiresAt(cur), gone=now>=ex, note=noteOf(cur);
   var act=c._draft?'':'<button type="button" class="linkbtn dc-act" data-kyc-add>'+(st==='valid'?'Record new KYC':'Renew KYC')+'</button>';
   var body=(cur.files&&cur.files.length?'<div class="dc-files">'+files(cur,0)+'</div>':'<p class="cl-muted">No files in this check.</p>')+
-    dcMeta([['Verified on',dmyOf(fromIso(cur.date))],['Verified by',esc(cur.by)],['Uploaded',whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'<small>by '+esc((cur.files&&cur.files[0]&&cur.files[0].by)||cur.by)+'</small>'],[gone?'Expired on':'Next verification',dmyOf(ex),gone?'bad':'']])+
+    dcMeta([['Verified on',dmyOf(fromIso(cur.date))],['Verified by',esc(cur.by)],['Uploaded',whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'<small>by '+esc((cur.files&&cur.files[0]&&cur.files[0].by)||cur.by)+'</small>']])+
     (note?'<p class="dc-note">Note: '+esc(note)+'</p>':'');
   var older=recs.slice(1);
   var rows=older.map(function(r,j){ var vi=j+1, e2=kycExpiresAt(r), g2=now>=e2;
     return '<tr><td class="dc-v">v'+(n-vi)+'</td><td>'+dcChips((r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return dcChip(f.name,view?'data-kpv="'+a+'"':'',view?'data-kdl="'+a+'"':'',f.size); }))+(noteOf(r)?'<small class="dc-hn">'+esc(noteOf(r))+'</small>':'')+'</td>'+
       '<td>'+dmyOf(fromIso(r.date))+'<small>by '+esc(r.by)+'</small></td><td'+(g2?' class="bad"':'')+'>'+dmyOf(e2)+'</td></tr>'; }).join('');
-  return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',sub:'Version '+n,pill:pill(KYC_STATUS,st),acts:act,body:body,
+  return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',sub:'Version '+n,exp:(gone?'Expired on ':'Next verification ')+'<b>'+dmyOf(ex)+'</b>',expBad:gone,pill:pill(KYC_STATUS,st),acts:act,body:body,
     hist:dcHist('k',c.id,'History',older.length,rows,['Version','Documents','Verified','Expiry'])})+'</section>';
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
@@ -6068,7 +6069,7 @@ function engagementTab(c){
   var review='<label class="el-review"><input type="checkbox" id="el-rev"><span>I have reviewed this letter and verified the client details, services, and fees.</span></label>';
   var fileName=function(x){ return x&&x.file?x.file.name:'engagement-letter-FY'+(x?letterFy(x):F)+'-'+String((x?letterFy(x):F)+1).slice(2)+'.pdf'; };
 
-  var body, head='';
+  var body, head='', expTxt='', expBad=false;
   if(st==='noservice') body=dcEmpty(S[0],S[1]);
   else if(st==='none') body=dcEmpty(S[0],S[1],review+'<div class="dc-eb">'+acts+menu+'</div>');
   else {
@@ -6077,6 +6078,7 @@ function engagementTab(c){
     var meta=st==='signed'
       ?[['Signed by',esc(signedBy)],['Signed on',L.method==='upload'?dmyOf(L.signedAt):whenOf(L.signedAt).replace(' · ',', ')],L.method==='upload'?['Uploaded by',esc(L.uploadedBy||rec&&rec.by||'staff')]:L.method==='manual'?['Recorded by',esc(rec&&rec.by||L.by||'staff')]:['Signed','Through the signing link'],['Expires',dmyOf(fyEndAt)]]
       :[['To be signed by',esc(who)+(role?' ('+esc(role)+')':'')],lastOk?['Sent',whenOf(lastOk.at).replace(' · ',', ')]:['Created',whenOf(L.created).replace(' · ',', ')+' by '+esc(L.by||'')],[st==='expired'?'Expired':'Expires',dmyOf(st==='expired'?letterExpiresAt(L):fyEndAt),st==='expired'?'bad':'']];
+    var ex=meta.pop(); expTxt=ex[0]+' <b>'+ex[1]+'</b>'; expBad=!!ex[2];
     body='<div class="dc-files">'+dcFile(fileName(L),'data-el="'+(st==='draft'?'view':'full')+'"','data-el="pdf"',L.file&&L.file.size)+'</div>'+dcMeta(meta)+
       (st==='failed'?'<p class="dc-note bad">'+S[1]+'</p>':'')+(st==='draft'?review:'');
   }
@@ -6087,7 +6089,7 @@ function engagementTab(c){
     return '<tr><td class="dc-v">FY '+fyLabel(y)+'</td><td>'+dcChips([dcChip(fileName(l),'data-elfull="'+l.id+'"','data-elpdf="'+l.id+'"',l.file&&l.file.size)])+'</td>'+
       '<td>'+(l.status==='signed'?dmyOf(l.signedAt)+'<small>by '+esc(l.signature&&l.signature.name||l.signedBy||'')+'</small>':'<span class="cl-muted">Not signed</span>')+'</td><td'+(Date.now()>exp?' class="bad"':'')+'>'+dmyOf(exp)+'</td></tr>'; }).join('');
   var doc=st==='none'?preview(actServices,null):st==='draft'?preview(L.services,L):'';
-  return '<section class="vsec el-main">'+dcCard({title:'Engagement Letter',sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),pill:st==='noservice'||st==='none'?'':pill(EL_STATE,st),acts:head,body:body,
+  return '<section class="vsec el-main">'+dcCard({title:'Engagement Letter',sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),exp:expTxt,expBad:expBad,pill:st==='noservice'||st==='none'?'':pill(EL_STATE,st),acts:head,body:body,
     hist:dcHist('l',c.id,'History',older.length,rows,['Year','Letter','Signed','Expiry'])})+'</section>'+doc;
 }
 /* why a send failed: the last attempt, and the failures in the letter's audit trail */

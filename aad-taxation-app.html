@@ -970,6 +970,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-cb{flex:1;padding:10px 0 12px;min-width:0}
 .ds-cb .ds-files{margin-top:0}
 .ds-cb .ds-by{margin-top:6px}
+.ds-cb.is-gone .ds-fname{color:var(--mute)}.ds-cb.is-gone .x{opacity:.6}
 .ds-card .ds-none{margin:0;font-size:12.5px;color:var(--mute)}
 .ds-cf{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 -16px;padding:6px 10px 6px 16px;border-top:1px solid var(--line-soft)}
 .ds-cf .ds-more svg:first-child{width:13px;height:13px}
@@ -1492,16 +1493,15 @@ function fileChips(d,t,vi,files){
 var docMenu=null;   // the document whose ⋮ menu is open
 I.dots3='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
 function docCard(d){
-  /* an expired version is no longer the active document: it moves into the history and the card asks for the renewal */
-  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
+  /* every state shows the latest version's files and upload details; an expired one is greyed and the card asks for the renewal */
+  var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', vs=versionsOf(d), hist=vs.slice(1), first=1, prev=hist.length, open=!!docOpen[d.k];
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', menu=docMenu===d.k, renew=gone||soon;
   var h='<div class="ds-item ds-card'+(gone?' is-exp':soon?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     /* name and status */
     '<div class="ds-ch"><b class="ds-name">'+t.name+'</b>'+stDot(st,stLabel(d))+'</div>'+
     (exp?'<div class="ds-exp'+(gone?' bad':soon?' soon':'')+'">'+(gone?'Expired on ':'Expires ')+exp+'</div>':'<div class="ds-exp" aria-hidden="true">&nbsp;</div>')+
     /* the files, or what's missing */
-    '<div class="ds-cb">'+(gone?'<div class="ds-none">No active document. The expired version is in Version history.</div>':
-      fileChips(d,t,0,d.cur.files)+'<div class="ds-by">Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</div>')+'</div>'+
+    '<div class="ds-cb'+(gone?' is-gone':'')+'">'+fileChips(d,t,0,d.cur.files)+'<div class="ds-by">Uploaded by '+esc(d.cur.by)+' · '+fmtD(d.cur.on)+', '+fmtT(d.cur.on)+'</div></div>'+
     /* history on the left, the one action and the menu on the right */
     '<div class="ds-cf">'+
       (prev?'<button type="button" class="ds-more" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+I.hist+'Version history ('+prev+')'+I.chev+'</button>':'<span class="ds-nohist">No previous versions</span>')+

@@ -1064,7 +1064,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .vh-acc:not([open]){padding-bottom:0}
 .vh-sys{padding:1px 7px;border-radius:6px;background:#EEF2FF;color:#4338CA;font-weight:600;font-size:12px}
 .vh-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC;margin-bottom:8px;min-width:0}
-.vh-lbl{width:44px;flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.vh-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:2px 0 6px}
 .dc2-tg:hover .dc2-name{color:var(--orange-ink)}
 .dc2-mw{position:relative;flex-shrink:0}
 .dc2-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute)}.dc2-more:hover,.dc2-more[aria-expanded="true"]{background:#F2F4F7;color:var(--ink)}
@@ -1726,7 +1726,7 @@ function versionTimeline(d){
     items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
         '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+what+'</summary><div class="vh-in">'+
       v.files.map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
-        return '<div class="vh-file">'+(sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
+        return (sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+'<div class="vh-file">'+
           '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
           '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
             '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+

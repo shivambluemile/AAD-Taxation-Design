@@ -914,6 +914,10 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .ds-item{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
 @keyframes dvflash{0%{background:#FFF4EA}100%{background:#fff}}
 .ds-item.flash{animation:dvflash 2.4s ease-out}
+/* expiring soon = soft orange, expired = soft red; valid and no-expiry stay neutral */
+.ds-item .ds-ic{background:#F3F4F6;color:var(--slate)}
+.ds-item.is-soon{border-color:#FBE3C6;background:#FFFCF8}.ds-item.is-soon .ds-ic{background:#FFF4E5;color:#D97706}.ds-item.is-soon .ds-exp{color:#B45309}
+.ds-item.is-expired{border-color:#F7D2D2;background:#FFFAFA}.ds-item.is-expired .ds-ic{background:#FEF2F2;color:var(--red)}.ds-item.is-expired .ds-exp{color:#B91C1C}
 .ds-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px}
 .ds-ic{width:36px;height:36px;border-radius:9px;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ds-ic svg{width:17px;height:17px}
@@ -1469,7 +1473,7 @@ function docCard(d){
   /* an expired version is no longer the active document: it moves into the history and the row asks for the renewal */
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', vs=versionsOf(d), hist=gone?vs:vs.slice(1), first=gone?0:1, prev=hist.length, open=!!docOpen[d.k];
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
-  var h='<div class="ds-item'+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
+  var h='<div class="ds-item'+(st==='expired'?' is-expired':st==='soon'?' is-soon':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<div class="ds-row">'+
       '<span class="ds-ic">'+I.file+'</span>'+
       '<div class="ds-tt"><b>'+t.name+'</b>'+

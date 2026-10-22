@@ -1822,7 +1822,7 @@ function docsBody(s){
   var parts=[], need=missing.concat(gone.map(function(d){ return d.k; }));
   if(missing.length) parts.push(join(missing.map(low))+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded');
   if(gone.length) parts.push(join(gone.map(function(d){ return low(d.k); }))+(gone.length>1?' have':' has')+' expired');
-  if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action Required:</b> '+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click Upload to provide the required document'+(need.length>1?'s':'')+'.</span>'+
+  if(need.length) lines='<div class="dx-line"><span class="dx-li">'+I.warn+'</span><span class="dx-lt"><b>Action Required:</b> '+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click upload to provide the required document'+(need.length>1?'s':'')+'.</span>'+
     '<button type="button" class="dx-up" data-needpop aria-haspopup="dialog">'+I.upsm+'Upload</button></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';

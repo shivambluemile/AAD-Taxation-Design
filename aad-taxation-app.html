@@ -1011,7 +1011,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 /* documents as tiles */
 .dt-grp{margin:2px 0 8px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 .dt-grp span{color:var(--faint);margin-left:4px}.dt-grp.warn{color:#B45309}
-.dt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.dt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .dt-tile{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:#fff;transition:border-color .15s,box-shadow .15s}
 .dt-tile:hover{border-color:#CBD2DA}
 .dt-tile.open{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
@@ -1028,13 +1028,15 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dx-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:#7F1D1D}.dx-tx b{font-size:13.5px;color:#991B1B}
 .dx-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px}
 @media (max-width:560px){.dx-alert{flex-wrap:wrap}.dx-btn{margin-left:44px}}
-.dt-files{list-style:none;margin:6px 14px 4px;padding:8px 0 0;border-top:1px solid var(--line-soft);display:flex;flex-direction:column;gap:2px}
-.dt-files li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;min-height:26px;font-size:12.5px}
-.dt-files .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB;justify-self:start}.dt-files .x.e-pdf{background:#FDECEC;color:#C2410C}
-.dt-files .ds-fname{min-width:0;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;font-weight:600}
-.dt-files .sdt-ib{width:24px;height:24px}
-.dt-files .dt-more{display:block;min-height:0}
-.dt-fmore{font-size:12px;font-weight:600;color:var(--mute);padding:3px 0}.dt-fmore:hover{color:var(--orange-ink);text-decoration:underline}
+.dt-files{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 14px 4px}
+.dt-fbox{min-width:0;border:1px solid var(--line);border-radius:10px;padding:8px 6px 8px 10px;background:#fff}
+.dt-flbl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.dt-frow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:7px}
+.dt-frow .x{font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:4px;background:#E8F1FD;color:#2563EB}.dt-frow .x.e-pdf{background:#FDECEC;color:#C2410C}
+.dt-fbox>.ds-fname{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;margin-top:4px;text-align:left;font-size:12.5px;font-weight:600;line-height:1.35}
+.dt-frow .sdt-ib{width:24px;height:24px;margin:-3px 0}
+.dt-fmore{grid-column:1/-1;justify-self:start;font-size:12px;font-weight:600;color:var(--mute);padding:2px 0}.dt-fmore:hover{color:var(--orange-ink);text-decoration:underline}
+@media (max-width:520px){.dt-files{grid-template-columns:1fr}}
 .dt-tile .dt-act{margin-top:auto}
 .dt-act{align-self:flex-start;margin:0 0 10px 14px;padding:4px 0;font-size:12.5px}
 .dt-detail{grid-column:1/-1}
@@ -1060,7 +1062,7 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 @media (max-width:760px){.vt thead{display:none}.vt tr{display:grid;grid-template-columns:1fr auto}.vt td{border:0}.vt-f{grid-column:1/-1}}
 .dt-dh{display:flex;align-items:center;justify-content:space-between;padding:6px 0 2px}.dt-dh b{font-size:13.5px;color:var(--ink)}
 .dt-detail .dg-ver{grid-template-columns:110px minmax(0,1fr)}
-@media (max-width:760px){.dt-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.dt-grid{grid-template-columns:1fr}}
 .ds-note{display:flex;align-items:flex-start;gap:7px;margin:14px 0 0;font-size:12px;line-height:1.5;color:var(--mute)}
 .ds-note svg{flex-shrink:0;margin-top:2px;width:13px;height:13px;color:var(--faint)}
 @media (max-width:640px){
@@ -1583,10 +1585,12 @@ function docCard(d){
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'';
   var line=gone?'Expired '+exp:soon?'Expires '+exp:exp?'Until '+exp:'No expiry';
   var nv=gone?'<span class="dt-nv"><i></i>No valid document</span>':'';
-  var FILES_SHOWN=2, fl=gone?[]:d.cur.files, files=fl.length?'<ul class="dt-files">'+fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n);
-      return '<li><span class="x e-'+x+'">'+x.toUpperCase()+'</span><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(sideName(d,t,f))+'</button>'+
-        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></li>'; }).join('')+
-      (fl.length>FILES_SHOWN?'<li class="dt-more"><button type="button" class="dt-fmore" data-toggle="'+d.k+'">+'+(fl.length-FILES_SHOWN)+' more file'+(fl.length-FILES_SHOWN===1?'':'s')+'</button></li>':'')+'</ul>':'';
+  var FILES_SHOWN=2, fl=gone?[]:d.cur.files, sided=t.slots.length>1;
+  var files=fl.length?'<div class="dt-files">'+fl.slice(0,FILES_SHOWN).map(function(f,fi){ var x=extOf(f.n);
+      return '<div class="dt-fbox"><div class="dt-frow"><span class="x e-'+x+'">'+x.toUpperCase()+'</span>'+(sided?'<span class="dt-flbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'<span></span>')+
+        '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></div>'+
+        '<button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button></div>'; }).join('')+
+      (fl.length>FILES_SHOWN?'<button type="button" class="dt-fmore" data-toggle="'+d.k+'">+'+(fl.length-FILES_SHOWN)+' more file'+(fl.length-FILES_SHOWN===1?'':'s')+'</button>':'')+'</div>':'';
   return '<div class="dt-tile'+(gone?' is-exp':soon?' is-soon':'')+(open?' open':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+
     '<button type="button" class="dt-main" data-toggle="'+d.k+'" aria-expanded="'+open+'" aria-label="'+esc(t.name)+', '+(gone?'no valid document, ':'')+line+'. '+(open?'Hide':'Show')+' files and history">'+
       '<span class="dt-ic">'+DOC_IC.HR+'</span><b class="dt-name">'+t.name+'</b>'+nv+'<span class="dt-line">'+line+'</span></button>'+files+
@@ -1643,7 +1647,7 @@ function currentList(docs){
     .sort(function(a,b){ return order[stOf(a)]-order[stOf(b)]; });   // the ones that need attention come first
   if(!list.length) return '<div class="dl-none"><b>No documents found</b>Try a different search or status.</div>';
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
-  var PER=3;
+  var PER=2;
   var group=function(label,items,cls){ if(!items.length) return '';
     var h='<div class="dt-grp '+cls+'">'+label+' <span>'+items.length+'</span></div><div class="dt-grid">';
     for(var i=0;i<items.length;i+=PER){ var row=items.slice(i,i+PER), op=row.filter(function(d){ return docOpen[d.k]; })[0];

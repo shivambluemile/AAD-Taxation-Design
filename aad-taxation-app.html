@@ -1055,6 +1055,10 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .vh-pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:#F1F2F4;color:var(--slate)}.vh-pill.bad{background:#FEF2F2;color:#B91C1C}
 .vh-valid{font-size:12.5px;color:var(--faint)}
 .vh-ev{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:13px;color:var(--ink)}.vh-ev svg{color:var(--mute);flex-shrink:0}.vh-ev b{font-weight:700}
+.vh-acc>summary{list-style:none;cursor:pointer;border-radius:8px;padding:2px 4px 2px 0}.vh-acc>summary::-webkit-details-marker{display:none}
+.vh-acc>summary:hover .vh-valid{color:var(--ink)}.vh-acc>summary:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.vh-chev{margin-left:auto;display:flex;color:var(--mute)}.vh-chev svg{transition:transform .15s;transform:rotate(-90deg)}.vh-acc[open] .vh-chev svg{transform:none}
+.vh-acc:not([open]){padding-bottom:0}
 .vh-sys{padding:1px 7px;border-radius:6px;background:#EEF2FF;color:#4338CA;font-weight:600;font-size:12px}
 .vh-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC;margin-bottom:8px;min-width:0}
 .vh-lbl{width:44px;flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
@@ -1700,15 +1704,15 @@ function versionTimeline(d){
     var v=vs[vi], newer=vi>0?vs[vi-1]:null, lapsed=t.exp&&v.exp&&(newer?v.exp<newer.on:daysTo(v.exp)<0);
     var what=lapsed?'<span class="vh-ev">'+DC_I.clock+'Expired by <span class="vh-sys">System</span> on '+fmtD(v.exp)+' 12:00 AM</span>'
       :'<span class="vh-ev">'+DC_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+fmtD(newer.on)+' '+fmtT(newer.on)+'</span>';
-    items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><div class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
-        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span></div>'+what+
+    items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><details class="vh-acc"'+(vi===from?' open':'')+'><summary class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
+        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>'+what+
       v.files.map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
         return '<div class="vh-file">'+(sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
           '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
           '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
             '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+
           '<span class="dc2-fa">'+
-          '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</li>');
+          '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</details></li>');
   }
   return '<div class="vh">'+(items.length?'<ol class="vh-list">'+items.join('')+'</ol>':'<p class="vh-none">No previous versions</p>')+'</div>';
 }
@@ -3247,6 +3251,10 @@ tbody tr:hover{background:#FCFCFD}
 .vh-pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:#F1F2F4;color:var(--slate)}.vh-pill.bad{background:#FEF2F2;color:#B91C1C}
 .vh-valid{font-size:12.5px;color:var(--faint)}
 .vh-ev{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:13px;color:var(--ink)}.vh-ev svg{color:var(--mute);flex-shrink:0}.vh-ev b{font-weight:700}
+.vh-acc>summary{list-style:none;cursor:pointer;border-radius:8px;padding:2px 4px 2px 0}.vh-acc>summary::-webkit-details-marker{display:none}
+.vh-acc>summary:hover .vh-valid{color:var(--ink)}.vh-acc>summary:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.vh-chev{margin-left:auto;display:flex;color:var(--mute)}.vh-chev svg{transition:transform .15s;transform:rotate(-90deg)}.vh-acc[open] .vh-chev svg{transform:none}
+.vh-acc:not([open]){padding-bottom:0}
 .vh-sys{padding:1px 7px;border-radius:6px;background:#EEF2FF;color:#4338CA;font-weight:600;font-size:12px}
 .vh-files{display:flex;flex-direction:column;gap:8px}.vh-files .cd2-file{background:#FAFBFC}
 .vh-note{margin:6px 0 0;font-size:12px;color:var(--mute)}
@@ -6251,9 +6259,9 @@ function cdLine(text,acts){ return '<div class="dx-slim cd2-slim" role="alert"><
 function cdBanner(title,text,row){ return '<div class="cd2-alert" role="alert"><span class="cd2-aic">'+CD_I.warn+'</span><div class="cd2-atx"><b>'+title+'</b><span>'+text+'</span><ul class="cd2-alist"><li class="cd2-arow">'+row+'</li></ul></div></div>'; }
 /* the history popup: earlier versions as a timeline, each with its files */
 function cdHistPop(title,items,wire){
-  var body=items.length?'<ol class="vh-list">'+items.map(function(it){
-      return '<li class="vh-it'+(it.bad?' bad':'')+'"><div class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span></div>'+
-        '<span class="vh-ev">'+it.ev+'</span><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</li>'; }).join('')+'</ol>'
+  var body=items.length?'<ol class="vh-list">'+items.map(function(it,i){
+      return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"'+(i?'':' open')+'><summary class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary>'+
+        '<span class="vh-ev">'+it.ev+'</span><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</details></li>'; }).join('')+'</ol>'
     :'<p class="vh-none">No previous versions</p>';
   showModal('<div class="modal cd2-hm" role="dialog" aria-modal="true" aria-labelledby="ch-t"><div class="modal-head"><h2 id="ch-t">'+esc(title)+'</h2><button data-close aria-label="Close">'+I.close+'</button></div><div class="modal-body">'+body+'</div></div>');
   if(wire) wire(document.querySelector('.cd2-hm'));

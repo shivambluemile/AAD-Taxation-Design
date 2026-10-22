@@ -2048,6 +2048,9 @@ document.addEventListener('input',function(e){if(e.target.closest('.filters'))up
 document.addEventListener('change',function(e){if(e.target.closest('.filters'))updateClearVisible()});
 
 listView();
+/* a notification opens a staff member's documents, with the document it is about open */
+window.AADShow=function(x){ if(!x||!x.id) return; openDetail(x.id); if(x.doc){ docOpen={}; docOpen[x.doc]=true; renderDetail(); var r=drawer.querySelector('[data-detail="'+x.doc+'"]'); if(r) r.scrollIntoView({block:'center'}); } };
+try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('staff'); if(want) window.AADShow(want.view); }catch(e){}
 })();
 <\/script>
 </body>
@@ -12367,6 +12370,9 @@ window.addEventListener('storage',function(e){ if((e.key===Q_KEY||e.key==='aad-c
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading quotations…</h3></div></div>';
 state.f=blank();   // the date range code above is ready now: start on This Month
 setTimeout(function(){ reload(); render(); },0);
+/* a notification opens one quotation: parent.AADShow from the shell, or an intent left before this page loaded */
+window.AADShow=function(id){ if(!st.list.length) reload(); if(byId(id)) openDetail(id); else toast('This quotation no longer exists.',true); };
+setTimeout(function(){ try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('quotations'); if(want) window.AADShow(want.view); }catch(e){} },0);
 })();
 
 <\/script>
@@ -14904,6 +14910,9 @@ state.f=blank(); state.applied=state.f;
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
 setTimeout(function(){ reload(); render(); },0);
 window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });
+/* a notification opens one sale: parent.AADShow from the shell, or an intent left before this page loaded */
+window.AADShow=function(id){ if(!st.list.length) reload(); if(byId(id)) openDetail(id); else toast('This sale no longer exists.',true); };
+setTimeout(function(){ try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('sales'); if(want) window.AADShow(want.view); }catch(e){} },0);
 
 })();
 
@@ -17212,6 +17221,149 @@ render();
 <\/script>
 </body>
 </html></script>
+<script type="text/plain" id="src-notifications"><body>
+
+<div class="shell">
+  <div class="main">
+    <header class="topbar">
+      <button class="burger" id="burger" aria-label="Toggle menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h11M4 17h16"/></svg>
+      </button>
+      <div class="spacer"></div>
+      <div class="top-search">
+        <label class="sr" for="globalsearch">Search</label>
+        <input id="globalsearch" type="search" placeholder="Search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
+      </div>
+      <button class="icon-btn" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="whoami">
+        <span class="avatar">JD</span>
+        <span class="who"><b>John Doe</b><span>Admin</span></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </header>
+
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<style>
+.nf-table{table-layout:fixed;min-width:0!important}
+.nf-table th.c-m{width:150px}.nf-table th.c-t{width:170px}.nf-table th.c-s{width:120px}.nf-table th.c-a{width:96px}
+.nf-row{display:flex;align-items:flex-start;gap:12px;min-width:0}
+.nf-ic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.t-new{background:var(--orange-soft);color:var(--orange-ink)}.t-ok{background:#ECFDF5;color:#059669}.t-bad{background:#FEF2F2;color:#DC2626}.t-warn{background:#FFF7E6;color:#B4690E}.t-info{background:#EFF6FF;color:#2563EB}
+.nf-tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.nf-tx .name-link .name{font-weight:600;color:var(--slate)}
+tr.un .nf-tx .name-link .name{font-weight:700;color:var(--ink)}
+tr.un td{background:#FFFCF9}
+.nf-d{font-size:12.5px;color:var(--mute);line-height:1.45;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nf-time small{display:block;font-size:12px;color:var(--faint)}
+.state.un i{background:var(--orange)}.state.rd i{background:#CBD5E1}
+.act[disabled]{visibility:hidden}
+.page-head .btn-ghost[disabled]{opacity:.5;cursor:default}.page-head .btn-ghost[disabled]:hover{background:#fff}
+@media (max-width:900px){.nf-table th.hm,.nf-table td.hm{display:none}}
+@media (max-width:600px){.nf-table th.hs,.nf-table td.hs{display:none}.nf-table th.c-a{width:76px}.content{padding-left:16px;padding-right:16px}}
+</style>
+
+<script>
+(function(){
+/* ================= Notifications: the full list behind the bell (the store lives in the app shell) ================= */
+var N = parent.AADNotifs;
+var I = {
+  chev:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>',
+  search:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
+  filter:'<svg width="15" height="11" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 3h20M5 9h14M9 15h6"/></svg>',
+  tick:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+  trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
+  prev:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 6-6 6 6 6"/></svg>',
+  next:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>'
+};
+var PER_PAGE = 10;
+var st = { q:'', status:'', kind:'', page:1 };
+var content = document.getElementById('content');
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+function toast(msg){ var t = document.getElementById('toast'); t.innerHTML = I.tick + esc(msg); t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('show'); }, 2600); }
+document.getElementById('burger').addEventListener('click', function(){ try{ parent.document.body.classList.toggle('collapsed'); }catch(e){} });
+
+function rows(){
+  var q = st.q.trim().toLowerCase();
+  return N.list().filter(function(n){
+    if(st.status === 'unread' && n.read) return false;
+    if(st.status === 'read' && !n.read) return false;
+    if(st.kind && n.kind !== st.kind) return false;
+    return !q || (n.title + ' ' + n.desc).toLowerCase().indexOf(q) >= 0;
+  });
+}
+function sel(id, label, opts, val){
+  return '<label class="sr" for="' + id + '">' + label + '</label><div class="sel"><select id="' + id + '">' +
+    opts.map(function(o){ return '<option value="' + o[0] + '"' + (o[0] === val ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') + '</select>' + I.chev + '</div>';
+}
+function row(n){
+  var k = N.kinds[n.kind] || N.kinds.lead, today = N.group(n.at) !== 'Earlier';
+  return '<tr' + (n.read ? '' : ' class="un"') + '>' +
+    '<td><div class="nf-row"><span class="nf-ic t-' + esc(n.tone || 'info') + '" aria-hidden="true">' + k.ic + '</span><div class="nf-tx">' +
+      '<button type="button" class="name-link" data-open="' + esc(n.id) + '"><span class="name">' + esc(n.title) + '</span></button><span class="nf-d" title="' + esc(n.desc) + '">' + esc(n.desc) + '</span></div></div></td>' +
+    '<td class="hm">' + esc(k.mod) + '</td>' +
+    '<td class="hm nf-time">' + (today ? N.group(n.at) : N.dmy(n.at)) + '<small>' + N.time(n.at) + '</small></td>' +
+    '<td class="hs"><span class="state ' + (n.read ? 'rd' : 'un') + '"><i></i>' + (n.read ? 'Read' : 'Unread') + '</span></td>' +
+    '<td class="r"><div class="acts">' +
+      '<button type="button" class="act" data-read="' + esc(n.id) + '" title="Mark as read" aria-label="Mark as read: ' + esc(n.title) + '"' + (n.read ? ' disabled' : '') + '>' + I.tick + '</button>' +
+      '<button type="button" class="act danger" data-del="' + esc(n.id) + '" title="Delete" aria-label="Delete: ' + esc(n.title) + '">' + I.trash + '</button></div></td></tr>';
+}
+function pager(page, pages){
+  var b = '<button type="button" data-pg="' + (page - 1) + '" aria-label="Previous page"' + (page <= 1 ? ' disabled' : '') + '>' + I.prev + '</button>';
+  for(var i = 1; i <= pages; i++) b += '<button type="button" data-pg="' + i + '"' + (i === page ? ' class="on" aria-current="page"' : '') + '>' + i + '</button>';
+  return b + '<button type="button" data-pg="' + (page + 1) + '" aria-label="Next page"' + (page >= pages ? ' disabled' : '') + '>' + I.next + '</button>';
+}
+function render(){
+  var all = N.list(), list = rows(), un = N.unread(), pages = Math.max(1, Math.ceil(list.length / PER_PAGE));
+  if(st.page > pages) st.page = pages;
+  var from = (st.page - 1) * PER_PAGE, shown = list.slice(from, from + PER_PAGE);
+  var kinds = [['', 'All types']]; Object.keys(N.kinds).forEach(function(k){ if(all.some(function(n){ return n.kind === k; })) kinds.push([k, N.kinds[k].label]); });
+  var filtered = st.q || st.status || st.kind;
+  var f = document.activeElement, fid = f && f.id, caret = f && f.id === 'nf-q' ? f.selectionStart : null;
+  content.innerHTML =
+    '<div class="page-head"><h1>Notifications</h1><div class="ph-acts"><button type="button" class="btn-ghost" id="nf-all"' + (un ? '' : ' disabled') + '>' + I.tick + 'Mark all as read</button></div></div>' +
+    '<div class="filterbar"><div class="search"><label class="sr" for="nf-q">Search notifications</label>' + I.search + '<input id="nf-q" type="search" placeholder="Search notifications" value="' + esc(st.q) + '"></div>' +
+      '<div class="filters"><span class="lbl">' + I.filter + 'Filter By:</span>' +
+        sel('nf-s', 'Status', [['', 'All'], ['unread', 'Unread'], ['read', 'Read']], st.status) +
+        sel('nf-k', 'Type', kinds, st.kind) +
+        '<button type="button" class="clearf" id="nf-clear"' + (filtered ? '' : ' hidden') + '>Clear filters</button></div></div>' +
+    '<div class="card">' + (shown.length
+      ? '<table class="nf-table">' +
+          '<thead><tr><th>Notification</th><th class="hm c-m">Module</th><th class="hm c-t">Received</th><th class="hs c-s">Status</th><th class="r c-a">Actions</th></tr></thead><tbody>' + shown.map(row).join('') + '</tbody></table>' +
+        '<div class="tfoot"><p>Showing ' + (from + 1) + '–' + (from + shown.length) + ' of ' + list.length + '</p><div class="pager">' + pager(st.page, pages) + '</div></div>'
+      : '<div class="empty"><h3>' + (all.length ? 'No notifications match' : 'No notifications yet') + '</h3><p>' +
+          (all.length ? 'Try another search or clear the filters.' : 'New activity for your work will show here. Notifications are kept for 90 days.') + '</p></div>') +
+    '</div>';
+  if(fid){ var back = document.getElementById(fid); if(back){ back.focus({ preventScroll:true }); if(caret != null) back.setSelectionRange(caret, caret); } }
+}
+content.addEventListener('input', function(e){ if(e.target.id === 'nf-q'){ st.q = e.target.value; st.page = 1; render(); } });
+content.addEventListener('change', function(e){
+  if(e.target.id === 'nf-s'){ st.status = e.target.value; st.page = 1; render(); }
+  if(e.target.id === 'nf-k'){ st.kind = e.target.value; st.page = 1; render(); }
+});
+content.addEventListener('click', function(e){
+  var t = e.target, x;
+  if((x = t.closest('[data-open]'))){ N.open(x.getAttribute('data-open')); return; }
+  if((x = t.closest('[data-read]'))){ N.read(x.getAttribute('data-read'), true); toast('Marked as read'); return; }
+  if((x = t.closest('[data-del]'))){ N.remove(x.getAttribute('data-del')); toast('Notification deleted'); return; }
+  if((x = t.closest('[data-pg]')) && !x.disabled){ st.page = +x.getAttribute('data-pg'); render(); content.scrollIntoView({ block:'start' }); return; }
+  if(t.closest('#nf-all')){ N.readAll(); toast('All notifications marked as read'); return; }
+  if(t.closest('#nf-clear')){ st = { q:'', status:'', kind:'', page:1 }; render(); }
+});
+/* the shell calls this whenever the store changes (a bell action, a new event, another tab) */
+window.AADNotifsChanged = render;
+render();
+})();
+<\/script>
+</script>
 <script type="text/plain" id="src-shift-core">
 /* ===== AAD shift core =====
    Shared by the app shell (header timer), Dashboard (shift actions) and Attendance (records).
@@ -21040,11 +21192,11 @@ function submit(){
     return el ? el.textContent.replace('</head>', CHECK_CSS + '</head>').split('<\\/script>').join('<\/script>').split('/*@@SHIFT_CORE@@*/').join(core)
       .split('/*@@SVC_CORE@@*/').join(text('services-core')).split('/*@@ONB_CORE@@*/').join(text('onboard-core')) : '';
   }
-  /* the Dashboard has no stylesheet of its own: it uses the Attendance page's head */
+  /* the Dashboard and Notifications pages have no stylesheet of their own: they use the Attendance page's head */
   function page(mod){
-    if(mod !== 'dashboard') return source(mod);
-    var head = source('attendance').split('<body>')[0].replace(/<title>[^<]*<\/title>/, '<title>Dashboard · AAD Taxation</title>');
-    return head + source('dashboard');
+    if(mod !== 'dashboard' && mod !== 'notifications') return source(mod);
+    var head = source('attendance').split('<body>')[0].replace(/<title>[^<]*<\/title>/, '<title>' + (mod === 'dashboard' ? 'Dashboard' : 'Notifications') + ' · AAD Taxation</title>');
+    return head + source(mod);
   }
 
   function make(mod){
@@ -21053,7 +21205,7 @@ function submit(){
       f.className = 'frame';
       f.title = mod;
       f.setAttribute('allow', 'camera');
-      f.addEventListener('load', function(){ paintPill(mod, f); paintUser(f); });
+      f.addEventListener('load', function(){ paintPill(mod, f); paintUser(f); paintBell(f); });
       f.setAttribute('srcdoc', page(mod));
       main.appendChild(f);
       frames[mod] = f;
@@ -21147,6 +21299,291 @@ function submit(){
   };
   window.addEventListener('storage', function(e){ if(e.key === 'aad-leave-v1') window.AADBadges(); });
 
+  /* ---------- notifications: one store for the whole app, a panel under every module's bell, and a full page ----------
+     Prototype: events are collected from the records saved in this browser (leave, quotations, sales) plus a few samples.
+     Each event has one id, so it is only ever added once; a deleted one is remembered so it doesn't come back.
+     Kept for 90 days (up to 200), the same window as the rest of the activity history. */
+  var NT_KEY = 'aad-notifs-v1', NT_KEEP_DAYS = 90, NT_MAX = 200, NT_DAY = 864e5, ME_NAME = 'John Doe', ME_ID = 'KPG1000';
+  var NT_SRC = ['aad-leave-v1', 'aad-quotations-v1', 'aad-invoices-v1'];
+  function ntSvg(p){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>'; }
+  var NT_KIND = {
+    lead:    { label:'Leads',        mod:'Clients',    ic:ntSvg('<circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M19 8v6M16 11h6"/>') },
+    onboard: { label:'Onboarding',   mod:'Clients',    ic:ntSvg('<circle cx="9" cy="8" r="3.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="m16 11 2 2 4-4"/>') },
+    quote:   { label:'Quotations',   mod:'Quotations', ic:ntSvg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>') },
+    doc:     { label:'Documents',    mod:'Staff',      ic:ntSvg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M12 11v4"/><path d="M12 18h.01"/>') },
+    leave:   { label:'Leave',        mod:'Leave',      ic:ntSvg('<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>') },
+    attend:  { label:'Attendance',   mod:'Attendance', ic:ntSvg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9 2.5h6"/>') },
+    pay:     { label:'Payments',     mod:'Sales',      ic:ntSvg('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6M9 16h3"/>') },
+    sub:     { label:'Subscription', mod:'Settings',   ic:ntSvg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h3"/>') }
+  };
+  function ntPad(n){ return (n < 10 ? '0' : '') + n; }
+  function ntDmy(t){
+    if(typeof t === 'string' && /^\d{4}-\d{2}-\d{2}/.test(t)) return t.slice(0, 10).split('-').reverse().join('-');
+    var d = new Date(t); return ntPad(d.getDate()) + '-' + ntPad(d.getMonth() + 1) + '-' + d.getFullYear();
+  }
+  function ntTime(t){ var d = new Date(t), h = d.getHours(); return ((h % 12) || 12) + ':' + ntPad(d.getMinutes()) + (h < 12 ? ' am' : ' pm'); }
+  function ntDayStart(){ var d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  /* Today / Yesterday / Earlier; the group already names the day, so a row shows only the time (or the date when earlier) */
+  function ntGroup(t){ var t0 = ntDayStart(); return t >= t0 ? 'Today' : t >= t0 - NT_DAY ? 'Yesterday' : 'Earlier'; }
+  function ntWhen(t){ return ntGroup(t) === 'Earlier' ? ntDmy(t) : ntTime(t); }
+  function ntEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
+  function ntRead(k){ try{ return JSON.parse(localStorage.getItem(k) || 'null'); }catch(e){ return null; } }
+
+  function ntLoad(){ var v = ntRead(NT_KEY); if(!v || !Array.isArray(v.list)) v = { list:[], gone:{} }; if(!v.gone) v.gone = {}; return v; }
+  function ntSave(v){ try{ localStorage.setItem(NT_KEY, JSON.stringify(v)); }catch(e){} }
+  function ntPrune(v){
+    var now = Date.now(), cut = now - NT_KEEP_DAYS * NT_DAY;
+    v.list = v.list.filter(function(n){ return n.at >= cut && n.at <= now + 6e4; }).sort(function(a, b){ return b.at - a.at; }).slice(0, NT_MAX);
+    Object.keys(v.gone).forEach(function(k){ if(v.gone[k] < cut) delete v.gone[k]; });
+  }
+
+  /* sample events (prototype only), added once; aud says who sees one: admin, staff or all */
+  function ntSeed(now){
+    var m = 6e4, h = 36e5, t0 = ntDayStart(), y = t0 - NT_DAY + 15 * h;
+    var at = function(t){ return Math.min(t, now - 5 * m); };
+    return [
+      { id:'seed:lead:9', kind:'lead', tone:'new', aud:'all', at:at(now - 25 * m), title:'New lead: Chloe Martin', desc:'Website enquiry about an individual tax return.', go:{ mod:'clients', client:9 } },
+      { id:'seed:onboard:5', kind:'onboard', tone:'ok', aud:'all', at:at(now - 2 * h), title:'Onboarding completed', desc:'Priya Sharma signed the engagement letter and is now an active client.', go:{ mod:'clients', client:5 } },
+      { id:'seed:doc:KPG1001:pass', kind:'doc', tone:'bad', aud:'admin', at:at(t0 + 8 * h), title:'Passport expired', desc:'Alexender Doe’s passport has expired. Ask for a renewed copy.', go:{ mod:'staff', staff:'KPG1001', doc:'pass' } },
+      { id:'seed:attend:KPG1004', kind:'attend', tone:'warn', aud:'admin', at:at(t0 + 7 * h), title:'Missed clock-out', desc:'Harry Potter didn’t end yesterday’s shift.', go:{ mod:'attendance' } },
+      { id:'seed:attend:me', kind:'attend', tone:'warn', aud:'staff', at:at(t0 + 9.5 * h), title:'Late start', desc:'Your shift started 25 minutes after the rostered time.', go:{ mod:'attendance' } },
+      { id:'seed:leave:me', kind:'leave', tone:'ok', aud:'staff', at:y, title:'Leave approved', desc:'Your annual leave request was approved.', go:{ mod:'leave' }, read:true },
+      { id:'seed:doc:KPG1001:visa', kind:'doc', tone:'warn', aud:'admin', at:y - h, title:'Visa document expires soon', desc:'Alexender Doe’s visa expires on 15-11-2026.', go:{ mod:'staff', staff:'KPG1001', doc:'visa' } },
+      { id:'seed:sub:renew', kind:'sub', tone:'warn', aud:'admin', at:y - 3 * h, title:'Subscription renews soon', desc:'Your Professional plan renews in 7 days.', go:{ mod:'settings' }, read:true },
+      { id:'seed:lead:8', kind:'lead', tone:'new', aud:'all', at:t0 - 3 * NT_DAY + 11 * h, title:'New lead: Southern Cross Logistics Pty Ltd', desc:'Referred by Greenleaf Partners for BAS and payroll.', go:{ mod:'clients', client:8 }, read:true },
+      { id:'seed:sub:paid', kind:'sub', tone:'ok', aud:'admin', at:t0 - 9 * NT_DAY + 10 * h, title:'Subscription payment received', desc:'The Professional plan invoice was paid.', go:{ mod:'settings' }, read:true }
+    ];
+  }
+  /* events from the records saved in this browser; only the last 30 days become notifications */
+  function ntLive(now){
+    var out = [], cut = now - 30 * NT_DAY, names = {};
+    var cl = ntRead('aad-clients-v1'); cl = Array.isArray(cl) ? cl : cl && Array.isArray(cl.list) ? cl.list : [];
+    cl.forEach(function(c){ names[c.id] = c.name; });
+    var LT = { annual:'annual leave', sick:'sick leave', lsl:'long service leave', unpaid:'unpaid leave' };
+    var leave = ntRead('aad-leave-v1');
+    (Array.isArray(leave) ? leave : []).forEach(function(l){
+      var span = ntDmy(l.from) + (l.to && l.to !== l.from ? ' to ' + ntDmy(l.to) : '');
+      if(l.status === 'pending' && l.submittedAt >= cut)
+        out.push({ id:'leave:' + l.id + ':pending', kind:'leave', tone:'info', aud:'admin', at:l.submittedAt, title:'Leave request',
+          desc:(l.submittedBy || 'A staff member') + ' asked for ' + (LT[l.type] || 'leave') + ', ' + span + '.', go:{ mod:'leave', leave:l.id } });
+      if((l.status === 'approved' || l.status === 'declined') && l.staff === ME_ID){
+        var e = (l.history || []).filter(function(x){ return x.kind === l.status; }).pop(), t = e ? e.t : l.submittedAt;
+        if(t >= cut) out.push({ id:'leave:' + l.id + ':' + l.status, kind:'leave', tone:l.status === 'approved' ? 'ok' : 'bad', aud:'staff', at:t,
+          title:'Leave ' + l.status, desc:'Your ' + (LT[l.type] || 'leave') + ' for ' + span + ' was ' + l.status + '.', go:{ mod:'leave', leave:l.id } });
+      }
+    });
+    var qs = ntRead('aad-quotations-v1');
+    (qs && Array.isArray(qs.list) ? qs.list : []).forEach(function(q){
+      if(['accepted', 'rejected', 'expired'].indexOf(q.status) < 0) return;
+      var e = (q.history || []).filter(function(x){ return x.type === q.status; }).pop(), t = e ? e.t : q.validUntil;
+      if(!(t >= cut) || t > now) return;
+      var who = e && e.by && e.by !== 'System' ? ' by ' + e.by : '';
+      out.push({ id:'quote:' + q.id + ':' + q.status, kind:'quote', tone:{ accepted:'ok', rejected:'bad', expired:'warn' }[q.status],
+        aud:q.accountant === ME_NAME ? 'all' : 'admin', at:t, title:'Quotation ' + q.status,
+        desc:q.id + ' for ' + (q.clientName || names[q.clientId] || 'a client') + (q.status === 'expired' ? ' passed its valid-until date.' : ' was ' + q.status + who + '.'),
+        go:{ mod:'quotations', id:q.id } });
+    });
+    var inv = ntRead('aad-invoices-v1');
+    (inv && Array.isArray(inv.list) ? inv.list : []).forEach(function(s){
+      /* still owed: the same sum Sales uses (amount less payments that weren't voided); drafts and disabled sales owe nothing */
+      var paid = (s.payments || []).reduce(function(a, p){ return a + (p.void ? 0 : +p.amount || 0); }, 0);
+      if(s.status === 'draft' || s.status === 'disabled' || !s.due || !((+s.amount || 0) - paid > 0.005)) return;
+      var who = names[s.clientId] ? ' for ' + names[s.clientId] : '', aud = s.accountant === ME_NAME ? 'all' : 'admin';
+      if(s.due < ntDayStart() && s.due >= cut)
+        out.push({ id:'pay:' + s.id + ':overdue', kind:'pay', tone:'bad', aud:aud, at:s.due, title:'Payment overdue',
+          desc:s.id + who + ' was due on ' + ntDmy(s.due) + '.', go:{ mod:'sales', id:s.id } });
+      else if(s.due >= ntDayStart() && s.due - now <= 3 * NT_DAY)
+        out.push({ id:'pay:' + s.id + ':due', kind:'pay', tone:'warn', aud:aud, at:Math.max(s.due - 3 * NT_DAY, s.date || 0), title:'Payment due soon',
+          desc:s.id + who + ' is due on ' + ntDmy(s.due) + '.', go:{ mod:'sales', id:s.id } });
+    });
+    return out;
+  }
+  function ntSync(){
+    var v = ntLoad(), now = Date.now(), cut = now - NT_KEEP_DAYS * NT_DAY, have = {}, n0 = v.list.length, changed = !v.seeded;
+    v.list.forEach(function(n){ have[n.id] = 1; });
+    (v.seeded ? [] : ntSeed(now)).concat(ntLive(now)).forEach(function(n){
+      if(have[n.id] || v.gone[n.id] || n.at < cut || n.at > now) return;     // a record dated ahead shows up when its time comes
+      n.read = !!n.read; v.list.push(n); have[n.id] = 1; changed = true;
+    });
+    v.seeded = true; ntPrune(v);
+    if(changed || v.list.length !== n0) ntSave(v);
+    ntPaint();
+  }
+  /* who sees what: staff never see admin-only modules or events meant for the admin */
+  function ntVisible(){
+    var sv = staffView();
+    return ntLoad().list.filter(function(n){
+      if(sv ? n.aud === 'admin' : n.aud === 'staff') return false;
+      return !(sv && n.go && ADMIN_ONLY.indexOf(n.go.mod) >= 0);
+    }).sort(function(a, b){ return b.at - a.at; });
+  }
+  function ntUnread(){ return ntVisible().filter(function(n){ return !n.read; }).length; }
+  function ntChange(fn){ var v = ntLoad(); fn(v); ntSave(v); ntPaint(); }
+  function ntMark(id, read){ ntChange(function(v){ v.list.forEach(function(n){ if(n.id === id) n.read = read !== false; }); }); }
+  function ntMarkAll(){ var vis = {}; ntVisible().forEach(function(n){ vis[n.id] = 1; }); ntChange(function(v){ v.list.forEach(function(n){ if(vis[n.id]) n.read = true; }); }); }
+  function ntDelete(id){ ntChange(function(v){ v.list = v.list.filter(function(n){ if(n.id === id){ v.gone[id] = n.at; return false; } return true; }); }); }
+  /* open the record a notification is about */
+  function ntShow(mod, x){
+    var fresh = !frames[mod]; select(mod);
+    var w = frames[mod] && frames[mod].contentWindow;
+    if(!fresh && w && w.AADShow) w.AADShow(x); else intents[mod] = { view:x };
+  }
+  function ntOpen(n){
+    var go = n && n.go; if(!go) return;
+    if(staffView() && ADMIN_ONLY.indexOf(go.mod) >= 0) return;
+    if(go.mod === 'clients' && go.client) return window.AADOpen('clients', '#/clients/' + go.client);
+    if(go.mod === 'leave' && go.leave != null) return window.AADApplyLeave({ view:go.leave });
+    if((go.mod === 'quotations' || go.mod === 'sales') && go.id) return ntShow(go.mod, go.id);
+    if(go.mod === 'staff' && go.staff) return ntShow('staff', { id:go.staff, doc:go.doc });
+    select(go.mod);
+  }
+  window.AADNotifs = {
+    list:ntVisible, unread:ntUnread, kinds:NT_KIND, group:ntGroup, when:ntWhen, dmy:ntDmy, time:ntTime,
+    read:ntMark, readAll:ntMarkAll, remove:ntDelete,
+    open:function(id){ var n = ntVisible().filter(function(x){ return x.id === id; })[0]; if(!n) return; if(!n.read) ntMark(id, true); ntOpen(n); }
+  };
+  /* modules can raise one directly: AADNotify({id, kind, tone, aud, title, desc, go}); the id keeps it from being added twice */
+  window.AADNotify = function(n){
+    if(!n || !n.id || !NT_KIND[n.kind]) return false;
+    var v = ntLoad(); if(v.gone[n.id] || v.list.some(function(x){ return x.id === n.id; })) return false;
+    v.list.push({ id:n.id, kind:n.kind, tone:n.tone || 'info', aud:n.aud || 'all', at:n.at || Date.now(), title:n.title, desc:n.desc || '', go:n.go || null, read:false });
+    ntPrune(v); ntSave(v); ntPaint(); return true;
+  };
+
+  var NT_CSS =
+    '.icon-btn .aad-nb{position:absolute;top:3px;right:2px;min-width:17px;height:17px;padding:0 4px;border-radius:999px;background:#F18934;color:#fff;border:2px solid #fff;font:700 10px/13px Inter,system-ui,sans-serif;text-align:center;box-sizing:border-box}'+
+    '.aad-np{position:fixed;z-index:210;width:384px;display:flex;flex-direction:column;background:#fff;border:1px solid #EBEEF0;border-radius:14px;box-shadow:0 16px 40px rgba(15,23,42,.16);font:13.5px Inter,system-ui,sans-serif;color:#181C1E;overflow:hidden}'+
+    '.aad-np button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}'+
+    '.aad-np .np-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 10px}'+
+    '.aad-np .np-h h2{margin:0;font:800 16px Manrope,Inter,sans-serif;letter-spacing:-.2px}'+
+    '.aad-np .np-all{font-size:12.5px;font-weight:600;color:#E46A11;padding:4px 2px}.aad-np .np-all:hover{text-decoration:underline}.aad-np .np-all[disabled]{color:#9BA6B7;cursor:default;text-decoration:none}'+
+    '.aad-np .np-tabs{display:flex;gap:4px;padding:0 16px 10px;border-bottom:1px solid #F1F2F4}'+
+    '.aad-np .np-tabs button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;font-size:12.5px;font-weight:600;color:#64748B}'+
+    '.aad-np .np-tabs button:hover{background:#F6F7F9;color:#181C1E}'+
+    '.aad-np .np-tabs button[aria-selected="true"]{background:#FFF1E8;color:#E46A11}'+
+    '.aad-np .np-tabs span{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#F18934;color:#fff;font-size:10.5px;font-weight:700;line-height:18px;text-align:center}'+
+    '.aad-np .np-b{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0}'+
+    '.aad-np .np-g{padding:10px 16px 4px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9BA6B7}'+
+    '.aad-np .np-it{position:relative;display:flex;align-items:flex-start;border-top:1px solid #F6F7F9}.aad-np .np-g+.np-it{border-top:0}'+
+    '.aad-np .np-it:hover,.aad-np .np-it:focus-within{background:#FAFBFC}'+
+    '.aad-np .np-main{flex:1;min-width:0;display:flex;align-items:flex-start;gap:12px;padding:10px 8px 10px 16px;text-align:left}'+
+    '.aad-np .np-ic{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}'+
+    '.aad-np .t-new{background:#FFF1E8;color:#E46A11}.aad-np .t-ok{background:#ECFDF5;color:#059669}.aad-np .t-bad{background:#FEF2F2;color:#DC2626}.aad-np .t-warn{background:#FFF7E6;color:#B4690E}.aad-np .t-info{background:#EFF6FF;color:#2563EB}'+
+    '.aad-np .np-tx{min-width:0;display:flex;flex-direction:column;gap:2px}'+
+    '.aad-np .np-tx b{font-size:13.5px;font-weight:600;color:#475569}.aad-np .un .np-tx b{font-weight:700;color:#181C1E}'+
+    '.aad-np .np-d{font-size:12.5px;line-height:1.45;color:#64748B;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}'+
+    '.aad-np .np-m{font-size:11.5px;color:#9BA6B7}'+
+    '.aad-np .np-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;padding:12px 12px 8px 0;flex-shrink:0;min-width:34px}'+
+    '.aad-np .np-dot{width:8px;height:8px;border-radius:50%;background:#F18934;margin:4px 6px 0 0}'+
+    '.aad-np .np-acts{display:flex;gap:4px;opacity:0}.aad-np .np-it:hover .np-acts,.aad-np .np-it:focus-within .np-acts{opacity:1}'+
+    '.aad-np .np-ib{width:26px;height:26px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#64748B;border:1px solid #E5E7EB!important;background:#fff!important}'+
+    '.aad-np .np-ib:hover{color:#181C1E;background:#F6F7F9!important}.aad-np .np-ib.del:hover{color:#E11D48;background:#FEF2F2!important;border-color:#FECACA!important}'+
+    '.aad-np .np-empty{padding:40px 24px;text-align:center;color:#64748B}.aad-np .np-empty i{width:44px;height:44px;border-radius:50%;background:#F6F7F9;color:#9BA6B7;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px}'+
+    '.aad-np .np-empty b{display:block;font:700 14.5px Manrope,Inter,sans-serif;color:#181C1E;margin-bottom:4px}.aad-np .np-empty span{font-size:12.5px}'+
+    '.aad-np .np-foot{display:block;width:100%;padding:12px 16px;border-top:1px solid #F1F2F4!important;font-size:13px;font-weight:600;color:#E46A11!important;text-align:center}.aad-np .np-foot:hover{background:#FFF8F2!important}'+
+    '@media (hover:none){.aad-np .np-acts{opacity:1}}'+
+    '@media (max-width:480px){.aad-np{left:8px!important;right:8px!important;width:auto}}';
+  var NT_I = {
+    bell:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/></svg>',
+    tick:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
+    trash:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>'
+  };
+  var ntFilter = 'all', ntPanel = null;     // ntPanel: {doc, el, bell}
+  function ntBell(doc){ return doc && doc.querySelector('.topbar .icon-btn[aria-label^="Notifications"]'); }
+  function ntBadge(doc, n){
+    var b = ntBell(doc); if(!b) return;
+    var dot = b.querySelector('.dot'); if(dot) dot.hidden = true;
+    var nb = b.querySelector('.aad-nb');
+    if(!n){ if(nb) nb.remove(); }
+    else { if(!nb){ nb = doc.createElement('span'); nb.className = 'aad-nb'; nb.setAttribute('aria-hidden', 'true'); b.appendChild(nb); } nb.textContent = n > 99 ? '99+' : n; }
+    b.setAttribute('aria-label', 'Notifications' + (n ? ', ' + n + ' unread' : ''));
+  }
+  function ntItem(n){
+    var k = NT_KIND[n.kind] || NT_KIND.lead;
+    return '<div class="np-it' + (n.read ? '' : ' un') + '">' +
+      '<button type="button" class="np-main" data-npo="' + ntEsc(n.id) + '"><span class="np-ic t-' + ntEsc(n.tone || 'info') + '" aria-hidden="true">' + k.ic + '</span>' +
+        '<span class="np-tx"><b>' + ntEsc(n.title) + '</b><span class="np-d">' + ntEsc(n.desc) + '</span><span class="np-m">' + ntWhen(n.at) + '</span></span>' +
+        (n.read ? '' : '<span class="sr">, unread</span>') + '</button>' +
+      '<div class="np-side">' + (n.read ? '' : '<i class="np-dot" aria-hidden="true"></i>') +
+        '<div class="np-acts">' + (n.read ? '' : '<button type="button" class="np-ib" data-npr="' + ntEsc(n.id) + '" title="Mark as read" aria-label="Mark as read: ' + ntEsc(n.title) + '">' + NT_I.tick + '</button>') +
+        '<button type="button" class="np-ib del" data-npd="' + ntEsc(n.id) + '" title="Delete" aria-label="Delete: ' + ntEsc(n.title) + '">' + NT_I.trash + '</button></div></div>' +
+    '</div>';
+  }
+  function ntPanelHtml(){
+    var all = ntVisible(), un = all.filter(function(n){ return !n.read; }).length;
+    var list = all.filter(function(n){ return ntFilter === 'all' || (ntFilter === 'unread' ? !n.read : n.read); });
+    var body = '', last = '';
+    list.forEach(function(n){ var g = ntGroup(n.at); if(g !== last){ body += '<div class="np-g">' + g + '</div>'; last = g; } body += ntItem(n); });
+    if(!list.length) body = '<div class="np-empty"><i>' + NT_I.bell + '</i><b>' + (ntFilter === 'unread' ? 'No unread notifications' : ntFilter === 'read' ? 'No read notifications' : 'No notifications yet') + '</b>' +
+      '<span>' + (ntFilter === 'unread' ? 'You’re all caught up.' : 'New activity for your work will show here.') + '</span></div>';
+    return '<div class="np-h"><h2 id="np-t">Notifications</h2><button type="button" class="np-all" data-np="all"' + (un ? '' : ' disabled') + '>Mark all as read</button></div>' +
+      '<div class="np-tabs" role="tablist" aria-label="Show">' + [['all', 'All'], ['unread', 'Unread'], ['read', 'Read']].map(function(f){
+        return '<button type="button" role="tab" data-npf="' + f[0] + '" aria-selected="' + (ntFilter === f[0]) + '">' + f[1] + (f[0] === 'unread' && un ? '<span>' + un + '</span>' : '') + '</button>'; }).join('') + '</div>' +
+      '<div class="np-b" role="tabpanel">' + body + '</div>' +
+      '<button type="button" class="np-foot" data-np="page">View all notifications</button>';
+  }
+  function ntPlace(){
+    if(!ntPanel) return;
+    var doc = ntPanel.doc, r = ntPanel.bell.getBoundingClientRect(), vw = doc.documentElement.clientWidth, vh = doc.documentElement.clientHeight;
+    ntPanel.el.style.top = (r.bottom + 8) + 'px';
+    ntPanel.el.style.right = Math.max(8, vw - r.right - 8) + 'px';
+    ntPanel.el.style.maxHeight = Math.min(560, vh - r.bottom - 20) + 'px';
+  }
+  function ntRender(keepFocus){
+    if(!ntPanel) return;
+    var el = ntPanel.el, b = el.querySelector('.np-b'), top = b ? b.scrollTop : 0, f = el.ownerDocument.activeElement, sel = null;
+    if(keepFocus && f && el.contains(f)){ ['data-npf', 'data-np', 'data-npo'].some(function(a){ if(f.hasAttribute(a)){ sel = '[' + a + '="' + f.getAttribute(a) + '"]'; return true; } }); }
+    el.innerHTML = ntPanelHtml();
+    b = el.querySelector('.np-b'); if(b) b.scrollTop = top;
+    var to = sel && el.querySelector(sel); if(keepFocus) (to || el.querySelector('[data-npf][aria-selected="true"]')).focus({ preventScroll:true });
+  }
+  function ntClose(back){
+    if(!ntPanel) return; var p = ntPanel; ntPanel = null;
+    p.el.remove(); p.bell.setAttribute('aria-expanded', 'false'); if(back) p.bell.focus();
+  }
+  function ntOpenPanel(doc, bell){
+    ntClose();
+    var el = doc.createElement('div'); el.className = 'aad-np'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-labelledby', 'np-t');
+    doc.body.appendChild(el); ntPanel = { doc:doc, el:el, bell:bell };
+    bell.setAttribute('aria-expanded', 'true');
+    ntPlace(); ntRender(true);
+    el.addEventListener('click', function(e){
+      var t = e.target, x;
+      if((x = t.closest('[data-npf]'))){ ntFilter = x.getAttribute('data-npf'); ntRender(true); return; }
+      if((x = t.closest('[data-npr]'))){ ntMark(x.getAttribute('data-npr'), true); return; }
+      if((x = t.closest('[data-npd]'))){ ntDelete(x.getAttribute('data-npd')); return; }
+      if((x = t.closest('[data-npo]'))){ var id = x.getAttribute('data-npo'); ntClose(); window.AADNotifs.open(id); return; }
+      if((x = t.closest('[data-np="all"]'))){ ntMarkAll(); return; }
+      if(t.closest('[data-np="page"]')){ ntClose(); select('notifications'); }
+    });
+    el.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){ e.stopPropagation(); ntClose(true); return; }
+      var tab = e.target.closest('[data-npf]'); if(!tab || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+      var tabs = [].slice.call(el.querySelectorAll('[data-npf]')), i = tabs.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : -1);
+      ntFilter = tabs[(i + tabs.length) % tabs.length].getAttribute('data-npf'); ntRender(true);
+    });
+  }
+  /* each module's bell: wired once when the page loads */
+  function paintBell(f){
+    var doc; try{ doc = f.contentDocument; }catch(e){ return; }
+    var bell = ntBell(doc); if(!bell || bell.dataset.nt) return;
+    bell.dataset.nt = '1'; bell.setAttribute('aria-haspopup', 'dialog'); bell.setAttribute('aria-expanded', 'false');
+    var st = doc.createElement('style'); st.textContent = NT_CSS; doc.head.appendChild(st);
+    bell.addEventListener('click', function(e){ e.stopPropagation(); if(ntPanel && ntPanel.bell === bell) ntClose(); else ntOpenPanel(doc, bell); });
+    doc.addEventListener('mousedown', function(e){ if(ntPanel && ntPanel.doc === doc && !ntPanel.el.contains(e.target) && !bell.contains(e.target)) ntClose(); });
+    doc.defaultView.addEventListener('resize', function(){ if(ntPanel && ntPanel.doc === doc) ntPlace(); });
+    ntBadge(doc, ntUnread());
+  }
+  /* every bell, the open panel and the full page follow the store straight away */
+  function ntPaint(){
+    var n = ntUnread();
+    Object.keys(frames).forEach(function(m){ var d; try{ d = frames[m].contentDocument; }catch(e){} if(d) ntBadge(d, n); });
+    ntRender(ntPanel && ntPanel.el.contains(ntPanel.doc.activeElement));
+    var w = frames.notifications && frames.notifications.contentWindow; if(w && w.AADNotifsChanged) w.AADNotifsChanged();
+  }
+  window.addEventListener('storage', function(e){ if(e.key === NT_KEY) ntPaint(); else if(NT_SRC.indexOf(e.key) >= 0) ntSync(); });
+  setInterval(ntSync, 30000);
+
   document.getElementById('navitems').addEventListener('click', function(e){
     var b = e.target.closest('button[data-mod]');
     if(b) select(b.dataset.mod);
@@ -21214,6 +21651,7 @@ function submit(){
     return;
   }
   applyView();
+  ntSync();
   select('dashboard');
 })();
 </script>

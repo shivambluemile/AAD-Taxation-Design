@@ -1123,10 +1123,11 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .nd-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.nd-t b{font-size:14px;color:var(--ink)}.nd-t span{font-size:12.5px;color:var(--mute)}.nd-t span.bad{color:#B91C1C}
 .nd-up{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
 @media (max-width:560px){.nd-row{flex-wrap:wrap}.nd-t{flex-basis:calc(100% - 50px)}}
-.dx-act{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px 4px}
+.dx-act{display:flex;align-items:center;gap:20px;padding:12px 4px}
+.dx-ac{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .dx-ah{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink)}.dx-ah b{font-weight:700}
 .dx-ap{margin:0;padding-left:23px;font-size:13px;line-height:1.5;color:var(--slate)}
-.dx-ab{margin:4px 0 0 23px}
+.dx-ab{flex-shrink:0;margin:0 4px 0 0}
 .dx-ups{display:flex;gap:14px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
 .dx-line{padding:6px 0}
 .dx-up{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--orange-ink);padding:4px 0;flex-shrink:0}.dx-up:hover{text-decoration:underline;text-underline-offset:2px}.dx-up svg{width:12px;height:12px}
@@ -1827,8 +1828,8 @@ function docsBody(s){
   var parts=[], need=missing.concat(gone.map(function(d){ return d.k; }));
   if(missing.length) parts.push(join(missing.map(low))+(missing.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded');
   if(gone.length) parts.push(join(gone.map(function(d){ return low(d.k); }))+(gone.length>1?' have':' has')+' expired');
-  if(need.length) lines='<div class="dx-act"><div class="dx-ah"><span class="dx-li">'+I.warn+'</span><b>Action Required</b></div>'+
-    '<p class="dx-ap">'+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click upload to provide the required document'+(need.length>1?'s':'')+'.</p>'+
+  if(need.length) lines='<div class="dx-act"><div class="dx-ac"><div class="dx-ah"><span class="dx-li">'+I.warn+'</span><b>Action Required</b></div>'+
+    '<p class="dx-ap">'+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click upload to provide the required document'+(need.length>1?'s':'')+'.</p></div>'+
     '<button type="button" class="dx-up dx-ab" data-needpop aria-haspopup="dialog">'+I.upsm+'Upload</button></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
   return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';

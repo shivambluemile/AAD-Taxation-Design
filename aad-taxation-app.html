@@ -10899,6 +10899,12 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-sub{font-size:13px;color:var(--mute);margin-top:4px}
 .qf2 .modal-body{background:#F7F8FA;gap:16px;padding:24px 32px}
 .qf2 .qf-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;min-width:0}
+.qf2 .qf-one{padding:0}.qf2 .qf-sec{padding:20px 22px;min-width:0}.qf2 .qf-one>.qf-sec+.qf-sec,.qf2 .qf-one>.qf-bottom{border-top:1px solid var(--line)}
+.qf2 .qf-one .qf-bottom{gap:0}.qf2 .qf-one .qf-bottom>.qf-sec+.qf-sec{border-left:1px solid var(--line)}
+.qf2 .qf-one>.ferr{margin:0 22px 16px}
+.qf-lgst{display:flex;justify-content:center;align-items:center;min-height:40px}
+.qf-thead .c{text-align:center}
+.qf-tdef{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13px;color:var(--slate);cursor:pointer}
 .qf2 .qf-ch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:30px}
 .qf2 .qf-ch h3,.qf2 .qf-sum h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}
 .qf2 .qf-ch p{font-size:12.5px;color:var(--mute);margin:3px 0 0}
@@ -10959,7 +10965,7 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-sum .qf-tot .t{align-items:center;margin-top:8px;padding-top:12px}
 .qf2 .qf-sum .qf-tot .t dd{font-size:22px;color:var(--orange-ink)}
 .qf2 .modal-foot{justify-content:flex-end}
-@media (max-width:900px){.qf2 .g2,.qf2 .g3,.qf2 .qf-bottom{grid-template-columns:1fr}.qf2 .modal-body{padding:18px}}
+@media (max-width:900px){.qf2 .g2,.qf2 .g3,.qf2 .qf-bottom{grid-template-columns:1fr}.qf2 .modal-body{padding:18px}.qf2 .qf-one .qf-bottom>.qf-sec+.qf-sec{border-left:0;border-top:1px solid var(--line)}}
 .qf-items{border-top:1px solid var(--line);padding-top:16px}
 .qf-ih{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
 .qf-ih h3{font-family:'Manrope';font-size:15px;font-weight:800;color:var(--ink);margin:0}.qf-ih span{font-size:12.5px;color:var(--faint)}
@@ -10968,7 +10974,7 @@ table,td,th{font-size:13.5px}
 .qf-row input[type=number]{text-align:right}
 .qf-row .qf-line{font-weight:700}
 .qf-tbl{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
-.qf-thead,.qf-row{display:grid;grid-template-columns:18px 140px minmax(0,1.3fr) minmax(0,1.5fr) 84px 124px 100px 34px;gap:12px;align-items:start}
+.qf-thead,.qf-row{display:grid;grid-template-columns:16px 166px minmax(0,1.7fr) minmax(0,1.2fr) 64px 104px 44px 84px 32px;gap:10px;align-items:start}
 .qf-thead{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;background:#FAFBFC;border-bottom:1px solid var(--line);padding:11px 12px;align-items:center}.qf-thead .r{text-align:right}
 .qf-rows{display:flex;flex-direction:column}
 .qf-row{padding:10px 12px;border-bottom:1px solid #F1F2F4}.qf-row:last-child{border-bottom:0}.qf-row:hover{background:#FCFCFD}
@@ -11404,7 +11410,10 @@ function svcById(id){ return catalogAll().services.filter(function(s){ return s.
 function nextQuoteId(){ var n=st.list.reduce(function(m,q){ return Math.max(m,+String(q.id).replace(/\D/g,'')||0); },1000); return 'Q-'+(n+1); }
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
 function round2(x){ return Math.round(x*100)/100; }
-function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
+function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:'',gst:true}; }
+/* default terms and conditions for new quotations, kept in this browser */
+var TERMS_KEY='aad-quote-terms-default';
+function defaultTerms(){ try{ return localStorage.getItem(TERMS_KEY)||''; }catch(e){ return ''; } }
 /* the firm's own companies a quotation can be issued from. PROTOTYPE ONLY: sample names until Settings has the real list */
 var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd','AAD Bookkeeping Pty Ltd','AAD Business Services Pty Ltd','AAD SMSF Services Pty Ltd','AAD Wealth Partners Pty Ltd'];
 /* which of them each branch can issue from. PROTOTYPE ONLY: sample spread, from one company up to all of them, until branches record their own */
@@ -11415,7 +11424,9 @@ function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
   var v=d.showDisc?num(d.discount):0; if(!(v>0)) v=0;
   var disc=d.discType==='%'?sub*Math.min(v,100)/100:v; disc=Math.min(disc,sub);
-  var total=round2(sub-disc); return {sub:sub,disc:round2(disc),gst:d.gst===false?0:round2(total/11),total:total};
+  var total=round2(sub-disc), base=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&x.gst!==false&&q>0&&p>=0?q*p:0); },0));
+  /* each line says whether its rate includes GST; GST is 1/11 of those lines, after the discount is shared across all lines */
+  return {sub:sub,disc:round2(disc),gst:sub>0?round2(base*(total/sub)/11):0,total:total,anyGst:base>0};
 }
 /* who the quotation (and later the invoice) is made out to: the client, or for a company one of its directors */
 /* a company: itself and all its directors; an individual: themselves and every company they're a director of (linked by client record, or by email) */
@@ -11440,11 +11451,11 @@ function openForm(id){
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
       clientId:q.clientId,onName:q.onName||q.clientName||'',companies:(q.companies||(q.company?[q.company]:[])).slice(),toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
-        return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
-      customerNotes:q.customerNotes||'',terms:q.terms||'',gst:q.gstMode!=='none',
+        return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):'',gst:x.gst!=null?x.gst!==false:q.gstMode!=='none'}; }),
+      customerNotes:q.customerNotes||'',terms:q.terms||'',termsDefault:!!q.terms&&q.terms===defaultTerms(),
       showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
     }:{clientId:null,onName:'',toName:'',companies:[],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
-      items:[blankLine()],customerNotes:'',terms:'',gst:true,showDisc:false,discType:'$',discount:''}};
+      items:[blankLine()],customerNotes:'',terms:defaultTerms(),termsDefault:!!defaultTerms(),showDisc:false,discType:'$',discount:''}};
   if(!QF.d.companies.length){ var c0=branchCos(QF.d.branch); if(c0.length===1) QF.d.companies=[c0[0]]; }   // one company for the branch: chosen for you
   paintForm();
 }
@@ -11476,47 +11487,49 @@ function paintForm(focusId){
     var list=svc.filter(function(o){ return (!x.cat||(o.cats||[]).map(String).indexOf(x.cat)>=0)&&(taken.indexOf(o.id)<0||o.id===x.svcId); });
     var lineErr=e['s'+i]||e['q'+i]||e['p'+i];
     return '<div class="qf-row" data-row="'+i+'">'+'<button type="button" class="qf-grip" data-grip="'+i+'" title="Drag to reorder" aria-label="Move line '+(i+1)+' (use the arrow keys)"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.4"/><circle cx="9" cy="3" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="9" cy="8" r="1.4"/><circle cx="3" cy="13" r="1.4"/><circle cx="9" cy="13" r="1.4"/></svg></button>'+
-      '<div><label class="sr" for="qf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="qf-c'+i+'" data-cat="'+i+'"><option value="">All categories</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="qf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="qf-c'+i+'" data-cat="'+i+'"><option value="">Choose categories</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="sr" for="qf-s'+i+'">Item, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm'+(e['s'+i]?' bad':'')+'" id="qf-s'+i+'" data-svc="'+i+'"><option value="">Choose an item</option>'+
         list.map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="sr" for="qf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="qf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
       '<div><label class="sr" for="qf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="qf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
       '<div class="qf-price"><label class="sr" for="qf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
+      '<div class="qf-lgst"><button type="button" class="toggle sm'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="switch" aria-checked="'+(x.gst!==false)+'" aria-label="Include GST, line '+(i+1)+'" title="'+(x.gst!==false?'Rate includes GST':'No GST on this line')+'"><i></i></button></div>'+
       '<div class="qf-line num">'+money(amt)+'</div>'+
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
-  var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
+  var card=function(title,sub,body,extra){ return '<section class="qf-sec"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };   // a section inside the one panel
   var staff=ASSIGNABLE.map(function(s){ return s.name; });
   var again=!!ov.querySelector('.drawer.qf');   // already open: redraw without sliding in again
   ov.innerHTML='<div class="drawer sf qf qf2'+(again?' qs-swap':'')+'" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body" id="qf-body">'+
+    '<div class="modal-body" id="qf-body"><div class="qf-card qf-one">'+
       card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
         field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>'+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,'<div class="qf-ms" id="qf-ms"><div class="qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Internal companies"></div>'+
             '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div></div>')+
-      card('Assignment and dates','','<div class="stack"><div class="g3">'+
+      card('Assignment and dates','','<div class="stack"><div class="g2">'+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
-          field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'<div></div></div>'+
-        '<div class="g3">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
+          field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+
+        '<div class="g2">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+'</div></div>')+
       card('Services','',
-        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Quotation lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="c">GST</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<label class="qf-gstt"><span>Include GST</span><button type="button" class="toggle sm'+(d.gst===false?'':' on')+'" data-gstsw role="switch" aria-checked="'+(d.gst!==false)+'" aria-label="Include GST"></button></label>')+
+        '<button type="button" class="qf-add" id="qf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>')+
       '<div class="qf-bottom">'+
-        '<section class="qf-card qf-notes"><div><label class="flabel" for="qf-cn">Customer notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the quote.</small></div>'+
-          '<div><label class="flabel" for="qf-tc">Terms and conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div></section>'+
-        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
+        '<section class="qf-sec qf-notes"><div><label class="flabel" for="qf-cn">Customer notes</label><textarea class="ftext" id="qf-cn" data-qf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the quote.</small></div>'+
+          '<div><label class="flabel" for="qf-tc">Terms and conditions</label><textarea class="ftext" id="qf-tc" data-qf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea>'+
+            '<label class="qf-tdef"><input type="checkbox" id="qf-tdef"'+(d.termsDefault?' checked':'')+'><span>Use these terms by default on every new quotation</span></label></div></section>'+
+        '<section class="qf-sec qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
           '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="qf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
             '<select id="qf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
             '<button type="button" class="sl-drm" id="qf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="qf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
-          '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
+          '<div><dt>'+(T.anyGst?'GST (included)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
-    '</div>'+
+    '</div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Next</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
@@ -11550,7 +11563,8 @@ function drawCos(touch){
 function liveTotals(){
   var d=QF.d, T=totalsOf(d);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total)];
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,T.anyGst?money(T.gst):'Not applied',money(T.total)];
+  var gl=ov.querySelectorAll('.qf-tot > div > dt')[2]; if(gl) gl.textContent=T.anyGst?'GST (included)':'GST';
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
 }
 function wireForm(focusId){
@@ -11587,7 +11601,9 @@ function wireForm(focusId){
   [].forEach.call(ov.querySelectorAll('[data-qty]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-qty')].qty=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-price]'),function(el){ el.oninput=function(){ d.items[+el.getAttribute('data-price')].price=el.value; touch(); liveTotals(); }; });
   [].forEach.call(ov.querySelectorAll('[data-rm]'),function(el){ el.onclick=function(){ d.items.splice(+el.getAttribute('data-rm'),1); if(!d.items.length) d.items.push(blankLine()); QF.errs={}; touch(); repaint(); }; });
-  var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
+  [].forEach.call(ov.querySelectorAll('[data-lgst]'),function(b){ b.onclick=function(){ var i=+b.getAttribute('data-lgst'), x=d.items[i]; x.gst=x.gst===false; touch();
+    b.classList.toggle('on',x.gst!==false); b.setAttribute('aria-checked',x.gst!==false); b.title=x.gst!==false?'Rate includes GST':'No GST on this line'; liveTotals(); }; });
+  var tdf=document.getElementById('qf-tdef'); if(tdf) tdf.onchange=function(){ d.termsDefault=tdf.checked; touch(); };
   var da=document.getElementById('qf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('qf-disc'); };
   var dr=document.getElementById('qf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete QF.errs.discount; touch(); repaint(); };
   var dt=document.getElementById('qf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete QF.errs.discount; touch(); repaint('qf-disc'); };
@@ -11655,8 +11671,8 @@ function saveForm(){
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
   var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
-    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
-    customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
+    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price)),gst:x.gst!==false}; }),
+    customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
   if(QF.isNew){
     if(byId(QF.id)) QF.id=nextQuoteId();                       // the number was taken meanwhile
@@ -11671,6 +11687,7 @@ function saveForm(){
     } else log(q,'edited',{note:money(T.total)});
   }
   if(!QuoteStore.save(st)){ toast('Couldn’t save the quotation. Try again.',true); return null; }
+  try{ var tt=d.terms.trim(); if(d.termsDefault&&tt) localStorage.setItem(TERMS_KEY,tt); else if(!d.termsDefault&&defaultTerms()===tt) localStorage.removeItem(TERMS_KEY); }catch(e0){}   // the default for new quotations
   QF.dirty=false; return q;
 }
 function leaveForm(){
@@ -11697,7 +11714,7 @@ function formModel(sign){
   var to=c?(d.onName||c.name):'';
   return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:c&&d.toName&&d.toName!==to?d.toName:'',sign:null,
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
-    T:totalsOf(d),noGst:d.gst===false,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
+    T:totalsOf(d),noGst:!totalsOf(d).anyGst,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
 }
 /* ---------- step 2: the quotation as the client sees it, reviewed, then sent for signature or signed manually (as in Add Client) ---------- */
 function dmyTxt(t){ var x=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(x.getDate())+'-'+p(x.getMonth()+1)+'-'+x.getFullYear(); }

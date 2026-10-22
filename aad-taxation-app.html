@@ -1739,7 +1739,7 @@ function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
   var shut=docShut[d.k]!=null?docShut[d.k]:!(gone||soon||open||flashK===d.k), nHist=versionsOf(d).length-(gone?0:1);
   var exp=t.exp&&d.cur.exp?fmtD(d.cur.exp):'', dl=exp?daysTo(d.cur.exp):null, ago=dl!=null?Math.abs(dl):0;
-  var line=gone?'Expired '+exp+' · '+ago+' day'+(ago===1?'':'s')+' ago':soon?'Expires '+exp+' · '+(dl===0?'today':dl+' day'+(dl===1?'':'s')+' left'):exp?'Until '+exp:'No expiry';
+  var line=gone?'Expired on '+exp:soon?(dl===0?'Expiring today':'Expiring within '+dl+' day'+(dl===1?'':'s')):exp?'Until '+exp:'No expiry';
   var sided=t.slots.length>1, fl=gone?[]:d.cur.files, FILES_SHOWN=filesAll[d.k]?Infinity:3;
   var expRow=expEdit===d.k
     ?'<div class="dc2-exp edit"><label class="dc2-elbl" for="dx-'+d.k+'">Expiry</label><input type="date" class="fin plain sm" id="dx-'+d.k+'" value="'+(d.cur.exp?isoDate(d.cur.exp):'')+'">'+
@@ -1796,7 +1796,7 @@ function paintNeed(){
   document.getElementById('need-body').innerHTML=list.length?'<p class="nd-intro">Upload each document below. Earlier versions of an expired document stay in its history.</p><ul class="nd-list">'+list.map(function(x){
     var t=typeOf(x.k), n=x.d?Math.abs(daysTo(x.d.cur.exp)):0, hv=x.d?versionsOf(x.d).length:0;
     return '<li class="nd-row"><span class="dt-ic">'+DOC_IC.HR+'</span><div class="nd-t"><b>'+esc(t.name)+'</b><span class="'+(x.d?'bad':'')+'">'+
-        (x.d?'Expired '+fmtD(x.d.cur.exp)+' · '+n+' day'+(n===1?'':'s')+' ago':'Mandatory · not uploaded yet')+' · needs '+t.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
+        (x.d?'Expired on '+fmtD(x.d.cur.exp):'Mandatory · not uploaded yet')+' · needs '+t.slots.map(function(s){ return esc(s.label); }).join(' and ')+'</span></div>'+
       (x.d?'<button type="button" class="dx-hist" data-needhist="'+x.k+'">History<span class="dc2-hn">'+hv+'</span></button>':'')+
       '<button type="button" class="btn btn-pri xs nd-up" data-needup="'+x.k+'">'+I.upsm+'Upload</button></li>'; }).join('')+'</ul>'
     :'<p class="nd-intro">Every required document is on file.</p>';
@@ -6328,7 +6328,7 @@ function kycTab(c){
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+'</section>';
   var note=kycNoteOf(c,cur);
   var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
-  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:'Next verification '+dmyOf(ex)+(st==='expiring'?' · '+cdDays(dl)+' left':''),lineCls:st==='expiring'?'warn':'',
+  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
     files:files||'<p class="cd2-none">No files in this check.</p>',
     extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
     foot:c._draft?'':'<button type="button" class="cd2-act" data-kyc-add>'+CD_I.up+'Replace</button>',nHist:nHist})+'</section>';
@@ -6439,7 +6439,7 @@ function engagementTab(c){
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
-  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),line:'Expires '+dmyOf(fyEndAt)+(soon?' · '+cdDays(dl)+' left':''),lineCls:soon?'warn':'',
+  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   return '<section class="vsec el-main">'+card+'</section>'+(st==='draft'?preview(L.services,L):'');

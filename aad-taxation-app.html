@@ -2859,8 +2859,10 @@ tbody tr:hover{background:#FCFCFD}
 .ky-lines{flex-direction:column;gap:2px;flex-basis:100%;margin-top:6px;font-size:12px;color:var(--faint)}
 .ky-sm{font-size:12px;color:var(--faint)}
 .ky-card .el-dt>b{font-size:12.5px;font-weight:600;color:var(--mute)}
-.ky-files{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-.ky-file{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.ky-files{display:flex;flex-direction:column;gap:8px;margin-top:0}
+.ky-cur{padding:14px 18px}.ky-none{margin:0;padding:14px 18px}
+.ky-hact{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ky-file{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
 .ky-file .x{font-size:10px;font-weight:800;padding:4px 7px;border-radius:5px;background:#E8F1FD;color:#2563EB;flex-shrink:0}.ky-file .x.e-pdf{background:#FDECEC;color:#C2410C}
 .ky-fn{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .ky-fname,.ky-fn b{font-size:14px;font-weight:700;color:var(--ink);text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.ky-fname:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}
@@ -5732,39 +5734,27 @@ function kycChips(files,vi){
   var view=canViewKyc();
   return '<div class="ds-files ky-files">'+files.map(function(f,fi){ var e=String(f.name||'').split('.').pop().toLowerCase();
     return '<div class="ky-file"><span class="x e-'+esc(e)+'">'+esc(e.toUpperCase())+'</span>'+
-      '<div class="ky-fn">'+(view?'<button class="ky-fname" data-kpv="'+vi+'|'+fi+'" title="'+esc(f.name)+'">'+esc(f.name)+'</button>':'<b title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+fsize(f.size)+'</small></div>'+
-      (view?'<span class="ky-fa"><button type="button" class="pill-btn quiet" data-kpv="'+vi+'|'+fi+'" aria-label="Open '+esc(f.name)+'">'+OI.ext+'Open</button>'+
-        '<button type="button" class="pill-btn quiet" data-kdl="'+vi+'|'+fi+'" aria-label="Download '+esc(f.name)+'">'+OI.dl+'Download</button></span>':'')+'</div>'; }).join('')+'</div>';
+      '<div class="ky-fn">'+(view?'<button class="ky-fname" data-kpv="'+vi+'|'+fi+'" title="Open '+esc(f.name)+'">'+esc(f.name)+'</button>':'<b title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'</div>'+
+      (view?'<button type="button" class="sdt-ib" data-kdl="'+vi+'|'+fi+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'')+'</div>'; }).join('')+'</div>';
 }
 /* KYC: the same layout as the engagement letter: a quiet rule banner, then one card with the current check, what it means, the next step, and the previous checks */
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], n=recs.length, now=Date.now();
-  var banner='<div class="el-bn">'+EL_INFO+'<p>Each KYC verification remains valid for one year from the verification date. New verifications are saved as separate versions, and all previous verification records and their associated documents are retained.</p></div>';
-  var st=cur?kycState(cur):'none', exp=cur?kycExpiresAt(cur):0, left=cur?Math.ceil((exp-now)/864e5):0;
-  var S={none:['No KYC recorded','Record this client’s identity check to keep them compliant.',null,['add','Record KYC']],
-    valid:['This KYC check is valid','Expires on '+whenOf(exp).replace(' · ',' at '),['add','Record new KYC'],null],
-    expiring:['This KYC check expires soon','Expires on '+whenOf(exp).replace(' · ',' at '),null,['add','Renew KYC']],
-    expired:['This KYC check has expired','Expired on '+whenOf(exp).replace(' · ',' at '),null,['add','Renew KYC']]}[st];   // the expiry lives here, not in the check details
-  var tone={none:'',valid:'s-signed',expiring:'s-awaiting',expired:'s-failed'}[st];
-  var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x[1]+'</button>':''; };
-  var status='<div class="el-st ky-st '+tone+'"><div class="el-stx"><b>'+S[0]+'</b><p>'+S[1]+'</p></div>'+
-    (S[2]||S[3]?'<div class="el-acts">'+btn(S[2],'btn-ghost')+btn(S[3],'btn-primary')+'</div>':'')+'</div>';
-  var doc=cur?'<div class="el-dr"><span class="ds-ic'+(st==='expired'?' bad':'')+'">'+OI.note+'</span><div class="el-dt"><b>KYC check · verified '+dmyOf(fromIso(cur.date))+'</b>'+
-      kycChips(cur.files||[],0)+
-      '<span class="ky-sm">Uploaded by '+esc(cur.by)+' · '+whenOf(kycUploadedAt(cur)).replace(' · ',', ')+'</span>'+
-      (cur.note?'<span class="ky-sm">Note: '+esc(cur.note)+'</span>':'')+'</div></div>':'';
+  var st=cur?kycState(cur):'none';
+  var A={none:[null,'Record KYC'],valid:['Record new KYC',null],expiring:[null,'Renew KYC'],expired:[null,'Renew KYC']}[st];   // one action, in the card header
+  var btn=function(x,cls){ return x&&!c._draft?'<button type="button" class="'+cls+' btn-sm" data-kyc-add>'+x+'</button>':''; };
+  var act=btn(A[0],'btn-ghost')+btn(A[1],'btn-primary');
+  var doc=cur?'<div class="ky-cur">'+kycChips(cur.files||[],0)+'</div>':'<p class="cl-muted ky-none">No KYC recorded yet.</p>';
   /* previous checks, newest first, collapsed */
   var older=recs.slice(1), open=older.length>0;                  // always shown
   var hist='<div class="el-hrw'+(open?' open':'')+'"><span class="el-hic">'+EL_HIST+'</span><b>Previous KYC checks</b><span class="el-cnt">'+older.length+'</span>'+
       (older.length?'':'<span class="el-hnone">None yet</span>')+'</div>'+
     (open?'<div class="el-hlist">'+older.map(function(r,j){ var vi=j+1, ex=kycExpiresAt(r), gone=now>=ex, next=recs[j];
-      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'<div class="el-hi ky-lines">'+
-        '<span>Uploaded by '+esc(r.by)+' · '+whenOf(kycUploadedAt(r)).replace(' · ',', ')+'</span><span>'+(gone?'Expired':'Expires')+' '+dmyOf(ex)+'</span>'+
-        (r.note?'<span>Note: '+esc(r.note)+'</span>':'')+'</div></div></div>'; }).join('')+'</div>':'');   // files first, then the details in small text
+      return '<div class="el-yg"><div class="el-yh"><b>Version '+(n-vi)+' · Verified '+dmyOf(fromIso(r.date))+'</b></div><div class="el-hrow ky-hrow">'+kycChips(r.files||[],vi)+'</div></div>'; }).join('')+'</div>':'');
   var card='<article class="el-card ky-card">'+
-    '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div>'+pill(st==='none'?{none:['Not recorded','grey']}:KYC_STATUS,st)+'</header>'+
-    doc+status+hist+'</article>';
-  return '<section class="vsec el-main">'+banner+card+'</section>';
+    '<header class="el-ch"><div><h4>KYC Verification</h4><p>'+(cur?'Version '+n:'Identity check for this client')+'</p></div><div class="ky-hact">'+(st==='none'?'':pill(KYC_STATUS,st))+act+'</div></header>'+
+    doc+hist+'</article>';
+  return '<section class="vsec el-main">'+card+'</section>';
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
 function kycTrail(c){

@@ -11395,6 +11395,8 @@ function nextQuoteId(){ var n=st.list.reduce(function(m,q){ return Math.max(m,+S
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
 function round2(x){ return Math.round(x*100)/100; }
 function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
+/* the firm's own companies a quotation can be issued from. PROTOTYPE ONLY: sample names until Settings has the real list */
+var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd'];
 /* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total (as in Sales) */
 function totalsOf(d){
   var sub=round2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
@@ -11423,12 +11425,12 @@ function openForm(id){
   openForm.ok=false;
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{
-      clientId:q.clientId,onName:q.onName||q.clientName||'',toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
+      clientId:q.clientId,onName:q.onName||q.clientName||'',company:q.company||INTERNAL_COS[0],toName:q.toName||q.onName||q.clientName||'',branch:q.branch,date:isoDay(q.created),due:isoDay(q.validUntil),accountant:q.accountant,accountant2:q.accountant2||'',
       items:(q.items.length?q.items:[blankLine()]).map(function(x){ var s=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(s&&s.cats&&s.cats[0]!=null?String(s.cats[0]):''),svcId:s?s.id:null,name:x.name||'',desc:x.desc!=null?x.desc:(s&&s.desc)||'',qty:x.qty!=null?String(x.qty):'1',price:x.price!=null?String(x.price):''}; }),
       customerNotes:q.customerNotes||'',terms:q.terms||'',gst:q.gstMode!=='none',
       showDisc:!!q.discountAmt,discType:q.discountType==='%'?'%':'$',discount:q.discountAmt?String(q.discountType==='%'?q.discountPct:q.discountAmt):''
-    }:{clientId:null,onName:'',toName:'',branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
+    }:{clientId:null,onName:'',toName:'',company:INTERNAL_COS[0],branch:me&&me.branches[0]||ME.branch||'',date:today,due:isoDay(Date.now()+VALID_DAYS*864e5),accountant:me?me.name:'',accountant2:'',
       items:[blankLine()],customerNotes:'',terms:'',gst:true,showDisc:false,discType:'$',discount:''}};
   paintForm();
 }
@@ -11475,12 +11477,13 @@ function paintForm(focusId){
   ov.innerHTML='<div class="drawer sf qf qf2" role="dialog" aria-modal="true" aria-labelledby="qf-t">'+
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body">'+
-      card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
-        field('Quotation issued to',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>')+
+      card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
+        field('On the name of',true,c?sel('qf-on','onName',names,d.onName,'Select'):noClient,'onName')+'</div>'+
+        '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
+          field('Internal company',true,sel('qf-co','company',INTERNAL_COS,d.company,'Select'),'company')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
-          field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
-          field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+
+          field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'<div></div></div>'+
         '<div class="g3">'+field('Quotation date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="qf-date" data-qf="date" type="date" value="'+esc(d.date)+'">','date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="qf-due" data-qf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due')+'</div></div>')+
       card('Services','',
@@ -11582,6 +11585,7 @@ function checkForm(full){
   if(d.clientId==null||!formClient()) e.client='Choose the client this quotation is for';
   else { if(full&&!d.onName) e.onName='Choose who the quotation is made out to'; }
   if(full&&!d.branch) e.branch='Choose the branch';
+  if(full&&!d.company) e.company='Choose the internal company';
   if(full&&!d.accountant) e.accountant='Choose the accountant';
   if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
   if(full&&!d.date) e.date='Enter the quotation date';
@@ -11615,7 +11619,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName||c.name,toName:'',branch:d.branch,company:d.company||'',accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price))}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};

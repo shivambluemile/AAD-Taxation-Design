@@ -1032,6 +1032,21 @@ table.sdt{min-width:560px;width:100%;border-collapse:collapse}
 .dc2-h .dc2-exp{margin:0 0 0 auto;flex-shrink:0}
 .dc2.shut{padding-bottom:18px}
 .dc2-foot{display:flex;align-items:center;gap:18px;margin-top:2px}
+.dc2.open{border-color:var(--line);box-shadow:none}
+.vh{margin-top:12px;padding-top:14px;border-top:1px dashed var(--line)}
+.vh-none{margin:0;font-size:12.5px;color:var(--faint)}
+.vh-list{list-style:none;margin:0;padding:0 0 0 22px;position:relative}
+.vh-list:before{content:"";position:absolute;left:5px;top:8px;bottom:6px;width:2px;background:var(--line)}
+.vh-it{position:relative;padding-bottom:18px}.vh-it:last-child{padding-bottom:4px}
+.vh-it:before{content:"";position:absolute;left:-22px;top:5px;width:12px;height:12px;border-radius:50%;background:#94A3B8;border:2px solid #fff;box-shadow:0 0 0 1px #E2E8F0}
+.vh-it.bad:before{background:#DC2626;box-shadow:0 0 0 1px #FECACA}
+.vh-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vh-pill{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;background:#F1F2F4;color:var(--slate)}.vh-pill.bad{background:#FEF2F2;color:#B91C1C}
+.vh-valid{font-size:12.5px;color:var(--faint)}
+.vh-ev{display:flex;align-items:center;gap:6px;margin:8px 0 10px;font-size:13px;color:var(--ink)}.vh-ev svg{color:var(--mute);flex-shrink:0}.vh-ev b{font-weight:700}
+.vh-sys{padding:1px 7px;border-radius:6px;background:#EEF2FF;color:#4338CA;font-weight:600;font-size:12px}
+.vh-file{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 12px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC;margin-bottom:8px;min-width:0}
+.vh-lbl{width:44px;flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
 .dc2-tg:hover .dc2-name{color:var(--orange-ink)}
 .dc2-mw{position:relative;flex-shrink:0}
 .dc2-more{width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--mute)}.dc2-more:hover,.dc2-more[aria-expanded="true"]{background:#F2F4F7;color:var(--ink)}
@@ -1641,9 +1656,30 @@ var DC_I={
   dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
   img:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>',
   file:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></svg>',
+  clock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  swap:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14l-3-3M20 16H6l3 3"/></svg>',
   tick:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
   chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>'
 };
+/* earlier versions, newest first: each one Expired (its expiry passed before anything replaced it) or Replaced (by whom, when), with its files */
+function versionTimeline(d){
+  var t=typeOf(d.k), vs=versionsOf(d), sided=t.slots.length>1, gone=stOf(d)==='expired', from=gone?0:1, items=[];
+  for(var vi=from;vi<vs.length;vi++){
+    var v=vs[vi], newer=vi>0?vs[vi-1]:null, lapsed=t.exp&&v.exp&&(newer?v.exp<newer.on:daysTo(v.exp)<0);
+    var what=lapsed?'<span class="vh-ev">'+DC_I.clock+'Expired by <span class="vh-sys">System</span> on '+fmtD(v.exp)+' 12:00 AM</span>'
+      :'<span class="vh-ev">'+DC_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+fmtD(newer.on)+' '+fmtT(newer.on)+'</span>';
+    items.push('<li class="vh-it'+(lapsed?' bad':'')+'"><div class="vh-top"><span class="vh-pill'+(lapsed?' bad':'')+'">'+(lapsed?'Expired':'Replaced')+'</span>'+
+        '<span class="vh-valid">Version '+v.ver+(t.exp&&v.exp?' · Valid until '+fmtD(v.exp):'')+'</span></div>'+what+
+      v.files.map(function(f,fi){ var x=extOf(f.n), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x);
+        return '<div class="vh-file">'+(sided?'<span class="vh-lbl">'+esc(slotLabel(d.k,f.slot))+'</span>':'')+
+          '<span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
+          '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
+            '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+
+          '<span class="dc2-fa"><button type="button" class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview" aria-label="Preview '+esc(f.n)+'">'+I.eye+'</button>'+
+          '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</li>');
+  }
+  return '<div class="vh">'+(items.length?'<ol class="vh-list">'+items.join('')+'</ol>':'<p class="vh-none">No previous versions</p>')+'</div>';
+}
 function isoDate(x){ return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()); }
 function docCard(d){
   var t=typeOf(d.k), st=stOf(d), gone=st==='expired', soon=st==='soon', open=!!docOpen[d.k], renew=gone||soon;
@@ -1669,7 +1705,7 @@ function docCard(d){
       expRow+
       '<button type="button" class="dc2-chev" data-shut="'+d.k+'" aria-hidden="true" tabindex="-1">'+DC_I.chev+'</button></div>'+
     (shut?'':'<div class="dc2-b">'+files+'</div><div class="dc2-foot"><button type="button" class="ds-act dc2-act'+(renew?' renew':'')+'" data-replace="'+d.k+'" aria-label="'+(renew?'Renew ':'Replace ')+esc(t.name)+'">'+(renew?'Renew':'Replace')+'</button>'+
-      '<button type="button" class="ds-act dc2-act" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide version history':'Version history')+'</button></div>')+
+      '<button type="button" class="ds-act dc2-act" data-toggle="'+d.k+'" aria-expanded="'+open+'">'+(open?'Hide version history':'Version history')+'</button></div>'+(open?versionTimeline(d):''))+
   '</div>';
 }
 /* the open tile's details: a compact versions table; older versions open below the history toggle.
@@ -1724,7 +1760,7 @@ function currentList(docs){
   var need=list.filter(function(d){ var x=stOf(d); return x==='expired'||x==='soon'; }), ok=list.filter(function(d){ var x=stOf(d); return x==='valid'||x==='none'; });
   var PER=1, h='<div class="dt-grid dc2-grid">';
   for(var i=0;i<list.length;i+=PER){ var row=list.slice(i,i+PER), op=row.filter(function(d){ return docOpen[d.k]; })[0];
-    h+=row.map(docCard).join('')+(op?docDetail(op):''); }
+    h+=row.map(docCard).join(''); }
   return h+'</div>';
 }
 /* viewer: one version of a document, switching between its sides */

@@ -11037,6 +11037,7 @@ table,td,th{font-size:13.5px}
 .qt-meta{font-size:12.5px;color:var(--slate);line-height:1.5;white-space:nowrap}.qt-meta span{font-size:11.5px;color:var(--faint)}
 .qt-clip{display:block;max-width:135px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qt-clip.sm{max-width:98px}
 .qt-cn{font-weight:600;color:var(--ink)}
+.qt-cmt{display:block;max-width:200px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;font-style:italic;color:var(--slate)}.qt-cmt.bad{color:#B91C1C}
 .qt-st .ar-sub{font-size:11px;white-space:nowrap;line-height:1.35;margin-top:3px}
 .state.q-draft i{background:#94A3B8}.state.q-sent i{background:#3B82F6}.state.q-acc i{background:#10B981}.state.q-conv i{background:#8B5CF6}
 .state.q-rej i{background:#FF5966}.state.q-exp i{background:#F59E0B}.state.q-can i{background:#CBD5E1}.state.q-can{color:var(--mute)}
@@ -11276,7 +11277,7 @@ var I={
   dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
   sort:'<svg width="10" height="12" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0 9.5 5h-9z" class="up"/><path d="M5 14 .5 9h9z" class="dn"/></svg>'
 };
-var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
+var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Declined','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
   send_failed:['Email not sent',''],accepted:['Quotation accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
@@ -11526,13 +11527,13 @@ function render(){
   if(!all.length) h+='<tr><td colspan="9"><div class="empty"><h3>No quotations yet</h3><p>Quotations appear here once they’re created.</p><button class="btn-primary" id="qt-add2">'+I.plus+'Add Quotation</button></div></td></tr>';
   else if(!page.length) h+='<tr><td colspan="9"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="clear2">Clear filters</button></div></td></tr>';
   page.forEach(function(q){
-    var c=client(q), at=attrLine(q);
+    var c=client(q), at=attrLine(q), cm=(q.status==='accepted'||q.status==='converted'||q.status==='rejected')&&q.clientComment&&q.clientComment.text||'';   // what the client wrote with their answer
     h+='<tr>'+
       '<td class="nowrap"><button class="name-link" data-do="view" data-q="'+q.id+'" title="Open the quotation details"><span class="name">'+esc(q.id)+'</span></button></td>'+
       '<td><div class="qt-person"><span class="qt-clip qt-cname" title="'+esc(c.name)+'"><b class="qt-cn">'+esc(c.name)+'</b></span></div></td>'+
       '<td class="num">'+dmyOf(q.created)+'</td>'+
       '<td class="num r">'+money(q.amount)+'</td>'+
-      '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+'</td>'+
+      '<td class="qt-st">'+badge(q.status)+(at?'<small class="ar-sub">'+at+'</small>':'')+(cm?'<small class="qt-cmt'+(q.status==='rejected'?' bad':'')+'" title="'+esc(cm)+'">“'+esc(cm)+'”</small>':'')+'</td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.branch)+'">'+esc(q.branch)+'</span></td>'+
       '<td><span class="qt-clip sm" title="'+esc(q.accountant)+'">'+esc(q.accountant)+'</span></td>'+
       '<td><div class="qt-meta">'+whenOf(q.created).replace(' · ',', ')+'<span class="qt-clip" title="'+esc(q.by)+'">by '+esc(q.by)+'</span></div></td>'+
@@ -13840,7 +13841,7 @@ var I={
   dots:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>',
   sort:'<svg width="10" height="12" viewBox="0 0 10 14" fill="currentColor"><path d="M5 0 9.5 5h-9z" class="up"/><path d="M5 14 .5 9h9z" class="dn"/></svg>'
 };
-var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Rejected','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
+var STATUS={draft:['Draft','q-draft'],sent:['Sent','q-sent'],accepted:['Accepted','q-acc'],converted:['Invoiced','q-conv'],rejected:['Declined','q-rej'],expired:['Expired','q-exp'],cancelled:['Cancelled','q-can']};
 var EV={created:['Quotation created','Created by'],edited:['Quotation edited','Edited by'],sent:['Quotation sent','Sent by'],resent:['Quotation resent','Resent by'],
   send_failed:['Email not sent',''],accepted:['Accepted','Accepted by'],rejected:['Marked as rejected','Rejected by'],cancelled:['Quotation cancelled','Cancelled by'],converted:['Converted to sale (invoiced)','Converted by'],expired:['Validity ended','Expired']};
 var VALID_DAYS=30;
@@ -21435,8 +21436,8 @@ function submit(){
       if(!(t >= cut) || t > now) return;
       var who = e && e.by && e.by !== 'System' ? ' by ' + e.by : '';
       out.push({ id:'quote:' + q.id + ':' + q.status, kind:'quote', tone:{ accepted:'ok', rejected:'bad', expired:'warn' }[q.status],
-        aud:q.accountant === ME_NAME ? 'all' : 'admin', at:t, title:'Quotation ' + q.status,
-        desc:q.id + ' for ' + (q.clientName || names[q.clientId] || 'a client') + (q.status === 'expired' ? ' passed its valid-until date.' : ' was ' + q.status + who + '.'),
+        aud:q.accountant === ME_NAME ? 'all' : 'admin', at:t, title:'Quotation ' + (q.status === 'rejected' ? 'declined' : q.status),
+        desc:q.id + ' for ' + (q.clientName || names[q.clientId] || 'a client') + (q.status === 'expired' ? ' passed its valid-until date.' : ' was ' + (q.status === 'rejected' ? 'declined' : q.status) + who + '.'),
         go:{ mod:'quotations', id:q.id } });
     });
     var inv = ntRead('aad-invoices-v1');

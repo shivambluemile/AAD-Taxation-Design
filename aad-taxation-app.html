@@ -11159,8 +11159,9 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .dc a{color:inherit;text-decoration:none}.qd-drawer .dc a:hover{text-decoration:underline}
 .qd-drawer .dc .qd-cl{color:var(--orange-ink);font-weight:700}.qd-drawer .dc .qd-cl:hover{text-decoration:underline;text-underline-offset:2px}
 .qd-drawer .dc small{font-weight:500;color:var(--faint)}
-.qd-drawer .copy{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;color:#A1A1AA}
-.qd-drawer .copy:hover{background:#F1F3F6;color:var(--orange-ink)}.qd-drawer .copy svg{width:12px;height:12px}
+.qd-drawer .copy,.qf-pf .copy{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;color:#A1A1AA}
+.qd-drawer .copy:hover,.qf-pf .copy:hover{background:#F1F3F6;color:var(--orange-ink)}.qd-drawer .copy svg,.qf-pf .copy svg{width:12px;height:12px}
+.qf-pf .copy{border:0;background:none;padding:0;cursor:pointer}.qf-pf .copy svg{color:inherit}
 .qd-drawer .dhead-acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
 .qd-drawer .dhead-acts .btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;font-size:12px;font-weight:600;background:#fff;border:1px solid var(--line);color:var(--slate);border-radius:6px}
 .qd-drawer .dhead-acts .btn-ghost:hover{border-color:var(--orange);color:var(--orange-ink)}
@@ -12170,7 +12171,7 @@ function recipientOf(c,name){
 function profileCard(c,d){
   var rc=recipientOf(c,d.onName), nm=d.onName||c.name, rec=rc.rec||{id:c.id,name:nm};
   /* one line under the name: email, phone, ABN (only the ones on file) */
-  var it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'</span>':''; };
+  var it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'<button type="button" class="copy" data-copy="'+esc(v)+'" title="Copy '+t.toLowerCase()+'" aria-label="Copy '+t.toLowerCase()+'">'+AI.copy+'</button></span>':''; };
   return '<div class="qf-pf">'+clAv({id:rec.id,name:nm})+'<div class="qf-pf-b"><b>'+esc(nm)+'</b>'+
     '<div class="qf-pf-m">'+it(QD_IC.mail,rc.email,'Email')+it(QD_IC.phone,d.contactPhone,'Phone')+it('<em>ABN</em>',d.abn,'ABN')+'</div></div></div>';
 }
@@ -12314,6 +12315,8 @@ function wireForm(focusId){
     row.ondrop=function(ev){ ev.preventDefault(); if(dragFrom==null) return; var below=row.classList.contains('drop-below'), to=i+(below?1:0); if(dragFrom<to) to--; var f=dragFrom; dragFrom=null; moveLine(f,to); };
     row.ondragend=function(){ row.draggable=false; dragFrom=null; [].forEach.call(ov.querySelectorAll('.qf-row'),function(x){ x.classList.remove('dragging','drop-above','drop-below'); }); };
   });
+  ov.querySelectorAll('.qf-pf .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
+    try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   var co=document.getElementById('qf-co'); if(co) co.onchange=function(){ d.companies=co.value?[co.value]:[]; delete QF.errs.company; touch(); repaint('qf-co'); };
   document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;

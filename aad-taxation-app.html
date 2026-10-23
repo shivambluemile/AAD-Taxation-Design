@@ -21162,6 +21162,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qp-s2r{text-align:right;flex-shrink:0}.qp-s2r span{display:block;font-size:12px;font-weight:600;color:var(--mute)}
 .qp-s2r b{display:block;font-family:'Manrope';font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1.2}
 @media (max-width:560px){.qp-s2{flex-direction:column;align-items:flex-start}.qp-s2r{text-align:left}}
+.qp-resp{margin-top:6px}.qp-resp h2{font-family:'Manrope';font-size:17px;font-weight:800;margin:0 0 12px}
 .qp-acts .btn svg{flex-shrink:0}.btn.busy{opacity:.75;cursor:progress}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
 .qp-done .ty-meta{max-width:560px;margin-left:auto;margin-right:auto}
@@ -21335,7 +21336,9 @@ function paintQuote(){
     '<div class="qp-s2r"><span>Total (inc. GST)</span><b>'+money(doc.T.total)+'</b></div></div>';
   var pdfBtn='<button type="button" class="btn sec" id="qa-pdf">'+IC.dl+'Download PDF</button>';
   var foot=state==='open'
-      ?'<div class="foot qp-acts">'+pdfBtn+'<span class="grow"></span><button type="button" class="btn sec qp-no" id="qa-no">Decline quotation</button><button type="button" class="btn pri" id="qa-go">Accept quotation</button></div>'
+      ?'<div class="qp-resp"><h2>Your response</h2><label class="l" for="qa-c">Comments <span class="opt">(optional to accept, required to decline)</span></label>'+
+        '<textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant" aria-describedby="qa-e"></textarea><span class="err" id="qa-e" hidden></span></div>'+
+        '<div class="foot qp-acts">'+pdfBtn+'<span class="grow"></span><button type="button" class="btn sec qp-no" id="qa-no">Decline quotation</button><button type="button" class="btn pri" id="qa-go">Accept quotation</button></div>'
       :state==='expired'?'<div class="note warn"><span>This quotation passed its valid-until date, so it can no longer be accepted. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot qp-acts">'+pdfBtn+'</div>'
       :'<div class="foot qp-acts"><button type="button" class="btn sec" id="qa-back">Back</button><span class="grow"></span>'+pdfBtn+'</div>';
   app.innerHTML='<div class="card qp-hero"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1>'+
@@ -21344,8 +21347,13 @@ function paintQuote(){
   document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var bk=document.getElementById('qa-back'); if(bk) bk.onclick=function(){ qShowDoc=false; paintQuote(); window.scrollTo(0,0); };
   var go=document.getElementById('qa-go'); if(!go) return;
-  go.onclick=function(){ if(qBusy) return; answerQuote('accepted','',go,function(err){ if(err){ toast(err,true); } }); };
-  document.getElementById('qa-no').onclick=function(){ declineDialog(who); };
+  var ta=document.getElementById('qa-c'), er=document.getElementById('qa-e');
+  var fail=function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } };
+  ta.oninput=function(){ if(!er.hidden&&ta.value.trim()){ er.hidden=true; ta.classList.remove('bad'); } };
+  go.onclick=function(){ if(qBusy) return; er.hidden=true; ta.classList.remove('bad'); answerQuote('accepted',ta.value.trim(),go,fail); };
+  document.getElementById('qa-no').onclick=function(){ if(qBusy) return; var note=ta.value.trim();
+    if(!note){ er.textContent='Add a comment to tell us why you’re declining'; er.hidden=false; ta.classList.add('bad'); ta.focus(); return; }
+    answerQuote('rejected',note,this,fail); };
 }
 /* records the answer once: the quotation is read again and must still be open */
 function answerQuote(to,note,btn,done){

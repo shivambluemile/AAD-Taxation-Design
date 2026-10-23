@@ -3327,6 +3327,8 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-art{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.cd2-art b{font-size:13.5px;color:var(--ink)}.cd2-art span{font-size:12px;color:#B91C1C}
 .cd2-abtn{display:inline-flex;align-items:center;gap:6px;flex-shrink:0}
 .modal.cd2-hm{max-width:640px}
+.cd2-hmore{display:block;margin:10px 0 0 26px;padding:0;border:0;background:none;font-size:13px;font-weight:600;color:var(--orange-ink);cursor:pointer}.cd2-hmore:hover{text-decoration:underline}
+.vh-pill.ok{background:#ECFDF5;color:#047857}
 .cd2-hist{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px 18px}.cd2-hh{margin:0 0 12px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 .cd2-hbtn.on{color:var(--orange-ink)}.cd2-fa{display:inline-flex;gap:4px;flex-shrink:0}.cd2-hm .modal-body{max-height:70vh;overflow-y:auto;gap:0;padding-top:20px}
 .vh-list{list-style:none;margin:0;padding:0 0 0 22px;position:relative}
@@ -6355,12 +6357,16 @@ function cdCard(o){ var shut=!!cdShut[o.key+o.cid];
 function cdLine(text,acts){ return '<div class="dx-slim cd2-slim" role="alert"><div class="dx-line"><span class="dx-li">'+CD_I.warn+'</span><span class="dx-lt">'+text+'</span>'+acts+'</div></div>'; }
 function cdBanner(title,text,row){ return '<div class="cd2-alert" role="alert"><span class="cd2-aic">'+CD_I.warn+'</span><div class="cd2-atx"><b>'+title+'</b><span>'+text+'</span><ul class="cd2-alist"><li class="cd2-arow">'+row+'</li></ul></div></div>'; }
 /* the history below a card: earlier versions as a timeline, each with its files (always shown when there are any) */
+var cdHistAll={};                                            // 'k'/'l' + client id -> every history entry shown
+var HIST_SHOWN=3;
 function cdHistBelow(key,c,items){
   if(!items.length) return '';
-  return '<div class="cd2-hist"><h4 class="cd2-hh">History</h4>'+(items.length?'<ol class="vh-list">'+items.map(function(it){
-      return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+
-        '<span class="vh-ev">'+it.ev+'</span></summary><div class="vh-in"><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</div></details></li>'; }).join('')+'</ol>'
-    :'<p class="vh-none">No previous versions</p>')+'</div>';
+  var all=!!cdHistAll[key+c.id], list=all?items:items.slice(0,HIST_SHOWN), more=items.length>HIST_SHOWN;
+  return '<div class="cd2-hist"><h4 class="cd2-hh">History</h4>'+(list.length?'<ol class="vh-list">'+list.map(function(it){
+      return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(it.bad?' bad':it.ok?' ok':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+
+        '<span class="vh-ev">'+it.ev+'</span></summary><div class="vh-in">'+(it.files.length?'<div class="vh-files">'+it.files.map(cdFile).join('')+'</div>':'')+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</div></details></li>'; }).join('')+'</ol>'
+    :'<p class="vh-none">No previous versions</p>')+
+    (more?'<button type="button" class="cd2-hmore" data-hall="'+key+'" aria-expanded="'+all+'">'+(all?'Show latest '+HIST_SHOWN:'View full history ('+items.length+')')+'</button>':'')+'</div>';
 }
 /* KYC: no KYC -> the empty state; valid -> the card; expired -> the banner, and the check moves into the history */
 function kycNoteOf(c,r){ if(r.note) return r.note; if(r.source!=='Add Client') return ''; var t=kycUploadedAt(r);
@@ -6447,11 +6453,14 @@ function letterHow(x){ var rec=(x.audit||[]).filter(function(a){ return /signed 
     'Signed by <em>'+esc(x.signature&&x.signature.name||x.signedBy||'')+'</em> · '+cdStamp(x.signedAt)+(x.method==='manual'?' · recorded by '+esc(rec&&rec.by||x.by||'staff'):' · signing link'); }
 function letterHistItems(c){
   var F=fyStart(Date.now()), L=currentLetter(c), gone=elState(L)==='expired', now=Date.now();
-  return ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
+  var PILL={'Generated':['Created',''],'Sent for signature':['Sent',''],'Resent for signature':['Resent',''],'Signed manually':['Signed','ok'],'Signed by client':['Signed','ok'],'Signed letter uploaded':['Signed','ok'],'Delivery failed':['Failed','bad']};
+  var evs=L&&!gone?(L.audit||[]).filter(function(a){ return PILL[a.action]; }).slice().reverse().map(function(a){ var p=PILL[a.action];
+    return {bad:p[1]==='bad',ok:p[1]==='ok',pill:p[0],valid:'FY '+fyLabel(letterFy(L))+' · '+esc(a.action)+(a.by?' by '+esc(a.by):''),ev:CD_I.clock+cdStamp(a.t),files:[],note:a.note?esc(a.note):''}; }):[];
+  return evs.concat(ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
     return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
-      files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
+      files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; }));
 }
 /* the Engagement letter tab: the deposit and account first (fields when they weren't filled in on Add Client, the saved values once they are), then the letter */
 var elPayEdit={};                                            // client id -> payment fields open for editing
@@ -6676,6 +6685,7 @@ function wireClientTab(c,t,body,repaintTab){
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });
   }
   body.querySelectorAll('[data-cdshut]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.cdshut+c.id; cdShut[k]=!cdShut[k]; repaintTab(); }; });
+  body.querySelectorAll('[data-hall]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.hall+c.id; cdHistAll[k]=!cdHistAll[k]; repaintTab(); }; });
   body.querySelectorAll('[data-dctog]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.dctog+c.id; dcOpen[k]=!dcOpen[k]; if(!dcOpen[k]) delete dcVh[k]; repaintTab(); }; });
   body.querySelectorAll('[data-dcvh]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.dcvh+c.id; dcVh[k]=!dcVh[k]; repaintTab(); }; });
   body.querySelectorAll('[data-hist]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.hist+c.id; histShut[k]=!histShut[k]; repaintTab(); }; });

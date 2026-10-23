@@ -21151,6 +21151,17 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qp-sum .qp-total{background:#FFF8F2}.qp-sum .qp-total dd{font-family:'Manrope';font-size:20px;font-weight:800;color:var(--orange-ink)}
 .qp-st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.qp-st i{width:8px;height:8px;border-radius:50%;background:#94A3B8}
 .qp-st.warn{color:#B45309}.qp-st.warn i{background:#F59E0B}.qp-st.ok{color:#047857}.qp-st.ok i{background:#10B981}.qp-st.bad{color:#B91C1C}.qp-st.bad i{background:#EF4444}.qp-st.grey{color:var(--mute)}
+.qp-s2{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.qp-s2l{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.qp-pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;background:#F1F2F4;color:var(--slate)}
+.qp-pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.qp-pill.warn{background:#FFF7E6;color:#B45309}.qp-pill.ok{background:#ECFDF5;color:#047857}.qp-pill.bad{background:#FEF2F2;color:#B91C1C}
+.qp-s2m{margin:2px 0 0;font-size:15px;color:var(--ink);font-weight:600}.qp-s2m b{font-weight:800}
+.qp-s2d{margin:0;font-size:13px;color:var(--mute)}
+.qp-s2m span,.qp-s2d span{margin:0 8px;color:#CBD5E1}
+.qp-s2r{text-align:right;flex-shrink:0}.qp-s2r span{display:block;font-size:12px;font-weight:600;color:var(--mute)}
+.qp-s2r b{display:block;font-family:'Manrope';font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1.2}
+@media (max-width:560px){.qp-s2{flex-direction:column;align-items:flex-start}.qp-s2r{text-align:left}}
 .qp-acts .btn svg{flex-shrink:0}.btn.busy{opacity:.75;cursor:progress}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
 .qp-done .ty-meta{max-width:560px;margin-left:auto;margin-right:auto}
@@ -21318,13 +21329,10 @@ function paintQuote(){
   if(state==='accepted'&&!qShowDoc) return quoteAccepted(q,c,doc);
   if(state==='declined'&&!qShowDoc) return quoteDeclined(q,c,doc);
   var stx=Q_STATUS[state];
-  var sum='<dl class="qp-sum">'+
-      '<div><dt>Quotation no.</dt><dd>'+e(q.id)+'</dd></div>'+
-      '<div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div>'+
-      '<div><dt>Quotation date</dt><dd>'+e(doc.dateTxt)+'</dd></div>'+
-      '<div><dt>'+(state==='expired'?'Expired on':'Valid until')+'</dt><dd>'+e(doc.dueTxt)+'</dd></div>'+
-      '<div><dt>Status</dt><dd><span class="qp-st '+stx[1]+'"><i></i>'+stx[0]+'</span></dd></div>'+
-      '<div class="qp-total"><dt>Total (inc. GST)</dt><dd>'+money(doc.T.total)+'</dd></div></dl>';
+  var sum='<div class="qp-s2"><div class="qp-s2l"><span class="qp-pill '+stx[1]+'"><i></i>'+stx[0]+'</span>'+
+      '<p class="qp-s2m"><b>'+e(q.id)+'</b><span>·</span>'+e(doc.to||c.name)+'</p>'+
+      '<p class="qp-s2d">Issued '+e(doc.dateTxt)+'<span>·</span>'+(state==='expired'?'Expired on ':'Valid until ')+e(doc.dueTxt)+'</p></div>'+
+    '<div class="qp-s2r"><span>Total (inc. GST)</span><b>'+money(doc.T.total)+'</b></div></div>';
   var pdfBtn='<button type="button" class="btn sec" id="qa-pdf">'+IC.dl+'Download PDF</button>';
   var foot=state==='open'
       ?'<div class="foot qp-acts">'+pdfBtn+'<span class="grow"></span><button type="button" class="btn sec qp-no" id="qa-no">Decline quotation</button><button type="button" class="btn pri" id="qa-go">Accept quotation</button></div>'

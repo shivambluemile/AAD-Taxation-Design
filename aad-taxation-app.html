@@ -11190,6 +11190,9 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .qd-head .btn-primary.qd-main{height:34px;padding:0 16px;font-size:13px}
 .qd-drawer .dhead-acts .btn-ghost svg{flex-shrink:0}
 .qd-drawer .dhead-acts .qd-more{width:34px;height:34px;padding:0;justify-content:center}
+.qd-cos{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end}.qd-co{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--line);border-radius:999px;background:#F6F7F9;font-size:12px;font-weight:600;color:var(--ink)}
+.qd-lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.qd-lines li b{display:block;font-size:13px;color:var(--ink)}.qd-lines li small{display:block;font-size:12px;color:var(--mute);margin-top:1px}
+.qd-note{margin:8px 0 0;font-size:12px;color:var(--mute)}
 .qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
 .qd-paper{min-width:0}
 .qd-paper .qf-doc{max-width:760px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -12732,6 +12735,11 @@ var QD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill=
     ban:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>',
     tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
     x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>'}; })();
+/* a line's category name, and whether its rate includes GST (older quotations: the quotation's GST setting) */
+function catOf(x){ var cat=catalogAll(), id=x.cat!=null&&x.cat!==''?String(x.cat):null;
+  if(id==null){ var v=x.svcId?svcById(x.svcId):null; id=v&&v.cats&&v.cats.length?String(v.cats[0]):null; }
+  var k=id!=null?cat.categories.filter(function(c){ return String(c.id)===id; })[0]:null; return k?k.name:''; }
+function lineGst(q,x){ return x.gst!=null?x.gst!==false:q.gstMode!=='none'; }
 function paintDetail(keep){
   if(ov.classList.contains('open')&&!ov.querySelector('.qd-drawer')) return;   // Send or Edit is open on top; the details come back when it closes
   var q=byId(detailId);
@@ -12769,6 +12777,7 @@ function paintDetail(keep){
       step(sent?'done':'todo',sent?(sent.type==='resent'?'Sent again':'Sent'):'Not sent yet',sent?by(sent)+'<br>'+when(sent.t):'Send it to the client')+
       (out?step(out.type==='accepted'?'done':'bad',outLbl[out.type],by(out)+'<br>'+when(out.t)):step('todo','Client response',sent?'Awaiting the client':'—'))+
       (out&&out.type!=='accepted'?'':step(conv?'done':'todo',conv?'Invoiced':'Not invoiced',conv?'Sale '+esc(q.invoiceId)+' · '+by(conv)+'<br>'+when(conv.t):'Converted to a sale once accepted'));
+    var cos=(q.companies&&q.companies.length?q.companies:q.company?[q.company]:[]);
     b='<div class="qd-ov"><div class="qd-paper">'+quoteDocHtml(docOf(q))+'</div>'+
       '<aside class="qd-side">'+
         '<section class="qd-grp"><h4>Client</h4><dl>'+
@@ -12776,8 +12785,13 @@ function paintDetail(keep){
           row('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+'</dl>'+
           (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
         (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+'Client feedback'+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
-        '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+row('Accountant',esc(q.accountant||''))+
-          (q.accountant2?row('Additional accountant',esc(q.accountant2)):'')+'</dl></section>'+
+        '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+
+          row('Internal company',cos.length?'<span class="qd-cos">'+cos.map(function(n){ return '<span class="qd-co">'+esc(n)+'</span>'; }).join('')+'</span>':'')+
+          row('Accountant',esc(q.accountant||''))+row('Additional accountant',esc(q.accountant2||''))+'</dl></section>'+
+        /* what the form records per line that the document doesn't print: the category and whether the rate includes GST */
+        (items.length?'<section class="qd-grp"><h4>Service details</h4><ul class="qd-lines">'+items.map(function(x){ var cn=catOf(x);
+          return '<li><b>'+esc(x.name)+'</b><small>'+(cn?esc(cn):'No category')+' · '+(lineGst(q,x)?'GST included':'No GST')+'</small></li>'; }).join('')+'</ul>'+
+          (q.discountType==='%'&&q.discountPct?'<p class="qd-note">Discount: '+q.discountPct+'% of the sub total</p>':'')+'</section>':'')+
         '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
       '</aside></div>';
   }

@@ -4444,7 +4444,7 @@ function kycDone(c){ var k=kycCurrent(c); return !!(k&&kycState(k)!=='expired');
 function currentLetter(c){ var F=fyStart(Date.now()); return ONB.letters.filter(function(l){ return l.clientId===c.id&&letterFy(l)===F; }).sort(function(a,b){ return b.created-a.created; })[0]||null; }
 function letterSignedFor(c){ var l=currentLetter(c); return !!(l&&l.status==='signed'); }
 /* who signs: the first director for a company, otherwise the client */
-var elDirPick={};                                          // client id -> director chosen to sign the letter
+var elDirPick={}, elHow={};                                // client id -> director chosen to sign the letter / 'request' | 'manual'
 function letterSigner(c,L){
   if(c.type==='company'&&elDirPick[c.id]&&!(L&&L.status==='signed')){ var pk=(c.directors||[]).filter(function(x){ return x.name===elDirPick[c.id]; })[0]; if(pk) return {name:pk.name,email:pk.email,phone:pk.phone,role:'director'}; }
   if(c.type==='company'&&L&&L.signer&&L.signer.name){ var d=(c.directors||[]).filter(function(x){ return x.name===L.signer.name; })[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'director'}; }
@@ -6474,8 +6474,8 @@ function engagementTab(c){
       '<button class="btn-edit" id="el-pedit">'+I.edit+'Edit</button></div>'+
     '<dl class="fgrid dr-grid el-pdl">'+fv('Deposit amount',dep)+fv('BSB',p.bsb)+fv('Account number',p.accNo)+'</dl></section>'+engagementBody(c);
 }
-/* the letter before it's sent, as in Add Client step 3: the letter, which director signs, then the send screen in place.
-   The client reviews and signs it themselves, so there's no manual signing or upload here */
+/* the letter before it's sent or signed, as in Add Client step 3: the letter, which director signs, then how it's signed:
+   Request Signature shows the send screen in place; Sign Manually shows the signature pad and Submit signature */
 function elFlow(c,services,L){
   var co=c.type==='company', dirs=co?(c.directors||[]).filter(function(d){ return String(d.name||'').trim(); }):[];
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
@@ -6486,13 +6486,28 @@ function elFlow(c,services,L){
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'
     :'<p class="cl-hint">Add a director in the Directors tab first.</p>')+'</div>';
-  h+='<div class="el-q el-sndq"><div id="el-snd"></div><div class="el-ff" id="el-sndf"></div></div></section>';
-  return h;
+  var how=elHow[c.id]||'';
+  h+='<div class="el-q"><h4>How should this be signed?</h4><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
+    [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=how===m[0];
+      return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div></div>';
+  if(how==='request') h+='<div class="el-q el-sndq"><div id="el-snd"></div><div class="el-ff" id="el-sndf"></div></div>';
+  if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div><span class="cl-err" id="el-sigerr" hidden></span>'+
+    '<div class="el-ff"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
+  return h+'</section>';
 }
 function wireElFlow(c,done){
-  document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen follows the new signer
+  document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
+  document.querySelectorAll('#cdb input[name=el-how]').forEach(function(x){ x.onchange=function(){ elHow[c.id]=x.value; done(); }; });
   var b=document.getElementById('el-snd'), ft=document.getElementById('el-sndf');
   if(b&&ft) letterAction(c,'send',done,{body:b,foot:ft});
+  var pe=document.getElementById('el-pad'); if(!pe) return;
+  var nm=letterSigner(c,currentLetter(c)||letterFor(c.id)).name||c.name;
+  var pad=sigPad(pe,nm,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
+  document.getElementById('el-sigok').onclick=function(){
+    var v=pad&&pad.value(nm), er=document.getElementById('el-sigerr');
+    if(!v){ er.innerHTML=I.info+'Draw the signature, select a style, or upload a signature image'; er.hidden=false; return; }
+    delete elHow[c.id]; letterAction(c,'signnow',done,{sig:v});
+  };
 }
 /* Save: all three must have something in them; the open letter (not yet signed) gets the same details */
 function wireElPay(c,done){
@@ -6607,6 +6622,12 @@ function letterAction(c,what,refresh,inline){
       },function(){ toast('The letter couldn’t be stored. Try again.',true); });
     };
     return;
+  }
+  if(what==='signnow'){
+    var nsig=inline.sig, nat=Date.now(); ONB=loadOnb(); L=currentLetter(c); var nx=ensure(), nfrom=nx.status;
+    nx.status='signed'; nx.signature=nsig; nx.signedAt=nat; nx.method='manual';
+    audit(nx,'Signed manually',ME,nfrom,'signed','Signer: '+nsig.name+' ('+nsig.method+') · signing date '+dmyOf(nat)); persistOnb();
+    logEvent(c,'letter','Engagement letter signed','FY '+fyLabel(letterFy(nx))+' · signed by '+nsig.name+' on '+dmyOf(nat)); toast('Engagement letter signed'); refresh(); return;
   }
   if(what==='sign') return signDialog(sg.name||c.name,function(sig,at){
     showModal('<div class="modal wide-pv" role="dialog" aria-modal="true" aria-labelledby="sr-t"><div class="modal-head"><h2 id="sr-t">Check the signature</h2><button data-close aria-label="Close">'+I.close+'</button></div>'+

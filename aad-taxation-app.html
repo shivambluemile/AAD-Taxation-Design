@@ -3079,6 +3079,14 @@ tbody tr:hover{background:#FCFCFD}
 .vaside .vside:last-of-type{border-bottom:0;padding-bottom:0}
 .vbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 32px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--slate)}
 .vbar b{color:var(--ink)}
+.dr-card{margin:22px 32px;border:1px solid var(--line);border-radius:14px;background:#fff;padding:18px 20px 4px}
+@media (max-width:640px){.dr-card{margin:16px}}
+.dr-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.dr-h h3{margin:0;font-family:'Manrope',Inter,sans-serif;font-size:16px;font-weight:800;color:var(--ink)}.dr-h p{margin:3px 0 0;font-size:13px;color:var(--mute)}
+.dr-row{padding:18px 0}.dr-row+.dr-row{border-top:1px solid var(--line)}
+.dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
+.dr-grid{margin:0}.dr-grid dt{text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;color:var(--mute)}.dr-grid dd{font-size:14px}.dr-none{padding:18px 0;margin:0}
 .vdir{padding:22px 32px}
 .vdir .ddir-acts{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .k-status .k-reset @media (max-width:1100px){.drow2{grid-template-columns:minmax(150px,1fr) minmax(0,1.3fr) auto}.drow2 .dcell.nowrap{display:none}}
@@ -4541,19 +4549,20 @@ function openDetail(id,swap,tab){
   }
 
   /* ----- Directors: one section per director ----- */
+  /* one card: the count and Manage directors on top, then each director as a row (name, Manage password, their details) */
   function directorsTab(){
-    var h='<div class="vbar"><p><b>'+c.directors.length+' of '+MAX_DIRECTORS+'</b> directors. Each director has their own details and login.</p>'+
+    var h='<section class="dr-card"><div class="dr-h"><div><h3>Directors</h3><p>'+c.directors.length+' of '+MAX_DIRECTORS+' directors</p></div>'+
       (c._draft?'':'<button class="btn-edit" data-manage>'+I.edit+'Manage directors</button>')+'</div>';
-    if(!c.directors.length) return h+'<p class="cl-muted vempty">No directors added</p>';
+    if(!c.directors.length) return h+'<p class="cl-muted dr-none">No directors added</p></section>';
     c.directors.forEach(function(d,i){
-      h+='<section class="vsec vdir"><div class="vsec-h"><div class="who2"><span class="av">'+esc(initials(d.name))+'</span><span><b>'+esc(d.name)+'</b><small>Director '+(i+1)+'</small></span></div>'+
-        (c._draft?'':'<div class="ddir-acts"><button class="linkbtn" data-reset="'+d.id+'">'+I.key+'Manage password</button></div>')+'</div>'+
-        '<dl class="fgrid">'+
+      h+='<div class="dr-row"><div class="dr-top"><div class="who2"><span class="av">'+esc(initials(d.name))+'</span><span><b>'+esc(d.name)+'</b><small>Director '+(i+1)+'</small></span></div>'+
+        (c._draft?'':'<button class="linkbtn" data-reset="'+d.id+'">'+I.key+'Manage password</button>')+'</div>'+
+        '<dl class="fgrid dr-grid">'+
           fv('Email address',mailto(d.email),{html:true,copy:d.email})+fv('Phone number',d.phone,{copy:d.phone})+
           fv('ABN',d.abn?fmtABN(d.abn):'')+fvTFN('TFN',d.tfn,'d'+d.id)+
-        '</dl></section>';
+        '</dl></div>';
     });
-    return h;
+    return h+'</section>';
   }
 
   /* ----- Activity: same timeline as the staff module ----- */

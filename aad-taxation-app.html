@@ -12803,10 +12803,6 @@ function paintDetail(keep){
     var cos=(q.companies&&q.companies.length?q.companies:q.company?[q.company]:[]);
     b='<div class="qd-ov"><div class="qd-paper">'+quoteDocHtml(docOf(q))+'</div>'+
       '<aside class="qd-side">'+
-        '<section class="qd-grp"><h4>Client</h4><dl>'+
-          row('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
-          row('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+'</dl>'+
-          (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
         (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+'Client feedback'+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
         '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+
           row('Internal company',cos.length?'<span class="qd-cos">'+cos.map(function(n,i){ return '<span class="qd-co'+(i>1?' xh':'')+'" title="'+esc(n)+'">'+esc(n)+'</span>'; }).join('')+(cos.length>2?'<span class="qd-co more" role="button" tabindex="0" data-xmore aria-label="Show '+(cos.length-2)+' more">+'+(cos.length-2)+'</span>':'')+'</span>':'')+

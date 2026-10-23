@@ -6320,7 +6320,6 @@ function dcChip(name,openAttr,dlAttr,size){ var e=String(name||'').split('.').po
    Replace (or the letter's next step) on the left, History with its count on the right, opening a popup timeline.
    Once expired, the card goes and a banner above says what needs uploading */
 var cdShut={};                                               // 'k'/'l' + client id -> card closed
-var cdHist={};                                               // 'k'/'l' + client id -> history shown below the card
 var CD_I={
   img:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>',
   file:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></svg>',
@@ -6344,15 +6343,14 @@ function cdCard(o){ var shut=!!cdShut[o.key+o.cid];
   return '<div class="cd2'+(shut?' shut':'')+'"><div class="cd2-h"><button type="button" class="cd2-tg" data-cdshut="'+o.key+'" aria-expanded="'+!shut+'" aria-label="'+esc(o.name)+'. '+(shut?'Expand':'Collapse')+'">'+
       '<span class="kt-ic">'+DC_DOC+'</span><b class="cd2-nm">'+o.name+'</b></button><span class="cd2-exp'+(o.lineCls?' '+o.lineCls:'')+'">'+o.line+'</span>'+
       '<button type="button" class="cd2-chev" data-cdshut="'+o.key+'" tabindex="-1" aria-hidden="true">'+CD_I.chev+'</button></div>'+
-    (shut?'':'<div class="cd2-b">'+o.files+'</div>'+(o.extra||'')+'<div class="cd2-foot"><span class="cd2-fl">'+o.foot+'</span>'+
-      (o.nHist?'<button type="button" class="cd2-hbtn'+(cdHist[o.key+o.cid]?' on':'')+'" data-cdhist="'+o.key+'" aria-expanded="'+!!cdHist[o.key+o.cid]+'">History<span class="cd2-hn">'+o.nHist+'</span></button>':'<span class="cd2-hbtn off">History<span class="cd2-hn">0</span></span>')+'</div>')+'</div>';
+    (shut?'':'<div class="cd2-b">'+o.files+'</div>'+(o.extra||'')+(o.foot?'<div class="cd2-foot"><span class="cd2-fl">'+o.foot+'</span></div>':''))+'</div>';
 }
 /* the banner that replaces an expired card */
 function cdLine(text,acts){ return '<div class="dx-slim cd2-slim" role="alert"><div class="dx-line"><span class="dx-li">'+CD_I.warn+'</span><span class="dx-lt">'+text+'</span>'+acts+'</div></div>'; }
 function cdBanner(title,text,row){ return '<div class="cd2-alert" role="alert"><span class="cd2-aic">'+CD_I.warn+'</span><div class="cd2-atx"><b>'+title+'</b><span>'+text+'</span><ul class="cd2-alist"><li class="cd2-arow">'+row+'</li></ul></div></div>'; }
-/* the history below a card: earlier versions as a timeline, each with its files (shown while History is on) */
+/* the history below a card: earlier versions as a timeline, each with its files (always shown when there are any) */
 function cdHistBelow(key,c,items){
-  if(!cdHist[key+c.id]) return '';
+  if(!items.length) return '';
   return '<div class="cd2-hist"><h4 class="cd2-hh">History</h4>'+(items.length?'<ol class="vh-list">'+items.map(function(it){
       return '<li class="vh-it'+(it.bad?' bad':'')+'"><details class="vh-acc"><summary class="vh-sum"><span class="vh-top"><span class="vh-pill'+(it.bad?' bad':'')+'">'+it.pill+'</span><span class="vh-valid">'+it.valid+'</span><span class="vh-chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></span>'+
         '<span class="vh-ev">'+it.ev+'</span></summary><div class="vh-in"><div class="vh-files">'+it.files.map(cdFile).join('')+'</div>'+(it.note?'<p class="vh-note">'+it.note+'</p>':'')+'</div></details></li>'; }).join('')+'</ol>'
@@ -6376,7 +6374,6 @@ function kycTab(c){
       c._draft?'':'<button type="button" class="btn-primary btn-sm" data-kyc-add>Upload KYC</button>')})+'</section>';
   var ex=kycExpiresAt(cur), dl=Math.round((ex-now)/864e5), nHist=kycHistItems(c).length;
   if(st==='expired') return '<section class="vsec el-main">'+cdLine('<b>KYC</b> expired on '+dmyOf(ex)+'. Record a new verification.',
-    '<button type="button" class="cd2-hbtn'+(cdHist['k'+c.id]?' on':'')+'" data-cdhist="k" aria-expanded="'+!!cdHist['k'+c.id]+'">History<span class="cd2-hn">'+nHist+'</span></button>'+
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
   var note=kycNoteOf(c,cur);
   var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
@@ -6520,7 +6517,6 @@ function engagementBody(c){
   var nHist=letterHistItems(c).length;
   if(st==='expired'){ var ex=letterExpiresAt(L), da=Math.round((now-ex)/864e5);
     return '<section class="vsec el-main">'+cdLine('<b>Engagement letter</b> for FY '+fyLabel(letterFy(L))+' expired on '+dmyOf(ex)+'. Send this year’s letter.',
-      '<button type="button" class="cd2-hbtn'+(cdHist['l'+c.id]?' on':'')+'" data-cdhist="l" aria-expanded="'+!!cdHist['l'+c.id]+'">History<span class="cd2-hn">'+nHist+'</span></button>'+
       '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed</button>'+
       '<button type="button" class="dx-up" data-el="send">'+CD_I.up+'Start renewal</button>')+cdHistBelow('l',c,letterHistItems(c))+'</section>';
   }
@@ -6629,8 +6625,6 @@ function wireClientTab(c,t,body,repaintTab){
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });
   }
   body.querySelectorAll('[data-cdshut]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.cdshut+c.id; cdShut[k]=!cdShut[k]; repaintTab(); }; });
-  body.querySelectorAll('[data-cdhist]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.cdhist+c.id; cdHist[k]=!cdHist[k]; repaintTab();
-    var h=document.querySelector('#cdb .cd2-hist'); if(h&&cdHist[k]) h.scrollIntoView({block:'nearest',behavior:'smooth'}); }; });
   body.querySelectorAll('[data-dctog]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.dctog+c.id; dcOpen[k]=!dcOpen[k]; if(!dcOpen[k]) delete dcVh[k]; repaintTab(); }; });
   body.querySelectorAll('[data-dcvh]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.dcvh+c.id; dcVh[k]=!dcVh[k]; repaintTab(); }; });
   body.querySelectorAll('[data-hist]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.hist+c.id; histShut[k]=!histShut[k]; repaintTab(); }; });

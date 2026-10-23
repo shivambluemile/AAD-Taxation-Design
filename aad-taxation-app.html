@@ -12074,7 +12074,6 @@ function act(k,id){
   if(k==='history') return openHistory(id);
   if(k==='accept'||k==='reject') return confirmOutcome(id,k==='accept'?'accepted':'rejected');
   if(k==='delete') return confirmDelete(id);
-  if(k==='link') return showClientLink(q);
   route(k,q);
 }
 content.addEventListener('click',function(e){
@@ -12716,23 +12715,6 @@ function openDetail(id){
   detailId=id; qdTab='overview'; paintDetail();
 }
 function closeDetail(){ detailId=null; closeOv(); }
-/* Client link: the page the client opens from the email or SMS, in preview mode (nothing is signed or saved), and the real link to copy */
-function showClientLink(q){
-  var src; try{ src=parent.AADPortalSrc(); }catch(e){ return toast('Preview isn’t available here',true); }
-  var link=portalLink('quote',q.token);
-  var layer=document.createElement('div'); layer.className='pv-layer'; layer.setAttribute('role','dialog'); layer.setAttribute('aria-modal','true'); layer.setAttribute('aria-label','Client view preview');
-  layer.innerHTML='<div class="pv-bar"><span class="pv-tag">Client view · preview</span><span class="pv-note">What '+esc(q.toName||client(q).name)+' sees from the link. Nothing you sign here is saved.</span>'+
-    '<span class="sp-grow"></span><button class="btn-ghost btn-sm" id="pv-copy">Copy real link</button><button class="btn-primary btn-sm" id="pv-x">Close preview</button></div>';
-  var fr=document.createElement('iframe'); fr.className='pv-frame'; fr.title='Client quotation preview';
-  fr.dataset.kind='quote'; fr.dataset.token=q.token; fr.dataset.preview='1'; fr.setAttribute('srcdoc',src);
-  layer.appendChild(fr); document.body.appendChild(layer);
-  var close=function(){ layer.remove(); document.removeEventListener('keydown',esc2,true); };
-  var esc2=function(e){ if(e.key==='Escape'){ e.stopPropagation(); close(); } };
-  document.addEventListener('keydown',esc2,true);
-  layer.querySelector('#pv-x').onclick=close;
-  layer.querySelector('#pv-copy').onclick=function(){ try{ navigator.clipboard.writeText(link).then(function(){ toast('Link copied'); },function(){ toast('Link copied'); }); }catch(e){ toast('Link copied'); } };
-  layer.querySelector('#pv-x').focus();
-}
 function canManage(q){ return isManager()||q.accountant===ME.name||q.by===ME.name; }
 /* the header actions: only what the status allows and the user may do (the same rules as the list menu) */
 function detailActions(q){
@@ -12740,7 +12722,6 @@ function detailActions(q){
   if((s==='draft'||s==='sent')&&own) main=['send',s==='sent'?'Send again':'Send'];
   if(s==='accepted'&&isManager()&&!q.invoiceId) main=['convert','Convert to sale'];
   if(canEdit(q)) more.push(['edit','Edit',AI.edit]);
-  if(q.token&&s!=='draft') more.push(['link','Client link',AI.copy]);
   if(canDelete(q)) more.push(['delete','Delete',AI.bin,'danger']);
   return {main:main,more:more};
 }
@@ -12771,7 +12752,7 @@ function paintDetail(keep){
   var tabs=[['overview','Overview'],['activity','Activities',hist.length]];
   if(!tabs.some(function(t){ return t[0]===qdTab; })) qdTab='overview';
 
-  /* header: the number and status, the one next step, the PDF, then Edit / Client link / Delete */
+  /* header: the number and status, the one next step, the PDF, then Edit / Delete */
   var A=detailActions(q);
   var head='<div class="cl-dhead qd-head"><h2 id="qd-t">'+esc(q.id)+' '+badge(q.status)+'</h2>'+
     '<div class="dhead-acts">'+(A.main?'<button class="btn-primary qd-main" data-qa="'+A.main[0]+'">'+esc(A.main[1])+'</button>':'')+

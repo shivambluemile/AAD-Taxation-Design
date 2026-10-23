@@ -11729,7 +11729,10 @@ function inScope(q){ return isManager()||q.accountant===ME.name||q.by===ME.name|
 
 /* ---------- QuoteStore: the one data access point ---------- */
 var QuoteStore={
-  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==5){ var seed=DevData.quotations(); v={v:5,list:seed}; if(seed.length) this.save(v); } return v; },   // nothing to seed until the Clients store has clients
+  load:function(){ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); if(!v||!Array.isArray(v.list)||v.v!==5){ var seed=DevData.quotations(); v={v:5,list:seed}; if(seed.length) this.save(v); }
+    /* sample: one expired and one client-declined quotation in this month's view (added once to existing stores too) */
+    if(!v.xs&&v.list.length){ var x=DevData.extra(v.list); if(x.length){ v.list=v.list.concat(x); v.xs=1; this.save(v); } }
+    return v; },   // nothing to seed until the Clients store has clients
   save:function(v){ try{ localStorage.setItem(Q_KEY,JSON.stringify(v)); return true; }catch(e){ return false; } }
 };
 function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
@@ -11743,6 +11746,25 @@ function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to;
 /* ---------- DEVELOPMENT DATA (temporary): sample quotations for the clients in this browser. Remove when the API is connected. ---------- */
 function clientName(c){ return c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name?c.directors[0].name:c.name; }
 var DevData={
+  extra:function(list){
+    var cl=loadClients().filter(function(c){ return c.active!==false; }), svc=[];
+    try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}
+    if(!cl.length||!svc.length||!ASSIGNABLE.length) return [];
+    var day=864e5, now=Date.now(), next=list.reduce(function(m,q){ return Math.max(m,+String(q.id).replace(/\D/g,'')||0); },1000)+1;
+    return ['expired','rejected'].map(function(st,i){
+      var c=cl[(i*3+1)%cl.length], who=ASSIGNABLE[i%ASSIGNABLE.length], by=who.name, made=now-(st==='expired'?18:6)*day-(3+i)*36e5;
+      var items=[svc[(i*4+1)%svc.length]].map(function(s){ return {name:s.name,qty:1,price:s.price}; });
+      var q={id:'Q-'+(next+i),created:made,by:by,clientId:c.id,clientName:c.name,branch:(BRANCHES[(i+2)%Math.max(1,BRANCHES.length)]||''),accountant:who.name,items:items,
+        amount:items.reduce(function(a,x){ return a+x.qty*x.price; },0),validUntil:st==='expired'?now-2*day:made+VALID_DAYS*day,status:'draft',history:[],dev:true};
+      log(q,'created',{by:by,t:made,to:'draft'});
+      setStatus(q,'sent','sent',{by:by,t:made+day});
+      if(st==='expired') setStatus(q,'expired','expired',{by:'System',t:q.validUntil});
+      else { var who2=clientName(c), at=made+3*day, note='We have gone with another firm this year, thank you.';
+        q.respondedAt=at; q.clientComment={text:note,by:who2,at:at,type:'rejected'};
+        setStatus(q,'rejected','rejected',{by:who2,t:at,note:'Declined through the quotation link · “'+note+'”'}); }
+      return q;
+    });
+  },
   quotations:function(){
     var cl=loadClients().filter(function(c){ return c.active!==false; }).slice(0,10), svc=[];
     try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}

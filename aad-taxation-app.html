@@ -1737,6 +1737,7 @@ function versionTimeline(d){
           '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|'+vi+'|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button>'+
             '<small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by '+esc(v.by)+' · '+fmtD(v.on)+' '+fmtT(v.on)+'</small></div>'+
           '<span class="dc2-fa">'+
+          '<button type="button" class="sdt-ib" data-view="'+d.k+'|'+vi+'|'+fi+'" title="View" aria-label="View '+esc(f.n)+'">'+I.eye+'</button>'+
           '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div>'; }).join('')+'</div></details></li>');
   }
   return '<div class="vh">'+(items.length?'<ol class="vh-list">'+items.join('')+'</ol>':'<p class="vh-none">No previous versions</p>')+'</div>';
@@ -1758,6 +1759,7 @@ function docCard(d){
         '<div class="dc2-file"><span class="dc2-fic '+(pic?'img':'e-'+x)+'">'+(pic?DC_I.img:DC_I.file)+'</span>'+
         '<div class="dc2-fn"><button type="button" class="ds-fname" data-view="'+d.k+'|0|'+fi+'" title="Preview '+esc(f.n)+'">'+esc(f.n)+'</button><small><b class="'+(pic?'img':'e-'+x)+'">'+x.toUpperCase()+'</b> · '+f.s+'</small><small>Uploaded by <em>'+esc(d.cur.by)+'</em> · '+fmtD(d.cur.on)+' '+fmtT(d.cur.on)+'</small></div>'+
         '<span class="dc2-fa">'+
+        '<button type="button" class="sdt-ib" data-view="'+d.k+'|0|'+fi+'" title="View" aria-label="View '+esc(f.n)+'">'+I.eye+'</button>'+
         '<button type="button" class="sdt-ib" data-dl="'+esc(f.n)+'" title="Download" aria-label="Download '+esc(f.n)+'">'+I.dl+'</button></span></div></div>'; }).join('')+
       (fl.length>3?'<button type="button" class="dt-fmore" data-fx="'+d.k+'" aria-expanded="'+!!filesAll[d.k]+'">'+(filesAll[d.k]?'Show fewer files':'+'+(fl.length-3)+' more file'+(fl.length-3===1?'':'s'))+'</button>':'');
   return '<div class="dc2'+(open?' open':'')+(shut?' shut':'')+(flashK===d.k?' flash':'')+'" data-doc="'+d.k+'">'+

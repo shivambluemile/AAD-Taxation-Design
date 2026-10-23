@@ -6463,24 +6463,24 @@ function engagementTab(c){
   if(!ready||elPayEdit[c.id]){
     var fld=function(k,label,o){ return '<div><label class="flabel" for="el-p-'+k+'">'+label+' <span class="req">*</span></label>'+(o.cur?'<div class="wz-cur"><span>$</span>':'')+
       '<input class="fin sm" id="el-p-'+k+'" data-elpay="'+k+'" value="'+esc(p[k]||'')+'" inputmode="'+(o.mode||'text')+'" maxlength="30" placeholder="'+o.ph+'" autocomplete="off">'+(o.cur?'</div>':'')+'</div>'; };
-    return '<section class="dr-card"><div class="dr-h"><div><h3>Payment details</h3><p>The deposit and the account it’s paid into, printed in the engagement letter.</p></div></div>'+
+    return '<section class="dr-card"><div class="dr-h"><div><h3>Payment details</h3></div></div>'+
       '<div class="wz-payg el-payg">'+fld('deposit','Deposit amount',{cur:true,ph:'0.00',mode:'decimal'})+fld('bsb','BSB',{ph:'000-000'})+fld('accNo','Account number',{ph:'e.g. 12345678'})+
         '<div class="wz-paysave">'+(ready?'<button type="button" class="btn-ghost btn-sm" id="el-pcancel">Cancel</button> ':'')+'<button type="button" class="btn-primary btn-sm" id="el-psave">Save</button></div></div>'+
       '<span class="cl-err" id="el-perr" hidden></span></section>'+
       (ready?engagementBody(c):'<p class="el-wait el-pwait">'+I.info+'Save the deposit amount, BSB and account number to see the engagement letter.</p>');
   }
   var dep=money(Number(String(p.deposit).replace(/[$,\s]/g,''))||0);
-  return '<section class="dr-card"><div class="dr-h"><div><h3>Payment details</h3><p>Printed in the engagement letter</p></div>'+
+  return '<section class="dr-card"><div class="dr-h"><div><h3>Payment details</h3></div>'+
       '<button class="btn-edit" id="el-pedit">'+I.edit+'Edit</button></div>'+
     '<dl class="fgrid dr-grid el-pdl">'+fv('Deposit amount',dep)+fv('BSB',p.bsb)+fv('Account number',p.accNo)+'</dl></section>'+engagementBody(c);
 }
 /* the letter before it's sent or signed, as in Add Client step 3: the letter, which director signs, then how it's signed:
-   Request Signature shows the send screen in place; Sign Manually shows the signature pad and Submit signature */
+   Request Signature shows Send, which opens the send screen in the side panel; Sign Manually shows the signature pad and Submit signature */
 function elFlow(c,services,L){
   var co=c.type==='company', dirs=co?(c.directors||[]).filter(function(d){ return String(d.name||'').trim(); }):[];
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
   var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
-  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+(co?' · choose the director who signs, then send it':' · send it to '+esc(c.name)+' to sign')+'</p></div>'+
+  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
       '<div class="el-acts"><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
     '<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>';
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
@@ -6490,7 +6490,7 @@ function elFlow(c,services,L){
   h+='<div class="el-q"><h4>How should this be signed?</h4><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
     [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=how===m[0];
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div></div>';
-  if(how==='request') h+='<div class="el-q el-sndq"><div id="el-snd"></div><div class="el-ff" id="el-sndf"></div></div>';
+  if(how==='request') h+='<div class="el-ff"><button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send</button></div>';   // opens the send screen in the side panel, as in Add Client
   if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div><span class="cl-err" id="el-sigerr" hidden></span>'+
     '<div class="el-ff"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
   return h+'</section>';
@@ -6498,8 +6498,6 @@ function elFlow(c,services,L){
 function wireElFlow(c,done){
   document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
   document.querySelectorAll('#cdb input[name=el-how]').forEach(function(x){ x.onchange=function(){ elHow[c.id]=x.value; done(); }; });
-  var b=document.getElementById('el-snd'), ft=document.getElementById('el-sndf');
-  if(b&&ft) letterAction(c,'send',done,{body:b,foot:ft});
   var pe=document.getElementById('el-pad'); if(!pe) return;
   var nm=letterSigner(c,currentLetter(c)||letterFor(c.id)).name||c.name;
   var pad=sigPad(pe,nm,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});

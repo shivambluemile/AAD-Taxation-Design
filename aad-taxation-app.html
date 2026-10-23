@@ -21631,11 +21631,11 @@ function declineDialog(){
 }
 /* confirmations: no decision can be made again */
 function quoteAccepted(q,c,doc){
-  var at=q.respondedAt||q.signedAt||((q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop()||{}).t, acc=q.accountant?e(q.accountant):'your accountant';
-  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><h2>Thank you, your quotation is accepted</h2>'+
-    '<p>We’ve let '+acc+' know. A copy of this quotation is available below for your records.</p>'+
-    '<dl class="qp-rcpt"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Accepted on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
-    '<div class="qp-next"><b>What happens next</b><ol><li>'+acc.charAt(0).toUpperCase()+acc.slice(1)+' will contact you to get started.</li><li>You’ll receive an invoice for the accepted services.</li><li>Pay using the details under “How to pay” on the invoice.</li></ol></div>'+
+  var at=q.respondedAt||q.signedAt||((q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop()||{}).t;
+  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><h2>Quotation '+e(q.id)+' has been accepted</h2>'+
+    '<p>Thank you. We’ve notified the sender of your acceptance, and a copy of this quotation is available below for your records.</p>'+
+    '<dl class="qp-rcpt"><div><dt>Quotation number</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total amount</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Date accepted</dt><dd>'+(at?dmyOf(at):'—')+'</dd></div></dl>'+
+    '<div class="qp-next"><b>What happens next</b><ol><li>You will be contacted shortly to begin work.</li><li>An invoice for the accepted services will be issued to you.</li><li>Payment instructions will be included with the invoice.</li></ol></div>'+
     '<div class="qw-acts"><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }

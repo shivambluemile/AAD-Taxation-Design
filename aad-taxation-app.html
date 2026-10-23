@@ -12799,7 +12799,7 @@ function paintDetail(keep){
   var mb=document.getElementById('qd-more');
   if(mb) mb.onclick=function(){
     if(menuEl&&menuEl.dataset.q==='qd'){ closeMenu(); mb.setAttribute('aria-expanded','false'); return; } closeMenu();
-    menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.q='qd';
+    menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.q='qd'; menuEl.style.zIndex='130';   // above the details drawer (overlay is 100)
     menuEl.innerHTML=A.more.map(function(m,i){ return (m[3]&&i?'<hr role="separator">':'')+'<button role="menuitem" data-mi="'+m[0]+'"'+(m[3]?' class="'+m[3]+'"':'')+'>'+m[2]+'<span>'+esc(m[1])+'</span></button>'; }).join('');
     document.body.appendChild(menuEl);
     var r=mb.getBoundingClientRect(); menuEl.style.top=(r.bottom+4)+'px'; menuEl.style.left=Math.max(8,r.right-menuEl.offsetWidth)+'px';

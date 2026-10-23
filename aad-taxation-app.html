@@ -12238,7 +12238,7 @@ function paintForm(focusId){
           '<div><dt>'+(T.anyGst?'GST (included)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save as draft</button><button class="btn-primary" id="qf-send">Save &amp; send</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save</button><button class="btn-primary" id="qf-send">Send</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   wireForm(focusId);
 }

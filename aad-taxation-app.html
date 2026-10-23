@@ -11550,6 +11550,24 @@ table,td,th{font-size:13.5px}
 /* internal companies: multi-select with chips (as the staff picker in Tasks) */
 .drawer.qs-swap{animation:none}
 .qf-ms{position:relative}
+/* shared multi-select look (same as Settings › Service categories) */
+.msel-box{min-height:44px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 40px 6px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:text;position:relative}
+.msel-box:focus-within,.qf-ms.open .msel-box{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
+.msel-box input{border:0;outline:0;flex:1;min-width:120px;height:30px;padding:0 6px;font-size:13.5px;background:transparent}
+.msel-box .ico{position:absolute;right:14px;top:22px;transform:translateY(-50%);color:var(--mute);pointer-events:none}
+.mtag{display:inline-flex;align-items:center;gap:4px;background:var(--orange-soft);color:var(--orange-ink);border-radius:5px;padding:4px 4px 4px 10px;font-size:12.5px;font-weight:600}
+.mtag button{color:inherit;display:inline-flex;padding:3px;border-radius:4px}.mtag button:hover{background:rgba(228,106,17,.12)}.mtag button svg{width:11px;height:11px}
+.mlist{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 28px rgba(15,23,42,.12);z-index:40;overflow:hidden}
+.qf-ms.open .mlist{display:block}
+.mlist-items{max-height:232px;overflow-y:auto;padding:6px}
+.mlist-items button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 10px;border-radius:6px;font-size:13.5px;text-align:left;color:var(--ink)}
+.mlist-items button:hover{background:#F6F7F9}
+.mlist-items .none{padding:14px 10px;font-size:13px;color:var(--mute)}
+.mlist-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 14px;border-top:1px solid var(--line-soft);background:#FBFBFC;font-size:12px;color:#94A3B8}
+.mlist-foot button{font-size:12px;font-weight:600;color:var(--orange-ink)}.mlist-foot button:hover{text-decoration:underline}
+.cbox{width:20px;height:20px;border-radius:5px;border:1.5px solid #CBD5E1;background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.cbox.on{background:var(--orange);border-color:var(--orange)}.cbox svg{display:none}.cbox.on svg{display:block}
+.cbox.sm{width:17px;height:17px;border-radius:4px}.cbox.sm svg{width:10px;height:10px}
 .qf-msbox{min-height:40px;width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 36px 5px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;cursor:pointer}
 .qf-msbox:hover{border-color:#D5DBE2}.qf-msbox.bad{border-color:#F3A3A3;background:#FFF7F7}.qf-msbox.off{cursor:default;background:#FAFBFC}
 .qf-ms.open .qf-msbox{border-color:var(--orange);box-shadow:0 0 0 3px rgba(241,137,52,.12)}
@@ -12144,8 +12162,7 @@ function paintForm(focusId){
     '<div class="modal-body" id="qf-body"><div class="qf-card qf-one">'+
       card('Client','','<div class="stack">'+field('Select client',true,clientField,'client')+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
-          field('Internal company',true,'<div class="qf-ms" id="qf-ms"><div class="qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Internal companies"></div>'+
-            '<span class="qf-mschev">'+I.chev+'</span><div class="qf-msmenu" id="qf-msmenu" role="listbox" aria-multiselectable="true"></div></div>','company')+'</div>'+
+          field('Internal company',true,'<div class="qf-ms msel" id="qf-ms"><div class="msel-box qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox"></div><div class="mlist qf-msmenu" id="qf-msmenu"></div></div>','company')+'</div>'+
         '<div class="g3">'+field('On the name of',true,c?sel('qf-on','onName',names.concat(d.onName&&!names.some(function(o){ return o[0]===d.onName; })?[[d.onName,d.onName]]:[]),d.onName,'Select'):noClient,'onName')+
           field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" maxlength="20" autocomplete="off" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
           field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
@@ -12184,21 +12201,33 @@ function clientMatches(q){
   return m.map(function(c,i){ return '<li role="option" tabindex="-1" data-cid="'+esc(c.id)+'"'+(i===0?' class="on"':'')+'><b>'+esc(c.name)+'</b><span>'+[c.email,c.phone].filter(Boolean).map(esc).join(' · ')+'</span></li>'; }).join('');
 }
 /* internal companies: the branch's companies; picked ones show as chips with × in the box */
-function drawCos(touch){
+/* internal companies: the Settings multi-select (Service categories) — tags in the box, type to search, tick in the list */
+function drawCos(touch,refocus){
   var d=QF.d, ms=document.getElementById('qf-ms'), box=document.getElementById('qf-msbox'), menu=document.getElementById('qf-msmenu'); if(!box) return;
-  var cos=branchCos(d.branch), open=ms.classList.contains('open');
-  box.innerHTML=!d.branch?'<span class="qf-msph">Select a branch first</span>':d.companies.length?d.companies.map(function(n){
-      return '<span class="qf-mschip">'+esc(n)+'<button type="button" data-corm="'+esc(n)+'" aria-label="Remove '+esc(n)+'">'+I.close+'</button></span>'; }).join(''):'<span class="qf-msph">Select companies</span>';
-  menu.innerHTML=cos.map(function(n){ var on=d.companies.indexOf(n)>=0;
-    return '<button type="button" class="qf-msopt'+(on?' on':'')+'" role="option" aria-selected="'+on+'" data-copick="'+esc(n)+'">'+esc(n)+'<span class="tk">'+I.tick+'</span></button>'; }).join('');
+  var cos=branchCos(d.branch), open=ms.classList.contains('open'), q=String(QF.coQ||'').trim().toLowerCase();
+  if(!d.branch){ box.innerHTML='<span class="qf-msph">Select a branch first</span>'; menu.innerHTML=''; ms.classList.remove('open'); return; }
+  box.innerHTML=d.companies.map(function(n){ return '<span class="mtag">'+esc(n)+'<button type="button" data-corm="'+esc(n)+'" aria-label="Remove '+esc(n)+'">'+I.close+'</button></span>'; }).join('')+
+    '<input id="qf-coq" autocomplete="off" placeholder="'+(d.companies.length?'':'Search companies')+'" value="'+esc(QF.coQ||'')+'" aria-label="Search internal companies" aria-expanded="'+open+'"><span class="ico">'+I.search+'</span>';
+  var opts=cos.filter(function(n){ return !q||n.toLowerCase().indexOf(q)>=0; });
+  menu.innerHTML='<div class="mlist-items" role="listbox" aria-multiselectable="true">'+(opts.length?opts.map(function(n){ var on=d.companies.indexOf(n)>=0;
+      return '<button type="button" role="option" aria-selected="'+on+'" data-copick="'+esc(n)+'"><span class="cbox sm'+(on?' on':'')+'">'+I.tick+'</span>'+esc(n)+'</button>'; }).join('')
+      :'<div class="none">No companies match “'+esc(QF.coQ||'')+'”</div>')+'</div>'+
+    '<div class="mlist-foot"><span>'+d.companies.length+' selected</span>'+(d.companies.length?'<button type="button" id="qf-coclr">Clear selection</button>':'')+'</div>';
+  var inp=document.getElementById('qf-coq');
   var done=function(){ delete QF.errs.company; box.classList.remove('bad'); var w=ms.parentNode.querySelector('.ferr'); if(w) w.classList.remove('show'); touch(); };
-  box.onclick=function(ev){ if(ev.target.closest('[data-corm]')||!d.branch) return; ms.classList.toggle('open'); box.setAttribute('aria-expanded',ms.classList.contains('open')); };
-  box.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); box.onclick(ev); } if(ev.key==='Escape'){ ms.classList.remove('open'); box.setAttribute('aria-expanded','false'); } };
-  [].forEach.call(box.querySelectorAll('[data-corm]'),function(b){ b.onclick=function(ev){ ev.stopPropagation(); var n=b.getAttribute('data-corm'); d.companies=d.companies.filter(function(x){ return x!==n; }); done(); drawCos(touch); }; });
-  [].forEach.call(menu.querySelectorAll('[data-copick]'),function(b){ b.onclick=function(){ var n=b.getAttribute('data-copick'), i=d.companies.indexOf(n);
-    if(i>=0) d.companies.splice(i,1); else d.companies.push(n); done(); drawCos(touch); }; });
+  var openIt=function(){ if(!ms.classList.contains('open')){ ms.classList.add('open'); inp.setAttribute('aria-expanded','true'); } };
+  box.onmousedown=function(ev){ if(ev.target.closest('[data-corm]')) return; if(ev.target!==inp){ ev.preventDefault(); inp.focus(); } openIt(); };
+  inp.onfocus=openIt;
+  inp.oninput=function(){ QF.coQ=inp.value; drawCos(touch,true); };
+  inp.onkeydown=function(ev){ if(ev.key==='Escape'){ ms.classList.remove('open'); inp.setAttribute('aria-expanded','false'); }
+    if(ev.key==='Backspace'&&!inp.value&&d.companies.length){ d.companies.pop(); done(); drawCos(touch,true); } };
+  [].forEach.call(box.querySelectorAll('[data-corm]'),function(x){ x.onclick=function(ev){ ev.stopPropagation(); var n=x.getAttribute('data-corm'); d.companies=d.companies.filter(function(y){ return y!==n; }); done(); drawCos(touch); }; });
+  [].forEach.call(menu.querySelectorAll('[data-copick]'),function(x){ x.onmousedown=function(ev){ ev.preventDefault(); }; x.onclick=function(){ var n=x.getAttribute('data-copick'), i=d.companies.indexOf(n);
+    if(i>=0) d.companies.splice(i,1); else d.companies.push(n); done(); drawCos(touch,true); }; });
+  var clr=document.getElementById('qf-coclr'); if(clr){ clr.onmousedown=function(ev){ ev.preventDefault(); }; clr.onclick=function(){ d.companies=[]; done(); drawCos(touch,true); }; }
   if(open) ms.classList.add('open');
-  if(!ov._msClose){ ov._msClose=true; ov.addEventListener('mousedown',function(ev){ var m=document.getElementById('qf-ms'); if(m&&!m.contains(ev.target)){ m.classList.remove('open'); var b=document.getElementById('qf-msbox'); if(b) b.setAttribute('aria-expanded','false'); } }); }
+  if(refocus){ var ni=document.getElementById('qf-coq'); if(ni){ ni.focus(); var L=ni.value.length; ni.setSelectionRange(L,L); } }
+  if(!ov._msClose){ ov._msClose=true; ov.addEventListener('mousedown',function(ev){ var m=document.getElementById('qf-ms'); if(m&&!m.contains(ev.target)){ m.classList.remove('open'); QF&&(QF.coQ=''); var i2=document.getElementById('qf-coq'); if(i2){ i2.setAttribute('aria-expanded','false'); } } }); }
 }
 function liveTotals(){
   var d=QF.d, T=totalsOf(d);

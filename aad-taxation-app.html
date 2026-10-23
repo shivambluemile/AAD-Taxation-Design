@@ -239,7 +239,7 @@ tbody tr:hover{background:#FCFCFD}
 .contact .cp:hover{color:var(--orange)}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
 .chip{background:var(--field);color:var(--slate);font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;white-space:nowrap}
-.chip.more{background:var(--orange-soft);color:var(--orange-ink)}
+.chip.more{background:var(--orange-soft);color:var(--orange-ink)}.xh{display:none!important}.xopen>.xh{display:inline-flex!important}.xopen>[data-xmore]{display:none!important}[data-xmore]{cursor:pointer}
 .badge{display:inline-block;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px}
 .badge.ok{background:var(--green-soft);color:var(--green)}
 .badge.no{background:var(--red-soft);color:var(--red)}
@@ -1434,11 +1434,18 @@ function ini(n){var p=n.trim().split(' ');return (p[0][0]+(p[1]?p[1][0]:p[0][1]|
 function av(i){return AV[i%AV.length]}
 function toast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(function(){toastEl.classList.remove('show')},1900)}
 
+/* "+N" chip: clicking it shows the chips it was hiding */
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); e.stopPropagation(); b.parentNode.classList.add('xopen'); },true);
+document.addEventListener('keydown',function(e){ var b=(e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); b.parentNode.classList.add('xopen'); });
 /* ================= Staff list ================= */
 function listView(){
   var rows=STAFF.map(function(s,i){
     var c=av(i);
-    var chips=s.b.map(function(b){return '<span class="chip">'+b+'</span>'}).join('')+(s.x?'<span class="chip more">+'+s.x+'</span>':'');
+    var rest=BRANCHES.filter(function(b){ return s.b.indexOf(b)<0; }).slice(0,s.x);
+    var chips=s.b.map(function(b){return '<span class="chip">'+b+'</span>'}).join('')+
+      rest.map(function(b){return '<span class="chip xh">'+b+'</span>'}).join('')+(rest.length?'<span class="chip more" role="button" tabindex="0" data-xmore aria-label="Show '+rest.length+' more">+'+rest.length+'</span>':'');
     return '<tr>'+
      '<td><div class="person"><span class="pav" style="background:'+c[0]+';color:'+c[1]+'">'+ini(s.n)+'</span><span><a class="pname" href="#" data-open="'+s.id+'">'+s.n+'</a></span></div></td>'+
      '<td><div class="contact">'+s.e+I.copy+'<br>'+s.p+I.copy+'</div></td>'+
@@ -2957,7 +2964,7 @@ tbody tr:hover{background:#FCFCFD}
 .cl-ent{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap}
 .cl-chips{display:flex;flex-wrap:wrap;gap:5px;max-width:230px}
 .cl-chip{background:var(--field);color:var(--slate);font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
-.cl-chip.more{background:var(--orange-soft);color:var(--orange-ink)}
+.cl-chip.more{background:var(--orange-soft);color:var(--orange-ink)}.xh{display:none!important}.xopen>.xh{display:inline-flex!important}.xopen>[data-xmore]{display:none!important}[data-xmore]{cursor:pointer}
 .cl-meta{font-size:12.5px;color:var(--slate);line-height:1.5;white-space:nowrap}.cl-meta span{display:block;font-size:11.5px;color:var(--faint)}
 .cl-list .cl-stage{text-align:left}
 .cl-em{display:inline-block;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
@@ -4307,6 +4314,11 @@ function pager(total){
   h+='<button data-p="'+(state.page+1)+'"'+(state.page===pages?' disabled':'')+' aria-label="Next">›</button>';
   return h+'</div></div>';
 }
+/* "+N" chip: clicking it shows the chips it was hiding */
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); e.stopPropagation(); b.parentNode.classList.add('xopen'); },true);
+document.addEventListener('keydown',function(e){ var b=(e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); b.parentNode.classList.add('xopen'); });
 function renderList(){
   document.title='Clients · AAD Taxation';
   var rows=filtered(), page=rows.slice((state.page-1)*state.per, state.page*state.per);
@@ -4328,7 +4340,8 @@ function renderList(){
     var r=c.draft?c.r:null, co=c.type==='company', av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
     var svc=r?r.services:(c.services||[]).filter(function(a){ return a.status==='active'; });
     var chips=svc.slice(0,2).map(function(a){ return '<span class="cl-chip" title="'+esc(a.name)+' · '+money(a.price)+'">'+esc(a.name)+'</span>'; }).join('')+
-      (svc.length>2?'<span class="cl-chip more" title="'+esc(svc.slice(2).map(function(a){ return a.name; }).join(', '))+'">+'+(svc.length-2)+'</span>':'');
+      svc.slice(2).map(function(a){ return '<span class="cl-chip xh" title="'+esc(a.name)+' · '+money(a.price)+'">'+esc(a.name)+'</span>'; }).join('')+
+      (svc.length>2?'<span class="cl-chip more" role="button" tabindex="0" data-xmore aria-label="Show '+(svc.length-2)+' more">+'+(svc.length-2)+'</span>':'');
     var kyc=r?(r.kyc.length?'<span class="ob-tick on" title="KYC documents uploaded by the client">'+I.tick+'KYC</span>':'<span class="ob-tick" title="No KYC documents yet">KYC</span>')
       :kycDone(c)?'<span class="ob-tick on" title="KYC valid until '+whenOf(kycExpiresAt(kycCurrent(c)))+'">'+I.tick+'KYC</span>':kycCurrent(c)?'<span class="ob-tick bad" title="KYC expired '+dmyOf(fromIso(kycExpiry(kycCurrent(c).date)))+'">KYC expired</span>':'<span class="ob-tick" title="No KYC yet">KYC</span>';
     var letter=(r?r.letter.status==='signed':letterSignedFor(c))?'<span class="ob-tick on" title="Engagement letter signed">'+I.tick+'Letter</span>':'<span class="ob-tick" title="Engagement letter not signed yet">Letter</span>';
@@ -11192,7 +11205,7 @@ button.ad-ph-img:hover:not([disabled]){border-color:var(--orange);box-shadow:0 0
 .qd-drawer .dhead-acts .qd-more{width:34px;height:34px;padding:0;justify-content:center}
 .qd-cos{display:flex;align-items:center;gap:4px;min-width:0;max-width:100%;margin-top:2px}
 .qd-co{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid var(--line);border-radius:999px;background:#F6F7F9;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.qd-co.more{flex-shrink:0;color:var(--mute)}
+.qd-co.more{flex-shrink:0;color:var(--mute)}.qd-cos.xopen{flex-wrap:wrap}.xh{display:none!important}.xopen>.xh{display:inline-flex!important}.xopen>[data-xmore]{display:none!important}[data-xmore]{cursor:pointer}
 .qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
 .qd-paper{min-width:0}
 .qd-paper .qf-doc{max-width:794px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -12735,6 +12748,11 @@ var QD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill=
     ban:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg>',
     tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
     x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>'}; })();
+/* "+N" chip: clicking it shows the chips it was hiding */
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); e.stopPropagation(); b.parentNode.classList.add('xopen'); },true);
+document.addEventListener('keydown',function(e){ var b=(e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); b.parentNode.classList.add('xopen'); });
 function paintDetail(keep){
   if(ov.classList.contains('open')&&!ov.querySelector('.qd-drawer')) return;   // Send or Edit is open on top; the details come back when it closes
   var q=byId(detailId);
@@ -12781,7 +12799,7 @@ function paintDetail(keep){
           (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
         (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+'Client feedback'+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
         '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+
-          row('Internal company',cos.length?'<span class="qd-cos" title="'+esc(cos.join(', '))+'"><span class="qd-co">'+esc(cos[0])+'</span>'+(cos.length>1?'<span class="qd-co more">+'+(cos.length-1)+'</span>':'')+'</span>':'')+
+          row('Internal company',cos.length?'<span class="qd-cos">'+cos.map(function(n,i){ return '<span class="qd-co'+(i>1?' xh':'')+'" title="'+esc(n)+'">'+esc(n)+'</span>'; }).join('')+(cos.length>2?'<span class="qd-co more" role="button" tabindex="0" data-xmore aria-label="Show '+(cos.length-2)+' more">+'+(cos.length-2)+'</span>':'')+'</span>':'')+
           row('Accountant',esc(q.accountant||''))+row('Additional accountant',esc(q.accountant2||''))+'</dl></section>'+
 
         '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
@@ -18177,7 +18195,7 @@ tbody tr:hover{background:#FCFCFD}
 .chips{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .chip{padding:5px 9px;border-radius:3px;font-size:11px;background:#F5F5F5;color:#4C4C5C;white-space:nowrap}
 .chip.hot{background:var(--orange-soft);color:var(--orange-ink)}
-.chip.more{color:#EF8733;background:#F5F5F5;padding:3px 6px;font-size:10px;cursor:pointer}
+.chip.more{color:#EF8733;background:#F5F5F5;padding:3px 6px;font-size:10px;cursor:pointer}.xh{display:none!important}.xopen>.xh{display:inline-flex!important}.xopen>[data-xmore]{display:none!important}[data-xmore]{cursor:pointer}
 .state{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#52525B;font-weight:500}
 .state i{width:8px;height:8px;border-radius:50%;background:#10B981;display:block}
 .state.no i{background:#FF5966}
@@ -18999,13 +19017,18 @@ function filteredDocs(){
     return true;
   });
 }
+/* "+N" chip: clicking it shows the chips it was hiding */
+document.addEventListener('click',function(e){ var b=e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); e.stopPropagation(); b.parentNode.classList.add('xopen'); },true);
+document.addEventListener('keydown',function(e){ var b=(e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-xmore]'); if(!b) return;
+  e.preventDefault(); b.parentNode.classList.add('xopen'); });
 function chipList(arr,hotFn){
   if(!arr.length) return '<span style="color:#94A3B8">--</span>';
-  var shown=arr.slice(0,2), rest=arr.length-2;
-  var h='<div class="chips">'+shown.map(function(v){
-    return '<span class="chip'+(hotFn&&hotFn(v)?' hot':'')+'">'+esc(v)+'</span>';
+  var rest=arr.length-2;
+  var h='<div class="chips">'+arr.map(function(v,i){
+    return '<span class="chip'+(hotFn&&hotFn(v)?' hot':'')+(i>1?' xh':'')+'">'+esc(v)+'</span>';
   }).join('');
-  if(rest>0) h+='<span class="chip more" title="'+esc(arr.join(', '))+'">+'+rest+'</span>';
+  if(rest>0) h+='<span class="chip more" role="button" tabindex="0" data-xmore aria-label="Show '+rest+' more">+'+rest+'</span>';
   return h+'</div>';
 }
 function renderDocTypes(item){
@@ -20066,11 +20089,8 @@ function renderServices(item){
   page.forEach(function(s){
     var names=catNames(s.cats), cats='<span style="color:#94A3B8">--</span>';
     if(names.length){
-      cats='<div class="chips">'+names.slice(0,2).map(function(n){return '<span class="chip">'+esc(n)+'</span>';}).join('');
-      if(names.length>2){
-        pops['c'+s.id]='<h4>Additional categories</h4><ul>'+names.slice(2).map(function(n){return '<li>'+esc(n)+'</li>';}).join('')+'</ul>';
-        cats+='<span class="chip more" tabindex="0" data-pop="c'+s.id+'" aria-label="'+esc(names.slice(2).join(', '))+'">+'+(names.length-2)+'</span>';
-      }
+      cats='<div class="chips">'+names.map(function(n,i){return '<span class="chip'+(i>1?' xh':'')+'">'+esc(n)+'</span>';}).join('');
+      if(names.length>2) cats+='<span class="chip more" role="button" tabindex="0" data-xmore aria-label="Show '+(names.length-2)+' more">+'+(names.length-2)+'</span>';
       cats+='</div>';
     }
     var desc=descCell(s.desc,'d'+s.id,pops);

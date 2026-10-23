@@ -2750,6 +2750,7 @@ tbody tr:hover{background:#FCFCFD}
   box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;
 }
 .modal.sm{max-width:440px}
+.modal.sm.as-m,.overlay>.modal.sm.as-m,#dlg.overlay>.modal.sm.as-m{width:min(600px,96vw);max-width:min(600px,96vw)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 32px;border-bottom:1px solid var(--line)}
 .modal-head h2{font-family:'Manrope';font-size:21px;font-weight:800;letter-spacing:-.3px}
 .modal-head button{color:var(--mute);width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center}
@@ -5239,11 +5240,11 @@ function snap(c){ return {name:c.name,type:c.type,entity:c.entity,email:c.email,
 function blankSvc(){ return {svcId:null,name:'',price:'',adminPrice:0}; }
 function chosen(list){ return list.filter(function(x){ return x.svcId; }); }
 function minOf(x){ var s=svcById(x.svcId); return s?s.price:x.adminPrice; }
-function svcPickerHtml(list,errs){
+function svcPickerHtml(list,errs,skip){
   refreshCatalog();
   errs=errs||{};
   if(!list.length) list.push(blankSvc());
-  var act=activeServices(), edit=canEditPrice();
+  var act=activeServices().filter(function(s){ return !skip||skip.indexOf(s.id)<0; }), edit=canEditPrice();
   var h='<div class="sp">'+list.map(function(x,i){
     var taken=list.filter(function(y,j){ return j!==i&&y.svcId; }).map(function(y){ return y.svcId; });
     var opts=act.filter(function(s){ return taken.indexOf(s.id)<0||s.id===x.svcId; });
@@ -5263,9 +5264,9 @@ function svcPickerHtml(list,errs){
   return h+'</div>';
 }
 /* paints the picker into `el` and keeps it live; errs is the caller's error object (only the picker's keys are touched) */
-function mountSvcPicker(el,list,errs,onChange){
+function mountSvcPicker(el,list,errs,onChange,skip){
   function clear(){ Object.keys(errs).forEach(function(k){ if(/^(s|p)\d+$|^list$/.test(k)) delete errs[k]; }); }
-  function paint(){ el.innerHTML=svcPickerHtml(list,errs); wire(); }
+  function paint(){ el.innerHTML=svcPickerHtml(list,errs,skip); wire(); }
   function priceErr(x){ var v=Number(x.price), m=minOf(x);
     if(String(x.price).trim()===''||isNaN(v)) return 'Enter a price';
     return v<m?'The price can’t be below the minimum of '+money(m):''; }
@@ -5285,7 +5286,7 @@ function mountSvcPicker(el,list,errs,onChange){
     var add=el.querySelector('#sp-add');
     /* fills the next row on its own: the next service not yet added, at its minimum price (an empty last row is filled instead of adding another) */
     if(add) add.onclick=function(){
-      var taken=chosen(list).map(function(y){ return y.svcId; }), nx=activeServices().filter(function(sv){ return taken.indexOf(sv.id)<0; })[0]; if(!nx) return;
+      var taken=chosen(list).map(function(y){ return y.svcId; }), nx=activeServices().filter(function(sv){ return taken.indexOf(sv.id)<0&&(!skip||skip.indexOf(sv.id)<0); })[0]; if(!nx) return;
       var row=list[list.length-1]; if(!row||row.svcId){ row=blankSvc(); list.push(row); }
       row.svcId=nx.id; row.name=nx.name; row.adminPrice=nx.price; row.price=nx.price;
       clear(); if(onChange) onChange(); paint(); var s=el.querySelector('#sp-s'+(list.length-1)); if(s) s.focus();
@@ -6231,23 +6232,18 @@ function servicesTab(c){
 function assignDialog(c,done){
   refreshCatalog();
   var activeIds=(c.services||[]).filter(function(a){ return a.status==='active'; }).map(function(a){ return a.svcId; });
-  var opts=activeServices().filter(function(s){ return activeIds.indexOf(s.id)<0; });
-  showModal('<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="as-t"><div class="confirm-body"><h3 id="as-t">Assign a service</h3>'+
-    '<p>A new assignment is recorded with today’s date and your name. If this service was revoked before, the old record stays in the history.</p>'+
-    '<label class="flabel" for="as-s" style="margin-top:14px">Service <span class="req">*</span></label><span class="selbox"><select id="as-s"><option value="">Choose a service</option>'+opts.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name)+'</option>'; }).join('')+'</select>'+I.chev+'</span>'+
-    '<label class="flabel" for="as-p" style="margin-top:14px">Price (inc. GST) <span class="req">*</span></label><input class="fin sm" id="as-p" type="number" min="0" step="0.01"'+(canEditPrice()?'':' readonly')+'>'+
-    '<p class="cl-hint" id="as-h"></p><span class="cl-err" id="as-e" hidden></span></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-primary" id="as-go">Assign service</button></div></div>');
-  var sel=document.getElementById('as-s'), pr=document.getElementById('as-p');
-  sel.onchange=function(){ var s=svcById(+sel.value); pr.value=s?s.price:''; pr.min=s?s.price:0; document.getElementById('as-h').textContent=s?'Minimum '+money(s.price)+(canEditPrice()?'. You can raise it for this client.':'.'):''; };
+  var list=[blankSvc()], errs={};
+  showModal('<div class="modal sm as-m" role="dialog" aria-modal="true" aria-labelledby="as-t"><div class="confirm-body"><h3 id="as-t">Assign services</h3>'+
+    '<p>Each new assignment is recorded with today’s date and your name. If a service was revoked before, the old record stays in the history.</p>'+
+    '<div id="as-sp" style="margin-top:14px"></div></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-primary" id="as-go">Assign services</button></div></div>');
+  var picker=mountSvcPicker(document.getElementById('as-sp'),list,errs,null,activeIds);
   document.getElementById('as-go').onclick=function(){
-    var s=svcById(+sel.value), e=document.getElementById('as-e'), v=Number(pr.value);
-    if(!s){ e.innerHTML=I.info+'Choose a service'; e.hidden=false; return; }
-    if(pr.value===''||isNaN(v)){ e.innerHTML=I.info+'Enter a price'; e.hidden=false; return; }
-    if(v<s.price){ e.innerHTML=I.info+'The price can’t be below the minimum of '+money(s.price); e.hidden=false; return; }
-    var a=assignment({svcId:s.id,name:s.name,price:v,adminPrice:s.price},'Assigned',ME);
-    (c.services=c.services||[]).push(a); logEvent(c,'service','Service assigned',a.name+' · '+money(a.price));
-    closeModal(); toast(a.name+' assigned'); done();
+    if(!picker.check()){ var b=document.querySelector('#as-sp .bad'); if(b) b.focus(); return; }
+    var added=chosen(list).map(function(x){ return assignment(x,'Assigned',ME); });
+    c.services=c.services||[];
+    added.forEach(function(a){ c.services.push(a); logEvent(c,'service','Service assigned',a.name+' · '+money(a.price)); });
+    closeModal(); toast(added.length===1?added[0].name+' assigned':added.length+' services assigned'); done();
   };
 }
 function revokeDialog(c,aid,done){
@@ -6441,7 +6437,7 @@ function engagementTab(c){
     none:['No engagement letter yet','Create the letter for FY '+fyLabel(F)+' and send it to '+esc(who)+' for signature, or upload a letter they’ve already signed.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
     draft:['Not sent yet','The letter has been created but hasn’t been sent to '+esc(who)+'.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
     awaiting:['Awaiting signature','',null,['send','Resend for Signature'],[['sign','Sign manually'],up]],
-    signed:['Signed','',null,null,[up]],
+    signed:['Signed','',null,null,[]],   // a signed letter is final: it can't be replaced
     failed:['Email not delivered',esc(last&&last.error||'The signing request couldn’t be delivered.')+' Check the email address and try again.',['err','View Error Details'],['send','Retry Sending'],[['sign','Sign manually'],up]],
     expired:['Expired','',null,['send','Start Renewal'],[up]]
   }[st];

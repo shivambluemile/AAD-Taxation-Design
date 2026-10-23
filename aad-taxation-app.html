@@ -12797,7 +12797,9 @@ function paintDetail(keep){
     var outLbl={accepted:'Accepted',rejected:'Declined',cancelled:'Cancelled',expired:'Expired'};
     var cmt=q.clientComment&&q.clientComment.text&&(q.status==='accepted'||q.status==='converted'||q.status==='rejected')?q.clientComment:null;   // what the client wrote with their answer
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):when(q.created))+(q.fromSale?'<br>From sale '+esc(q.fromSale):''))+
-      step(sent?'done':'todo',sent?(sent.type==='resent'?'Sent again':'Sent'):'Not sent yet',sent?by(sent)+'<br>'+when(sent.t):'Send it to the client')+
+      /* the first send, then every resend as its own step */
+      (sent?ok.filter(function(e){ return e.type==='sent'||e.type==='resent'; }).map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join('')
+        :step('todo','Not sent yet','Send it to the client'))+
       (out?step(out.type==='accepted'?'done':'bad',outLbl[out.type],by(out)+'<br>'+when(out.t)):step('todo','Client response',sent?'Awaiting the client':'—'))+
       (out&&out.type!=='accepted'?'':step(conv?'done':'todo',conv?'Invoiced':'Not invoiced',conv?'Sale '+esc(q.invoiceId)+' · '+by(conv)+'<br>'+when(conv.t):'Converted to a sale once accepted'));
     var cos=(q.companies&&q.companies.length?q.companies:q.company?[q.company]:[]);

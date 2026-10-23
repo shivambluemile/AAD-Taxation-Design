@@ -12304,7 +12304,7 @@ function recipientOf(c,name){
 function profileCard(c,d){
   var rc=recipientOf(c,d.onName), nm=d.onName||c.name, rec=rc.rec||{id:c.id,name:nm};
   /* one line under the name: email, phone, ABN (only the ones on file) */
-  var it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'<button type="button" class="copy" data-copy="'+esc(v)+'" title="Copy '+t.toLowerCase()+'" aria-label="Copy '+t.toLowerCase()+'">'+AI.copy+'</button></span>':''; };
+  var it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'</span>':''; };
   return '<div class="qf-pf">'+clAv({id:rec.id,name:nm})+'<div class="qf-pf-b"><b>'+esc(nm)+'</b>'+
     '<div class="qf-pf-m">'+it(QD_IC.mail,rc.email,'Email')+it(QD_IC.phone,d.contactPhone,'Phone')+it('<em>ABN</em>',d.abn,'ABN')+'</div></div></div>';
 }
@@ -12368,7 +12368,7 @@ function paintForm(focusId){
             '<select id="qf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
             '<button type="button" class="sl-drm" id="qf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="qf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
-          '<div><dt>'+(T.anyGst?'GST (included)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
+          '<div><dt>'+(T.anyGst?'GST applied (10%)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="qf-cancel">Cancel</button><button class="btn-ghost" id="qf-draft">Save</button><button class="btn-primary" id="qf-send">Send</button></div></div>';
@@ -12388,7 +12388,7 @@ function liveTotals(){
   var d=QF.d, T=totalsOf(d);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
   var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,T.anyGst?money(T.gst):'Not applied',money(T.total)];
-  var gl=ov.querySelectorAll('.qf-tot > div > dt')[2]; if(gl) gl.textContent=T.anyGst?'GST (included)':'GST';
+  var gl=ov.querySelectorAll('.qf-tot > div > dt')[2]; if(gl) gl.textContent=T.anyGst?'GST applied (10%)':'GST';
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
 }
 function wireForm(focusId){
@@ -12448,8 +12448,6 @@ function wireForm(focusId){
     row.ondrop=function(ev){ ev.preventDefault(); if(dragFrom==null) return; var below=row.classList.contains('drop-below'), to=i+(below?1:0); if(dragFrom<to) to--; var f=dragFrom; dragFrom=null; moveLine(f,to); };
     row.ondragend=function(){ row.draggable=false; dragFrom=null; [].forEach.call(ov.querySelectorAll('.qf-row'),function(x){ x.classList.remove('dragging','drop-above','drop-below'); }); };
   });
-  ov.querySelectorAll('.qf-pf .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
-    try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   var co=document.getElementById('qf-co'); if(co) co.onchange=function(){ d.companies=co.value?[co.value]:[]; delete QF.errs.company; touch(); repaint('qf-co'); };
   document.getElementById('qf-add').onclick=function(){ d.items.push(blankLine()); touch(); repaint('qf-c'+(d.items.length-1)); };
   document.getElementById('qf-x').onclick=leaveForm; document.getElementById('qf-cancel').onclick=leaveForm;
@@ -14987,7 +14985,7 @@ function paintSaleForm(focusId){
             '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
             '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
-          '<div><dt>'+(d.gst===false?'GST':'GST (included)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+          '<div><dt>'+(d.gst===false?'GST':'GST applied (10%)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           (function(){ var bal=c?creditOf(c.id):0; if(!bal&&!d.useCredit) return '';
             return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" aria-label="Client credit to apply, up to '+money(bal)+'"></span>'+
               '<button type="button" class="sl-drm" id="sf-crrm" title="Don’t apply credit" aria-label="Don’t apply credit">'+I.close+'</button></span>':'')+'</dt>'+
@@ -15377,7 +15375,7 @@ function paintDetail(keep){
         :'<tr><td colspan="7" class="cl-muted">No services on this sale</td></tr>')+
       '</tbody></table></div>'+
       '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount'+(s.discountType==='%'&&s.discountPct?' ('+s.discountPct+'%)':'')+'</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div>'+
-        '<div><dt>'+(s.gstMode==='none'?'GST':'GST (incl.)')+'</dt><dd>'+(s.gstMode==='none'?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+        '<div><dt>'+(s.gstMode==='none'?'GST':'GST applied (10%)')+'</dt><dd>'+(s.gstMode==='none'?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
         '<div class="sd-paid"><dt>Amount Paid'+(credit?'<small>incl. '+money(credit)+' client credit</small>':'')+'</dt><dd>'+money(paidOf(s))+'</dd></div>'+
         '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+(dis?'<span class="cl-muted">— Disabled</span>':money(pendingOf(s)))+'</dd></div></dl></section>';
   }
@@ -20953,7 +20951,7 @@ function quoteDocHtml(m){
         :'<tr><td colspan="6" class="qf-none">No lines added yet</td></tr>')+
     '</tbody></table>'+
     '<div class="qd2-foot"><div class="qd2-nt">'+(m.notes?'<span class="qd2-lbl">Notes</span><p>'+br(m.notes)+'</p>':'')+(m.terms?'<span class="qd2-lbl">Terms &amp; conditions</span><p>'+br(m.terms)+'</p>':'')+'</div>'+
-      '<div class="qd2-sum"><dl class="qd2-tot">'+(T.disc?kv('Discount'+(m.discPct?' ('+m.discPct+'%)':''),'−'+money(T.disc)):'')+kv('Subtotal (excl. GST)',money(T.total-gst))+kv('GST',money(gst))+'</dl>'+
+      '<div class="qd2-sum"><dl class="qd2-tot">'+(T.disc?kv('Discount'+(m.discPct?' ('+m.discPct+'%)':''),'−'+money(T.disc)):'')+kv('Subtotal (excl. GST)',money(T.total-gst))+kv(gst?'GST applied (10%)':'GST',money(gst))+'</dl>'+
         '<div class="qd2-grand"><span>Amount</span><b>'+money(T.total)+'</b></div>'+(m.extra||'')+'</div></div>'+
     /* quotations are accepted online; one signed before that keeps its signature */
     (sig?'<div class="qf-doc-sg"><p class="qf-doc-sgt">Acceptance</p><div><span>Name</span><b>'+e(sg.name)+'</b></div>'+
@@ -21634,23 +21632,21 @@ function declineDialog(){
 /* confirmations: no decision can be made again */
 function quoteAccepted(q,c,doc){
   var at=q.respondedAt||q.signedAt||((q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop()||{}).t, acc=q.accountant?e(q.accountant):'your accountant';
-  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><span class="qp-pill ok">Accepted</span><h2>Thank you, your quotation is accepted</h2>'+
+  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><h2>Thank you, your quotation is accepted</h2>'+
     '<p>We’ve let '+acc+' know. A copy of this quotation is available below for your records.</p>'+
     '<dl class="qp-rcpt"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Accepted on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
     '<div class="qp-next"><b>What happens next</b><ol><li>'+acc.charAt(0).toUpperCase()+acc.slice(1)+' will contact you to get started.</li><li>You’ll receive an invoice for the accepted services.</li><li>Pay using the details under “How to pay” on the invoice.</li></ol></div>'+
-    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
-  document.getElementById('qw-view').onclick=function(){ quoteViewer(doc); };
+    '<div class="qw-acts"><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }
 function quoteDeclined(q,c,doc){
   var at=q.respondedAt||((q.history||[]).filter(function(h){ return h.type==='rejected'; }).pop()||{}).t, why=q.clientComment&&q.clientComment.text;
-  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big bad">'+IC.x+'</div><span class="qp-pill bad">Declined</span><h2>You’ve declined this quotation</h2>'+
+  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big bad">'+IC.x+'</div><h2>You’ve declined this quotation</h2>'+
     '<p>Thank you for letting us know. We’ve shared your feedback with '+(q.accountant?e(q.accountant)+', your accountant':'your accountant')+'.</p>'+
     '<dl class="qp-rcpt"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Declined on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
     (why?'<div class="qp-why"><b>Your reason</b><p>“'+e(why)+'”</p></div>':'')+
     '<p class="qp-change">Changed your mind? Call '+FIRM.name+' on '+FIRM.phone+' and we’ll send you an updated quotation.</p>'+
-    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
-  document.getElementById('qw-view').onclick=function(){ quoteViewer(doc); };
+    '<div class="qw-acts"><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }
 if(KIND==='quote') paintQuote();

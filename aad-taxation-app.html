@@ -11735,7 +11735,7 @@ var QuoteStore={
 function log(q,type,o){ o=o||{}; (q.history=q.history||[]).push({type:type,by:o.by||ME.name,t:o.t||Date.now(),from:o.from||'',to:o.to||'',note:o.note||'',ok:o.ok!==false,sale:o.sale||''}); }
 /* what can be done to a quotation: anything not yet invoiced (or cancelled) can be edited; drafts never sent can be deleted;
    sent and accepted ones can be cancelled; invoiced ones are locked */
-var EDITABLE=['draft','sent','accepted','rejected','expired'];
+var EDITABLE=['draft','sent','rejected','expired']; /* accepted by the client: locked */
 function canEdit(q){ return EDITABLE.indexOf(q.status)>=0&&!q.invoiceId&&(isManager()||q.accountant===ME.name||q.by===ME.name); }
 function canDelete(q){ return q.status==='draft'&&!q.invoiceId&&!(q.history||[]).some(function(e){ return e.type==='sent'&&e.ok; })&&(isManager()||q.by===ME.name); }
 function setStatus(q,to,type,o){ o=o||{}; o.from=q.status; o.to=to; q.status=to; log(q,type,o); }
@@ -12103,8 +12103,9 @@ function openForm(id){
   if(id&&!q) return toast('This quotation no longer exists.',true);
   if(q&&(q.status==='converted'||q.invoiceId)) return toast(q.id+' is invoiced'+(q.invoiceId?' ('+q.invoiceId+')':'')+', so it’s locked. Change the sale instead.',true);
   if(q&&q.status==='cancelled') return toast(q.id+' is cancelled and can’t be edited.',true);
+  if(q&&q.status==='accepted') return toast(q.id+' has been accepted by the client, so it can’t be edited.',true);
   if(q&&!canEdit(q)) return toast('You can only edit quotations you created or are assigned to.',true);
-  if(q&&['accepted','rejected','expired'].indexOf(q.status)>=0&&!openForm.ok){ return confirmReopen(q); }
+  if(q&&['rejected','expired'].indexOf(q.status)>=0&&!openForm.ok){ return confirmReopen(q); }
   openForm.ok=false;
   var today=isoDay(Date.now()), me=ASSIGNABLE.filter(function(s){ return s.name===ME.name; })[0];
   QF={id:q?q.id:nextQuoteId(),isNew:!q,errs:{},dirty:false,pick:'',d:q?{

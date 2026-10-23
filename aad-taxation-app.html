@@ -3086,6 +3086,9 @@ tbody tr:hover{background:#FCFCFD}
 .dr-row{padding:18px 0}.dr-row+.dr-row{border-top:1px solid var(--line)}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
+.sv-add{margin:16px 0 4px;padding:16px;border:1px solid #F8C9A2;border-radius:12px;background:#FFFAF5}
+.sv-add-t{margin:0;font-size:14px;font-weight:700;color:var(--ink)}.sv-add-n{margin:2px 0 14px;font-size:12.5px;color:var(--mute)}
+.sv-add-f{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #F3DCC8}
 .sv-row{display:flex;align-items:center;gap:12px;padding:14px 0}.sv-row+.sv-row{border-top:1px solid var(--line)}
 .sv-ic{width:36px;height:36px;border-radius:10px;background:#FFF1E6;color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}.sv-ic svg{width:16px;height:16px}
 .sv-main{flex:1;min-width:0}.sv-main b{display:block;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sv-main small{display:block;font-size:12px;color:var(--mute);margin-top:2px}
@@ -6237,7 +6240,9 @@ function completeRequest(r,kycDate,auto){
 function servicesTab(c){
   var list=c.services||[], act=list.filter(function(a){ return a.status==='active'; });
   var h='<section class="dr-card"><div class="dr-h"><div><h3>Current services</h3><p>'+act.length+' active'+(act.length?' · '+money(totalOf(act))+' total':'')+'</p></div>'+
-    (c._draft?'':'<button class="btn-edit" data-assign>'+I.plus+'Assign service</button>')+'</div>'+
+    (c._draft||svcAdd[c.id]?'':'<button class="btn-edit" data-assign>'+I.plus+'Assign service</button>')+'</div>'+
+    (svcAdd[c.id]?'<div class="sv-add"><p class="sv-add-t">Add services</p><p class="sv-add-n">Each assignment is recorded with today’s date and your name.</p><div id="as-sp"></div>'+
+      '<div class="sv-add-f"><button type="button" class="btn-ghost btn-sm" id="as-x">Cancel</button><button type="button" class="btn-primary btn-sm" id="as-go">Assign services</button></div></div>':'')+
     (act.length?act.map(function(a){
       return '<div class="sv-row"><span class="sv-ic">'+I.tag+'</span><div class="sv-main"><b>'+esc(a.name)+'</b><small>Assigned '+whenOf(a.at)+' by '+esc(a.by)+'</small></div>'+
         '<span class="sv-pr">'+money(a.price)+'</span>'+(c._draft?'':'<button class="linkbtn danger sv-rv" data-revoke="'+a.aid+'">Revoke</button>')+'</div>'; }).join('')
@@ -6251,21 +6256,22 @@ function servicesTab(c){
     }).join(''):'<p class="cl-muted dr-none">No revoked services.</p>')+'</section>';
   return h;
 }
-function assignDialog(c,done){
+var svcAdd={};                                               // client id -> {list,errs} while the add-services panel is open
+function assignDialog(c,done){ svcAdd[c.id]={list:[blankSvc()],errs:{}}; done(); }
+/* the open add-services panel: the same picker as Add Client, then Cancel / Assign services */
+function wireAssign(c,done){
+  var st=svcAdd[c.id], el=document.getElementById('as-sp'); if(!st||!el) return;
   refreshCatalog();
   var activeIds=(c.services||[]).filter(function(a){ return a.status==='active'; }).map(function(a){ return a.svcId; });
-  var list=[blankSvc()], errs={};
-  showModal('<div class="modal sm as-m" role="dialog" aria-modal="true" aria-labelledby="as-t"><div class="confirm-body"><h3 id="as-t">Assign services</h3>'+
-    '<p>Each new assignment is recorded with today’s date and your name. If a service was revoked before, the old record stays in the history.</p>'+
-    '<div id="as-sp" style="margin-top:14px"></div></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" data-cancel>Cancel</button><button class="btn-primary" id="as-go">Assign services</button></div></div>');
-  var picker=mountSvcPicker(document.getElementById('as-sp'),list,errs,null,activeIds);
+  var picker=mountSvcPicker(el,st.list,st.errs,null,activeIds);
+  var s0=el.querySelector('select'); if(s0&&!chosen(st.list).length) s0.focus();
+  document.getElementById('as-x').onclick=function(){ delete svcAdd[c.id]; done(); };
   document.getElementById('as-go').onclick=function(){
-    if(!picker.check()){ var b=document.querySelector('#as-sp .bad'); if(b) b.focus(); return; }
-    var added=chosen(list).map(function(x){ return assignment(x,'Assigned',ME); });
+    if(!picker.check()){ var b=el.querySelector('.bad'); if(b) b.focus(); return; }
+    var added=chosen(st.list).map(function(x){ return assignment(x,'Assigned',ME); });
     c.services=c.services||[];
     added.forEach(function(a){ c.services.push(a); logEvent(c,'service','Service assigned',a.name+' · '+money(a.price)); });
-    closeModal(); toast(added.length===1?added[0].name+' assigned':added.length+' services assigned'); done();
+    delete svcAdd[c.id]; toast(added.length===1?added[0].name+' assigned':added.length+' services assigned'); done();
   };
 }
 function revokeDialog(c,aid,done){
@@ -6572,6 +6578,7 @@ function letterAction(c,what,refresh){
 function wireClientTab(c,t,body,repaintTab){
   if(t==='services'){
     body.querySelectorAll('[data-assign]').forEach(function(b){ b.onclick=function(){ assignDialog(c,repaintTab); }; });
+    wireAssign(c,repaintTab);
     body.querySelectorAll('[data-revoke]').forEach(function(b){ b.onclick=function(){ revokeDialog(c,b.dataset.revoke,repaintTab); }; });
   }
   if(t==='documents'){

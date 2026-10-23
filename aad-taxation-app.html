@@ -21163,7 +21163,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qp-s2r b{display:block;font-family:'Manrope';font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1.2}
 @media (max-width:560px){.qp-s2{flex-direction:column;align-items:flex-start}.qp-s2r{text-align:left}}
 .qp-resp{margin-top:6px}.qp-resp h2{font-family:'Manrope';font-size:17px;font-weight:800;margin:0 0 12px}
-.qr-page .top{display:none}.qr-page .wrap{max-width:880px;padding-top:40px}
+.qr-page .wrap{max-width:880px}
 .qr{padding:22px 22px 24px}
 .qr-h{display:flex;align-items:center;gap:14px;padding-bottom:18px;border-bottom:1px solid var(--line)}
 .qr-logo{width:52px;height:52px;border-radius:12px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}.qr-logo img{width:44px;height:auto}
@@ -21357,9 +21357,8 @@ function paintQuote(){
   /* one compact card: who it's from, the key figures, the document (opens in a viewer), the comment, then Accept / Decline */
   var exp=state==='expired';
   document.body.classList.add('qr-page');
-  app.innerHTML='<div class="card qr">'+
-    '<div class="qr-h"><span class="qr-logo"><img src="logo.png" alt="AAD Taxation"></span><div><h1>'+(exp?'This quotation has expired':'Your quotation is ready')+'</h1>'+
-      '<p>Quotation '+e(q.id)+(q.accountant?' · Prepared by '+e(q.accountant):'')+'</p></div></div>'+
+  app.innerHTML='<div class="hello"><h1>'+(exp?'This quotation has expired':'Your quotation is ready')+'</h1><p>Quotation '+e(q.id)+(q.accountant?' · Prepared by '+e(q.accountant):'')+'</p></div>'+   // centred, as on the other client pages; the logo is in the page header
+    '<div class="card qr">'+
     '<p class="qr-sec">Review your quotation</p>'+
     '<div class="qr-box"><div class="qr-row"><span>Prepared for</span><b>'+e(doc.to||c.name)+'</b></div>'+
       '<div class="qr-row"><span>'+(exp?'Expired on':'Valid until')+'</span><b>'+e(doc.dueTxt)+'</b></div>'+

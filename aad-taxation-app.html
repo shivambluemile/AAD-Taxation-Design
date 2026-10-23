@@ -12775,7 +12775,7 @@ function paintDetail(keep){
           row('Email',c.email?'<span class="qd-cp"><a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)+'</span>':'')+
           row('Phone',c.phone?'<span class="qd-cp">'+esc(c.phone)+copy(c.phone)+'</span>':'')+'</dl>'+
           (cr?'<button class="qd-link" data-qd="client">Open client record</button>':'<p class="cl-muted qd-gone">This client is no longer on file</p>')+'</section>'+
-        (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+(cmt.type==='rejected'?'Reason for declining':'Client’s comment')+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
+        (cmt?'<section class="qd-grp qd-cmt'+(cmt.type==='rejected'?' bad':'')+'"><h4>'+'Client feedback'+'</h4><p>'+esc(cmt.text)+'</p></section>':'')+
         '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(q.branch||''))+row('Accountant',esc(q.accountant||''))+
           (q.accountant2?row('Additional accountant',esc(q.accountant2)):'')+'</dl></section>'+
         '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
@@ -21145,6 +21145,25 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qv-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.qv-top h2{margin:0}
 .qv-doc{margin-bottom:22px}.qv-doc .qf-doc{max-width:794px;margin:0 auto}
 .qp-hero{margin-bottom:16px;padding:26px 32px}
+.qp-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:20px 0 0}
+.qp-sum div{background:#fff;padding:12px 16px;min-width:0}.qp-sum dt{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#7A8597}
+.qp-sum dd{font-size:14px;font-weight:700;color:var(--ink);margin-top:4px;overflow-wrap:anywhere}
+.qp-sum .qp-total{background:#FFF8F2}.qp-sum .qp-total dd{font-family:'Manrope';font-size:20px;font-weight:800;color:var(--orange-ink)}
+.qp-st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}.qp-st i{width:8px;height:8px;border-radius:50%;background:#94A3B8}
+.qp-st.warn{color:#B45309}.qp-st.warn i{background:#F59E0B}.qp-st.ok{color:#047857}.qp-st.ok i{background:#10B981}.qp-st.bad{color:#B91C1C}.qp-st.bad i{background:#EF4444}.qp-st.grey{color:var(--mute)}
+.qp-acts .btn svg{flex-shrink:0}.btn.busy{opacity:.75;cursor:progress}
+.btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
+.qp-done .ty-meta{max-width:560px;margin-left:auto;margin-right:auto}
+.qp-ov{position:fixed;inset:0;z-index:100;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+.qp-modal{background:#fff;border-radius:14px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(15,23,42,.22);overflow:hidden;margin:auto 0}
+.qp-mh{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid var(--line)}
+.qp-mh h2{font-family:'Manrope';font-size:19px;font-weight:800;letter-spacing:-.3px;margin:0}
+.qp-mx{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--mute)}.qp-mx:hover{background:#F2F4F7;color:var(--ink)}.qp-mx svg{width:16px;height:16px}
+.qp-mb{padding:20px 24px;display:flex;flex-direction:column}.qp-mb p{margin:0 0 16px;font-size:13.5px;color:var(--mute);line-height:1.55}
+.qp-mf{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--line);background:#FBFBFC}
+.in.bad{border-color:#F3A3A3;background:#FFF7F7}
+@media (max-width:640px){.qp-sum{grid-template-columns:1fr 1fr}.qp-acts{flex-wrap:wrap}.qp-acts .grow{display:none}.qp-acts .btn{flex:1 1 auto;justify-content:center}.qp-mf .btn{flex:1;justify-content:center}}
+@media (prefers-reduced-motion:reduce){.qp-ov,.qp-modal{animation:none;transition:none}}
 .qp-eye{font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--orange-ink);margin-bottom:6px}
 .qp-hero h1{font-family:'Manrope';font-size:24px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
 .qp-lead{font-size:14px;color:var(--mute);line-height:1.55;margin-top:6px}
@@ -21197,6 +21216,7 @@ var app=document.getElementById('app');
 ensureLetterCss(document);
 var STATES=['ACT','NSW','NT','QLD','SA','TAS','VIC','WA'], ENTITIES=['Partnership','Trust','Company'];
 var IC={
+  dl:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
   doc:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
   bin:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
   search:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>',
@@ -21277,70 +21297,113 @@ var Q_KEY='aad-quotations-v1';
 function loadQuotes(){ try{ var v=JSON.parse(localStorage.getItem(Q_KEY)||'null'); return v&&Array.isArray(v.list)?v:null; }catch(err){ return null; } }
 function quoteClient(q){ try{ var cl=JSON.parse(localStorage.getItem('aad-clients-v1')||'[]').filter(function(c){ return String(c.id)===String(q.clientId); })[0]; return cl||{name:q.clientName||'',email:''}; }catch(err){ return {name:q.clientName||'',email:''}; } }
 var qShowDoc=false;
+/* ---------- the client's quotation page ----------
+   sent: summary, the document, then Accept / Decline at the bottom (Decline asks for a reason in a dialog);
+   accepted / declined: a confirmation; expired: the document without the decision; draft / cancelled / unknown: unavailable.
+   The saved quotation is re-read and its status checked before any answer is recorded */
+var qBusy=false;
+function quoteState(q){ if(!q) return 'none'; if(q.status==='draft'||q.status==='cancelled') return 'unavailable';
+  if(q.status==='accepted'||q.status==='converted') return 'accepted'; if(q.status==='rejected') return 'declined';
+  if(q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now())) return 'expired';
+  return q.status==='sent'?'open':'unavailable'; }
+function quoteNow(){ var st=loadQuotes(); return st&&st.list.filter(function(x){ return x.token===TOKEN; })[0]; }
+var Q_STATUS={open:['Awaiting your response','warn'],accepted:['Accepted','ok'],declined:['Declined','bad'],expired:['Expired','grey']};
 function paintQuote(){
-  var st=loadQuotes(), q=st&&st.list.filter(function(x){ return x.token===TOKEN; })[0];
-  if(!q) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
-  if(q.status==='cancelled') return closed('x','This quotation was withdrawn','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
-  if(q.status==='rejected') return closed('x','You declined this quotation','Thanks for letting us know. Your comments were passed to your accountant. Contact '+FIRM.name+' on '+FIRM.phone+' if you change your mind.');
+  var q=quoteNow(), state=quoteState(q);
+  if(state==='none') return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
+  if(state==='unavailable') return closed('x','This quotation isn’t available','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
   ensureQuoteCss(document);
   var c=quoteClient(q), dir=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name;
   var who=q.contactName||q.toName||dir||c.name, first=String(who||'').split(' ')[0], doc=quoteDocOf(q,c.name);
-  var acc=(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop();
-  var expired=q.status==='expired'||(q.status==='sent'&&new Date(q.validUntil).setHours(23,59,59,999)<Date.now());
-  var done=q.status==='accepted'||q.status==='converted';
-  if(done&&!qShowDoc) return quoteWelcome(q,c,who,doc,acc);
-  /* the summary first, then the quotation, then the answer; every action sits at the bottom of the page */
-  var pdfBtn='<button class="btn sec" id="qa-pdf">Download PDF</button>';
-  app.innerHTML='<div class="card qp-hero">'+
-      '<h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1>'+
-      '<p class="qp-lead">'+(done?'You accepted this quotation. A copy is below for your records.':expired?'This quotation has passed its valid-until date.':'Please review the services and fees below, then let us know if you’d like to go ahead.')+(q.accountant?' Prepared by '+e(q.accountant)+', your accountant.':'')+'</p></div>'+
-
-
-    '<div class="card qp-card">'+
-      '<div class="qv-doc qp-doc">'+quoteDocHtml(doc)+'</div>'+
-      (done?'<div class="foot"><button class="btn sec" id="qa-back">Back</button><span class="grow"></span>'+pdfBtn+'</div>':
-       expired?'<div class="note warn"><span>Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot"><span class="grow"></span>'+pdfBtn+'</div>':
-        '<div class="qp-resp"><h2>Your response</h2><p class="sub">Accept to go ahead, or decline and tell us why.</p>'+
-        '<label class="l" for="qa-c">Comments <span class="opt">(required if you decline)</span></label>'+
-        '<textarea class="in qp-ta" id="qa-c" rows="4" maxlength="500" placeholder="Anything you’d like us to know"></textarea><span class="err" id="qa-e" hidden></span></div>'+
-        '<div class="foot">'+pdfBtn+'<span class="grow"></span><button class="btn sec qp-no" id="qa-no">Decline</button><button class="btn pri" id="qa-go">Accept quotation</button></div>')+
-    '</div>';
+  if(state==='accepted'&&!qShowDoc) return quoteAccepted(q,c,doc);
+  if(state==='declined'&&!qShowDoc) return quoteDeclined(q,c,doc);
+  var stx=Q_STATUS[state];
+  var sum='<dl class="qp-sum">'+
+      '<div><dt>Quotation no.</dt><dd>'+e(q.id)+'</dd></div>'+
+      '<div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div>'+
+      '<div><dt>Quotation date</dt><dd>'+e(doc.dateTxt)+'</dd></div>'+
+      '<div><dt>'+(state==='expired'?'Expired on':'Valid until')+'</dt><dd>'+e(doc.dueTxt)+'</dd></div>'+
+      '<div><dt>Status</dt><dd><span class="qp-st '+stx[1]+'"><i></i>'+stx[0]+'</span></dd></div>'+
+      '<div class="qp-total"><dt>Total (inc. GST)</dt><dd>'+money(doc.T.total)+'</dd></div></dl>';
+  var pdfBtn='<button type="button" class="btn sec" id="qa-pdf">'+IC.dl+'Download PDF</button>';
+  var foot=state==='open'
+      ?'<div class="foot qp-acts">'+pdfBtn+'<span class="grow"></span><button type="button" class="btn sec qp-no" id="qa-no">Decline quotation</button><button type="button" class="btn pri" id="qa-go">Accept quotation</button></div>'
+      :state==='expired'?'<div class="note warn"><span>This quotation passed its valid-until date, so it can no longer be accepted. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div><div class="foot qp-acts">'+pdfBtn+'</div>'
+      :'<div class="foot qp-acts"><button type="button" class="btn sec" id="qa-back">Back</button><span class="grow"></span>'+pdfBtn+'</div>';
+  app.innerHTML='<div class="card qp-hero"><h1>'+(first?'Hi '+e(first)+', here’s your quotation':'Your quotation')+'</h1>'+
+      '<p class="qp-lead">Review the services and fees below and let us know if you would like to proceed.'+(q.accountant?' Prepared by '+e(q.accountant)+', your accountant.':'')+'</p>'+sum+'</div>'+
+    '<div class="card qp-card"><div class="qv-doc qp-doc">'+quoteDocHtml(doc)+'</div>'+foot+'</div>';
   document.getElementById('qa-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var bk=document.getElementById('qa-back'); if(bk) bk.onclick=function(){ qShowDoc=false; paintQuote(); window.scrollTo(0,0); };
   var go=document.getElementById('qa-go'); if(!go) return;
-  var ta=document.getElementById('qa-c'), er=document.getElementById('qa-e');
-  ta.oninput=function(){ if(!er.hidden&&ta.value.trim()){ er.hidden=true; ta.classList.remove('bad'); } };
-  var answer=function(to){
-    var note=ta.value.trim();
-    if(to==='rejected'&&!note){ er.textContent='Tell us why you’re declining'; er.hidden=false; ta.classList.add('bad'); ta.focus(); return; }
-    if(PREVIEW){ toast('Preview only: in the real link this '+(to==='accepted'?'accepts':'declines')+' the quotation'); return; }
-    var all=loadQuotes(), x=all&&all.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return paintQuote();
-    if(x.status!=='sent') return paintQuote();                      // already answered, or changed by the firm meanwhile
-    var at=Date.now(), from=x.status; x.status=to;
-    x.clientComment=note?{text:note,by:who,at:at,type:to}:null; x.respondedAt=at;
-    x.history.push({type:to,by:who,t:at,from:from,to:to,note:(to==='accepted'?'Accepted':'Declined')+' through the quotation link'+(note?' · “'+note+'”':''),ok:true});
-    try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ return toast('We couldn’t record your answer. Please try again.',true); }
-    qShowDoc=false; paintQuote(); window.scrollTo(0,0);
-  };
-  go.onclick=function(){ answer('accepted'); };
-  document.getElementById('qa-no').onclick=function(){ answer('rejected'); };
+  go.onclick=function(){ if(qBusy) return; answerQuote('accepted','',go,function(err){ if(err){ toast(err,true); } }); };
+  document.getElementById('qa-no').onclick=function(){ declineDialog(who); };
 }
-function quoteWelcome(q,c,who,doc,acc){
-  var first=String(who||c.name||'').trim().split(' ')[0], at=q.respondedAt||q.signedAt||(acc&&acc.t)||Date.now(), mail=c.email||'';
-  app.innerHTML='<div class="card ty qw" role="status">'+TY_ART+
-    '<p class="qw-eyebrow">Quotation accepted</p>'+
-    '<h1>Welcome to '+FIRM.name+(first?', '+e(first):'')+'!</h1>'+
-    '<p class="ty-lead">Thank you for choosing us. Your quotation is accepted and we’re ready to get started on your services.</p>'+
-    '<dl class="ty-meta"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Accepted</dt><dd>'+whenOf(at)+'</dd></div><div><dt>Total (inc. GST)</dt><dd>'+money(doc.T.total)+'</dd></div></dl>'+
-    '<div class="ty-next"><h2>What happens next</h2><ol>'+
-      '<li><b>Your accountant will be in touch</b><span>'+(q.accountant?e(q.accountant)+' will contact you':'We’ll contact you')+(mail?' at '+e(mail):'')+', usually within one business day.</span></li>'+
-      '<li><b>Get your paperwork ready</b><span>Keep receipts, statements and any ATO letters handy so we can start straight away.</span></li>'+
-      '<li><b>We’ll send your invoice</b><span>It matches the quotation you accepted. You don’t need to do anything until it arrives.</span></li></ol></div>'+
-    '<div class="qw-acts"><button class="btn sec" id="qw-view">View quotation</button><button class="btn sec" id="qw-pdf">Download PDF</button></div>'+
-    '<p class="ty-help">Questions? Call <a href="tel:'+FIRM.phone.replace(/ /g,'')+'">'+FIRM.phone+'</a> or email <a href="mailto:'+FIRM.email+'">'+FIRM.email+'</a>.</p></div>';
+/* records the answer once: the quotation is read again and must still be open */
+function answerQuote(to,note,btn,done){
+  if(qBusy) return; qBusy=true;
+  var label=btn.textContent; btn.disabled=true; btn.classList.add('busy'); btn.textContent=to==='accepted'?'Accepting…':'Sending…';
+  [].forEach.call(document.querySelectorAll('#qa-go,#qa-no,#qd-go,#qd-x,#qd-cancel'),function(x){ x.disabled=true; });
+  setTimeout(function(){
+    var reset=function(msg){ qBusy=false; btn.disabled=false; btn.classList.remove('busy'); btn.textContent=label; [].forEach.call(document.querySelectorAll('#qa-go,#qa-no,#qd-go,#qd-x,#qd-cancel'),function(x){ x.disabled=false; }); done(msg); };
+    if(PREVIEW){ reset('Preview only: in the real link this '+(to==='accepted'?'accepts':'declines')+' the quotation'); return; }
+    var all=loadQuotes(), x=all&&all.list.filter(function(y){ return y.token===TOKEN; })[0];
+    if(!x||quoteState(x)!=='open'){ qBusy=false; closeDecline(); paintQuote(); window.scrollTo(0,0); return; }   // already answered, expired or changed meanwhile
+    var c=quoteClient(x), dir=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name, who=x.contactName||x.toName||dir||c.name;
+    var at=Date.now(), from=x.status; x.status=to; x.respondedAt=at;
+    x.clientComment=note?{text:note,by:who,at:at,type:to}:null;
+    x.history.push({type:to,by:who,t:at,from:from,to:to,note:(to==='accepted'?'Accepted':'Declined')+' through the quotation link'+(note?' · “'+note+'”':''),ok:true});
+    try{ localStorage.setItem(Q_KEY,JSON.stringify(all)); }catch(err){ reset('We couldn’t record your answer. Please try again.'); return; }
+    /* the accountant hears about it straight away (same id as the CRM's own check, so it isn't added twice) */
+    try{ parent.AADNotify&&parent.AADNotify({id:'quote:'+x.id+':'+to,kind:'quote',tone:to==='accepted'?'ok':'bad',aud:x.accountant==='John Doe'?'all':'admin',at:at,
+      title:'Quotation '+(to==='accepted'?'accepted':'declined'),desc:x.id+' for '+(x.clientName||c.name)+' was '+(to==='accepted'?'accepted':'declined')+' by '+who+'.'+(note?' “'+note+'”':''),go:{mod:'quotations',id:x.id}}); }catch(err){}
+    qBusy=false; qShowDoc=false; closeDecline(); paintQuote(); window.scrollTo(0,0);
+  },600);
+}
+/* Decline: a dialog asking for the reason (required) */
+function closeDecline(){ var o=document.getElementById('qd-ov'); if(o) o.remove(); document.removeEventListener('keydown',declineKeys,true); var r=document.getElementById('qa-no'); if(r) r.focus(); }
+function declineKeys(ev){ if(ev.key==='Escape'&&!qBusy){ ev.preventDefault(); closeDecline(); } }
+function declineDialog(){
+  var o=document.createElement('div'); o.className='qp-ov'; o.id='qd-ov';
+  o.innerHTML='<div class="qp-modal" role="dialog" aria-modal="true" aria-labelledby="qd-t" aria-describedby="qd-d">'+
+    '<div class="qp-mh"><h2 id="qd-t">Decline this quotation?</h2><button type="button" class="qp-mx" id="qd-x" aria-label="Close">'+IC.x+'</button></div>'+
+    '<div class="qp-mb"><p id="qd-d">Please tell us why you are declining this quotation. Your feedback will be shared with your accountant.</p>'+
+      '<label class="l" for="qd-r">Reason for declining <span class="req">*</span></label>'+
+      '<textarea class="in qp-ta" id="qd-r" rows="4" maxlength="500" placeholder="Share your reason for declining..." aria-required="true" aria-describedby="qd-e"></textarea>'+
+      '<span class="err" id="qd-e" hidden></span></div>'+
+    '<div class="qp-mf"><button type="button" class="btn sec" id="qd-cancel">Cancel</button><button type="button" class="btn pri qp-dno" id="qd-go">Confirm decline</button></div></div>';
+  document.body.appendChild(o);
+  var ta=document.getElementById('qd-r'), er=document.getElementById('qd-e');
+  ta.focus();
+  document.addEventListener('keydown',declineKeys,true);
+  o.addEventListener('mousedown',function(ev){ if(ev.target===o&&!qBusy) closeDecline(); });
+  document.getElementById('qd-x').onclick=function(){ if(!qBusy) closeDecline(); };
+  document.getElementById('qd-cancel').onclick=function(){ if(!qBusy) closeDecline(); };
+  ta.oninput=function(){ if(!er.hidden&&ta.value.trim()){ er.hidden=true; ta.classList.remove('bad'); } };
+  /* keep the focus inside the dialog */
+  o.addEventListener('keydown',function(ev){ if(ev.key!=='Tab') return; var f=[].slice.call(o.querySelectorAll('button:not([disabled]),textarea')), i=f.indexOf(document.activeElement);
+    if(ev.shiftKey&&i<=0){ ev.preventDefault(); f[f.length-1].focus(); } else if(!ev.shiftKey&&i===f.length-1){ ev.preventDefault(); f[0].focus(); } });
+  document.getElementById('qd-go').onclick=function(){
+    var note=ta.value.trim();
+    if(!note){ er.textContent='Enter a reason for declining'; er.hidden=false; ta.classList.add('bad'); ta.focus(); return; }
+    answerQuote('rejected',note,this,function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } });
+  };
+}
+/* confirmations: no decision can be made again */
+function quoteAccepted(q,c,doc){
+  var at=q.respondedAt||q.signedAt||((q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop()||{}).t;
+  app.innerHTML='<div class="card done qp-done" role="status"><div class="big">'+IC.tick+'</div><h2>Quotation accepted successfully</h2>'+
+    '<p>Thank you. '+(q.accountant?e(q.accountant)+', your accountant, has':'Your accountant has')+' been notified and will be in touch to get started.</p>'+
+    '<dl class="ty-meta"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Client</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Accepted</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
+    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn sec" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-view').onclick=function(){ qShowDoc=true; paintQuote(); window.scrollTo(0,0); };
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
-  window.scrollTo(0,0);
+}
+function quoteDeclined(q,c,doc){
+  app.innerHTML='<div class="card done qp-done" role="status"><div class="big bad">'+IC.x+'</div><h2>Quotation declined</h2>'+
+    '<p>Your response to quotation '+e(q.id)+' has been sent to '+(q.accountant?e(q.accountant)+', your accountant':'your accountant')+'. Thank you for your feedback.</p>'+
+    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button></div></div>';
+  document.getElementById('qw-view').onclick=function(){ qShowDoc=true; paintQuote(); window.scrollTo(0,0); };
 }
 if(KIND==='quote') paintQuote();
 if(KIND==='onboard') bootOnboard();

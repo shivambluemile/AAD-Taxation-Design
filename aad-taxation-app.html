@@ -21258,9 +21258,6 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qr-dic{width:36px;height:36px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--slate);margin-bottom:4px}
 .qr-doc b{font-size:14px;color:var(--ink)}.qr-doc>span:last-child{font-size:12.5px;color:var(--mute)}
 .qr-docw{margin-top:4px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.qr-tools{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:14px}
-.qr-tb{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;font-weight:600;color:var(--slate);cursor:pointer;transition:background .15s,border-color .15s,color .15s}
-.qr-tb:hover{background:#FFF8F2;border-color:#F8C9A2;color:var(--orange-ink)}.qr-tb svg{width:15px;height:15px}.qr-tb:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
 .qr-dh{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:#FAFBFC}
 .qr-dh b{font-size:13.5px;color:var(--ink)}
 .qr-dacts{display:flex;align-items:center;gap:14px}
@@ -21453,15 +21450,11 @@ function paintQuote(){
   app.innerHTML='<div class="hello"><h1>'+(exp?'This quotation has expired':'Your quotation is ready')+'</h1><p>Quotation '+e(q.id)+(q.accountant?' · Prepared by '+e(q.accountant):'')+'</p></div>'+   // centred, as on the other client pages; the logo is in the page header
     '<div class="card qr">'+
     '<div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Quotation document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div></div>'+
-    '<div class="qr-tools"><button type="button" class="qr-tb" id="qa-pdf">'+IC.dl+'Download PDF</button><button type="button" class="qr-tb" id="qa-print"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>Print</button><button type="button" class="qr-tb" id="qa-doc" aria-haspopup="dialog"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>Full screen</button></div>'+
     (exp?'<div class="note warn"><span>This quotation passed its valid-until date, so it can no longer be accepted. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>'
       :'<div class="qr-acts"><button type="button" class="btn pri qa-big" id="qa-go">'+IC.tick+'Accept quotation · '+money(doc.T.total)+'</button>'+
         '<span class="err" id="qa-e" hidden></span>'+
         '<p class="qa-alt">Not what you need? <button type="button" class="qa-dl" id="qa-no">Decline this quotation</button></p></div>')+
   '</div>';
-  document.getElementById('qa-doc').onclick=function(){ quoteViewer(doc); };
-  var outQ=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download or print the quotation',true); };
-  document.getElementById('qa-pdf').onclick=outQ; document.getElementById('qa-print').onclick=outQ;
   var go=document.getElementById('qa-go'); if(!go) return;
   var er=document.getElementById('qa-e');
   var fail=function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } };

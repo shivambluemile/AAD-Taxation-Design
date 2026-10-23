@@ -3086,6 +3086,10 @@ tbody tr:hover{background:#FCFCFD}
 .dr-row{padding:18px 0}.dr-row+.dr-row{border-top:1px solid var(--line)}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
+.el-det{margin-bottom:0}.el-dg{padding:16px 0 4px}
+.el-svc{border-top:1px solid var(--line);padding:14px 0 12px}.el-svt{margin:0 0 6px;font-size:12px;color:var(--mute)}
+.el-sr{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:14px;color:var(--ink)}.el-sr b{font-weight:600;font-variant-numeric:tabular-nums}
+.el-sr.t{border-top:1px dashed var(--line);margin-top:4px;padding-top:9px}.el-sr.t span,.el-sr.t b{font-weight:700}
 .sv-add{margin:16px 0 4px;padding:16px;border:1px solid #F8C9A2;border-radius:12px;background:#FFFAF5}
 .sv-add-t{margin:0;font-size:14px;font-weight:700;color:var(--ink)}.sv-add-n{margin:2px 0 14px;font-size:12.5px;color:var(--mute)}
 .sv-add-f{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #F3DCC8}
@@ -6449,7 +6453,20 @@ function letterHistItems(c){
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
       files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
+/* the Engagement letter tab: first what goes into the letter (deposit, account, services and fees, who signs), then the letter itself */
 function engagementTab(c){
+  var body=engagementBody(c); if(c._draft) return body;
+  ONB=loadOnb(); var L=currentLetter(c)||letterFor(c.id), act=(c.services||[]).filter(function(a){ return a.status==='active'; });
+  var svc=L&&L.services&&L.services.length?L.services:act, pay=(L&&L.pay)||c.pay||{}, sg=letterSigner(c,L);
+  if(!svc.length&&!pay.deposit) return body;
+  var kv=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+(v?esc(v):'<span class="cl-muted">—</span>')+'</dd></div>'; };
+  var dep=pay.deposit!=null&&String(pay.deposit).trim()!==''?money(Number(String(pay.deposit).replace(/[$,\s]/g,''))||0):'';
+  return '<section class="dr-card el-det"><div class="dr-h"><div><h3>Letter details</h3><p>What the engagement letter for FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+' sets out</p></div></div>'+
+    '<dl class="fgrid dr-grid el-dg">'+kv('Deposit amount',dep)+kv('BSB',pay.bsb)+kv('Account number',pay.accNo)+kv('To be signed by',sg.name+(sg.role?' ('+sg.role+')':''))+'</dl>'+
+    '<div class="el-svc"><p class="el-svt">Services and fees</p>'+(svc.length?svc.map(function(x){ return '<div class="el-sr"><span>'+esc(x.name)+'</span><b>'+money(+x.price||0)+'</b></div>'; }).join('')+
+      '<div class="el-sr t"><span>Total (incl. GST)</span><b>'+money(svc.reduce(function(a,x){ return a+(+x.price||0); },0))+'</b></div>':'<p class="cl-muted">No services yet.</p>')+'</div></section>'+body;
+}
+function engagementBody(c){
   ONB=loadOnb(); var F=fyStart(Date.now()), L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var fyEndAt=new Date(F+1,5,30,23,59,59,999).getTime(), now=Date.now();
   var actServices=act.map(function(a){ return {name:a.name,price:a.price}; });

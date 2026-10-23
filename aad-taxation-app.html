@@ -11702,7 +11702,7 @@ var DevData={
     var cl=loadClients().filter(function(c){ return c.active!==false; }).slice(0,10), svc=[];
     try{ svc=loadCatalog().services.filter(function(s){ return s.active; }); }catch(e){}
     if(!cl.length||!svc.length||!ASSIGNABLE.length) return [];
-    var day=864e5, now=Date.now(), plan=['draft','sent','converted','draft','accepted','rejected','sent','expired','cancelled','converted','sent','draft','accepted','converted'], out=[];
+    var day=864e5, now=Date.now(), plan=['draft','sent','converted','draft','accepted','rejected','sent','expired','draft','converted','sent','draft','accepted','converted'], out=[];
     plan.forEach(function(st,i){
       var c=cl[i%cl.length], who=ASSIGNABLE[i%ASSIGNABLE.length], by=ASSIGNABLE[(i+1)%ASSIGNABLE.length].name, made=now-(42-i*3)*day-(i*37%9)*36e5;
       var items=[svc[i%svc.length]].concat(i%3?[svc[(i*5+2)%svc.length]]:[]).map(function(s){ return {name:s.name,qty:1,price:s.price}; });
@@ -11727,7 +11727,11 @@ var DevData={
 /* ---------- load ---------- */
 var st=null, loadErr=null, clients=[];
 function expireDue(){ var ch=false, today=isoDay(Date.now()); st.list.forEach(function(q){ if(q.status==='sent'&&isoDay(q.validUntil)<today){ setStatus(q,'expired','expired',{by:'System',t:q.validUntil}); ch=true; } }); if(ch) QuoteStore.save(st); }
-function reload(){ try{ st=QuoteStore.load(); clients=loadClients(); expireDue(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
+/* quotations can't be cancelled: any saved as cancelled go back to the status they had before, and the cancel entry leaves their history */
+function uncancel(){ var ch=false; (st&&st.list||[]).forEach(function(q){ if(q.status!=='cancelled') return;
+  var c=(q.history||[]).filter(function(e){ return e.type==='cancelled'; }).pop(); q.status=c&&c.from&&c.from!=='cancelled'?c.from:'draft';
+  q.history=(q.history||[]).filter(function(e){ return e.type!=='cancelled'; }); ch=true; }); if(ch) QuoteStore.save(st); }
+function reload(){ try{ st=QuoteStore.load(); clients=loadClients(); uncancel(); expireDue(); loadErr=null; }catch(e){ st=null; loadErr=e; } }
 function client(q){ var c=clients.filter(function(x){ return String(x.id)===String(q.clientId); })[0]; return c?{id:c.id,name:c.name,email:c.email||'',phone:c.phone||'',type:c.type,entity:c.entity}:{name:q.clientName||'Client no longer on file',email:'',phone:''}; }
 function byId(id){ return st.list.filter(function(q){ return q.id===id; })[0]; }
 function scoped(){ return st.list.filter(inScope); }

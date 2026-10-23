@@ -12164,8 +12164,8 @@ function paintForm(focusId){
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,'<div class="qf-ms msel" id="qf-ms"><div class="msel-box qf-msbox'+(e.company?' bad':'')+(d.branch?'':' off')+'" id="qf-msbox"></div><div class="mlist qf-msmenu" id="qf-msmenu"></div></div>','company')+'</div>'+
         '<div class="g3">'+field('On the name of',true,c?sel('qf-on','onName',names.concat(d.onName&&!names.some(function(o){ return o[0]===d.onName; })?[[d.onName,d.onName]]:[]),d.onName,'Select'):noClient,'onName')+
-          field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" maxlength="20" autocomplete="off" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
-          field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
+          field('Phone Number',false,'<input class="fin plain sm" id="qf-cp1" data-qf="contactPhone" type="tel" inputmode="tel" maxlength="20" autocomplete="off" placeholder="04XX XXX XXX" value="'+esc(d.contactPhone)+'"'+(c?'':' disabled')+'>')+
+          field('ABN',false,'<input class="fin plain sm" id="qf-abn" data-qf="abn" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="e.g. 51 824 753 556" value="'+esc(d.abn)+'"'+(c?'':' disabled')+'>')+'</div></div>')+
       card('Assignment and dates','','<div class="stack"><div class="g2">'+
           field('Select accountant',true,sel('qf-acc','accountant',staff,d.accountant,'Select'),'accountant')+
           field('Additional accountant',false,sel('qf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2')+'</div>'+

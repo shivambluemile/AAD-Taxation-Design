@@ -1618,9 +1618,11 @@ function F(slot,n,s){ return {slot:slot,n:n,s:s}; }
 var SEED_SETS=[null,['lic','tfn','contract'],['lic','visa','tfn'],[]];
 function seedDocs(id){
   var docs=[
-    {k:'lic',ver:2,no:'DL0904821',
+    {k:'lic',ver:3,no:'DL0904821',
      cur:{files:[F('front','licence_front_2026.jpg','1.8 MB'),F('back','licence_back_2026.jpg','2.1 MB')],exp:dayOff(612),on:dayOff(-4,10,24),by:'John Doe',note:'Renewed licence — new card issued by Service NSW'},
-     hist:[{ver:1,files:[F('front','licence_front_2021.jpg','1.6 MB'),F('back','licence_back_2021.jpg','1.9 MB')],exp:dayOff(-6),on:dayOff(-1735,11,0),by:'Admin',rOn:dayOff(-4,10,24),rBy:'John Doe'}]},
+     hist:[{ver:2,files:[F('front','licence_front_2021.jpg','1.6 MB'),F('back','licence_back_2021.jpg','1.9 MB')],exp:dayOff(-6),on:dayOff(-1735,11,0),by:'Admin',rOn:dayOff(-4,10,24),rBy:'John Doe'},
+           /* sample: a first upload replaced before it expired (the front was blurry) */
+           {ver:1,files:[F('front','licence_front_blurry.jpg','0.6 MB'),F('back','licence_back.pdf','0.4 MB')],exp:dayOff(-6),on:dayOff(-1742,16,45),by:'Ankit Verma',rOn:dayOff(-1735,11,0),rBy:'Admin'}]},
     {k:'pass',ver:2,no:'PA7713920',
      cur:{files:[F('main','passport_2016.pdf','1.2 MB')],exp:dayOff(-21),on:dayOff(-640,9,15),by:'Marthew'},
      hist:[{ver:1,files:[F('main','passport_scan_old.pdf','0.9 MB')],exp:dayOff(-650),on:dayOff(-1100,14,2),by:'Admin',rOn:dayOff(-640,9,15),rBy:'Marthew'}]},

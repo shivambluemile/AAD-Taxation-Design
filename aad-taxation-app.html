@@ -1594,7 +1594,7 @@ var DOC_TYPES=[
   {k:'super',name:'Superannuation Choice Form',cat:'Payroll',exp:false,slots:[{id:'main',label:'Form'}]}
 ];
 /* document numbers are stored in full but only the last 4 characters are shown */
-var SOON_DAYS=60;
+var SOON_DAYS=7;   // staff hear about an expiry 7 days before it
 function typeOf(k){ for(var i=0;i<DOC_TYPES.length;i++) if(DOC_TYPES[i].k===k) return DOC_TYPES[i]; return null; }
 function slotLabel(k,id){ var t=typeOf(k); for(var i=0;i<t.slots.length;i++) if(t.slots[i].id===id) return t.slots[i].label; return 'File'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}); }
@@ -6442,7 +6442,7 @@ function engagementTab(c){
       '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed</button>'+
       '<button type="button" class="dx-up" data-el="send">'+CD_I.up+'Start renewal</button>')+'</section>';
   }
-  var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=30;
+  var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=7;
   var fileWho=st==='signed'?letterHow(L):'Created by <em>'+esc(L.by||'staff')+'</em> · '+cdStamp(L.created);
   var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'<span class="'+(st==='awaiting'?'warn':'')+'">'+S[0]+'</span> · To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
@@ -20431,7 +20431,7 @@ var KYC_DAYS=365;
 function kycUploadedAt(rec){ return rec.at||fromIso(rec.date); }
 function kycExpiresAt(rec){ return rec.expiresAt||(kycUploadedAt(rec)+KYC_DAYS*864e5); }
 function kycExpiry(x){ return isoOf(typeof x==='object'&&x?kycExpiresAt(x):fromIso(x)+KYC_DAYS*864e5); }   // a record, or (older callers) an upload date
-function kycState(rec){ var now=Date.now(), exp=kycExpiresAt(rec); if(now>=exp) return 'expired'; return (exp-now)/864e5<=30?'expiring':'valid'; }
+function kycState(rec){ var now=Date.now(), exp=kycExpiresAt(rec); if(now>=exp) return 'expired'; return (exp-now)/864e5<=7?'expiring':'valid'; }   // flagged 7 days before
 function pill(map,k){ var s=map[k]||[k,'grey']; return '<span class="ob-pill '+s[1]+'"><i></i>'+s[0]+'</span>'; }
 
 /* ---------- store ---------- */

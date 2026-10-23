@@ -4425,11 +4425,12 @@ function letterSigner(c,L){
 function firstSigner(c){ if(c.type==='company'){ var d=(c.directors||[])[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'first director'}; } return {name:c.name,email:c.email,phone:c.phone,role:'client'}; }   // generated or sent isn't enough
 function detailTabs(c){
   var t=[], act=(c.services||[]).filter(function(a){ return a.status==='active'; }).length;
-  t.push(['notes','Notes',(c.notes||[]).length]);            // notes come first
-  t.push(['services','Services',act]);
+  /* the order a client is set up in: directors, services, KYC, the letter; then notes and the activity log */
   if(c.type==='company') t.push(['directors','Directors',c.directors.length]);
+  t.push(['services','Services',act]);
   t.push(['documents','KYC',kycRecs(c).length,kycDone(c)]);
   t.push(['engagement','Engagement letter',null,letterSignedFor(c)]);
+  t.push(['notes','Notes',(c.notes||[]).length]);
   t.push(['activity','Activities']);
   return t;
 }
@@ -6077,15 +6078,15 @@ var rqTab='services';
 function openRequestDetail(id,swap,tab){
   ONB=loadOnb(); var r=reqById(id); if(!r){ closeDrawer(); return; }
   if(r.clientId&&findClient(r.clientId)){ openReqId=null; go('/clients/'+r.clientId); return; }
-  if(openReqId!==id) rqTab='notes';
+  var newReq=openReqId!==id; if(newReq) rqTab='';
   openReqId=id;
   var f=r.form||{}, co=r.type==='company', link=portalLink('onboard',r.token), expired=Date.now()>r.expires, open=['draft','info'].indexOf(r.status)>=0;
   var who=esc(f.name||r.name), first=co?who:esc(String(f.name||r.name).split(' ')[0]);
   var dirs=co&&f.directors?f.directors.filter(function(d){ return String(d.name||'').trim(); }):[];
-  var tabs=[['notes','Notes'],['services','Services',r.services.length]];
-  if(dirs.length) tabs.push(['directors','Directors',dirs.length]);
-  tabs.push(['documents','KYC',r.kyc.length||null,!!r.kyc.length],['engagement','Engagement letter',null,r.letter.status==='signed'],['activity','Activities']);
-  if(tab) rqTab=tab; if(!tabs.some(function(t){ return t[0]===rqTab; })) rqTab='notes';
+  var tabs=dirs.length?[['directors','Directors',dirs.length]]:[];   // same order as a client's tabs
+  tabs.push(['services','Services',r.services.length],['documents','KYC',r.kyc.length||null,!!r.kyc.length],['engagement','Engagement letter',null,r.letter.status==='signed'],['notes','Notes'],['activity','Activities']);
+  if(openReqId!==id||!rqTab) rqTab=tabs[0][0];
+  if(tab) rqTab=tab; if(!tabs.some(function(t){ return t[0]===rqTab; })) rqTab=tabs[0][0];
   var dc=function(icon,val,copy){ return val?'<span class="dc"><i class="dci">'+icon+'</i>'+val+(copy?'<button class="copy" data-copy="'+esc(copy)+'" title="Copy" aria-label="Copy">'+I.copy+'</button>':'')+'</span>':''; };
   var a0=f.address||{}, addr=[a0.street,[a0.suburb,a0.state,a0.postcode].filter(Boolean).join(' ')].filter(Boolean).join(', ');
   var acts={

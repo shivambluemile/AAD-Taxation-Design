@@ -3088,7 +3088,8 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
 .el-q{margin-top:18px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
-.el-ff{display:flex;align-items:center;gap:10px;margin-top:18px;padding:14px 0;border-top:1px solid var(--line)}.el-pick{font-size:13px}
+.el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
+.el-flow .el-opt{align-items:center}.el-flow .el-opt input{margin:0}
 .el-payg{padding-top:16px;margin-bottom:6px}.el-pdl{padding:16px 0 12px}.el-pwait{margin:0 32px 22px}
 .sv-add{margin:16px 0 4px;padding:16px;border:1px solid #F8C9A2;border-radius:12px;background:#FFFAF5}
 .sv-add-t{margin:0;font-size:14px;font-weight:700;color:var(--ink)}.sv-add-n{margin:2px 0 14px;font-size:12.5px;color:var(--mute)}
@@ -4443,7 +4444,7 @@ function kycDone(c){ var k=kycCurrent(c); return !!(k&&kycState(k)!=='expired');
 function currentLetter(c){ var F=fyStart(Date.now()); return ONB.letters.filter(function(l){ return l.clientId===c.id&&letterFy(l)===F; }).sort(function(a,b){ return b.created-a.created; })[0]||null; }
 function letterSignedFor(c){ var l=currentLetter(c); return !!(l&&l.status==='signed'); }
 /* who signs: the first director for a company, otherwise the client */
-var elDirPick={}, elHow={};                                // client id -> director chosen to sign / 'request' | 'manual'
+var elDirPick={};                                          // client id -> director chosen to sign the letter
 function letterSigner(c,L){
   if(c.type==='company'&&elDirPick[c.id]&&!(L&&L.status==='signed')){ var pk=(c.directors||[]).filter(function(x){ return x.name===elDirPick[c.id]; })[0]; if(pk) return {name:pk.name,email:pk.email,phone:pk.phone,role:'director'}; }
   if(c.type==='company'&&L&&L.signer&&L.signer.name){ var d=(c.directors||[]).filter(function(x){ return x.name===L.signer.name; })[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'director'}; }
@@ -6473,28 +6474,25 @@ function engagementTab(c){
       '<button class="btn-edit" id="el-pedit">'+I.edit+'Edit</button></div>'+
     '<dl class="fgrid dr-grid el-pdl">'+fv('Deposit amount',dep)+fv('BSB',p.bsb)+fv('Account number',p.accNo)+'</dl></section>'+engagementBody(c);
 }
-/* the letter before it's sent or signed, as in Add Client step 3: the letter, the review tick, which director signs, and how */
+/* the letter before it's sent, as in Add Client step 3: the letter, which director signs, then the send screen in place.
+   The client reviews and signs it themselves, so there's no manual signing or upload here */
 function elFlow(c,services,L){
   var co=c.type==='company', dirs=co?(c.directors||[]).filter(function(d){ return String(d.name||'').trim(); }):[];
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
-  var sg=letterSigner(c,L), how=elHow[c.id]||'', ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
-  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+' · check it, choose who signs, then send or sign it</p></div>'+
+  var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
+  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+(co?' · choose the director who signs, then send it':' · send it to '+esc(c.name)+' to sign')+'</p></div>'+
       '<div class="el-acts"><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
-    '<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>'+
-    '<label class="el-review"><input type="checkbox" id="el-rev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>';
+    '<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>';
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'
     :'<p class="cl-hint">Add a director in the Directors tab first.</p>')+'</div>';
-  h+='<div class="el-q"><h4>How should this be signed?</h4><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
-    [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=how===m[0];
-      return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div></div>'+
-    '<div class="el-ff"><button type="button" class="linkbtn" data-el="upload">'+CD_I.up+'Upload a signed letter instead</button><span class="sp-grow"></span>'+
-      (how==='request'?'<button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send for signature</button>':how==='manual'?'<button type="button" class="btn-primary btn-sm" data-el="sign">Sign manually</button>':'<span class="cl-muted el-pick">Choose how it’s signed</span>')+'</div></section>';
+  h+='<div class="el-q el-sndq"><div id="el-snd"></div><div class="el-ff" id="el-sndf"></div></div></section>';
   return h;
 }
 function wireElFlow(c,done){
-  document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // a new signer: tick the review again
-  document.querySelectorAll('#cdb input[name=el-how]').forEach(function(x){ x.onchange=function(){ elHow[c.id]=x.value; var rv=document.getElementById('el-rev'), keep=rv&&rv.checked; done(); var r2=document.getElementById('el-rev'); if(r2&&keep) r2.checked=true; }; });
+  document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen follows the new signer
+  var b=document.getElementById('el-snd'), ft=document.getElementById('el-sndf');
+  if(b&&ft) letterAction(c,'send',done,{body:b,foot:ft});
 }
 /* Save: all three must have something in them; the open letter (not yet signed) gets the same details */
 function wireElPay(c,done){
@@ -6571,7 +6569,7 @@ function elErrorDetails(c){
   document.getElementById('ee-go').onclick=function(){ closeModal(); letterAction(c,'send',function(){ openDetail(c.id,true,'engagement'); }); };
 }
 /* sign or (re)send the letter from the client's record */
-function letterAction(c,what,refresh){
+function letterAction(c,what,refresh,inline){
   ONB=loadOnb(); var L=currentLetter(c), act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,L||letterFor(c.id));
   var services=L?L.services:act.map(function(a){ return {name:a.name,price:a.price}; });
   var byId=function(id){ return ONB.letters.filter(function(l){ return l.id===id; })[0]; };
@@ -6623,10 +6621,12 @@ function letterAction(c,what,refresh){
   if(what==='send'){
     var x0=L, token=x0?x0.token:newToken(), expires=Date.now()+LINK_DAYS*864e5;
     if(!sg.email&&!sg.phone){ toast((c.type==='company'?'Add an email or phone for '+(sg.name||'the signing director'):'Add an email or phone for the client')+' first',true); return; }
-    showDrawer('<div class="drawer wz swap" role="dialog" aria-modal="true" aria-labelledby="ls-t"><div class="modal-head"><h2 id="ls-t">Send engagement letter · '+esc(c.name)+'</h2><button id="ls-x" aria-label="Close">'+I.close+'</button></div><div class="modal-body" id="lsb"></div><div class="modal-foot" id="ls-foot"></div></div>');
-    var back=function(){ openDetail(c.id,true,'engagement'); };
-    document.getElementById('ls-x').onclick=back;
-    sendScreen(document.getElementById('lsb'),document.getElementById('ls-foot'),{kind:'engagement',sendLabel:x0&&x0.sends.length?'Resend letter':'Send letter',
+    if(!inline){
+      showDrawer('<div class="drawer wz swap" role="dialog" aria-modal="true" aria-labelledby="ls-t"><div class="modal-head"><h2 id="ls-t">Send engagement letter · '+esc(c.name)+'</h2><button id="ls-x" aria-label="Close">'+I.close+'</button></div><div class="modal-body" id="lsb"></div><div class="modal-foot" id="ls-foot"></div></div>');
+      document.getElementById('ls-x').onclick=function(){ openDetail(c.id,true,'engagement'); };
+    }
+    var back=inline?refresh:function(){ openDetail(c.id,true,'engagement'); };
+    sendScreen(inline?inline.body:document.getElementById('lsb'),inline?inline.foot:document.getElementById('ls-foot'),{kind:'engagement',sendLabel:x0&&x0.sends.length?'Resend letter':'Send letter',
       intro:c.type==='company'?'<div class="wz-intro"><b>Send to '+esc(sg.name)+'</b><span>They get a secure link to review and sign. No other director needs to sign.</span></div>':'',
       to:{email:sg.email,phone:sg.phone},ctx:tplCtx({name:c.name,type:c.type,entity:c.entity,services:services,staff:ME,kind:'engagement',link:portalLink('sign',token),expires:expires}),
       back:back,

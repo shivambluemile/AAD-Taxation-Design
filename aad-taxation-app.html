@@ -11515,9 +11515,9 @@ table,td,th{font-size:13.5px}
 .qf-pf{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#F9FAFB}
 .qf-pf .cl-av{width:40px;height:40px;font-size:13px}
 .qf-pf-b{min-width:0;flex:1}.qf-pf-b>b{display:block;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.qf-pf dl{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:4px 16px;margin:4px 0 0}
-.qf-pf dt{font-size:11px;color:var(--mute)}.qf-pf dd{margin:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qf-pf-none{color:var(--mute)}
-@media (max-width:600px){.qf-pf dl{grid-template-columns:1fr}}
+.qf-pf-m{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:5px}
+.qf-pf-m span{display:inline-flex;align-items:center;gap:5px;min-width:0;font-size:13px;color:var(--ink);white-space:nowrap}
+.qf-pf-m svg{width:13px;height:13px;flex-shrink:0;color:var(--mute)}.qf-pf-m em{font-style:normal;font-size:11px;color:var(--mute)}
 .qf-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;height:42px;padding:0 6px 0 14px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .qf-chosen b{font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .drawer.sf.qf{max-width:min(1040px,96vw)}
@@ -12169,9 +12169,10 @@ function recipientOf(c,name){
 /* the person or company the quotation is made out to, as a profile card */
 function profileCard(c,d){
   var rc=recipientOf(c,d.onName), nm=d.onName||c.name, rec=rc.rec||{id:c.id,name:nm};
-  var it=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+(v?esc(v):'<span class="qf-pf-none">—</span>')+'</dd></div>'; };
+  /* one line under the name: email, phone, ABN (only the ones on file) */
+  var it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'</span>':''; };
   return '<div class="qf-pf">'+clAv({id:rec.id,name:nm})+'<div class="qf-pf-b"><b>'+esc(nm)+'</b>'+
-    '<dl>'+it('Email',rc.email)+it('Phone',d.contactPhone)+it('ABN',d.abn)+'</dl></div></div>';
+    '<div class="qf-pf-m">'+it(QD_IC.mail,rc.email,'Email')+it(QD_IC.phone,d.contactPhone,'Phone')+it('<em>ABN</em>',d.abn,'ABN')+'</div></div></div>';
 }
 function fillContact(c){ var d=QF.d; d.contactPhone=c.phone||c.commPhone||''; d.abn=c.abn||''; }
 function formClient(){ return QF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(QF.d.clientId); })[0]:null; }

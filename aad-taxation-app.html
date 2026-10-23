@@ -3086,6 +3086,14 @@ tbody tr:hover{background:#FCFCFD}
 .dr-row{padding:18px 0}.dr-row+.dr-row{border-top:1px solid var(--line)}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
+.sv-row{display:flex;align-items:center;gap:12px;padding:14px 0}.sv-row+.sv-row{border-top:1px solid var(--line)}
+.sv-ic{width:36px;height:36px;border-radius:10px;background:#FFF1E6;color:var(--orange-ink);display:flex;align-items:center;justify-content:center;flex-shrink:0}.sv-ic svg{width:16px;height:16px}
+.sv-main{flex:1;min-width:0}.sv-main b{display:block;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sv-main small{display:block;font-size:12px;color:var(--mute);margin-top:2px}
+.sv-pr{font-size:14px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.sv-rv{margin-left:6px}
+.sv-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:28px 0 26px}.sv-empty .sv-ic{margin-bottom:8px}.sv-empty b{font-size:14px;color:var(--ink)}.sv-empty span:last-child{font-size:13px;color:var(--mute)}
+.sv-hrow{padding:14px 0}.sv-hrow+.sv-hrow{border-top:1px solid var(--line)}.sv-htop{display:flex;align-items:center;gap:10px}.sv-htop b{font-size:14px;font-weight:600;color:var(--ink)}.sv-hpr{margin-left:auto;font-size:13.5px;font-weight:600;color:var(--ink)}
+.sv-hmeta{display:flex;flex-direction:column;gap:2px;margin-top:4px;font-size:12px;color:var(--mute)}.sv-hmeta b{color:var(--slate);font-weight:600}.sv-why{font-style:italic;color:var(--slate)}
+.dr-card+.dr-card{margin-top:0}
 .dr-grid{margin:0}.dr-grid dt{text-transform:none;letter-spacing:0;font-size:12px;font-weight:500;color:var(--mute)}.dr-grid dd{font-size:14px}.dr-none{padding:18px 0;margin:0}
 .vdir{padding:22px 32px}
 .vdir .ddir-acts{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -6225,20 +6233,22 @@ function completeRequest(r,kycDate,auto){
 /* =========================================================
    Client detail tabs: Services, KYC documents, Notes, Engagement letter
 ========================================================= */
+/* two cards like Directors: the current services (Assign service, Revoke), then every assignment ever made */
 function servicesTab(c){
   var list=c.services||[], act=list.filter(function(a){ return a.status==='active'; });
-  var h='<div class="vbar"><p><b>'+act.length+' active</b> service'+(act.length===1?'':'s')+(act.length?' · '+money(totalOf(act))+' total':'')+'. Revoked services stay in the history below.</p>'+
-    (c._draft?'':'<button class="btn-edit" data-assign>'+I.plus+'Assign service</button>')+'</div>';
-  h+='<section class="vsec"><div class="vsec-h"><h3>'+I.tag+'Current services</h3></div>'+
-    (act.length?'<table class="mini"><thead><tr><th>Service</th><th class="r">Price</th><th>Assigned</th>'+(c._draft?'':'<th class="c">Action</th>')+'</tr></thead><tbody>'+act.map(function(a){
-      return '<tr><td>'+esc(a.name)+'</td><td class="r">'+money(a.price)+'</td><td>'+whenOf(a.at)+'<small class="cl-muted"> by '+esc(a.by)+'</small></td>'+(c._draft?'':'<td class="c"><button class="linkbtn danger" data-revoke="'+a.aid+'">Revoke</button></td>')+'</tr>'; }).join('')+'</tbody></table>'
-      :'<p class="cl-muted">No active services. Assign one to start working with this client.</p>')+'</section>';
-  h+='<section class="vsec"><div class="vsec-h"><h3>'+I.clock+'Service history</h3><span class="cl-muted">Every assignment is its own record</span></div>'+
-    (list.length?'<div class="svh">'+list.slice().sort(function(a,b){ return b.at-a.at; }).map(function(a){
-      return '<div class="svh-row"><div class="svh-top"><b>'+esc(a.name)+'</b><span>'+money(a.price)+'</span>'+pill({active:['Active','green'],revoked:['Revoked','grey']},a.status)+'</div>'+
-        '<div class="svh-meta"><span><em>Assigned</em> '+whenOf(a.at)+' by <b>'+esc(a.by)+'</b>'+(a.source?' · '+esc(a.source):'')+'</span>'+
-        (a.status==='revoked'?'<span><em>Revoked</em> '+whenOf(a.revokedAt)+' by <b>'+esc(a.revokedBy)+'</b></span><span class="svh-why">“'+esc(a.reason)+'”</span>':'')+'</div></div>';
-    }).join('')+'</div>':'<p class="cl-muted">No services have been assigned yet.</p>')+'</section>';
+  var h='<section class="dr-card"><div class="dr-h"><div><h3>Current services</h3><p>'+act.length+' active'+(act.length?' · '+money(totalOf(act))+' total':'')+'</p></div>'+
+    (c._draft?'':'<button class="btn-edit" data-assign>'+I.plus+'Assign service</button>')+'</div>'+
+    (act.length?act.map(function(a){
+      return '<div class="sv-row"><span class="sv-ic">'+I.tag+'</span><div class="sv-main"><b>'+esc(a.name)+'</b><small>Assigned '+whenOf(a.at)+' by '+esc(a.by)+'</small></div>'+
+        '<span class="sv-pr">'+money(a.price)+'</span>'+(c._draft?'':'<button class="linkbtn danger sv-rv" data-revoke="'+a.aid+'">Revoke</button>')+'</div>'; }).join('')
+      :'<div class="sv-empty"><span class="sv-ic">'+I.tag+'</span><b>No active services</b><span>Assign a service to start working with this client.</span></div>')+'</section>';
+  var past=list.filter(function(a){ return a.status!=='active'; });   // the active ones are listed above
+  h+='<section class="dr-card"><div class="dr-h"><div><h3>Service history</h3><p>Services that were revoked, with who revoked them and why.</p></div></div>'+
+    (past.length?past.slice().sort(function(a,b){ return b.at-a.at; }).map(function(a){
+      return '<div class="sv-hrow"><div class="sv-htop"><b>'+esc(a.name)+'</b><span class="sv-hpr">'+money(a.price)+'</span>'+pill({active:['Active','green'],revoked:['Revoked','grey']},a.status)+'</div>'+
+        '<div class="sv-hmeta"><span>Assigned '+whenOf(a.at)+' by <b>'+esc(a.by)+'</b>'+(a.source&&a.source!=='Assigned'?' · '+esc(a.source):'')+'</span>'+
+        (a.status==='revoked'?'<span>Revoked '+whenOf(a.revokedAt)+' by <b>'+esc(a.revokedBy)+'</b></span><span class="sv-why">“'+esc(a.reason)+'”</span>':'')+'</div></div>';
+    }).join(''):'<p class="cl-muted dr-none">No revoked services.</p>')+'</section>';
   return h;
 }
 function assignDialog(c,done){

@@ -21554,8 +21554,9 @@ function quoteDeclined(q,c,doc){
     '<dl class="ty-meta qp-meta4"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Declined on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
     (why?'<div class="qp-why"><b>Your reason</b><p>“'+e(why)+'”</p></div>':'')+
     '<p class="qp-change">Changed your mind? Call '+FIRM.name+' on '+FIRM.phone+' and we’ll send you an updated quotation.</p>'+
-    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button></div></div>';
+    '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-view').onclick=function(){ quoteViewer(doc); };
+  document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }
 if(KIND==='quote') paintQuote();
 if(KIND==='onboard') bootOnboard();

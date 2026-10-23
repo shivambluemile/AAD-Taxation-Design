@@ -1844,7 +1844,7 @@ function docsBody(s){
     '<p class="dx-ap">'+esc(who)+'’s '+join(need.map(low))+(need.length>1?' are mandatory documents and have':' is a mandatory document and has')+' not been uploaded. Please click upload to provide the required document'+(need.length>1?'s':'')+'.</p></div>'+
     '<button type="button" class="dx-up dx-ab" data-needpop aria-haspopup="dialog">'+I.upsm+'Upload</button></div>';
   if(lines) h='<div class="dx-slim" role="alert">'+lines+'</div>'+h;
-  return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Each document keeps its '+KEEP_VERSIONS+' most recent versions. When a new version is uploaded, the oldest is permanently deleted and can’t be recovered.</span></p>';
+  return h+currentList(docs)+'<p class="ds-note" role="note">'+I.info+'<span>Only the '+KEEP_VERSIONS+' most recent versions are retained. Uploading a new version permanently removes the oldest version.</span></p>';
 }
 function currentList(docs){
   var q=docQ.trim().toLowerCase(), order={expired:0,soon:1,valid:2,none:3};

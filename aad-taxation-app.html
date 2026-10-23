@@ -3087,7 +3087,7 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
-.el-q{margin-top:18px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
+.el-q{margin-top:18px}.el-man .el-review{margin-top:14px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
 .el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
 .el-flow .el-opt{align-items:center}.el-flow .el-opt input{margin:0}
 .el-payg{padding-top:16px;margin-bottom:6px}.el-pdl{padding:16px 0 12px}.el-pwait{margin:0 32px 22px}
@@ -6491,7 +6491,9 @@ function elFlow(c,services,L){
     [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=how===m[0];
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div></div>';
   if(how==='request') h+='<div class="el-ff"><button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send</button></div>';   // opens the send screen in the side panel, as in Add Client
-  if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div><span class="cl-err" id="el-sigerr" hidden></span>'+
+  if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+
+    '<label class="el-review" id="el-revl"><input type="checkbox" id="el-mrev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+
+    '<span class="cl-err" id="el-sigerr" hidden></span>'+
     '<div class="el-ff"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
   return h+'</section>';
 }
@@ -6501,9 +6503,11 @@ function wireElFlow(c,done){
   var pe=document.getElementById('el-pad'); if(!pe) return;
   var nm=letterSigner(c,currentLetter(c)||letterFor(c.id)).name||c.name;
   var pad=sigPad(pe,nm,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
+  document.getElementById('el-mrev').onchange=function(){ if(this.checked){ document.getElementById('el-revl').classList.remove('bad'); document.getElementById('el-sigerr').hidden=true; } };
   document.getElementById('el-sigok').onclick=function(){
     var v=pad&&pad.value(nm), er=document.getElementById('el-sigerr');
     if(!v){ er.innerHTML=I.info+'Draw the signature, select a style, or upload a signature image'; er.hidden=false; return; }
+    if(!document.getElementById('el-mrev').checked){ document.getElementById('el-revl').classList.add('bad'); er.innerHTML=I.info+'Confirm you’ve reviewed the letter'; er.hidden=false; return; }
     delete elHow[c.id]; letterAction(c,'signnow',done,{sig:v});
   };
 }

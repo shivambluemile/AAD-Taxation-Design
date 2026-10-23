@@ -11473,6 +11473,8 @@ table,td,th{font-size:13.5px}
 .qt-menu hr{border:0;border-top:1px solid #F1F2F4;margin:4px 6px}
 .qt-clip.qt-cname{max-width:150px}
 .qt-person{display:flex;align-items:center;gap:11px;min-width:0}.qt-pn{min-width:0}.qt-person .qt-clip.qt-cname{max-width:92px}
+/* the client name shows in full, wrapping onto a second line when long */
+.qt-person .qt-clip.qt-cname{max-width:200px;min-width:120px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.35}
 .cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
 .qs-cnt{font-size:12px;color:var(--faint);text-align:right;margin-top:4px}
 .qs-link{font-size:12.5px;color:var(--mute);line-height:1.5}

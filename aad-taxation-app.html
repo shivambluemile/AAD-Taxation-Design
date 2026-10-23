@@ -21270,11 +21270,11 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .qa-alt{margin:2px 0 0;font-size:13px;color:var(--mute)}.qa-dl{border:0;background:none;padding:0;font:inherit;color:var(--mute);text-decoration:underline;cursor:pointer}.qa-dl:hover{color:var(--red)}
 .qp-res{padding:40px 32px}.qp-pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px}
 .qp-pill.ok{background:#ECFDF5;color:#047857}.qp-pill.bad{background:#FEF2F2;color:var(--red)}
-.qp-res .ty-meta.qp-meta4{grid-template-columns:repeat(4,minmax(0,1fr));max-width:640px}
-.qp-next,.qp-why{max-width:640px;margin:18px auto 0;text-align:left;border:1px solid var(--line);border-radius:12px;padding:14px 18px}.qp-next b,.qp-why b{display:block;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#7A8597;margin-bottom:8px}
+.qp-rcpt{max-width:460px;margin:24px auto 0;padding:6px 18px;border:1px solid var(--line);border-radius:12px;background:#FAFBFC;text-align:left}.qp-rcpt div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0}.qp-rcpt div+div{border-top:1px dashed var(--line)}.qp-rcpt dt{font-size:13px;color:var(--mute)}.qp-rcpt dd{margin:0;font-size:14px;font-weight:600;color:var(--ink);text-align:right;overflow-wrap:anywhere}.qp-rcpt div:nth-child(3) dd{font-family:Manrope,Inter,sans-serif;font-size:17px;font-weight:800}
+.qp-next,.qp-why{max-width:460px;margin:18px auto 0;text-align:left;border:1px solid var(--line);border-radius:12px;padding:14px 18px}.qp-next b,.qp-why b{display:block;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#7A8597;margin-bottom:8px}
 .qp-next ol{margin:0;padding-left:18px;font-size:14px;color:var(--ink);line-height:1.7}.qp-why p{margin:0!important;max-width:none!important;font-size:14px;color:var(--ink)!important}
 .card.done p.qp-change{font-size:13px;margin-top:16px}
-@media (max-width:640px){.qp-res .ty-meta.qp-meta4{grid-template-columns:1fr 1fr}}
+
 .qp-modal.qr-view{max-width:860px}.qr-vb{padding:16px;background:#F7F8FA;max-height:calc(100vh - 220px);overflow:auto}.qr-vb .qf-doc{max-width:794px;margin:0 auto}
 .qp-acts .btn svg{flex-shrink:0}.btn.busy{opacity:.75;cursor:progress}
 .btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(241,137,52,.3)}
@@ -21541,7 +21541,7 @@ function quoteAccepted(q,c,doc){
   var at=q.respondedAt||q.signedAt||((q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop()||{}).t, acc=q.accountant?e(q.accountant):'your accountant';
   app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><span class="qp-pill ok">Accepted</span><h2>Thank you, your quotation is accepted</h2>'+
     '<p>We’ve let '+acc+' know. A copy of this quotation is available below for your records.</p>'+
-    '<dl class="ty-meta qp-meta4"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Accepted on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
+    '<dl class="qp-rcpt"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Accepted on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
     '<div class="qp-next"><b>What happens next</b><ol><li>'+acc.charAt(0).toUpperCase()+acc.slice(1)+' will contact you to get started.</li><li>You’ll receive an invoice for the accepted services.</li><li>Pay using the details under “How to pay” on the invoice.</li></ol></div>'+
     '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-view').onclick=function(){ quoteViewer(doc); };
@@ -21551,7 +21551,7 @@ function quoteDeclined(q,c,doc){
   var at=q.respondedAt||((q.history||[]).filter(function(h){ return h.type==='rejected'; }).pop()||{}).t, why=q.clientComment&&q.clientComment.text;
   app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big bad">'+IC.x+'</div><span class="qp-pill bad">Declined</span><h2>You’ve declined this quotation</h2>'+
     '<p>Thank you for letting us know. We’ve shared your feedback with '+(q.accountant?e(q.accountant)+', your accountant':'your accountant')+'.</p>'+
-    '<dl class="ty-meta qp-meta4"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Declined on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
+    '<dl class="qp-rcpt"><div><dt>Quotation</dt><dd>'+e(q.id)+'</dd></div><div><dt>Prepared for</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Declined on</dt><dd>'+(at?whenOf(at):'—')+'</dd></div></dl>'+
     (why?'<div class="qp-why"><b>Your reason</b><p>“'+e(why)+'”</p></div>':'')+
     '<p class="qp-change">Changed your mind? Call '+FIRM.name+' on '+FIRM.phone+' and we’ll send you an updated quotation.</p>'+
     '<div class="qw-acts"><button type="button" class="btn sec" id="qw-view">View quotation</button><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';

@@ -12363,7 +12363,7 @@ function saveForm(){
   if(!QF.isNew&&!q){ toast('This quotation no longer exists.',true); return null; }
   if(q&&(EDITABLE.indexOf(q.status)<0||q.invoiceId)){ toast('This quotation can no longer be edited.',true); return null; }
   var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-  var fields={clientId:c.id,clientName:c.name,onName:d.onName.trim()||c.name,toName:'',contactPhone:d.contactPhone.trim(),abn:d.abn.trim(),branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
+  var fields={clientId:c.id,clientName:c.name,onName:d.onName.trim()||c.name,toName:'',contactPhone:d.contactPhone.trim(),abn:d.abn.trim(),contactEmail:recipientOf(c,d.onName.trim()||c.name).email||'',branch:d.branch,companies:d.companies.slice(),company:d.companies[0]||'',accountant:d.accountant,accountant2:d.accountant2||'',
     items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),qty:num(x.qty),price:round2(num(x.price)),gst:x.gst!==false}; }),
     customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),subtotal:T.sub,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'&&T.disc?num(d.discount):null,
     created:d.date?at(d.date):Date.now(),validUntil:d.due?new Date(d.due+'T23:59:00').getTime():Date.now()+VALID_DAYS*864e5};
@@ -12406,8 +12406,8 @@ function formModel(sign){
   var d=QF.d, c=formClient();
   var to=c?(d.onName||c.name):'';
   return ({id:QF.id,dateTxt:d.date?fmtD(d.date):'—',dueTxt:d.due?fmtD(d.due):'—',to:to,toSub:c&&d.onName&&d.onName!==c.name?c.name:'',attn:'',phone:c?d.contactPhone.trim():'',abn:c?d.abn.trim():'',sign:null,
-    email:c?recipientOf(c,d.onName).email:'',branch:d.branch||'',
-    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0}; }),
+    email:c?recipientOf(c,d.onName).email:'',branch:d.branch||'',company:d.companies[0]||'',discPct:d.showDisc&&d.discType==='%'?num(d.discount):null,
+    items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc,qty:num(x.qty)||0,price:num(x.price)||0,gst:x.gst!==false}; }),
     T:totalsOf(d),noGst:!totalsOf(d).anyGst,notes:d.customerNotes.trim(),terms:d.terms.trim(),sign:sign||null});
 }
 function dmyTxt(t){ var x=new Date(t), p=function(n){ return (n<10?'0':'')+n; }; return p(x.getDate())+'-'+p(x.getMonth()+1)+'-'+x.getFullYear(); }
@@ -15347,8 +15347,9 @@ function invoiceHtml(s){
   var c=client(s), sub=s.subtotal!=null?s.subtotal:r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), to=s.onName||c.name;
   var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>: '+money(paidOf(s))+'</dd></div><div><dt>Balance due</dt><dd>: '+money(pendingOf(s))+'</dd></div></dl>'+
     (s.status==='disabled'?'<p class="qd2-note"><b>This invoice has been disabled.</b></p>':'<p class="qd2-note">Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.</p>');
-  var m={kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:c.email||'',branch:s.branch||'',
-    items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
+  var m={kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
+    company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
+    items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
     T:{sub:sub,disc:r2(+s.discountAmt||0),gst:s.gstMode==='none'?0:r2(s.amount/11),total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:null};
   return quoteDocHtml(m);
 }
@@ -20823,9 +20824,9 @@ function quoteDocOf(q,cname,email){
   var acc=(q.status==='accepted'||q.status==='converted')?(q.history||[]).filter(function(h){ return h.type==='accepted'; }).pop():null;
   var attn=q.contactName&&q.contactName!==to?q.contactName:q.toName&&q.toName!==to?q.toName:'';
   return {id:q.id,dateTxt:dmyOf(q.created),dueTxt:dmyOf(q.validUntil),to:to,toSub:q.onName&&q.onName!==cname?cname:'',attn:attn,phone:q.contactPhone||'',abn:q.abn||'',
-    email:q.contactEmail||email||'',branch:q.branch||'',
+    email:q.contactEmail!=null?q.contactEmail:(email||''),branch:q.branch||'',company:q.company||(q.companies&&q.companies[0])||'',discPct:q.discountType==='%'?q.discountPct:null,
     accepted:acc?{name:acc.by,at:acc.t}:null,
-    items:(q.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0}; }),
+    items:(q.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:q.gstMode!=='none'}; }),
     T:{sub:sub,disc:disc,gst:q.gstMode==='none'?0:q.gst!=null?q.gst:r2(total/11),total:total},noGst:q.gstMode==='none',notes:q.customerNotes||'',terms:q.terms||'',
     sign:q.signature?{name:q.signedBy||'',sig:q.signature,at:q.signedAt}:null};
 }
@@ -20847,22 +20848,26 @@ function quoteDocHtml(m){
       '<div class="qd2-hr"><h3 class="qd2-title">'+K+'</h3><dl class="qd2-meta">'+kv(K+' number',e(m.id))+kv(K+' date',e(m.dateTxt))+kv('Due date',e(m.dueTxt))+'</dl></div></div>'+
     '<div class="qd2-parties"><div class="qd2-box"><span class="qd2-lbl">'+K+' to</span>'+(m.to?'<b>'+e(m.to)+'</b>':'<b class="qd2-mute">No client chosen yet</b>')+
         (m.toSub?'<span>'+e(m.toSub)+'</span>':'')+(m.attn?'<span>Attention: '+e(m.attn)+'</span>':'')+
-        (m.phone?'<span>'+e(m.phone)+'</span>':'')+(m.email?'<span>'+e(m.email)+'</span>':'')+(m.abn?'<span>ABN '+e(m.abn)+'</span>':'')+(m.branch?'<span class="qd2-gap">'+e(m.branch)+'</span>':'')+'</div>'+
-      '<div class="qd2-box"><span class="qd2-lbl">'+K+' from</span><b>AAD Taxation</b><span>'+DOC_FROM.phone+'</span><span>'+DOC_FROM.email+'</span><span class="qd2-gap">'+DOC_FROM.address+'</span></div></div>'+
+        (m.phone?'<span>'+e(m.phone)+'</span>':'')+(m.email?'<span>'+e(m.email)+'</span>':'')+(m.abn?'<span>ABN '+e(m.abn)+'</span>':'')+'</div>'+
+      '<div class="qd2-box"><span class="qd2-lbl">'+K+' from</span><b>'+e(m.company||'AAD Taxation')+'</b>'+(m.branch?'<span>'+e(m.branch)+' branch</span>':'')+
+        '<span class="qd2-gap">'+DOC_FROM.phone+'</span><span>'+DOC_FROM.email+'</span></div></div>'+
     '<table class="qf-doc-t qd2-t"><thead><tr><th>Category</th><th>Item</th><th>Description</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
-      (m.items.length?m.items.map(function(x){ return '<tr><td>'+(x.cat?'<span class="qd2-cat">'+e(x.cat)+'</span>':'')+'</td><td class="qd2-it">'+e(x.name)+'</td><td class="qd2-ds">'+br(x.desc||'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'</td><td class="r qd2-am">'+money(x.qty*x.price)+'</td></tr>'; }).join('')
+      (m.items.length?m.items.map(function(x){ return '<tr><td>'+(x.cat?'<span class="qd2-cat">'+e(x.cat)+'</span>':'')+'</td><td class="qd2-it">'+e(x.name)+'</td><td class="qd2-ds">'+br(x.desc||'')+'</td><td class="c">'+x.qty+'</td><td class="r">'+money(x.price)+'<small class="qd2-gst">'+(x.gst===false?'No GST':'Incl. GST')+'</small></td><td class="r qd2-am">'+money(x.qty*x.price)+'</td></tr>'; }).join('')
         :'<tr><td colspan="6" class="qf-none">No lines added yet</td></tr>')+
     '</tbody></table>'+
     '<div class="qd2-foot"><div class="qd2-nt">'+(m.notes?'<span class="qd2-lbl">Notes</span><p>'+br(m.notes)+'</p>':'')+(m.terms?'<span class="qd2-lbl">Terms &amp; conditions</span><p>'+br(m.terms)+'</p>':'')+'</div>'+
-      '<div class="qd2-sum"><dl class="qd2-tot">'+(T.disc?kv('Discount','−'+money(T.disc)):'')+kv('Subtotal',money(T.total-gst))+kv('GST',money(gst))+'</dl>'+
+      '<div class="qd2-sum"><dl class="qd2-tot">'+(T.disc?kv('Discount'+(m.discPct?' ('+m.discPct+'%)':''),'−'+money(T.disc)):'')+kv('Subtotal (excl. GST)',money(T.total-gst))+kv('GST',money(gst))+'</dl>'+
         '<div class="qd2-grand"><span>Amount</span><b>'+money(T.total)+'</b></div>'+(m.extra||'')+'</div></div>'+
     /* quotations are accepted online; one signed before that keeps its signature */
     (sig?'<div class="qf-doc-sg"><p class="qf-doc-sgt">Acceptance</p><div><span>Name</span><b>'+e(sg.name)+'</b></div>'+
       '<div><span>Signature</span><b>'+(sig.method==='type'?'<em style="font-family:'+e(sig.font||'cursive')+'">'+e(sig.text)+'</em>':'<img src="'+sig.data+'" alt="Signature">')+'</b></div>'+
       '<div><span>Date</span><b>'+(sg.at?dmyOf(sg.at):'')+'</b></div></div>'
      :m.accepted?'<p class="qf-doc-acc">Accepted online by <b>'+e(m.accepted.name)+'</b> on '+dmyOf(m.accepted.at)+'</p>':'')+
-    '<div class="qd2-pay"><div class="qd2-payh"><h4>How to pay</h4><span class="qd2-call">Call '+DOC_PAY.call+'</span></div>'+
-      '<dl>'+kv('By direct debit',DOC_PAY.name)+kv('BSB',DOC_PAY.bsb)+kv('Account no',DOC_PAY.acc)+kv('ABN',DOC_PAY.abn)+'</dl></div>'+
+    '<div class="qd2-pay"><h4>How to pay</h4><ol class="qd2-steps">'+
+      '<li>Pay by direct debit or bank transfer to <b>'+DOC_PAY.name+'</b> (ABN '+DOC_PAY.abn+').</li>'+
+      '<li>Use BSB <b>'+DOC_PAY.bsb+'</b> and account number <b>'+DOC_PAY.acc+'</b>.</li>'+
+      '<li>Enter <b>'+e(m.id)+'</b> as the payment reference.</li>'+
+      '<li>Questions about your payment? Call us on <b>'+DOC_PAY.call+'</b>.</li></ol></div>'+
     '<p class="qd2-final">Please note: all services and sales are considered final and are non-refundable.</p>'+
     '</div></div>';
 }
@@ -20886,12 +20891,12 @@ var QUOTE_DOC_CSS=
   '.qd2-sum{width:250px;flex-shrink:0}.qd2-tot{margin:0}.qd2-tot div{display:flex;justify-content:space-between;gap:12px;padding:4px 2px}.qd2-tot dt{color:#6B7280}.qd2-tot dd{margin:0;font-variant-numeric:tabular-nums;color:#111827}'+
   '.qd2-grand{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:11px 14px;border-radius:10px;background:#FFF4EC;color:#C2410C}.qd2-grand span{font-weight:700}.qd2-grand b{font-family:Manrope,Inter,sans-serif;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}'+
   '.qd2-paid{margin:8px 0 0}.qd2-note{margin:8px 2px 0;font-size:11.5px;color:#6B7280;text-align:right}'+
-  '.qd2-pay{margin-top:34px;border:1px solid #E5E7EB;border-radius:12px;padding:16px 18px;break-inside:avoid}'+
-  '.qd2-payh{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.qd2-pay h4{margin:0;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#C2410C}'+
-  '.qd2-call{font-size:12px;font-weight:600;color:#111827;background:#F3F4F6;border-radius:999px;padding:3px 10px}'+
-  '.qd2-pay dl{margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.qd2-pay dt{font-size:11px;color:#6B7280;margin-bottom:2px}.qd2-pay dd{margin:0;font-weight:600;color:#111827;overflow-wrap:anywhere}'+
+  '.qd2-pay{margin-top:30px;padding-top:18px;border-top:1px solid #E5E7EB;break-inside:avoid}.qd2-pay h4{margin:0 0 10px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#C2410C}'+
+  '.qd2-steps{margin:0;padding:0;list-style:none;counter-reset:st}.qd2-steps li{counter-increment:st;position:relative;padding:3px 0 3px 30px;color:#374151}.qd2-steps li+li{margin-top:5px}'+
+  '.qd2-steps li::before{content:counter(st);position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;background:#FFF4EC;color:#C2410C;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.qd2-steps b{color:#111827;font-weight:600}'+
+  '.qd2-gst{display:block;font-size:10.5px;color:#9CA3AF;margin-top:1px}'+
   '.qd2-final{margin:18px 0 0;padding-top:12px;border-top:1px solid #F1F2F4;text-align:center;font-size:11px;color:#9CA3AF}'+
-  '@media (max-width:640px){.qd2-parties{grid-template-columns:1fr}.qd2-foot{flex-direction:column}.qd2-sum{width:100%}.qd2-head{flex-direction:column}.qd2-hr{text-align:left}.qd2-meta{justify-content:start}.qd2-pay dl{grid-template-columns:1fr 1fr}}'+
+  '@media (max-width:640px){.qd2-parties{grid-template-columns:1fr}.qd2-foot{flex-direction:column}.qd2-sum{width:100%}.qd2-head{flex-direction:column}.qd2-hr{text-align:left}.qd2-meta{justify-content:start}}'+
   '.qf-doc-top{display:flex;justify-content:space-between;gap:20px;margin-bottom:16px}.qf-doc-top h3{font-family:Manrope,Inter,sans-serif;font-size:24px;font-weight:800;margin:0}'+
   '.qf-doc-top dl{margin:0}.qf-doc-top dl div{display:flex;justify-content:space-between;gap:16px}.qf-doc-top dt{color:#555}.qf-doc-top dd{margin:0;font-weight:600}'+
   '.qf-doc-to{margin:0}.qf-doc-to span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#666}.qf-doc-to b{display:block}.qf-doc-to em{display:block;font-style:normal;color:#333;margin-top:2px}'+

@@ -6453,14 +6453,12 @@ function letterHow(x){ var rec=(x.audit||[]).filter(function(a){ return /signed 
     'Signed by <em>'+esc(x.signature&&x.signature.name||x.signedBy||'')+'</em> · '+cdStamp(x.signedAt)+(x.method==='manual'?' · recorded by '+esc(rec&&rec.by||x.by||'staff'):' · signing link'); }
 function letterHistItems(c){
   var F=fyStart(Date.now()), L=currentLetter(c), gone=elState(L)==='expired', now=Date.now();
-  var PILL={'Generated':['Created',''],'Sent for signature':['Sent',''],'Resent for signature':['Resent',''],'Signed manually':['Signed','ok'],'Signed by client':['Signed','ok'],'Signed letter uploaded':['Signed','ok'],'Delivery failed':['Failed','bad']};
-  var evs=L&&!gone?(L.audit||[]).filter(function(a){ return PILL[a.action]; }).slice().reverse().map(function(a){ var p=PILL[a.action];
-    return {bad:p[1]==='bad',ok:p[1]==='ok',pill:p[0],valid:'FY '+fyLabel(letterFy(L))+' · '+esc(a.action)+(a.by?' by '+esc(a.by):''),ev:CD_I.clock+cdStamp(a.t),files:[],note:a.note?esc(a.note):''}; }):[];
-  return evs.concat(ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
+  /* earlier financial years (and this one once it has expired); status changes are in Activities */
+  return ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
     return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
-      files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; }));
+      files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
 /* the Engagement letter tab: the deposit and account first (fields when they weren't filled in on Add Client, the saved values once they are), then the letter */
 var elPayEdit={};                                            // client id -> payment fields open for editing
@@ -6875,6 +6873,23 @@ document.addEventListener('click',function(e){
   if(document.body.classList.contains('nav-open') && !e.target.closest('.nav') && !e.target.closest('#burger')) document.body.classList.remove('nav-open');
 });
 seedOnboarding();
+/* DEVELOPMENT DATA (temporary): signed letters for the two previous financial years, so the letter history has FY 2025–26 / 2024–25 entries. Added once. */
+function seedLetterYears(){
+  var st=loadOnb(); if(st.fySeed) return;
+  var F=fyStart(Date.now()), day=864e5;
+  CLIENTS.forEach(function(c){
+    var act=(c.services||[]).filter(function(a){ return a.status==='active'; }); if(!act.length) return;
+    var who=firstSigner(c).name||c.name;
+    [1,2].forEach(function(k){ var y=F-k; if(st.letters.some(function(l){ return l.clientId===c.id&&letterFy(l)===y; })) return;
+      var made=new Date(y,6,8+k*3,10,30).getTime();
+      st.letters.push({id:'Lfy'+y+'c'+c.id,clientId:c.id,client:snap(c),token:newToken(),created:made,by:'Sarah Lee',fy:y,services:act.map(function(a){ return {name:a.name,price:a.price}; }),
+        status:'signed',signature:{method:'type',text:who,name:who},signedAt:made+2*day,method:'client-link',logged:true,dev:true,sends:[{at:made,by:'Sarah Lee',channels:['Email'],ok:true}],
+        audit:[{t:made,action:'Sent for signature',by:'Sarah Lee',from:'pending',to:'sent',note:'Email'},{t:made+2*day,action:'Signed by client',by:who,from:'sent',to:'signed',note:'Through the signing link'}]});
+    });
+  });
+  st.fySeed=1; saveOnb(st);
+}
+seedLetterYears();
 autoCompleteRequests();
 annualUpkeep();
 route();

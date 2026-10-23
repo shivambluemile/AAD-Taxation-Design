@@ -11512,7 +11512,12 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-one .qf-bottom{gap:0}
 .qf2 .qf-one>.ferr{margin:0 22px 16px}
 .qf-rate{display:flex;flex-direction:column;gap:7px;min-width:0}
-.qf-lgst{display:flex;justify-content:flex-end;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--mute)}
+.qf-lgst{display:flex;justify-content:flex-start;align-items:center}
+.qf-gck{display:inline-flex;align-items:center;gap:6px;padding:2px 2px 2px 0;font-size:12px;font-weight:600;color:var(--mute);background:none;border:0;cursor:pointer}
+.qf-gck i{width:15px;height:15px;border-radius:4px;border:1.5px solid #CBD5E1;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.qf-gck i svg{opacity:0}.qf-gck.on{color:var(--slate)}.qf-gck.on i{background:var(--orange);border-color:var(--orange)}.qf-gck.on i svg{opacity:1}
+.qf-gck:hover{color:var(--ink)}.qf-gck:hover i{border-color:#94A3B8}.qf-gck.on:hover i{border-color:var(--orange-ink)}
+.qf-gck:focus-visible{outline:none}.qf-gck:focus-visible i{box-shadow:0 0 0 3px rgba(241,137,52,.25)}
 .qf-thead .c{text-align:center}
 .qf-tdef{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13px;color:var(--slate);cursor:pointer}
 .qf2 .qf-ch{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:30px}
@@ -12126,7 +12131,7 @@ function paintForm(focusId){
       '<div><label class="sr" for="qf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="qf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
       '<div><label class="sr" for="qf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="qf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
       '<div class="qf-rate"><div class="qf-price"><label class="sr" for="qf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="qf-p'+i+'" data-price="'+i+'" type="number" min="'+min+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+min+'"':' placeholder="0.00" disabled')+'></div>'+
-      '<div class="qf-lgst"><button type="button" class="toggle sm'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="switch" aria-checked="'+(x.gst!==false)+'" aria-label="Include GST, line '+(i+1)+'" title="'+(x.gst!==false?'Rate includes GST':'No GST on this line')+'"><i></i></button><span aria-hidden="true">GST</span></div></div>'+
+      '<div class="qf-lgst"><button type="button" class="qf-gck'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="checkbox" aria-checked="'+(x.gst!==false)+'" aria-label="Rate includes GST, line '+(i+1)+'" title="'+(x.gst!==false?'Rate includes GST':'No GST on this line')+'"><i><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></i>Incl. GST</button></div></div>'+
       '<div class="qf-line num">'+money(amt)+'</div>'+
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+AI.bin+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';

@@ -6560,7 +6560,7 @@ function engagementBody(c){
   var menu=S[4].length?'<span class="el-mw"><button type="button" class="el-more" data-elmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+EL_DOTS+'</button>'+
       '<span class="el-menu" role="menu" hidden>'+S[4].map(function(x){ return '<button type="button" role="menuitem" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</span></span>':'';
   var review='<label class="el-review"><input type="checkbox" id="el-rev"><span>I have reviewed this letter and verified the client details, services, and fees.</span></label>';
-  if(st==='noservice') return '<section class="vsec el-main">'+dcCard({title:'Engagement Letter',sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),body:dcEmpty(S[0],S[1])})+'</section>';
+  if(st==='noservice') return '<section class="vsec el-main">'+dcCard({title:'Engagement Letter',sub:'FY '+fyLabel(F)+' · 01-07-'+F+' to 30-06-'+(F+1),body:dcEmpty(S[0],S[1],'<div class="dc-eb"><button type="button" class="btn-primary btn-sm" data-el-assign>'+I.plus+'Assign service</button></div>')})+'</section>';
   if(st==='none') return elFlow(c,actServices,null);
   if(st==='draft') return elFlow(c,L.services,L);
 
@@ -6695,7 +6695,8 @@ function wireClientTab(c,t,body,repaintTab){
       logEvent(c,'note','Note added',''); toast('Note added'); repaintTab();
     };
   }
-  if(t==='engagement'){ wireElPay(c,repaintTab); wireElFlow(c,repaintTab); }
+  if(t==='engagement'){ wireElPay(c,repaintTab); wireElFlow(c,repaintTab);
+    body.querySelectorAll('[data-el-assign]').forEach(function(b){ b.onclick=function(){ svcAdd[c.id]={list:[blankSvc()],errs:{}}; openDetail(c.id,true,'services'); }; }); }   // opens the Services tab with Add services ready
   if(t==='engagement'){ body.querySelectorAll('[data-el]').forEach(function(b){ b.onclick=function(){
       var k=b.dataset.el, m=body.querySelector('.el-menu:not([hidden])'); if(m){ m.hidden=true; m.previousElementSibling.setAttribute('aria-expanded','false'); }
       if(k==='view'){ var dv=document.getElementById('el-doc'); if(dv) dv.scrollIntoView({behavior:'smooth',block:'start'}); else letterAction(c,'full',repaintTab); return; }

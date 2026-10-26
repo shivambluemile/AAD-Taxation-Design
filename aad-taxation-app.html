@@ -4448,7 +4448,7 @@ function currentLetter(c){ var F=fyStart(Date.now()); return ONB.letters.filter(
 function letterSignedFor(c){ var l=currentLetter(c); return !!(l&&l.status==='signed'); }
 /* who signs: the first director for a company, otherwise the client */
 var EL_BADGE={draft:['Draft','grey'],awaiting:['Signature pending','amber'],signed:['Signed','green'],failed:['Failed','red'],expired:['Expired','red']};
-var elDirPick={}, elHow={};                                // client id -> director chosen to sign the letter / 'request' | 'manual'
+var elDirPick={}, elHow={}, elPv={};                                // client id -> director chosen to sign the letter / 'request' | 'manual'
 function letterSigner(c,L){
   if(c.type==='company'&&elDirPick[c.id]&&!(L&&L.status==='signed')){ var pk=(c.directors||[]).filter(function(x){ return x.name===elDirPick[c.id]; })[0]; if(pk) return {name:pk.name,email:pk.email,phone:pk.phone,role:'director'}; }
   if(c.type==='company'&&L&&L.signer&&L.signer.name){ var d=(c.directors||[]).filter(function(x){ return x.name===L.signer.name; })[0]; if(d) return {name:d.name,email:d.email,phone:d.phone,role:'director'}; }
@@ -6490,8 +6490,8 @@ function elFlow(c,services,L){
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
   var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
   var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter '+pill(EL_BADGE,'draft')+'</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
-      '<div class="el-acts"><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
-    '<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>';
+      '<div class="el-acts"><button type="button" class="pill-btn quiet'+(elPv[c.id]?' on':'')+'" id="el-pvt" aria-expanded="'+!!elPv[c.id]+'">'+I.eye+(elPv[c.id]?'Hide preview':'Preview')+'</button><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
+    (elPv[c.id]?'<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>':'');   // only when asked for
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'
     :'<p class="cl-hint">Add a director in the Directors tab first.</p>')+'</div>';
@@ -6506,6 +6506,7 @@ function elFlow(c,services,L){
 }
 function wireElFlow(c,done){
   document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
+  var pv=document.getElementById('el-pvt'); if(pv) pv.onclick=function(){ elPv[c.id]=!elPv[c.id]; done(); };
   var mo=document.getElementById('el-mopen'); if(mo) mo.onclick=function(){ elHow[c.id]='manual'; done(); var p=document.getElementById('el-pad'); if(p) p.scrollIntoView({block:'center',behavior:'smooth'}); };
   var mx=document.getElementById('el-mx'); if(mx) mx.onclick=function(){ delete elHow[c.id]; done(); };
   var pe=document.getElementById('el-pad'); if(!pe) return;

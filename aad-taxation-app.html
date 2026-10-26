@@ -12137,7 +12137,7 @@ function render(){
   var h=head();
   var people=function(list){ return list.map(function(n){ return [n,n]; }); };
   var accts=ASSIGNABLE.map(function(s){ return s.name; }); all.forEach(function(x){ [x.accountant,x.accountant2].forEach(function(n){ if(n&&accts.indexOf(n)<0) accts.push(n); }); });
-  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search number, client or email" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
+  h+='<div class="filterbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by quotation ID, client name or email address" aria-label="Search quotations" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
     selHtml('f-acc','All Accountants',people(accts.sort()),f.accountant)+

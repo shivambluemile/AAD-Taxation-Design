@@ -6533,6 +6533,7 @@ function elManual(name){
 function wireElFlow(c,done){
   document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
   var pv=document.getElementById('el-pvt'); if(pv) pv.onclick=function(){ elPv[c.id]=!elPv[c.id]; done(); };
+  document.querySelectorAll('#cdb [data-elpv]').forEach(function(x){ x.onclick=function(){ elPv[c.id]=!elPv[c.id]; done(); if(elPv[c.id]){ var w=document.querySelector('#cdb .el-pvw'); if(w) w.scrollIntoView({block:'start',behavior:'smooth'}); } }; });
   var mo=document.getElementById('el-mopen'); if(mo) mo.onclick=function(){ elHow[c.id]='manual'; done(); var p=document.getElementById('el-pad'); if(p) p.scrollIntoView({block:'center',behavior:'smooth'}); };
   var mx=document.getElementById('el-mx'); if(mx) mx.onclick=function(){ delete elHow[c.id]; done(); };
   var pe=document.getElementById('el-pad'); if(!pe) return;
@@ -6607,10 +6608,11 @@ function engagementBody(c){
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
   var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
-    files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size||letterSize(c,L),who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
+    files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size||letterSize(c,L),who:fileWho,open:st==='signed'?'data-el="full"':'data-elpv="1"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
+  var pvw=st!=='signed'&&elPv[c.id]?'<section class="dr-card el-flow"><div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(letterCtx(c,L.services,L))+'</div></section>':'';   // asked for from the file row
   var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';
-  return '<section class="vsec el-main">'+card+man+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');
+  return '<section class="vsec el-main">'+card+pvw+man+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');
 }
 /* why a send failed: the last attempt, and the failures in the letter's audit trail */
 function elErrorDetails(c){

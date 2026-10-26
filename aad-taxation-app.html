@@ -6459,7 +6459,7 @@ function letterHistItems(c){
   /* earlier financial years (and this one once it has expired); status changes are in Activities */
   return ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
-    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+' · '+(l.status==='signed'?'Signed':'Not signed')+(lapsed?'':' · Expires '+dmyOf(e2)),
+    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+(lapsed?'':' · Expires '+dmyOf(e2)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
       files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }

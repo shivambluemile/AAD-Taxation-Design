@@ -6391,7 +6391,7 @@ function kycHistItems(c){
   for(var vi=from;vi<recs.length;vi++){ var r=recs[vi], newer=vi>0?recs[vi-1]:null, ex=kycExpiresAt(r), lapsed=newer?ex<kycUploadedAt(newer):now>=ex, note=kycNoteOf(c,r);
     out.push({bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'Version '+(recs.length-vi)+' · Verified '+dmyOf(fromIso(r.date))+' by '+esc(r.by),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(ex):CD_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+cdStamp(kycUploadedAt(newer)),
-      files:(r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return {extIcon:true,name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||r.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(r)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}; }),
+      files:(r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return {name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||r.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(r)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}; }),
       note:note?'Note: '+esc(note):''}); }
   return out;
 }
@@ -6403,7 +6403,7 @@ function kycTab(c){
   if(st==='expired') return '<section class="vsec el-main">'+cdLine('<b>KYC</b> expired on '+dmyOf(ex)+'. Record a new verification.',
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
   var note=kycNoteOf(c,cur);
-  var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({extIcon:true,name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
+  var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
   return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,cls:'el-c',name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
     files:files||'<p class="cd2-none">No files in this check.</p>',
     extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
@@ -6471,6 +6471,8 @@ function letterFileName(x,F){ return x&&x.file?x.file.name:'engagement-letter-FY
 function letterHow(x){ var rec=(x.audit||[]).filter(function(a){ return /signed manually|uploaded/i.test(a.action); }).slice(-1)[0];
   return x.method==='upload'?'Signed by <em>'+esc(x.signedBy||'')+'</em> on '+dmyOf(x.signedAt)+' · uploaded by <em>'+esc(x.uploadedBy||rec&&rec.by||'staff')+'</em>'+(x.uploadedAt?' · '+cdStamp(x.uploadedAt):''):
     'Signed by <em>'+esc(x.signature&&x.signature.name||x.signedBy||'')+'</em> · '+cdStamp(x.signedAt)+(x.method==='manual'?' · Recorded by '+esc(rec&&rec.by||x.by||'staff'):' · Signing link'); }
+/* a generated letter has no stored file: its size is about that of the printed letter */
+function letterSize(c,l){ try{ return Math.round(letterHtml(letterCtx(c,l.services||[],l)).length*1.35); }catch(e){ return 0; } }
 function letterHistItems(c){
   var F=fyStart(Date.now()), L=currentLetter(c), gone=elState(L)==='expired', now=Date.now();
   /* earlier financial years (and this one once it has expired); status changes are in Activities */
@@ -6478,7 +6480,7 @@ function letterHistItems(c){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
     return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+(lapsed?'':' · Expires '+dmyOf(e2)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
-      files:[{extIcon:true,name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
+      files:[{name:letterFileName(l,F),size:l.file&&l.file.size||letterSize(c,l),who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
 /* the Engagement letter tab: the deposit and account first (fields when they weren't filled in on Add Client, the saved values once they are), then the letter */
 var elPayEdit={};                                            // client id -> payment fields open for editing
@@ -6605,7 +6607,7 @@ function engagementBody(c){
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
   var card=cdCard({key:'l',cid:c.id,cls:'el-c',name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
-    files:cdFile({extIcon:true,name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
+    files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size||letterSize(c,L),who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';
   return '<section class="vsec el-main">'+card+man+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');

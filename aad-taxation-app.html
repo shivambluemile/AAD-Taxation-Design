@@ -12552,8 +12552,8 @@ function saveForm(){
 }
 function leaveForm(){
   if(!QF||!QF.dirty){ QF=null; return closeOv(); }
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="ql-t"><div class="confirm-body"><h3 id="ql-t">Discard your changes?</h3><p>What you’ve entered in '+esc(QF.id)+' isn’t saved. Save it as a draft to keep it.</p></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="ql-no">Keep editing</button><button class="btn-danger" id="ql-go">Discard</button></div></div>';
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="ql-t"><div class="confirm-body"><h3 id="ql-t">Discard Changes to Quotation '+esc(QF.id)+'</h3><p>Your changes to quotation '+esc(QF.id)+' haven’t been saved. Save them as a draft before leaving, or discard them permanently.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="ql-no">Keep Editing</button><button class="btn-danger" id="ql-go">Discard Changes</button></div></div>';
   dlg.classList.add('open');
   document.getElementById('ql-no').onclick=closeDlg;
   document.getElementById('ql-go').onclick=function(){ closeDlg(); QF=null; closeOv(); };

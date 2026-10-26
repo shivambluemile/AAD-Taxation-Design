@@ -5479,7 +5479,7 @@ function sendScreen(body,foot,cfg){
       (cc?field('cc','Cc','Separate addresses with commas',rmBtn('cc','Cc')):'')+(bcc?field('bcc','Bcc','Separate addresses with commas',rmBtn('bcc','Bcc')):'')+
       field('subject','Subject','Subject','',true)+
       (s.eMode==='write'?chips('email','Click to insert into the Subject or the Message, where your cursor is'):'')+   // between the two fields it serves
-      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Message'+REQ+'</label>'+modes('eMode')+'</div>'+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Content'+REQ+'</label>'+modes('eMode')+'</div>'+
         (s.eMode==='write'?'<div class="ss-rte'+(s.errs.body?' bad':'')+'">'+toolbar()+
             '<div class="ss-ed" id="ss-body" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ss-body-l" aria-describedby="ss-body-n" tabindex="0">'+s.bodyHtml+'</div></div>'+
             '<div class="ss-cnt" id="ss-body-n">'+String(s.body||'').length+'/'+MSG_MAX+' characters</div>'
@@ -12368,7 +12368,7 @@ function paintForm(focusId){
     '<div class="modal-head"><div><h2 id="qf-t">'+(QF.isNew?'Add Quotation':'Edit Quotation · '+esc(QF.id))+'</h2></div><button id="qf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="qf-body"><div class="qf-card qf-one">'+
       card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
-          field('On the name of',true,c?sel('qf-on','onName',names.concat(d.onName&&!names.some(function(o){ return o[0]===d.onName; })?[[d.onName,d.onName]]:[]),d.onName,'Select'):noClient,'onName')+'</div>'+
+          field('Invoice on the name of',true,c?sel('qf-on','onName',names.concat(d.onName&&!names.some(function(o){ return o[0]===d.onName; })?[[d.onName,d.onName]]:[]),d.onName,'Select'):noClient,'onName')+'</div>'+
         (c?profileCard(c,d):'')+
         '<div class="g2">'+field('Select branch',true,sel('qf-br','branch',BRANCHES,d.branch,'Select'),'branch')+
           field('Internal company',true,d.branch?'<div class="sf-sel"><select class="fin plain sm'+(e.company?' bad':'')+'" id="qf-co"><option value="">Select</option>'+
@@ -12634,7 +12634,7 @@ function sendScreen(body,foot,cfg){
       (cc?field('cc','Cc','Separate addresses with commas',rmBtn('cc','Cc')):'')+(bcc?field('bcc','Bcc','Separate addresses with commas',rmBtn('bcc','Bcc')):'')+
       field('subject','Subject','Subject','',true)+
       (s.eMode==='write'?chips('email','Click to insert into the Subject or the Message, where your cursor is'):'')+   // between the two fields it serves
-      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Message'+REQ+'</label>'+modes('eMode')+'</div>'+
+      '<div class="ss-f"><div class="ss-lrow"><label class="flabel" id="ss-body-l">Content'+REQ+'</label>'+modes('eMode')+'</div>'+
         (s.eMode==='write'?'<div class="ss-rte'+(s.errs.body?' bad':'')+'">'+toolbar()+
             '<div class="ss-ed" id="ss-body" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="ss-body-l" aria-describedby="ss-body-n" tabindex="0">'+s.bodyHtml+'</div></div>'+
             '<div class="ss-cnt" id="ss-body-n">'+String(s.body||'').length+'/'+MSG_MAX+' characters</div>'
@@ -14988,7 +14988,7 @@ function paintSaleForm(focusId){
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body" id="sf-body">'+
       card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
-        field('On the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>')+
+        field('Invoice on the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
           field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+

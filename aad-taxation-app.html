@@ -21383,7 +21383,7 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .btn.qa-big{height:52px;font-size:15.5px;border-radius:10px;gap:8px;box-shadow:0 6px 16px rgba(241,137,52,.28)}.btn.qa-big svg{width:18px;height:18px}
 .qr-acts .btn.qa-sm{width:auto;height:44px;padding:0 26px;font-size:14.5px;border-radius:10px;gap:8px}.btn.qa-sm svg{width:16px;height:16px}
 .qa-sign{margin-top:20px;padding:20px;border:1px solid var(--line);border-radius:14px;background:#fff}.qa-sign h3{margin:0 0 14px;font-family:'Manrope',Inter,sans-serif;font-size:16px;font-weight:800;color:var(--ink)}
-.qa-sign .qa-sl{margin-top:14px}.qa-sign .err{display:block;margin-top:8px}.qa-sf{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.qa-sign .qa-sl{margin-top:14px}.qa-sign .err{display:block;margin-top:8px}.qa-sf{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
 .qa-alt{margin:2px 0 0;font-size:13px;color:var(--mute)}.qa-dl{border:0;background:none;padding:0;font:inherit;color:var(--mute);text-decoration:underline;cursor:pointer}.qa-dl:hover{color:var(--red)}
 .qp-res{padding:40px 32px}.qp-pill{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:10px}
 .qp-pill.ok{background:#ECFDF5;color:#047857}.qp-pill.bad{background:#FEF2F2;color:var(--red)}
@@ -21568,22 +21568,17 @@ function paintQuote(){
     '<div class="card qr">'+
     '<div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Quotation document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
     (exp?'<div class="note warn"><span>This quotation passed its valid-until date, so it can no longer be accepted. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>'
-      :'<div class="qr-acts" id="qa-acts"><button type="button" class="btn pri qa-sm" id="qa-go">'+IC.tick+'Accept quotation</button>'+
-        '<p class="qa-alt">Not what you need? <button type="button" class="qa-dl" id="qa-no">Decline this quotation</button></p></div>'+
-        '<div class="qa-sign" id="qa-sign" hidden><h3>Accept quotation '+e(q.id)+' · '+money(doc.T.total)+'</h3>'+
-          '<label class="l" for="qa-c">Comment <span class="opt">(optional)</span></label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
-          '<label class="l qa-sl">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
+      /* open from the start: the client's signature first, then a comment, then Sign and accept (or decline) */
+      :'<div class="qa-sign" id="qa-sign"><h3>Accept quotation '+e(q.id)+' · '+money(doc.T.total)+'</h3>'+
+          '<label class="l">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
+          '<label class="l qa-sl" for="qa-c">Comment</label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
           '<span class="err" id="qa-e" hidden></span>'+
-          '<div class="qa-sf"><button type="button" class="btn sec" id="qa-x">Cancel</button><button type="button" class="btn pri" id="qa-ok">'+IC.tick+'Sign and accept</button></div></div>')+
+          '<div class="qa-sf"><p class="qa-alt">Not what you need? <button type="button" class="qa-dl" id="qa-no">Decline this quotation</button></p><button type="button" class="btn pri" id="qa-ok">'+IC.tick+'Sign and accept</button></div></div>')+
     '</div>'+
   '</div>';
-  var go=document.getElementById('qa-go'); if(!go) return;
-  var er=document.getElementById('qa-e'), box=document.getElementById('qa-sign'), acts=document.getElementById('qa-acts'), pad=null;
+  var ok=document.getElementById('qa-ok'); if(!ok) return;
+  var er=document.getElementById('qa-e'), pad=sigPad(document.getElementById('qa-pad'),who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
   var fail=function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } };
-  /* Accept: a comment (optional) and the client's signature, then Sign and accept */
-  go.onclick=function(){ if(qBusy) return; acts.hidden=true; box.hidden=false; if(!pad) pad=sigPad(document.getElementById('qa-pad'),who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]}); box.scrollIntoView({block:'start',behavior:'smooth'}); };
-  document.getElementById('qa-x').onclick=function(){ if(qBusy) return; er.hidden=true; box.hidden=true; acts.hidden=false; };
-  var ok=document.getElementById('qa-ok');
   ok.onclick=function(){ if(qBusy) return; er.hidden=true; var sig=pad&&pad.value(who);
     if(!sig){ fail('Draw your signature, select a style, or upload a signature image'); return; }
     answerQuote('accepted',document.getElementById('qa-c').value.trim(),ok,fail,sig); };

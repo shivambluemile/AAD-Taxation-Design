@@ -6404,7 +6404,7 @@ function kycTab(c){
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
   var note=kycNoteOf(c,cur);
   var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
-  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',badge:pill({valid:['Verified','green'],expiring:['Expiring soon','amber']},st==='expiring'?'expiring':'valid'),line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
+  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
     files:files||'<p class="cd2-none">No files in this check.</p>',
     extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
     foot:c._draft?'':'<button type="button" class="cd2-act" data-kyc-add>'+CD_I.up+'Replace</button>',nHist:nHist})+cdHistBelow('k',c,kycHistItems(c))+'</section>';

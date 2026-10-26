@@ -6490,7 +6490,7 @@ function elFlow(c,services,L){
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
   var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
   var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter '+pill(EL_BADGE,'draft')+'</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
-      '<div class="el-acts"><button type="button" class="pill-btn quiet'+(elPv[c.id]?' on':'')+'" id="el-pvt" aria-expanded="'+!!elPv[c.id]+'">'+I.eye+(elPv[c.id]?'Hide preview':'Preview')+'</button><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
+      '<div class="el-acts"><button type="button" class="pill-btn quiet'+(elPv[c.id]?' on':'')+'" id="el-pvt" aria-expanded="'+!!elPv[c.id]+'">'+I.eye+(elPv[c.id]?'Hide preview':'Preview')+'</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
     (elPv[c.id]?'<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>':'');   // only when asked for
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'

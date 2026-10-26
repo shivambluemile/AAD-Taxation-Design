@@ -3087,7 +3087,8 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
-.el-q{margin-top:18px}.el-man .el-review{margin-top:14px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
+.el-q{margin-top:18px}.el-flow .dr-h h3 .ob-pill,.cd2-nm+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
+.cd2-slim .ob-pill{margin-right:4px}.el-man .el-review{margin-top:14px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
 .el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
 .el-flow .el-opt{align-items:center}.el-flow .el-opt input{margin:0}
 .el-payg{padding-top:16px;margin-bottom:6px}.el-pdl{padding:16px 0 12px}.el-pwait{margin:0 32px 22px}
@@ -4446,6 +4447,7 @@ function kycDone(c){ var k=kycCurrent(c); return !!(k&&kycState(k)!=='expired');
 function currentLetter(c){ var F=fyStart(Date.now()); return ONB.letters.filter(function(l){ return l.clientId===c.id&&letterFy(l)===F; }).sort(function(a,b){ return b.created-a.created; })[0]||null; }
 function letterSignedFor(c){ var l=currentLetter(c); return !!(l&&l.status==='signed'); }
 /* who signs: the first director for a company, otherwise the client */
+var EL_BADGE={draft:['Draft','grey'],awaiting:['Signature pending','amber'],signed:['Signed','green'],failed:['Failed','red'],expired:['Expired','red']};
 var elDirPick={}, elHow={};                                // client id -> director chosen to sign the letter / 'request' | 'manual'
 function letterSigner(c,L){
   if(c.type==='company'&&elDirPick[c.id]&&!(L&&L.status==='signed')){ var pk=(c.directors||[]).filter(function(x){ return x.name===elDirPick[c.id]; })[0]; if(pk) return {name:pk.name,email:pk.email,phone:pk.phone,role:'director'}; }
@@ -6349,7 +6351,7 @@ function cdFile(o){ var x=String(o.name||'').split('.').pop().toLowerCase(), pic
 }
 function cdCard(o){ var shut=!!cdShut[o.key+o.cid];
   return '<div class="cd2'+(shut?' shut':'')+'"><div class="cd2-h"><button type="button" class="cd2-tg" data-cdshut="'+o.key+'" aria-expanded="'+!shut+'" aria-label="'+esc(o.name)+'. '+(shut?'Expand':'Collapse')+'">'+
-      '<span class="kt-ic">'+DC_DOC+'</span><b class="cd2-nm">'+o.name+'</b></button><span class="cd2-exp'+(o.lineCls?' '+o.lineCls:'')+'">'+o.line+'</span>'+
+      '<span class="kt-ic">'+DC_DOC+'</span><b class="cd2-nm">'+o.name+'</b>'+(o.badge||'')+'</button><span class="cd2-exp'+(o.lineCls?' '+o.lineCls:'')+'">'+o.line+'</span>'+
       '<button type="button" class="cd2-chev" data-cdshut="'+o.key+'" tabindex="-1" aria-hidden="true">'+CD_I.chev+'</button></div>'+
     (shut?'':'<div class="cd2-b">'+o.files+'</div>'+(o.extra||'')+(o.foot?'<div class="cd2-foot"><span class="cd2-fl">'+o.foot+'</span></div>':''))+'</div>';
 }
@@ -6487,26 +6489,25 @@ function elFlow(c,services,L){
   var co=c.type==='company', dirs=co?(c.directors||[]).filter(function(d){ return String(d.name||'').trim(); }):[];
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
   var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
-  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
+  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter '+pill(EL_BADGE,'draft')+'</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
       '<div class="el-acts"><button type="button" class="pill-btn quiet" data-el="full">'+OI.ext+'Open full page</button><button type="button" class="pill-btn quiet" data-el="pdf">'+OI.dl+'Download PDF</button></div></div>'+
     '<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>';
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'
     :'<p class="cl-hint">Add a director in the Directors tab first.</p>')+'</div>';
   var how=elHow[c.id]||'';
-  h+='<div class="el-q"><h4>How should this be signed?</h4><div class="el-opts two" role="radiogroup" aria-label="Signing method">'+
-    [['request','Request Signature','Send a secure signing link to '+(co?'the director':'the client')],['manual','Sign Manually','Add the signature now']].map(function(m){ var on=how===m[0];
-      return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-how" value="'+m[0]+'"'+(on?' checked':'')+'><span><b>'+m[1]+'</b><small>'+m[2]+'</small></span></label>'; }).join('')+'</div></div>';
-  if(how==='request') h+='<div class="el-ff"><button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send</button></div>';   // opens the send screen in the side panel, as in Add Client
+  /* Send opens the send screen in the side panel (as in Add Client); Sign manually opens the signature pad here */
+  if(how!=='manual') h+='<div class="el-ff"><button type="button" class="btn-ghost btn-sm" id="el-mopen">Sign manually</button><button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send</button></div>';
   if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+
     '<label class="el-review" id="el-revl"><input type="checkbox" id="el-mrev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+
     '<span class="cl-err" id="el-sigerr" hidden></span>'+
-    '<div class="el-ff"><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
+    '<div class="el-ff"><button type="button" class="btn-ghost btn-sm" id="el-mx">Cancel</button><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
   return h+'</section>';
 }
 function wireElFlow(c,done){
   document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
-  document.querySelectorAll('#cdb input[name=el-how]').forEach(function(x){ x.onchange=function(){ elHow[c.id]=x.value; done(); }; });
+  var mo=document.getElementById('el-mopen'); if(mo) mo.onclick=function(){ elHow[c.id]='manual'; done(); var p=document.getElementById('el-pad'); if(p) p.scrollIntoView({block:'center',behavior:'smooth'}); };
+  var mx=document.getElementById('el-mx'); if(mx) mx.onclick=function(){ delete elHow[c.id]; done(); };
   var pe=document.getElementById('el-pad'); if(!pe) return;
   var nm=letterSigner(c,currentLetter(c)||letterFor(c.id)).name||c.name;
   var pad=sigPad(pe,nm,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
@@ -6552,10 +6553,10 @@ function engagementBody(c){
     noservice:['No services assigned','Assign a service to this client to create the engagement letter for FY '+fyLabel(F)+'.',null,null,[]],
     none:['No engagement letter yet','Create the letter for FY '+fyLabel(F)+' and send it to '+esc(who)+' for signature, or upload a letter they’ve already signed.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
     draft:['Not sent yet','The letter has been created but hasn’t been sent to '+esc(who)+'.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
-    awaiting:['Awaiting signature','',null,['send','Resend for Signature'],[['sign','Sign manually'],up]],
+    awaiting:['Signature pending','',null,['send','Resend for Signature'],[]],
     signed:['Signed','',null,null,[]],   // a signed letter is final: it can't be replaced
-    failed:['Email not delivered',esc(last&&last.error||'The signing request couldn’t be delivered.')+' Check the email address and try again.',['err','View Error Details'],['send','Retry Sending'],[['sign','Sign manually'],up]],
-    expired:['Expired','',null,['send','Start Renewal'],[up]]
+    failed:['Email not delivered',esc(last&&last.error||'The signing request couldn’t be delivered.')+' Check the email address and try again.',['err','View Error Details'],['send','Retry Sending'],[]],
+    expired:['Expired','',null,['send','Start Renewal'],[]]
   }[st];
   var menu=S[4].length?'<span class="el-mw"><button type="button" class="el-more" data-elmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+EL_DOTS+'</button>'+
       '<span class="el-menu" role="menu" hidden>'+S[4].map(function(x){ return '<button type="button" role="menuitem" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('')+'</span></span>':'';
@@ -6566,17 +6567,16 @@ function engagementBody(c){
 
   var nHist=letterHistItems(c).length;
   if(st==='expired'){ var ex=letterExpiresAt(L), da=Math.round((now-ex)/864e5);
-    return '<section class="vsec el-main">'+cdLine('<b>Engagement letter</b> for FY '+fyLabel(letterFy(L))+' expired on '+dmyOf(ex)+'. Send this year’s letter.',
-      '<button type="button" class="cd2-act quiet" data-el="upload">Upload signed</button>'+
+    return '<section class="vsec el-main">'+cdLine(pill(EL_BADGE,'expired')+' <b>Engagement letter</b> for FY '+fyLabel(letterFy(L))+' expired on '+dmyOf(ex)+'. Send this year’s letter.',
       '<button type="button" class="dx-up" data-el="send">'+CD_I.up+'Start renewal</button>')+cdHistBelow('l',c,letterHistItems(c))+'</section>';
   }
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=7;
   var fileWho=st==='signed'?letterHow(L):'Created by <em>'+esc(L.by||'staff')+'</em> · '+cdStamp(L.created);
-  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'<span class="'+(st==='awaiting'?'warn':'')+'">'+S[0]+'</span> · To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
+  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
-  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
+  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   return '<section class="vsec el-main">'+card+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');

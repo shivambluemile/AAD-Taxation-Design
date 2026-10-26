@@ -6597,7 +6597,10 @@ function engagementBody(c){
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=7;
   /* who did the last thing to it: signed, or sent (by whom and when); 'created by' says nothing as letters are generated */
   var fileWho=st==='signed'?letterHow(L):lastOk?'Sent by <em>'+esc(lastOk.by||'staff')+'</em> · '+cdStamp(lastOk.at):'Generated '+cdStamp(L.created);
-  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+'')+'</p>';
+  var waitD=lastOk?Math.floor((now-lastOk.at)/864e5):0, waitTx=waitD<1?'sent today':waitD===1?'sent 1 day ago':'sent '+waitD+' days ago';
+  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>'
+    :st==='awaiting'?'Awaiting signature from <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+' · '+waitTx+(waitD>=7?' · <span class="warn">No response yet, send a reminder</span>':'')
+    :'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':''))+'</p>';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
@@ -11996,7 +11999,7 @@ function clAv(c){ var p=String(c.name||'?').trim().split(' ').filter(Boolean), i
   av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
   return '<span class="cl-av" style="background:'+av[0]+';color:'+av[1]+'" aria-hidden="true">'+esc(ini)+'</span>'; }
 /* date range: the same control as the Leave module (presets + custom dates), This Month by default */
-var DEFAULT_RANGE='this_month';
+var DEFAULT_RANGE='this_year';
 function fmtD(iso){ return iso?iso.split('-').reverse().join('-'):''; }
 function rIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }

@@ -6445,6 +6445,11 @@ var histShut={};                                             // 'k'/'l' + client
 /* one status per letter, from its actual state: a sent letter is waiting for a signature */
 var EL_STATE={none:['Not created','grey'],draft:['Draft','grey'],awaiting:['Awaiting Signature','amber'],signed:['Signed','green'],failed:['Failed','red'],expired:['Expired','grey']};
 function elState(L){ if(!L) return 'none'; if(letterExpired(L)) return 'expired'; return L.status==='signed'?'signed':L.status==='sent'?'awaiting':L.status==='failed'?'failed':'draft'; }
+/* the staff member a client belongs to: whoever added the client (their first history entry), otherwise the person signed in */
+function clOwner(c){ var h=(c.history||[]).filter(function(x){ return x.kind==='created'&&x.by&&x.by!=='System'; })[0]; return h?h.by:ME; }
+/* letters made before this were saved as "System": show the person instead */
+function elOwnerFix(){ var ch=false; ONB.letters.forEach(function(l){ var c=findClient(l.clientId); if(!c) return;
+  if(l.by==='System'){ l.by=clOwner(c); ch=true; } (l.sends||[]).forEach(function(x){ if(x.by==='System'){ x.by=l.by; ch=true; } }); }); if(ch) persistOnb(); }
 function elAuto(L){ return L.by==='System'||(L.audit||[]).some(function(x){ return /new financial year/i.test(x.action); }); }
 var EL_DOTS='<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>';
 var EL_HIST='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/></svg>';
@@ -6807,10 +6812,10 @@ function annualUpkeep(){
     mine.forEach(function(l){ if(letterFy(l)<F&&!l.expiryLogged){ l.expiryLogged=true; l.expiredAt=letterExpiresAt(l);
       audit(l,'Expired','System',l.status,'expired','Financial year '+fyLabel(letterFy(l))+' ended '+whenOf(l.expiredAt)+' · letter kept on file');
       c.history.push({t:l.expiredAt,kind:'letter',title:'Engagement letter expired',detail:'FY '+fyLabel(letterFy(l))+' · '+whenOf(l.expiredAt),by:'System'}); changed=true; onbChanged=true; } });
-    /* 1 July: a new letter for the new financial year, emailed to the signing director (or the client) */
+    /* 1 July: a new letter for the new financial year, emailed to the signing director (or the client), on behalf of the client's staff member */
     var act=(c.services||[]).filter(function(a){ return a.status==='active'; }), sg=letterSigner(c,letterFor(c.id));
     if(c.active&&mine.length&&act.length&&sg.email&&!mine.some(function(l){ return letterFy(l)===F; })){
-      var L={id:'L'+now.toString(36)+c.id,clientId:c.id,client:snap(c),token:newToken(),created:now,by:'System',fy:F,signer:{name:sg.name,email:sg.email,role:sg.role},
+      var L={id:'L'+now.toString(36)+c.id,clientId:c.id,client:snap(c),token:newToken(),created:now,by:clOwner(c),fy:F,signer:{name:sg.name,email:sg.email,role:sg.role},
         services:act.map(function(a){ return {name:a.name,price:a.price}; }),status:'pending',expires:now+LINK_DAYS*day,sends:[],audit:[]};
       audit(L,'Generated for the new financial year','System','','pending','FY '+fyLabel(F)+' · from 01-07-'+F+' · expires '+whenOf(letterExpiresAt(L)));
       ONB.letters.push(L); onbChanged=true; mailNewYearLetter(c,L,sg);
@@ -6818,6 +6823,7 @@ function annualUpkeep(){
     }
   });
   if(onbChanged) persistOnb();
+  elOwnerFix();
   if(changed) saveClients();
 }
 /* 1 July: the new year's letter is emailed to the signer through the email service; the result is recorded either way */
@@ -6827,7 +6833,7 @@ function mailNewYearLetter(c,L,sg){
     '\n\nThe link is valid until '+dmyOf(L.expires)+'.\n\nKind regards,\nAAD Taxation';
   deliver({email:{to:sg.email,subject:sub,body:body}}).then(function(r){
     ONB=loadOnb(); var x=ONB.letters.filter(function(l){ return l.id===L.id; })[0]; if(!x||x.status==='signed') return;
-    var send={at:Date.now(),by:'System',channels:['Email'],ok:!!r.ok,emailTo:sg.email,auto:true}; if(!r.ok) send.error=r.error; x.sends.push(send);
+    var send={at:Date.now(),by:x.by&&x.by!=='System'?x.by:clOwner(c),channels:['Email'],ok:!!r.ok,emailTo:sg.email,auto:true}; if(!r.ok) send.error=r.error; x.sends.push(send);
     var from=x.status; x.status=r.ok?'sent':'failed';
     audit(x,r.ok?'Emailed automatically':'Automatic email failed','System',from,x.status,r.ok?'To '+sg.name+' ('+sg.email+') · new financial year':r.error);
     persistOnb(); var cc=findClient(c.id);

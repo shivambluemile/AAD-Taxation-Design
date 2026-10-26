@@ -3321,8 +3321,8 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-nm+.cd2-sub+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
 .cd2.el-c .cd2-b{margin:0;padding:14px 20px 4px}.cd2.el-c .cd2-file{border:0;padding:4px 0;background:none}
 .cd2.el-c .cd2-file .sdt-ib{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff}.cd2.el-c .cd2-file .sdt-ib:hover{border-color:#F8C9A2;color:var(--orange-ink)}
-.cd2.el-c .cd2-meta{margin:2px 20px 0 66px}.cd2.el-c .cd2-foot{margin:12px 0 0;padding:12px 20px;border-top:1px solid var(--line)}.cd2.el-c>.cd2-foot:last-child{margin-bottom:0}
-.cd2-fic.ext{font-size:10.5px;font-weight:800;letter-spacing:.02em;background:#FEE2E2;color:#DC2626}.cd2.el-c>:last-child{margin-bottom:16px}.cd2.el-c .cd2-fa{gap:10px}
+.cd2.el-c .cd2-meta{margin:2px 20px 0 66px}.cd2.el-c .cd2-foot{margin:6px 0 0;padding:8px 20px 14px}.cd2.el-c>.cd2-foot:last-child{margin-bottom:0}
+.cd2-fic.ext{font-size:10.5px;font-weight:800;letter-spacing:.02em;background:#FEE2E2;color:#DC2626}.cd2-fic.ext.img{background:#E8F5EE;color:#2F7D54}.cd2.el-c>:last-child{margin-bottom:16px}.cd2.el-c .cd2-fa{gap:10px}
 .cd2-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px}
 .cd2-fl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cd2-act{display:inline-flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;font-weight:600;color:var(--orange-ink)}.cd2-act:hover{text-decoration:underline;text-underline-offset:2px}.cd2-act.quiet{color:var(--slate)}
@@ -6391,7 +6391,7 @@ function kycHistItems(c){
   for(var vi=from;vi<recs.length;vi++){ var r=recs[vi], newer=vi>0?recs[vi-1]:null, ex=kycExpiresAt(r), lapsed=newer?ex<kycUploadedAt(newer):now>=ex, note=kycNoteOf(c,r);
     out.push({bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'Version '+(recs.length-vi)+' · Verified '+dmyOf(fromIso(r.date))+' by '+esc(r.by),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(ex):CD_I.swap+'Replaced by <b>'+esc(newer.by)+'</b> on '+cdStamp(kycUploadedAt(newer)),
-      files:(r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return {name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||r.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(r)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}; }),
+      files:(r.files||[]).map(function(f,fi){ var a=vi+'|'+fi; return {extIcon:true,name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||r.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(r)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}; }),
       note:note?'Note: '+esc(note):''}); }
   return out;
 }
@@ -6403,8 +6403,8 @@ function kycTab(c){
   if(st==='expired') return '<section class="vsec el-main">'+cdLine('<b>KYC</b> expired on '+dmyOf(ex)+'. Record a new verification.',
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
   var note=kycNoteOf(c,cur);
-  var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
-  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
+  var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({extIcon:true,name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
+  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,cls:'el-c',name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
     files:files||'<p class="cd2-none">No files in this check.</p>',
     extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
     foot:c._draft?'':'<button type="button" class="cd2-act" data-kyc-add>'+CD_I.up+'Replace</button>',nHist:nHist})+cdHistBelow('k',c,kycHistItems(c))+'</section>';

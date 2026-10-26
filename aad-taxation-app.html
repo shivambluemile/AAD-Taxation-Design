@@ -3087,7 +3087,8 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
-.el-q{margin-top:18px}.el-iacts .act.on{background:var(--orange-soft);color:var(--orange-ink);border-color:#F8C9A2}.el-flow .dr-h h3 .ob-pill,.cd2-nm+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
+.el-q{margin-top:18px}.el-hr{display:inline-flex;align-items:center;gap:12px}.el-flow .dr-h{align-items:center}.el-flow .dr-h h3{font-size:15px}
+.el-iacts .act.on{background:var(--orange-soft);color:var(--orange-ink);border-color:#F8C9A2}.el-flow .dr-h h3 .ob-pill,.cd2-nm+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
 .cd2-slim .ob-pill{margin-right:4px}.el-man .el-review{margin-top:14px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
 .el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
 .el-flow .el-opt{align-items:center}.el-flow .el-opt input{margin:0}
@@ -6458,7 +6459,7 @@ function letterHistItems(c){
   /* earlier financial years (and this one once it has expired); status changes are in Activities */
   return ONB.letters.filter(function(l){ return l.clientId===c.id&&(l!==L||gone); }).sort(function(a,z){ return letterFy(z)-letterFy(a)||z.created-a.created; }).map(function(l){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
-    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l)),
+    return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+' · '+(l.status==='signed'?'Signed':'Not signed')+(lapsed?'':' · Expires '+dmyOf(e2)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
       files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
@@ -6489,8 +6490,10 @@ function elFlow(c,services,L){
   var co=c.type==='company', dirs=co?(c.directors||[]).filter(function(d){ return String(d.name||'').trim(); }):[];
   if(co&&!elDirPick[c.id]&&dirs.length) elDirPick[c.id]=(L&&L.signer&&L.signer.name)||dirs[0].name;
   var sg=letterSigner(c,L), ctx=letterCtx(c,services,L); ctx.signerName=sg.name;
-  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement letter '+pill(EL_BADGE,'draft')+'</h3><p>FY '+fyLabel(L?letterFy(L):fyStart(Date.now()))+'</p></div>'+
-      '<span class="acts el-iacts"><button type="button" class="act'+(elPv[c.id]?' on':'')+'" id="el-pvt" aria-expanded="'+!!elPv[c.id]+'" title="'+(elPv[c.id]?'Hide preview':'Preview')+'" aria-label="'+(elPv[c.id]?'Hide preview':'Preview')+'">'+I.eye+'</button><button type="button" class="act" data-el="pdf" title="Download PDF" aria-label="Download PDF">'+OI.dl+'</button></span></div>'+
+  var fy=L?letterFy(L):fyStart(Date.now());   // header like the letter card: title · FY and status badge, the expiry on the right
+  var h='<section class="dr-card el-flow"><div class="dr-h"><div><h3>Engagement Letter · FY '+fyLabel(fy)+' '+pill(EL_BADGE,'draft')+'</h3></div>'+
+      '<span class="el-hr"><span class="cd2-exp">Expires '+dmyOf(fromIso(fyEnd(fy)))+'</span>'+
+      '<span class="acts el-iacts"><button type="button" class="act'+(elPv[c.id]?' on':'')+'" id="el-pvt" aria-expanded="'+!!elPv[c.id]+'" title="'+(elPv[c.id]?'Hide preview':'Preview')+'" aria-label="'+(elPv[c.id]?'Hide preview':'Preview')+'">'+I.eye+'</button><button type="button" class="act" data-el="pdf" title="Download PDF" aria-label="Download PDF">'+OI.dl+'</button></span></span></div>'+
     (elPv[c.id]?'<div class="el-wrap el-pvw"><span class="el-pvb">Preview</span>'+letterHtml(ctx)+'</div>':'');   // only when asked for
   if(co) h+='<div class="el-q"><h4>Which director will sign the engagement letter?</h4>'+(dirs.length?'<div class="el-opts" role="radiogroup" aria-label="Signing director">'+dirs.map(function(x){ var on=elDirPick[c.id]===x.name;
       return '<label class="el-opt'+(on?' on':'')+'"><input type="radio" name="el-dir" value="'+esc(x.name)+'"'+(on?' checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+[x.email&&esc(x.email),x.phone&&esc(x.phone)].filter(Boolean).join(' · ')+'</small></span></label>'; }).join('')+'</div>'

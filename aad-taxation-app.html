@@ -12834,9 +12834,9 @@ function confirmOutcome(id,to){
 }
 function confirmDelete(id){
   var q=byId(id);
-  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qdl-t"><div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="qdl-t">Delete draft '+esc(q.id)+'?</h3>'+
-    '<p>The draft for <strong>'+esc(client(q).name)+'</strong> is removed for good. This can’t be undone.</p></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="qd-no">Cancel</button><button class="btn-danger" id="qd-go">Delete draft</button></div></div>';
+  dlg.innerHTML='<div class="modal sm" role="dialog" aria-modal="true" aria-labelledby="qdl-t"><div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="qdl-t">Delete Draft Quotation '+esc(q.id)+'</h3>'+
+    '<p>The draft quotation for <strong>'+esc(client(q).name)+'</strong> will be permanently deleted. This action cannot be undone.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="qd-no">Cancel</button><button class="btn-danger" id="qd-go">Delete</button></div></div>';
   dlg.classList.add('open');
   document.getElementById('qd-no').onclick=closeDlg;
   document.getElementById('qd-go').onclick=function(){
@@ -20987,7 +20987,7 @@ function quoteDocHtml(m){
       '<li>Use BSB <b>'+DOC_PAY.bsb+'</b> and account number <b>'+DOC_PAY.acc+'</b>.</li>'+
       '<li><b>Payment terms:</b> '+DOC_PAY.terms+'</li>'+
       '<li>Questions about your payment? Call us on <b>'+DOC_PAY.call+'</b>.</li></ol></div>'+
-    '<p class="qd2-final">Please note: all services and sales are considered final and are non-refundable.</p>'+
+    '<p class="qd2-final">Please note that all services and sales are final and non-refundable.</p>'+
     '</div></div>';
 }
 var QUOTE_DOC_CSS=

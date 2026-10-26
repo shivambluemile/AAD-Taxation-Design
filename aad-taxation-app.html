@@ -11999,7 +11999,7 @@ function clAv(c){ var p=String(c.name||'?').trim().split(' ').filter(Boolean), i
   av=CL_AV[(String(c.id).split('').reduce(function(a,ch){ return a+ch.charCodeAt(0); },0))%CL_AV.length];
   return '<span class="cl-av" style="background:'+av[0]+';color:'+av[1]+'" aria-hidden="true">'+esc(ini)+'</span>'; }
 /* date range: the same control as the Leave module (presets + custom dates), This Month by default */
-var DEFAULT_RANGE='this_year';
+var DEFAULT_RANGE='all';   // no date filter until one is picked
 function fmtD(iso){ return iso?iso.split('-').reverse().join('-'):''; }
 function rIso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
@@ -12028,7 +12028,7 @@ function rangeOf(key){
   }
 }
 var RANGES=[
-  [['today','Today'],['this_week','This Week'],['this_month','This Month'],['this_year','This Year']]
+  [['all','All Dates'],['today','Today'],['this_week','This Week'],['this_month','This Month'],['this_year','This Year']]
 ];
 function rangeName(key){ for(var g=0;g<RANGES.length;g++) for(var i=0;i<RANGES[g].length;i++) if(RANGES[g][i][0]===key) return RANGES[g][i][1]; return 'Custom Range'; }
 function fmtRange(a,b){

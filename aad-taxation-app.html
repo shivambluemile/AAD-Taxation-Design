@@ -20940,7 +20940,7 @@ function quoteDocHtml(m){
   var kv=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+v+'</dd></div>'; };
   return '<div class="qf-doc"><div class="qf-doc-b">'+
     '<div class="qd2-head"><img class="qd2-logo" src="'+DOC_LOGO+'" alt="AAD Taxation">'+
-      '<div class="qd2-hr"><h3 class="qd2-title">'+K+'</h3><dl class="qd2-meta">'+kv(K+' number',e(m.id))+kv(K+' date',e(m.dateTxt))+kv('Due date',e(m.dueTxt))+'</dl></div></div>'+
+      '<div class="qd2-hr"><dl class="qd2-meta">'+kv(K+' number',e(m.id))+kv(K+' date',e(m.dateTxt))+kv('Due date',e(m.dueTxt))+'</dl></div></div>'+
     '<div class="qd2-parties"><div class="qd2-box"><span class="qd2-lbl">'+K+' to</span>'+(m.to?'<b>'+e(m.to)+'</b>':'<b class="qd2-mute">No client chosen yet</b>')+
         (m.toSub?'<span>'+e(m.toSub)+'</span>':'')+(m.attn?'<span>Attention: '+e(m.attn)+'</span>':'')+
         (m.phone?'<span>'+e(m.phone)+'</span>':'')+(m.email?'<span>'+e(m.email)+'</span>':'')+(m.abn?'<span>ABN '+e(m.abn)+'</span>':'')+'</div>'+

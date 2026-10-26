@@ -21569,7 +21569,7 @@ function paintQuote(){
     '<div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Quotation document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
     (exp?'<div class="note warn"><span>This quotation passed its valid-until date, so it can no longer be accepted. Contact '+FIRM.name+' on '+FIRM.phone+' for an updated quotation.</span></div>'
       /* open from the start: the client's signature first, then a comment, then Sign and accept (or decline) */
-      :'<div class="qa-sign" id="qa-sign"><h3>Accept quotation '+e(q.id)+' · '+money(doc.T.total)+'</h3>'+
+      :'<div class="qa-sign" id="qa-sign">'+
           '<label class="l">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
           '<label class="l qa-sl" for="qa-c">Comment</label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
           '<span class="err" id="qa-e" hidden></span>'+

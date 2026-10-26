@@ -3311,6 +3311,12 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-none{margin:0;font-size:12.5px;color:var(--faint)}
 .cd2-meta{margin:10px 0 0;font-size:12.5px;color:var(--mute)}.cd2-meta em{font-style:normal;font-weight:600;color:var(--slate)}.cd2-meta .warn{color:#B45309;font-weight:600}.cd2-meta .bad{color:#B91C1C}
 .cd2-rev{margin-top:10px}.cd2-rev .el-review{margin:0}
+.cd2.el-c{padding:0}.cd2.el-c .cd2-h{padding:18px 20px;border-bottom:1px solid var(--line)}.cd2.el-c.shut .cd2-h{border-bottom:0}
+.cd2.el-c .cd2-nm{font-size:16px}.cd2-sub{display:inline-flex;align-items:center;padding-left:12px;margin-left:4px;border-left:1px solid var(--line);font-size:14.5px;color:var(--mute);white-space:nowrap}
+.cd2-nm+.cd2-sub+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
+.cd2.el-c .cd2-b{margin:0;padding:14px 20px 4px}.cd2.el-c .cd2-file{border:0;padding:4px 0;background:none}
+.cd2.el-c .cd2-file .sdt-ib{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff}.cd2.el-c .cd2-file .sdt-ib:hover{border-color:#F8C9A2;color:var(--orange-ink)}
+.cd2.el-c .cd2-meta,.cd2.el-c .cd2-foot{margin-left:20px;margin-right:20px}.cd2.el-c>:last-child{margin-bottom:16px}.cd2.el-c .cd2-fa{gap:10px}
 .cd2-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px}
 .cd2-fl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cd2-act{display:inline-flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;font-weight:600;color:var(--orange-ink)}.cd2-act:hover{text-decoration:underline;text-underline-offset:2px}.cd2-act.quiet{color:var(--slate)}
@@ -6351,8 +6357,8 @@ function cdFile(o){ var x=String(o.name||'').split('.').pop().toLowerCase(), pic
     (o.dl?'<button type="button" class="sdt-ib" '+o.dl+' title="Download" aria-label="Download '+esc(o.name)+'">'+OI.dl+'</button>':'')+'</span></div></div>';
 }
 function cdCard(o){ var shut=!!cdShut[o.key+o.cid];
-  return '<div class="cd2'+(shut?' shut':'')+'"><div class="cd2-h"><button type="button" class="cd2-tg" data-cdshut="'+o.key+'" aria-expanded="'+!shut+'" aria-label="'+esc(o.name)+'. '+(shut?'Expand':'Collapse')+'">'+
-      '<span class="kt-ic">'+DC_DOC+'</span><b class="cd2-nm">'+o.name+'</b>'+(o.badge||'')+'</button><span class="cd2-exp'+(o.lineCls?' '+o.lineCls:'')+'">'+o.line+'</span>'+
+  return '<div class="cd2'+(o.cls?' '+o.cls:'')+(shut?' shut':'')+'"><div class="cd2-h"><button type="button" class="cd2-tg" data-cdshut="'+o.key+'" aria-expanded="'+!shut+'" aria-label="'+esc(o.name)+'. '+(shut?'Expand':'Collapse')+'">'+
+      '<span class="kt-ic">'+DC_DOC+'</span><b class="cd2-nm">'+o.name+'</b>'+(o.sub?'<span class="cd2-sub">'+o.sub+'</span>':'')+(o.badge||'')+'</button><span class="cd2-exp'+(o.lineCls?' '+o.lineCls:'')+'">'+o.line+'</span>'+
       '<button type="button" class="cd2-chev" data-cdshut="'+o.key+'" tabindex="-1" aria-hidden="true">'+CD_I.chev+'</button></div>'+
     (shut?'':'<div class="cd2-b">'+o.files+'</div>'+(o.extra||'')+(o.foot?'<div class="cd2-foot"><span class="cd2-fl">'+o.foot+'</span></div>':''))+'</div>';
 }
@@ -6458,7 +6464,7 @@ var EL_INFO='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke=
 function letterFileName(x,F){ return x&&x.file?x.file.name:'engagement-letter-FY'+(x?letterFy(x):F)+'-'+String((x?letterFy(x):F)+1).slice(2)+'.pdf'; }
 function letterHow(x){ var rec=(x.audit||[]).filter(function(a){ return /signed manually|uploaded/i.test(a.action); }).slice(-1)[0];
   return x.method==='upload'?'Signed by <em>'+esc(x.signedBy||'')+'</em> on '+dmyOf(x.signedAt)+' · uploaded by <em>'+esc(x.uploadedBy||rec&&rec.by||'staff')+'</em>'+(x.uploadedAt?' · '+cdStamp(x.uploadedAt):''):
-    'Signed by <em>'+esc(x.signature&&x.signature.name||x.signedBy||'')+'</em> · '+cdStamp(x.signedAt)+(x.method==='manual'?' · recorded by '+esc(rec&&rec.by||x.by||'staff'):' · signing link'); }
+    'Signed by <em>'+esc(x.signature&&x.signature.name||x.signedBy||'')+'</em> · '+cdStamp(x.signedAt)+(x.method==='manual'?' · Recorded by '+esc(rec&&rec.by||x.by||'staff'):' · Signing link'); }
 function letterHistItems(c){
   var F=fyStart(Date.now()), L=currentLetter(c), gone=elState(L)==='expired', now=Date.now();
   /* earlier financial years (and this one once it has expired); status changes are in Activities */
@@ -6589,7 +6595,7 @@ function engagementBody(c){
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
-  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
+  var card=cdCard({key:'l',cid:c.id,cls:'el-c',name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';

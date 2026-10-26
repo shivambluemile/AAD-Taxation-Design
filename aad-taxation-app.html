@@ -6404,7 +6404,7 @@ function kycTab(c){
     (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
   var note=kycNoteOf(c,cur);
   var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
-  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,cls:'el-c',name:'KYC Verification',badge:pill({valid:['Verified','green'],expiring:['Expiring soon','amber']},st==='expiring'?'expiring':'valid'),line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
+  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',badge:pill({valid:['Verified','green'],expiring:['Expiring soon','amber']},st==='expiring'?'expiring':'valid'),line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
     files:files||'<p class="cd2-none">No files in this check.</p>',
     extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
     foot:c._draft?'':'<button type="button" class="cd2-act" data-kyc-add>'+CD_I.up+'Replace</button>',nHist:nHist})+cdHistBelow('k',c,kycHistItems(c))+'</section>';
@@ -6606,7 +6606,7 @@ function engagementBody(c){
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
-  var card=cdCard({key:'l',cid:c.id,cls:'el-c',name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
+  var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size||letterSize(c,L),who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';

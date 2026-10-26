@@ -6578,8 +6578,9 @@ function engagementBody(c){
       '<button type="button" class="dx-up" data-el="send">'+CD_I.up+'Start renewal</button>')+cdHistBelow('l',c,letterHistItems(c))+'</section>';
   }
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=7;
-  var fileWho=st==='signed'?letterHow(L):'Created by <em>'+esc(L.by||'staff')+'</em> · '+cdStamp(L.created);
-  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
+  /* who did the last thing to it: signed, or sent (by whom and when); 'created by' says nothing as letters are generated */
+  var fileWho=st==='signed'?letterHow(L):lastOk?'Sent by <em>'+esc(lastOk.by||'staff')+'</em> · '+cdStamp(lastOk.at):'Generated '+cdStamp(L.created);
+  var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+'')+'</p>';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');

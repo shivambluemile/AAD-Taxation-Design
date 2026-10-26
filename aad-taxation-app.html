@@ -3321,7 +3321,8 @@ tbody tr:hover{background:#FCFCFD}
 .cd2-nm+.cd2-sub+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
 .cd2.el-c .cd2-b{margin:0;padding:14px 20px 4px}.cd2.el-c .cd2-file{border:0;padding:4px 0;background:none}
 .cd2.el-c .cd2-file .sdt-ib{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff}.cd2.el-c .cd2-file .sdt-ib:hover{border-color:#F8C9A2;color:var(--orange-ink)}
-.cd2.el-c .cd2-meta,.cd2.el-c .cd2-foot{margin-left:66px;margin-right:20px}.cd2.el-c .cd2-meta{margin-top:2px}.cd2.el-c .cd2-foot{margin-top:8px}.cd2.el-c>:last-child{margin-bottom:16px}.cd2.el-c .cd2-fa{gap:10px}
+.cd2.el-c .cd2-meta{margin:2px 20px 0 66px}.cd2.el-c .cd2-foot{margin:12px 0 0;padding:12px 20px;border-top:1px solid var(--line)}.cd2.el-c>.cd2-foot:last-child{margin-bottom:0}
+.cd2-fic.ext{font-size:10.5px;font-weight:800;letter-spacing:.02em;background:#FEE2E2;color:#DC2626}.cd2.el-c>:last-child{margin-bottom:16px}.cd2.el-c .cd2-fa{gap:10px}
 .cd2-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px}
 .cd2-fl{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .cd2-act{display:inline-flex;align-items:center;gap:6px;padding:4px 0;font-size:13px;font-weight:600;color:var(--orange-ink)}.cd2-act:hover{text-decoration:underline;text-underline-offset:2px}.cd2-act.quiet{color:var(--slate)}
@@ -6355,9 +6356,9 @@ function cdStamp(t){ return whenOf(t).replace(' · ',' '); }
 function cdDays(n){ n=Math.abs(n); return n+' day'+(n===1?'':'s'); }
 /* one file row: type icon, name (opens it), type and size, who uploaded it and when, download */
 function cdFile(o){ var x=String(o.name||'').split('.').pop().toLowerCase(), pic=/^(jpe?g|png|gif|webp|heic)$/.test(x), cls=pic?'img':'e-'+esc(x);
-  return '<div class="cd2-cell">'+(o.label?'<span class="cd2-lbl">'+esc(o.label)+'</span>':'')+'<div class="cd2-file"><span class="cd2-fic '+cls+'">'+(pic?CD_I.img:CD_I.file)+'</span>'+
+  return '<div class="cd2-cell">'+(o.label?'<span class="cd2-lbl">'+esc(o.label)+'</span>':'')+'<div class="cd2-file"><span class="cd2-fic '+cls+(o.extIcon?' ext':'')+'">'+(o.extIcon?esc(x.toUpperCase()):pic?CD_I.img:CD_I.file)+'</span>'+
     '<div class="cd2-fn">'+(o.open?'<button type="button" class="cd2-name" '+o.open+' title="Open '+esc(o.name)+'">'+esc(o.name)+'</button>':'<b class="cd2-name" title="'+esc(o.name)+'">'+esc(o.name)+'</b>')+
-      '<small><b class="'+cls+'">'+esc(x.toUpperCase())+'</b>'+(o.size?' · '+fsize(o.size):'')+'</small>'+(o.who?'<small>'+o.who+'</small>':'')+'</div>'+
+      (o.extIcon?(o.size?'<small>'+fsize(o.size)+'</small>':''):'<small><b class="'+cls+'">'+esc(x.toUpperCase())+'</b>'+(o.size?' · '+fsize(o.size):'')+'</small>')+(o.who?'<small>'+o.who+'</small>':'')+'</div>'+
     '<span class="cd2-fa">'+(o.open?'<button type="button" class="sdt-ib" '+o.open+' title="View" aria-label="View '+esc(o.name)+'">'+I.eye+'</button>':'')+
     (o.dl?'<button type="button" class="sdt-ib" '+o.dl+' title="Download" aria-label="Download '+esc(o.name)+'">'+OI.dl+'</button>':'')+'</span></div></div>';
 }
@@ -6477,7 +6478,7 @@ function letterHistItems(c){
     var e2=l.expiredAt||letterExpiresAt(l), lapsed=now>e2;
     return {bad:lapsed,pill:lapsed?'Expired':'Replaced',valid:'FY '+fyLabel(letterFy(l))+(lapsed?'':' · Expires '+dmyOf(e2)),
       ev:lapsed?CD_I.clock+'Expired on '+dmyOf(e2):CD_I.swap+'Replaced by a newer letter',
-      files:[{name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
+      files:[{extIcon:true,name:letterFileName(l,F),size:l.file&&l.file.size,who:l.status==='signed'?letterHow(l):'Not signed · created '+cdStamp(l.created)+(l.by?' by <em>'+esc(l.by)+'</em>':''),open:'data-elfull="'+l.id+'"',dl:'data-elpdf="'+l.id+'"'}]}; });
 }
 /* the Engagement letter tab: the deposit and account first (fields when they weren't filled in on Add Client, the saved values once they are), then the letter */
 var elPayEdit={};                                            // client id -> payment fields open for editing
@@ -6597,15 +6598,14 @@ function engagementBody(c){
   var dl=Math.round((fyEndAt-now)/864e5), soon=dl<=7;
   /* who did the last thing to it: signed, or sent (by whom and when); 'created by' says nothing as letters are generated */
   var fileWho=st==='signed'?letterHow(L):lastOk?'Sent by <em>'+esc(lastOk.by||'staff')+'</em> · '+cdStamp(lastOk.at):'Generated '+cdStamp(L.created);
-  var waitD=lastOk?Math.floor((now-lastOk.at)/864e5):0, waitTx=waitD<1?'sent today':waitD===1?'sent 1 day ago':'sent '+waitD+' days ago';
   var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>'
-    :st==='awaiting'?'Awaiting signature from <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+' · '+waitTx+(waitD>=7?' · <span class="warn">No response yet, send a reminder</span>':'')
     :'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':''))+'</p>';
+  if(st==='awaiting') meta='';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
     S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
   var card=cdCard({key:'l',cid:c.id,cls:'el-c',name:'Engagement Letter',sub:'FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
-    files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
+    files:cdFile({extIcon:true,name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
   var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';
   return '<section class="vsec el-main">'+card+man+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');

@@ -3087,7 +3087,7 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
-.el-q{margin-top:18px}.el-hr{display:inline-flex;align-items:center;gap:12px}.el-flow .dr-h{align-items:center}.el-flow .dr-h h3{font-size:15px}
+.el-q{margin-top:18px}.el-main>.dr-card{margin:16px 0 0}.el-main>.dr-card>.el-man{margin-top:0}.el-hr{display:inline-flex;align-items:center;gap:12px}.el-flow .dr-h{align-items:center}.el-flow .dr-h h3{font-size:15px}
 .el-iacts .act.on{background:var(--orange-soft);color:var(--orange-ink);border-color:#F8C9A2}.el-flow .dr-h h3 .ob-pill,.cd2-nm+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
 .cd2-slim .ob-pill{margin-right:4px}.el-man .el-review{margin-top:14px}.el-q h4{margin:0 0 10px;font-size:13.5px;font-weight:700;color:var(--ink)}
 .el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
@@ -6501,11 +6501,14 @@ function elFlow(c,services,L){
   var how=elHow[c.id]||'';
   /* Send opens the send screen in the side panel (as in Add Client); Sign manually opens the signature pad here */
   if(how!=='manual') h+='<div class="el-ff"><button type="button" class="btn-ghost btn-sm" id="el-mopen">Sign manually</button><button type="button" class="btn-primary btn-sm" data-el="send">'+OI.send+'Send</button></div>';
-  if(how==='manual') h+='<div class="el-q el-man"><span class="flabel">Signature'+(sg.name?' of '+esc(sg.name):'')+'</span><div id="el-pad"></div>'+
+  if(how==='manual') h+=elManual(sg.name);
+  return h+'</section>';
+}
+function elManual(name){
+  return '<div class="el-q el-man"><span class="flabel">Signature'+(name?' of '+esc(name):'')+'</span><div id="el-pad"></div>'+
     '<label class="el-review" id="el-revl"><input type="checkbox" id="el-mrev"><span>I confirm that I have reviewed this letter and verified the client details, services, and fees.</span></label>'+
     '<span class="cl-err" id="el-sigerr" hidden></span>'+
     '<div class="el-ff"><button type="button" class="btn-ghost btn-sm" id="el-mx">Cancel</button><button type="button" class="btn-primary btn-sm" id="el-sigok">Submit signature</button></div></div>';
-  return h+'</section>';
 }
 function wireElFlow(c,done){
   document.querySelectorAll('#cdb input[name=el-dir]').forEach(function(x){ x.onchange=function(){ elDirPick[c.id]=x.value; done(); }; });   // the send screen / pad follow the new signer
@@ -6557,9 +6560,9 @@ function engagementBody(c){
     noservice:['No services assigned','Assign a service to this client to create the engagement letter for FY '+fyLabel(F)+'.',null,null,[]],
     none:['No engagement letter yet','Create the letter for FY '+fyLabel(F)+' and send it to '+esc(who)+' for signature, or upload a letter they’ve already signed.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
     draft:['Not sent yet','The letter has been created but hasn’t been sent to '+esc(who)+'.',null,['send','Send for Signature'],[['sign','Sign manually'],up]],
-    awaiting:['Signature pending','',null,['send','Resend for Signature'],[]],
+    awaiting:['Signature pending','',null,['send','Resend for Signature'],[['msign','Sign manually']]],
     signed:['Signed','',null,null,[]],   // a signed letter is final: it can't be replaced
-    failed:['Email not delivered',esc(last&&last.error||'The signing request couldn’t be delivered.')+' Check the email address and try again.',['err','View Error Details'],['send','Retry Sending'],[]],
+    failed:['Email not delivered',esc(last&&last.error||'The signing request couldn’t be delivered.')+' Check the email address and try again.',['err','View Error Details'],['send','Retry Sending'],[['msign','Sign manually']]],
     expired:['Expired','',null,['send','Start Renewal'],[]]
   }[st];
   var menu=S[4].length?'<span class="el-mw"><button type="button" class="el-more" data-elmenu aria-haspopup="menu" aria-expanded="false" aria-label="More actions" title="More actions">'+EL_DOTS+'</button>'+
@@ -6579,11 +6582,12 @@ function engagementBody(c){
   var meta=st==='signed'?'':'<p class="cd2-meta">'+(st==='failed'?'<span class="bad">'+S[1]+'</span>':'To be signed by <em>'+esc(who)+'</em>'+(role?' ('+esc(role)+')':'')+(lastOk?' · Sent '+cdStamp(lastOk.at):''))+'</p>';
   /* the next step first, then the other ways to get it signed, all as links (no menu) */
   var foot=(S[3]?'<button type="button" class="cd2-act" data-el="'+S[3][0]+'">'+CD_I.up+S[3][1]+'</button>':'')+(S[2]?'<button type="button" class="cd2-act quiet" data-el="'+S[2][0]+'">'+S[2][1]+'</button>':'')+
-    S[4].map(function(x){ return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
+    S[4].map(function(x){ if(x[0]==='msign') return elHow[c.id]==='manual'?'':'<button type="button" class="cd2-act quiet" id="el-mopen">Sign manually</button>'; return x[0]==='upload'&&st==='signed'?'<button type="button" class="cd2-act" data-el="upload">'+CD_I.up+'Replace</button>':'<button type="button" class="cd2-act quiet" data-el="'+x[0]+'">'+x[1]+'</button>'; }).join('');
   var card=cdCard({key:'l',cid:c.id,name:'Engagement Letter · FY '+fyLabel(F),badge:pill(EL_BADGE,st),line:soon?'Expiring within '+cdDays(dl):'Expires '+dmyOf(fyEndAt),lineCls:soon?'warn':'',
     files:cdFile({name:letterFileName(L,F),size:L.file&&L.file.size,who:fileWho,open:'data-el="'+(st==='draft'?'view':'full')+'"',dl:'data-el="pdf"'}),
     extra:meta+(st==='draft'?'<div class="cd2-rev">'+review+'</div>':''),foot:foot,nHist:nHist});
-  return '<section class="vsec el-main">'+card+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');
+  var man=(st==='awaiting'||st==='failed')&&elHow[c.id]==='manual'?'<section class="dr-card el-flow">'+elManual(sg.name||c.name)+'</section>':'';
+  return '<section class="vsec el-main">'+card+man+cdHistBelow('l',c,letterHistItems(c))+'</section>'+(st==='draft'?preview(L.services,L):'');
 }
 /* why a send failed: the last attempt, and the failures in the letter's audit trail */
 function elErrorDetails(c){
@@ -6759,6 +6763,13 @@ function annualUpkeep(){
         audit:[{t:cAt,action:'Sent for signature',by:'Sarah Lee',from:'pending',to:'sent',note:'Email'},{t:sAt,action:'Signed by client',by:demo.name,from:'sent',to:'signed',note:'Through the signing link'}]});
       onbChanged=true;
     }
+    changed=true;
+  }
+  /* sample (prototype only): a newer check uploaded before the last one ran out, so James Nguyen's KYC history also shows a Replaced version */
+  if(demo&&!demo.demoReplaced){
+    demo.demoReplaced=true; demo.kycRecords=demo.kycRecords||[];
+    var u3=now-385*day+(3*36e5+40*6e4);
+    demo.kycRecords.push({id:'kd3c',date:isoOf(u3),files:[{name:'passport_james_nguyen_2025.pdf',size:442000,at:u3,by:'Priya Nair'}],by:'Priya Nair',at:u3,expiresAt:u3+KYC_DAYS*day,note:'New passport issued, re-verified',source:'Sample'});
     changed=true;
   }
   /* sample (prototype only): two more years of James Nguyen's letters, so the history shows several years */

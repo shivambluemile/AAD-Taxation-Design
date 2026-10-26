@@ -3088,9 +3088,10 @@ tbody tr:hover{background:#FCFCFD}
 .dr-top .av{background:#FFF1E6;color:var(--orange-ink)}
 .el-flow .el-wrap{margin-top:16px}.el-flow .el-review{margin-top:14px}
 .el-q{margin-top:18px}
-.pd-card{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:22px 32px 16px;padding:14px 16px 14px 20px;border:1px solid var(--line);border-radius:14px;background:#fff}
-.pd-t{font-size:14px;font-weight:700;color:var(--ink)}.pd-line{display:flex;flex-wrap:wrap;gap:6px 22px;flex:1;min-width:0}
-.pd-line span{font-size:14px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}.pd-line em{font-style:normal;font-weight:400;color:var(--mute);margin-right:6px}.pd-card .pd-ed{margin-left:auto}
+.pd-card{display:block;margin:22px 32px 16px;padding:14px 16px 16px 20px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.pd-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.pd-t{font-size:14px;font-weight:700;color:var(--ink)}.pd-line{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 22px}
+.pd-line span{display:flex;flex-direction:column;gap:2px;font-size:14.5px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}.pd-line em{font-style:normal;font-weight:400;font-size:12px;color:var(--mute)}.pd-card .pd-ed{margin-left:auto}
 .pd-card+.vsec.el-main{padding-top:0}
 @media (max-width:640px){.pd-card{margin:16px}}.dr-card+.vsec.el-main{padding-top:0}.el-main .cd2-hist{margin-top:12px}.el-main>.dr-card{margin:16px 0 0}.el-main>.dr-card>.el-man{margin-top:0}.el-hr{display:inline-flex;align-items:center;gap:12px}.el-flow .dr-h{align-items:center}.el-flow .dr-h h3{font-size:15px}
 .el-iacts .act.on{background:var(--orange-soft);color:var(--orange-ink);border-color:#F8C9A2}.el-flow .dr-h h3 .ob-pill,.cd2-nm+.ob-pill{margin-left:8px;vertical-align:middle;font-size:11.5px;padding:2px 9px}
@@ -6501,8 +6502,9 @@ function engagementTab(c){
   var dep=money(Number(String(p.deposit).replace(/[$,\s]/g,''))||0);
   /* one line: the three values, and an edit icon */
   var it=function(l,v){ return '<span><em>'+l+'</em>'+esc(v)+'</span>'; };
-  return '<section class="pd-card"><b class="pd-t">Payment details</b><span class="pd-line">'+it('Deposit',dep)+it('BSB',p.bsb)+it('Account',p.accNo)+'</span>'+
-      '<button type="button" class="act pd-ed" id="el-pedit" title="Edit payment details" aria-label="Edit payment details">'+I.edit+'</button></section>'+engagementBody(c);
+  return '<section class="pd-card"><div class="pd-top"><b class="pd-t">Payment details</b>'+
+      '<button type="button" class="act pd-ed" id="el-pedit" title="Edit payment details" aria-label="Edit payment details">'+I.edit+'</button></div>'+
+    '<span class="pd-line">'+it('Deposit amount',dep)+it('BSB',p.bsb)+it('Account number',p.accNo)+'</span></section>'+engagementBody(c);
 }
 /* the letter before it's sent or signed, as in Add Client step 3: the letter, which director signs, then how it's signed:
    Request Signature shows Send, which opens the send screen in the side panel; Sign Manually shows the signature pad and Submit signature */

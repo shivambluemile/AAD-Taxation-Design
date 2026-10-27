@@ -3099,6 +3099,26 @@ tbody tr:hover{background:#FCFCFD}
 .el-ff{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:16px;padding:14px 0;border-top:1px solid var(--line)}.el-ff #ss-back{display:none}
 .el-flow .el-opt{align-items:center}.el-flow .el-opt input{margin:0}
 .el-payg{padding-top:16px;margin-bottom:6px}.el-pdl{padding:16px 0 12px}.el-pwait{margin:0 32px 22px}
+.ky-card{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}.ky-card+.ky-card{margin-top:16px}
+.ky-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ky-h h3{margin:0;font-family:'Manrope',Inter,sans-serif;font-size:16px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}.ky-h p{margin:3px 0 0;font-size:12.5px;color:var(--mute)}
+.ky-h .ob-pill{font-size:11.5px;padding:2px 9px}.ky-hacts{display:flex;gap:8px}.ky-hacts .btn-ghost{display:inline-flex;align-items:center;gap:6px}
+.ky-b{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.ky-ban{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px}.ky-ban b{display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700}.ky-ban span{font-size:12.5px}.ky-ban svg{width:15px;height:15px}
+.ky-ban.ok{background:#ECFDF5;color:#047857}.ky-ban.warn{background:#FFF7E6;color:#B4690E}.ky-ban.bad{background:#FEF2F2;color:#B91C1C}.ky-ban.none{background:#F6F7F9;color:var(--slate);font-size:13px}
+.ky-file{display:grid;grid-template-columns:40px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.ky-ext{width:40px;height:40px;border-radius:8px;background:#FEE2E2;color:#DC2626;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ky-fn{min-width:0}.ky-name{display:block;max-width:100%;padding:0;border:0;background:none;text-align:left;font:inherit;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.ky-name:hover{color:var(--orange-ink)}.ky-fn small{display:block;font-size:12px;color:var(--mute)}
+.ky-col{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0}.ky-lbl{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7A8597}.ky-col b{font-size:13px;font-weight:600;color:var(--ink)}
+.ky-who{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink);min-width:0}.ky-who i{width:22px;height:22px;border-radius:50%;background:#E8EEFC;color:#3B5BDB;font-style:normal;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ky-role{font-size:11px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:999px;padding:1px 8px}
+.ky-acts{display:flex;gap:8px}.ky-acts .btn-ghost{display:inline-flex;align-items:center;gap:5px}
+.ky-ver{margin:2px 0 0;font-size:12.5px;color:var(--mute)}.ky-ver b{color:var(--slate);font-weight:600}
+.ky-yr+.ky-yr{border-top:1px solid var(--line)}.ky-yh{display:grid;grid-template-columns:20px minmax(0,1fr) minmax(0,1.2fr) auto auto;align-items:center;gap:14px;width:100%;padding:14px 20px;border:0;background:none;text-align:left;font:inherit;cursor:pointer}.ky-yh:hover{background:#FAFBFC}
+.ky-chev{color:var(--mute);transform:rotate(-90deg);transition:transform .15s;display:inline-flex}.ky-yr.open .ky-chev{transform:none}
+.ky-yt b{display:block;font-size:14px;font-weight:700;color:var(--ink)}.ky-yt small,.ky-ym small{display:block;font-size:12px;color:var(--mute)}.ky-ym{font-size:13px;color:var(--ink)}.ky-yv{font-size:13px;color:var(--slate)}
+.ky-yb{padding:4px 20px 16px;display:flex;flex-direction:column;gap:10px;background:#FAFBFC}
+@media (max-width:760px){.ky-file{grid-template-columns:40px minmax(0,1fr)}.ky-file .ky-col,.ky-file .ky-acts{grid-column:2}.ky-yh{grid-template-columns:20px minmax(0,1fr) auto}.ky-ym,.ky-yv{display:none}}
 .sv-add{margin:16px 0 4px;padding:16px;border:1px solid #F8C9A2;border-radius:12px;background:#FFFAF5}
 .sv-add-t{margin:0;font-size:14px;font-weight:700;color:var(--ink)}.sv-add-n{margin:2px 0 14px;font-size:12.5px;color:var(--mute)}
 .sv-add-f{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #F3DCC8}
@@ -6345,6 +6365,7 @@ function dcChip(name,openAttr,dlAttr,size){ var e=String(name||'').split('.').po
    Once expired, the card goes and a banner above says what needs uploading */
 var cdShut={};                                               // 'k'/'l' + client id -> card closed
 var CD_I={
+  chk:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>',
   img:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 9"/></svg>',
   file:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></svg>',
   chev:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
@@ -6396,19 +6417,48 @@ function kycHistItems(c){
       note:note?'Note: '+esc(note):''}); }
   return out;
 }
+/* KYC tab: the current financial year's check (validity banner, each document with who uploaded it and when), then earlier years, each opening to its documents */
+var kycYrOpen={};                                            // client id + record id -> earlier year opened
+function kycWho(c,name){ var n=String(name||'').trim(), dir=(c.directors||[]).some(function(d){ return d.name===n; }); return n===c.name||dir?'Client':'Staff'; }
+function kycIni(n){ return String(n||'?').trim().split(/\s+/).map(function(p){ return p[0]; }).join('').slice(0,2).toUpperCase(); }
+function kycFileRow(c,rec,f,a,view){
+  var x=String(f.name||'').split('.').pop().toUpperCase(), by=f.by||rec.by, at=f.at||kycUploadedAt(rec);
+  return '<div class="ky-file"><span class="ky-ext">'+esc(x)+'</span>'+
+    '<div class="ky-fn">'+(view?'<button type="button" class="ky-name" data-kpv="'+a+'" title="'+esc(f.name)+'">'+esc(f.name)+'</button>':'<b class="ky-name" title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+(f.size?fsize(f.size):'')+'</small></div>'+
+    '<div class="ky-col"><span class="ky-lbl">Uploaded by</span><span class="ky-who"><i>'+esc(kycIni(by))+'</i>'+esc(by)+'</span><span class="ky-role">'+kycWho(c,by)+'</span></div>'+
+    '<div class="ky-col"><span class="ky-lbl">Uploaded on</span><b>'+whenOf(at)+'</b></div>'+
+    '<div class="ky-acts">'+(view?'<button type="button" class="btn-ghost btn-sm" data-kpv="'+a+'">View</button><button type="button" class="btn-ghost btn-sm" data-kdl="'+a+'">'+OI.dl+'Download</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+'</div></div>';
+}
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], now=Date.now(), view=canViewKyc(), st=cur?kycState(cur):'none';
-  if(!cur) return '<section class="vsec el-main">'+dcCard({title:'KYC Verification',body:dcEmpty('No KYC uploaded','Upload the client’s identity documents, such as a passport or driver licence. Each verification stays valid for 12 months.',
-      c._draft?'':'<button type="button" class="btn-primary btn-sm" data-kyc-add>Upload KYC</button>')})+'</section>';
-  var ex=kycExpiresAt(cur), dl=Math.round((ex-now)/864e5), nHist=kycHistItems(c).length;
-  if(st==='expired') return '<section class="vsec el-main">'+cdLine('<b>KYC</b> expired on '+dmyOf(ex)+'. Record a new verification.',
-    (c._draft?'':'<button type="button" class="dx-up" data-kyc-add>'+CD_I.up+'Upload new</button>'))+cdHistBelow('k',c,kycHistItems(c))+'</section>';
-  var note=kycNoteOf(c,cur);
-  var files=(cur.files||[]).map(function(f,fi){ var a='0|'+fi; return cdFile({name:f.name,size:f.size,who:'Uploaded by <em>'+esc(f.by||cur.by)+'</em> · '+cdStamp(f.at||kycUploadedAt(cur)),open:view?'data-kpv="'+a+'"':'',dl:view?'data-kdl="'+a+'"':''}); }).join('');
-  return '<section class="vsec el-main">'+cdCard({key:'k',cid:c.id,name:'KYC Verification',line:st==='expiring'?'Expiring within '+cdDays(dl):'Next verification '+dmyOf(ex),lineCls:st==='expiring'?'warn':'',
-    files:files||'<p class="cd2-none">No files in this check.</p>',
-    extra:'<p class="cd2-meta">Verified '+dmyOf(fromIso(cur.date))+' by <em>'+esc(cur.by)+'</em>'+(note?' · Note: '+esc(note):'')+'</p>',
-    foot:c._draft?'':'<button type="button" class="cd2-act" data-kyc-add>'+CD_I.up+'Replace</button>',nHist:nHist})+cdHistBelow('k',c,kycHistItems(c))+'</section>';
+  var acts=c._draft?'':'<div class="ky-hacts"><button type="button" class="btn-ghost btn-sm" data-kyc-req>'+OI.send+'Send request</button><button type="button" class="btn-primary btn-sm" data-kyc-add>'+(cur?'Replace':'Upload KYC')+'</button></div>';
+  var h='<section class="vsec el-main">';
+  if(!cur){
+    h+='<div class="ky-card"><div class="ky-h"><div><h3>KYC</h3><p>No KYC documents uploaded</p></div>'+acts+'</div>'+
+      '<div class="ky-b"><div class="ky-ban none">Upload the client’s identity documents, such as a passport or driver licence. Each verification stays valid for 12 months.</div></div></div>';
+  } else {
+    var ex=kycExpiresAt(cur), left=Math.ceil((ex-now)/864e5), fy=fyLabel(fyStart(fromIso(cur.date))), note=kycNoteOf(c,cur), n=(cur.files||[]).length;
+    var badge=st==='expired'?pill({x:['Expired','red']},'x'):st==='expiring'?pill({x:['Expiring soon','amber']},'x'):pill({x:['Current','green']},'x');
+    h+='<div class="ky-card"><div class="ky-h"><div><h3>KYC — FY '+fy+' '+badge+'</h3><p>'+n+' KYC document'+(n===1?'':'s')+' uploaded</p></div>'+acts+'</div><div class="ky-b">'+
+      (st==='expired'?'<div class="ky-ban bad"><b>Expired on '+dmyOf(ex)+'</b><span>Record a new verification</span></div>'
+        :'<div class="ky-ban '+(st==='expiring'?'warn':'ok')+'"><b>'+CD_I.chk+'Valid till '+dmyOf(ex)+'</b><span>'+left+' day'+(left===1?'':'s')+' left</span></div>')+
+      ((cur.files||[]).map(function(fl,fi){ return kycFileRow(c,cur,fl,'0|'+fi,view); }).join('')||'<p class="cl-muted">No files in this check.</p>')+
+      '<p class="ky-ver">Verified '+dmyOf(fromIso(cur.date))+' by <b>'+esc(cur.by)+'</b>'+(note?' · Note: '+esc(note):'')+'</p></div></div>';
+  }
+  /* earlier checks, newest first, by financial year */
+  var past=recs.slice(1);
+  if(past.length){
+    h+='<div class="ky-card"><div class="ky-h"><div><h3>Previous Years KYC History</h3><p>Select a year to view its documents</p></div></div>'+past.map(function(rec,i){
+      var vi=i+1, newer=recs[vi-1], ex2=kycExpiresAt(rec), lapsed=ex2<kycUploadedAt(newer), k=c.id+'|'+(rec.id||vi), open=!!kycYrOpen[k], m=(rec.files||[]).length, nt=kycNoteOf(c,rec);
+      return '<div class="ky-yr'+(open?' open':'')+'"><button type="button" class="ky-yh" data-kyyr="'+esc(k)+'" aria-expanded="'+open+'"><span class="ky-chev">'+CD_I.chev+'</span>'+
+          '<span class="ky-yt"><b>FY '+fyLabel(fyStart(fromIso(rec.date)))+'</b><small>'+m+' KYC document'+(m===1?'':'s')+'</small></span>'+
+          '<span class="ky-ym">Uploaded '+dmyOf(kycUploadedAt(rec))+'<small>by '+esc(rec.by)+' · '+kycWho(c,rec.by)+'</small></span>'+
+          '<span class="ky-yv">Valid till '+dmyOf(ex2)+'</span>'+pill({x:[lapsed?'Expired':'Replaced',lapsed?'red':'grey']},'x')+'</button>'+
+        (open?'<div class="ky-yb">'+(rec.files||[]).map(function(fl,fi){ return kycFileRow(c,rec,fl,vi+'|'+fi,view); }).join('')+
+          '<p class="ky-ver">Version '+(recs.length-vi)+' · '+(lapsed?'Expired on '+dmyOf(ex2):'Replaced on '+dmyOf(kycUploadedAt(newer))+' by '+esc(newer.by))+(nt?' · Note: '+esc(nt):'')+'</p></div>':'')+'</div>';
+    }).join('')+'</div>';
+  }
+  return h+'</section>';
 }
 /* every upload, renewal and expiry, newest first, from the records themselves */
 function kycTrail(c){
@@ -6715,6 +6765,11 @@ function wireClientTab(c,t,body,repaintTab){
   if(t==='documents'){
     var recs=kycRecs(c), fileOf=function(v){ var p=v.split('|'); var r=recs[+p[0]]; return r&&r.files[+p[1]]; };
     body.querySelectorAll('[data-kyc-add]').forEach(function(b){ b.onclick=function(){ kycDialog(c,repaintTab); }; });
+    body.querySelectorAll('[data-kyyr]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.kyyr; kycYrOpen[k]=!kycYrOpen[k]; repaintTab(); }; });
+    /* asks the client to upload their KYC documents (prototype: recorded in Activities) */
+    body.querySelectorAll('[data-kyc-req]').forEach(function(b){ b.onclick=function(){ var to=c.email||((c.directors||[])[0]||{}).email;
+      if(!to) return toast('Add an email for the client first',true);
+      logEvent(c,'document','KYC requested','Request sent to '+to); toast('KYC request sent to '+to); }; });
     body.querySelectorAll('[data-kyv]').forEach(function(b){ b.onclick=function(){ kycOpen[c.id]=!kycOpen[c.id]; repaintTab(); }; });
     body.querySelectorAll('[data-kpv]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kpv); if(f) openKyc(f); }; });
     body.querySelectorAll('[data-kdl]').forEach(function(b){ b.onclick=function(){ var f=fileOf(b.dataset.kdl); if(f) openKyc(f,true); }; });

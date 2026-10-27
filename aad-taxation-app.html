@@ -6433,11 +6433,15 @@ function kycFileRow(c,rec,f,a,view){
 }
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], now=Date.now(), view=canViewKyc(), st=cur?kycState(cur):'none';
-  var acts=c._draft?'':'<div class="ky-hacts"><button type="button" class="ky-req" data-kyc-req>'+OI.send+'Send request</button><button type="button" class="btn-primary btn-sm" data-kyc-add>'+(cur?'Replace':'Upload KYC')+'</button></div>';
+  var gone=st==='expired';
+  var acts=c._draft?'':'<div class="ky-hacts"><button type="button" class="ky-req" data-kyc-req>'+OI.send+'Send request</button><button type="button" class="btn-primary btn-sm" data-kyc-add>'+(!cur?'Upload KYC':gone?'Upload new':'Replace')+'</button></div>';
   var h='<section class="vsec el-main"><div class="ky-card">';
   if(!cur){
     h+='<div class="ky-h"><div><h3>KYC Verification</h3><span class="ky-val none">No KYC uploaded yet</span></div>'+acts+'</div>'+
       '<p class="ky-none">Upload the client’s identity documents, such as a passport or driver licence. Each verification stays valid for 12 months.</p>';
+  } else if(gone){
+    h+='<div class="ky-h"><div><h3>KYC Verification</h3><span class="ky-val bad">Expired on '+dmyOf(kycExpiresAt(cur))+'</span></div>'+acts+'</div>'+
+      '<p class="ky-none">There’s no valid KYC for this client. The last check expired and is kept under Previous versions. Upload new documents, or send the client a request.</p>';
   } else {
     var ex=kycExpiresAt(cur), left=Math.ceil((ex-now)/864e5), note=kycNoteOf(c,cur), n=(cur.files||[]).length;
     var val=st==='expired'?'<span class="ky-val bad">Expired on '+dmyOf(ex)+'</span>':'<span class="ky-val '+(st==='expiring'?'warn':'ok')+'">Valid till '+dmyOf(ex)+' · '+left+' day'+(left===1?'':'s')+' left</span>';
@@ -6447,10 +6451,10 @@ function kycTab(c){
       (note?'<p class="ky-note">Note: '+esc(note)+'</p>':'');
   }
   /* earlier checks, newest first */
-  var past=recs.slice(1);
+  var past=gone?recs:recs.slice(1), off=gone?0:1;
   if(past.length){
     h+='<h4 class="ky-ph">Previous versions</h4><div class="ky-yrs">'+past.map(function(rec,i){
-      var vi=i+1, newer=recs[vi-1], ex2=kycExpiresAt(rec), lapsed=ex2<kycUploadedAt(newer), k=c.id+'|'+(rec.id||vi), open=!!kycYrOpen[k], m=(rec.files||[]).length, nt=kycNoteOf(c,rec);
+      var vi=i+off, newer=vi>0?recs[vi-1]:null, ex2=kycExpiresAt(rec), lapsed=!newer||ex2<kycUploadedAt(newer), k=c.id+'|'+(rec.id||vi), open=!!kycYrOpen[k], m=(rec.files||[]).length, nt=kycNoteOf(c,rec);
       return '<div class="ky-yr'+(open?' open':'')+'"><button type="button" class="ky-yh" data-kyyr="'+esc(k)+'" aria-expanded="'+open+'"><span class="ky-chev">'+CD_I.chev+'</span>'+
           '<span class="ky-yt"><b>FY '+fyLabel(fyStart(fromIso(rec.date)))+'</b><small>'+m+' KYC document'+(m===1?'':'s')+'</small></span>'+
           '<span class="ky-ym">Verified '+dmyOf(fromIso(rec.date))+'<small>by '+esc(rec.by)+'</small></span>'+

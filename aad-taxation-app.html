@@ -14461,7 +14461,15 @@ table,td,th{font-size:13.5px}
 .qf-gck i svg{opacity:0}.qf-gck.on{color:var(--slate)}.qf-gck.on i{background:var(--orange);border-color:var(--orange)}.qf-gck.on i svg{opacity:1}
 .qf-gck:hover{color:var(--ink)}.qf-gck:hover i{border-color:#94A3B8}.qf-gck.on:hover i{border-color:var(--orange-ink)}.qf-gck[disabled]{cursor:default;opacity:.7}
 .qf-gck:focus-visible{outline:none}.qf-gck:focus-visible i{box-shadow:0 0 0 3px rgba(241,137,52,.25)}
-.sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:18px 136px minmax(0,1.3fr) minmax(0,1.5fr) 84px 76px 120px 100px 34px}
+.qf2 .qf-one{padding:0}.qf2 .qf-sec{padding:20px 22px;min-width:0}.qf2 .qf-one>.qf-sec+.qf-sec,.qf2 .qf-one>.qf-bottom{padding-top:4px}
+.qf2 .qf-one .qf-bottom{gap:0}
+.qf2 .qf-one>.ferr{margin:0 22px 16px}
+.qf-pf{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#F9FAFB}
+.qf-pf .cl-av{width:40px;height:40px;font-size:13px}
+.qf-pf-b{min-width:0;flex:1}.qf-pf-b>b{display:block;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qf-pf-m{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:5px}
+.qf-pf-m span{display:inline-flex;align-items:center;gap:5px;min-width:0;font-size:13px;color:var(--ink);white-space:nowrap}
+.qf-pf-m svg{width:13px;height:13px;flex-shrink:0;color:var(--mute)}.qf-pf-m em{font-style:normal;font-size:11px;color:var(--mute)}
 .sl-fee{color:var(--mute);font-weight:500}
 .sl-dates{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .sl-up{border-top:1px solid var(--line);padding-top:16px}
@@ -15060,6 +15068,16 @@ function svcById(id){ return catalogAll().services.filter(function(s){ return s.
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
 function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:'',gst:true}; }
 /* the invoice is made out to the client, or for a company one of its directors (as on quotations) */
+function saleRecipient(c,name){
+  if(!name||name===c.name) return {rec:c,email:c.email||'',phone:c.phone||c.commPhone||'',abn:c.abn||''};
+  var x=(c.type==='company'&&c.directors||[]).filter(function(y){ return y.name===name; })[0];
+  return x?{rec:{id:'d:'+x.name,name:x.name},email:x.email||'',phone:x.phone||'',abn:x.abn||''}:{rec:{id:'n:'+name,name:name},email:'',phone:'',abn:''};
+}
+function saleProfile(c,name){
+  var rc=saleRecipient(c,name), nm=name||c.name, it=function(ic,v,t){ return v?'<span title="'+t+'">'+ic+esc(v)+'</span>':''; };
+  return '<div class="qf-pf">'+clAv({id:rc.rec.id,name:nm})+'<div class="qf-pf-b"><b>'+esc(nm)+'</b>'+
+    '<div class="qf-pf-m">'+it(SD_IC.mail,rc.email,'Email')+it(SD_IC.phone,rc.phone,'Phone')+it('<em>ABN</em>',rc.abn,'ABN')+'</div></div></div>';
+}
 function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
 /* never reuse an invoice number, including ones a quotation already points to */
 function nextSaleId(){ var qs=quotes(), ids=st.list.map(function(s){ return s.id; }).concat(qs?qs.list.map(function(q){ return q.invoiceId; }).filter(Boolean):[]);
@@ -15124,11 +15142,10 @@ function paintSaleForm(focusId){
     var list=svc.filter(function(o){ return (!x.cat||(o.cats||[]).map(String).indexOf(x.cat)>=0)&&(taken.indexOf(o.id)<0||o.id===x.svcId); });
     var lineErr=e['s'+i]||e['q'+i]||e['p'+i];
     return '<div class="qf-row" data-row="'+i+'">'+'<button type="button" class="qf-grip" data-grip="'+i+'" title="Drag to reorder" aria-label="Move line '+(i+1)+' (use the arrow keys)"><svg width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.4"/><circle cx="9" cy="3" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="9" cy="8" r="1.4"/><circle cx="3" cy="13" r="1.4"/><circle cx="9" cy="13" r="1.4"/></svg></button>'+
-      '<div><label class="sr" for="sf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="sf-c'+i+'" data-cat="'+i+'"><option value="">All categories</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+      '<div><label class="sr" for="sf-c'+i+'">Category, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm" id="sf-c'+i+'" data-cat="'+i+'"><option value="">Choose Category</option>'+cats.map(function(k){ return '<option value="'+k.id+'"'+(String(k.id)===x.cat?' selected':'')+'>'+esc(k.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="sr" for="sf-s'+i+'">Item details, line '+(i+1)+'</label><div class="sf-sel"><select class="fin plain sm'+(e['s'+i]?' bad':'')+'" id="sf-s'+i+'" data-svc="'+i+'"><option value="">Choose an item</option>'+
         list.map(function(o){ return '<option value="'+o.id+'"'+(o.id===x.svcId?' selected':'')+'>'+esc(o.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
       '<div><label class="sr" for="sf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="sf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
-      '<div class="qf-line sl-fee" title="The fee for this service in Settings → Services. The rate can’t be lower.">'+(fee!=null?money(fee):'<span class="ar-dash">—</span>')+'</div>'+
       '<div><label class="sr" for="sf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="sf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
       '<div class="qf-rate"><div class="qf-price"><label class="sr" for="sf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="sf-p'+i+'" data-price="'+i+'" type="number" min="'+(fee||0)+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+fee+'"':' placeholder="0.00" disabled')+'></div>'+
         '<div class="qf-lgst"><button type="button" class="qf-gck'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="checkbox" aria-checked="'+(x.gst!==false)+'" aria-label="Apply GST, line '+(i+1)+'" title="'+(x.gst!==false?'GST applied (included in the rate)':'No GST on this line')+'"><i><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></i>Apply GST</button></div></div>'+
@@ -15140,29 +15157,30 @@ function paintSaleForm(focusId){
       '<button type="button" class="sf-rm" id="sf-docrm" title="Remove" aria-label="Remove '+esc(d.doc.name)+'">'+MI['delete']+'</button></div>'
     :'<label class="sf-drop" id="sf-drop"><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden>'+
       '<span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
-  var card=function(title,sub,body,extra){ return '<section class="qf-card"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
+  var card=function(title,sub,body,extra){ return '<section class="qf-sec"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
   ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
-    '<div class="modal-body" id="sf-body">'+
-      card('Client','','<div class="g2">'+field('Select client',true,clientField,'client')+
-        field('Invoice on the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>')+
-      card('Assignment and dates','','<div class="stack"><div class="g3">'+
-          field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
-          field('Internal company',true,d.branch?sel('sf-co','company',branchCos(d.branch),d.company,'Select'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Select a branch first</option></select>'+I.chev+'</div>','company','sf-co')+
-          field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+'</div>'+
-        '<div class="g3">'+field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
-        '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
+    '<div class="modal-body" id="sf-body"><div class="qf-card qf-one">'+
+      card('Client','','<div class="stack"><div class="g2">'+field('Select client',true,clientField,'client')+
+        field('Invoice on the name of',true,c?sel('sf-on','onName',names,d.onName,'Select'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>'+
+        (c?saleProfile(c,d.onName):'')+
+        '<div class="g2">'+field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
+          field('Internal company',true,d.branch?sel('sf-co','company',branchCos(d.branch),d.company,'Select'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Select a branch first</option></select>'+I.chev+'</div>','company','sf-co')+'</div></div>')+
+      card('Assignment and dates','','<div class="stack"><div class="g2">'+
+          field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
+          field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
+        '<div class="g2">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div></div>')+
       card('Services','',
-        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
+        '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>')+
       card('Document','',doc+err('doc'))+
       '<div class="qf-bottom">'+
-        '<section class="qf-card qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
+        '<section class="qf-sec qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
           '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
           '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></section>'+
-        '<section class="qf-card qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
+        '<section class="qf-sec qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
           '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
             '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
             '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
@@ -15175,7 +15193,7 @@ function paintSaleForm(focusId){
               (e.credit?'<p class="ferr show sl-derr sl-crerr">'+esc(e.credit)+'</p>':''); })()+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
-    '</div>'+
+    '</div></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-ghost" id="sf-draft">'+(SF.wasSent?'Save':'Save as draft')+'</button><button class="btn-primary" id="sf-go">'+(SF.wasSent?'Save & resend':'Save & send')+'</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   if(SF.locked){

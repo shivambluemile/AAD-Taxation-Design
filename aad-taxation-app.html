@@ -14416,6 +14416,8 @@ table,td,th{font-size:13.5px}
 .sd-head{position:relative}.sd-head .dhead-acts{flex-wrap:wrap;margin-right:44px}.sd-head #sd-x{position:absolute;top:20px;right:20px}
 .sd-head .dhead-acts .btn-ghost,.sd-head .dhead-acts .btn-primary{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-size:13px}
 .sd-head .dhead-acts svg{width:15px;height:15px;flex-shrink:0}
+.sd-head .sd-more{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--slate);cursor:pointer}
+.sd-head .sd-more svg{width:18px;height:18px}
 .qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
 .qd-paper{min-width:0}
 .qd-paper .qf-doc{max-width:794px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -15042,13 +15044,14 @@ var MI=(function(){ var s=function(p){ return '<svg width="16" height="16" viewB
     receipt:s('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/>'),view:s('<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
     revoke:s('<path d="M10 14a4 4 0 0 0 5.7 0l1.5-1.5M14 10a4 4 0 0 0-5.7 0L6.8 11.5"/><path d="M4 4l16 16"/>')}; })();
 var menuEl=null;
-function closeMenu(){ if(menuEl){ var b=content.querySelector('[data-menu="'+menuEl.dataset.s+'"]'); if(b) b.setAttribute('aria-expanded','false'); menuEl.remove(); menuEl=null; } }
+function closeMenu(){ if(menuEl){ [].forEach.call(document.querySelectorAll('[data-menu="'+menuEl.dataset.s+'"]'),function(b){ b.setAttribute('aria-expanded','false'); }); menuEl.remove(); menuEl=null; } }
 function openMenu(btn){
   var id=btn.getAttribute('data-menu'); if(menuEl&&menuEl.dataset.s===id) return closeMenu(); closeMenu();
   var s=byId(id); if(!s) return;
-  var list=actionsFor(s), main=list.filter(function(a){ return !a[2]; }), risky=list.filter(function(a){ return a[2]; });
+  var skip=btn.getAttribute('data-skip'), list=actionsFor(s).filter(function(a){ return a[0]!==skip; }), main=list.filter(function(a){ return !a[2]; }), risky=list.filter(function(a){ return a[2]; });
   var item=function(a){ return '<button role="menuitem" data-a="'+a[0]+'" data-s="'+s.id+'"'+(a[2]?' class="'+a[2]+'"':'')+'>'+MI[a[0]]+'<span>'+esc(a[1])+'</span></button>'; };
   menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.s=id;
+  if(ov.contains(btn)) menuEl.style.zIndex='130';   // above the details drawer
   menuEl.innerHTML=main.map(item).join('')+(risky.length?'<hr role="separator">'+risky.map(item).join(''):'');
   document.body.appendChild(menuEl);
   var r=btn.getBoundingClientRect(), mh=menuEl.offsetHeight, top=r.bottom+4; if(top+mh>window.innerHeight-8) top=Math.max(8,r.top-mh-4);
@@ -15859,8 +15862,7 @@ function paintDetail(keep){
   var head='<div class="cl-dhead qd-head sd-head"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+badge(s.status)+(dis?'':'<span class="state p-'+ps+'"><i></i>'+PAY[ps]+'</span>')+
         (er&&er.status==='pending'?'<span class="state s-req"><i></i>Edit requested</span>':'')+'</h2>'+who+'</div>'+
     '<div class="dhead-acts">'+(main?'<button class="btn-primary qd-main" data-sa="'+main[0]+'">'+MI[main[0]]+esc(main[1])+'</button>':'')+
-      '<button class="btn-ghost" data-sa="pdf">'+MI.pdf+'PDF</button>'+
-      more.map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+(MI[a[0]]||'')+esc(a[1])+'</button>'; }).join('')+
+      '<button class="qt-more sd-more" data-menu="'+esc(s.id)+'" data-skip="'+(main?main[0]:'')+'" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for '+esc(s.id)+'" title="More actions">'+I.dots+'</button>'+
       '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
     var o=t[0]===sdTab; return '<button role="tab" aria-selected="'+o+'" class="'+(o?'on':'')+'" data-stab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
@@ -15928,6 +15930,8 @@ function paintDetail(keep){
   document.getElementById('sd-x').onclick=closeDetail;
   ov.querySelectorAll('[data-stab]').forEach(function(t){ t.onclick=function(){ sdTab=t.getAttribute('data-stab'); paintDetail(); }; });
   ov.querySelectorAll('[data-sa]').forEach(function(x){ x.onclick=function(){ doAction(x.getAttribute('data-sa'),detailId); }; });
+  var sm=ov.querySelector('.sd-more'); if(sm) sm.onclick=function(){ openMenu(sm); };
+  var sb=document.getElementById('sd-b'); if(sb) sb.addEventListener('scroll',closeMenu);
   ov.querySelectorAll('.sd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   ov.querySelectorAll('[data-doc]').forEach(function(x){ x.onclick=function(){ openDoc(s,x.getAttribute('data-doc')==='down'); }; });
@@ -15965,7 +15969,7 @@ document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if
 /* ---------- the invoice document: the quotation layout titled as a tax invoice, with what's been paid ---------- */
 function invoiceHtml(s){
   var c=client(s), sub=s.subtotal!=null?s.subtotal:r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), to=s.onName||c.name;
-  var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>: '+money(paidOf(s))+'</dd></div><div><dt>Balance due</dt><dd>: '+money(pendingOf(s))+'</dd></div></dl>'+
+  var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>'+money(paidOf(s))+'</dd></div><div><dt>Balance due</dt><dd>'+money(pendingOf(s))+'</dd></div></dl>'+
     (s.status==='disabled'?'<p class="qd2-note"><b>This invoice has been disabled.</b></p>':'<p class="qd2-note">Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.</p>');
   var m={kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
     company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
@@ -21802,7 +21806,8 @@ button{background:none;border:0;cursor:pointer}
 .iv-hint{margin:14px 0 0;font-size:12.5px;color:var(--mute);line-height:1.5}
 .iv-bank{margin:12px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC}
 .iv-bank dt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}.iv-bank dd{margin:2px 0 0;font-size:14px;font-weight:600;color:var(--ink)}
-.qr .note{margin-top:18px}
+.iv-foot{padding:0 24px 24px;background:#fff}.iv-foot .note{margin:0 0 4px}.iv-foot .qw-acts{margin-top:18px}
+.qw-acts .btn{min-height:44px}
 @media (max-width:560px){.iv-opts,.iv-bank{grid-template-columns:1fr}}
 .qv-acts{display:flex;gap:8px;flex-wrap:wrap}
 .ty-art{width:240px;max-width:80%;height:auto;display:block;margin:0 auto 10px}
@@ -22239,7 +22244,7 @@ function invoiceDocOf(s,c){
   var paid=Math.round((s.payments||[]).filter(function(p){ return !p.void; }).reduce(function(a,p){ return a+(+p.amount||0); },0)*100)/100;
   var pend=s.status==='disabled'?0:Math.max(0,Math.round((s.amount-paid)*100)/100), to=s.onName||c.name;
   var sub=s.subtotal!=null?s.subtotal:(s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0);
-  var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>: '+money(paid)+'</dd></div><div><dt>Balance due</dt><dd>: '+money(pend)+'</dd></div></dl>'+
+  var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>'+money(paid)+'</dd></div><div><dt>Balance due</dt><dd>'+money(pend)+'</dd></div></dl>'+
     '<p class="qd2-note">'+(pend>0?'Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.':'This invoice is paid in full. Thank you.')+'</p>';
   return {kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
     company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
@@ -22259,10 +22264,10 @@ function paintInvoice(){
   document.body.classList.add('qr-page');
   app.innerHTML='<div class="hello"><h1>'+(paid?'This invoice is paid':'Your invoice is ready')+'</h1><p>Invoice '+e(s.id)+(paid?'':' · Due '+dmyOf(s.due))+'</p></div>'+
     '<div class="card qr"><div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Invoice document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
-      (paid?'<div class="note ok">'+IC.tick+'<span>Payment received in full. Thank you.</span></div>':ivNote)+
+      '<div class="iv-foot">'+(paid?'<div class="note ok">'+IC.tick+'<span>Payment received in full. Thank you.</span></div>':ivNote)+
       '<div class="qw-acts">'+(paid?'<button type="button" class="btn sec" id="iv-pdf">'+IC.dl+'Download invoice</button><button type="button" class="btn pri" id="iv-rc">'+IC.dl+'Download receipt</button>'
-        :'<button type="button" class="btn sec" id="iv-pdf">'+IC.dl+'Download PDF</button><button type="button" class="btn pri" id="iv-pay">Pay now · '+money(doc._pend)+'</button>')+'</div></div></div>';
-  document.getElementById('iv-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+        :'<button type="button" class="btn pri" id="iv-pay">Pay now · '+money(doc._pend)+'</button>')+'</div></div></div></div>';
+  var pdf=document.getElementById('iv-pdf'); if(pdf) pdf.onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
   var rc=document.getElementById('iv-rc'); if(rc) rc.onclick=function(){ var l=(s.payments||[]).filter(function(p){ return !p.void; }).sort(function(a,z){ return z.at-a.at; })[0]; if(l&&!printReceipt(receiptOf(s,l,c.name))) toast('Allow pop-ups to download the receipt',true); };
   var pn=document.getElementById('iv-pay'); if(pn) pn.onclick=function(){ payDialog(s,doc._pend); };
 }

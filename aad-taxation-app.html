@@ -14426,7 +14426,7 @@ table,td,th{font-size:13.5px}
 .qd-grp dl{margin:0;display:flex;flex-direction:column;gap:12px}
 .qd-grp dt{font-size:12px;color:var(--mute);margin-bottom:2px}
 .qd-grp dd{margin:0;font-size:13.5px;font-weight:600;color:var(--ink);min-width:0;overflow-wrap:anywhere}
-.qd-grp .sf-file{padding:7px 8px 7px 10px;gap:10px}.qd-grp .sf-fn b{font-size:12.5px}
+.qd-grp .sf-file{padding:7px 6px 7px 10px;gap:10px;min-width:0}.qd-grp .sf-fn{min-width:0;overflow:hidden}.qd-grp .sf-fn .name-link{display:block;max-width:100%;padding:0;border:0;background:none;text-align:left;cursor:pointer}.qd-grp .sf-fn b{display:block;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.qd-grp .sf-fn .name-link:hover b{color:var(--orange-ink)}.qd-grp .sf-rm{flex-shrink:0;align-self:center;width:32px;height:32px;border:0;background:none;cursor:pointer}.qd-grp .sf-rm:hover{background:#F6F7F9;color:var(--orange-ink)}
 .qd-steps{list-style:none;margin:0;padding:0}
 .qd-steps .rq-st{display:flex;gap:12px;align-items:flex-start;padding:0 0 14px;position:relative}
 .qd-steps .rq-st:last-child{padding-bottom:0}
@@ -21416,7 +21416,7 @@ function quoteDocHtml(m){
   var kv=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+v+'</dd></div>'; };
   return '<div class="qf-doc"><div class="qf-doc-b">'+
     '<div class="qd2-head"><img class="qd2-logo" src="'+DOC_LOGO+'" alt="AAD Taxation">'+
-      '<div class="qd2-hr">'+(inv?'<p class="qd2-title">Tax Invoice</p>':'')+'<dl class="qd2-meta">'+kv(K+' number',e(m.id))+kv(K+' date',e(m.dateTxt))+kv('Due date',e(m.dueTxt))+'</dl></div></div>'+
+      '<div class="qd2-hr"><dl class="qd2-meta">'+kv(K+' number',e(m.id))+kv(K+' date',e(m.dateTxt))+kv('Due date',e(m.dueTxt))+'</dl></div></div>'+
     '<div class="qd2-parties"><div class="qd2-box"><span class="qd2-lbl">'+K+' to</span>'+(m.to?'<b>'+e(m.to)+'</b>':'<b class="qd2-mute">No client chosen yet</b>')+
         (m.toSub?'<span>'+e(m.toSub)+'</span>':'')+(m.attn?'<span>Attention: '+e(m.attn)+'</span>':'')+
         (m.phone?'<span>'+e(m.phone)+'</span>':'')+(m.email?'<span>'+e(m.email)+'</span>':'')+(m.abn?'<span>ABN '+e(m.abn)+'</span>':'')+'</div>'+
@@ -21466,7 +21466,6 @@ var QUOTE_DOC_CSS=
   '.qd2-steps{margin:0;padding:0;list-style:none;counter-reset:st}.qd2-steps li{counter-increment:st;position:relative;padding:3px 0 3px 30px;color:#374151}.qd2-steps li+li{margin-top:5px}'+
   '.qd2-steps li::before{content:counter(st);position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;background:#FFF4EC;color:#C2410C;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.qd2-steps b{color:#111827;font-weight:600}'+
   '.qd2-gst{display:block;font-size:10.5px;color:#9CA3AF;margin-top:1px}'+
-  '.qd2-title{margin:0 0 10px;font-family:Manrope,Inter,sans-serif;font-size:20px;font-weight:800;color:#111827;letter-spacing:-.01em}'+
   '.qd2-imp{margin:0 0 16px;padding:10px 14px;border:1px solid #FECACA;border-left:3px solid #DC2626;border-radius:8px;background:#FEF2F2;font-size:12px;line-height:1.5;color:#991B1B}.qd2-imp b{color:#B91C1C}'+
   '.qd2-final{margin:18px 0 0;padding-top:12px;border-top:1px solid #F1F2F4;text-align:center;font-size:11px;color:#9CA3AF}'+
   '@media (max-width:640px){.qd2-parties{grid-template-columns:1fr}.qd2-foot{flex-direction:column}.qd2-sum{width:100%}.qd2-head{flex-direction:column}.qd2-hr{text-align:left}.qd2-meta{justify-content:start}}'+

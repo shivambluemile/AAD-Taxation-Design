@@ -14409,7 +14409,40 @@ table,td,th{font-size:13.5px}
 .mf-foot .btn-ghost[disabled]{opacity:.45;cursor:not-allowed}
 @media (max-width:640px){.filters .rbtn.mf-btn{flex:1 1 auto}.mf-sec{padding:16px 18px}}
 /* Sale Details: the Quotation Details panel, as wide as Add Sale for the sale lines */
-.drawer.sd-drawer{max-width:min(1040px,96vw)}
+.drawer.sd-drawer{max-width:min(1080px,96vw)}
+.sd-head{flex-wrap:wrap;row-gap:12px}.sd-head .dpmain{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;flex:1 1 260px}.sd-head h2{display:flex;align-items:center;flex-wrap:wrap;gap:8px;white-space:nowrap}
+.sd-cl{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--orange-ink);cursor:pointer}.sd-cl:hover{text-decoration:underline}.sd-cl.gone{color:var(--slate);cursor:default}.sd-cl.gone:hover{text-decoration:none}
+.sd-cl svg{width:15px;height:15px;flex-shrink:0}
+.sd-head{position:relative;padding-right:64px}.sd-head .dhead-acts{flex-wrap:wrap}.sd-head #sd-x{position:absolute;top:20px;right:20px}
+.sd-head .dhead-acts .btn-ghost,.sd-head .dhead-acts .btn-primary{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-size:13px}
+.sd-head .dhead-acts svg{width:15px;height:15px;flex-shrink:0}
+.qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
+.qd-paper{min-width:0}
+.qd-paper .qf-doc{max-width:794px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qd-paper .qf-doc-t th{background:none}
+.qd-side{display:flex;flex-direction:column;gap:14px;position:sticky;top:24px}
+.qd-grp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.qd-grp h4{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#64748B;margin:0 0 12px}
+.qd-grp dl{margin:0;display:flex;flex-direction:column;gap:12px}
+.qd-grp dt{font-size:12px;color:var(--mute);margin-bottom:2px}
+.qd-grp dd{margin:0;font-size:13.5px;font-weight:600;color:var(--ink);min-width:0;overflow-wrap:anywhere}
+.qd-grp .sf-file{padding:7px 8px 7px 10px;gap:10px}.qd-grp .sf-fn b{font-size:12.5px}
+.qd-steps{list-style:none;margin:0;padding:0}
+.qd-steps .rq-st{display:flex;gap:12px;align-items:flex-start;padding:0 0 14px;position:relative}
+.qd-steps .rq-st:last-child{padding-bottom:0}
+.qd-steps .rq-st:not(:last-child):after{content:"";position:absolute;left:10px;top:24px;bottom:2px;width:2px;background:var(--line)}
+.qd-steps .rq-st i{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid #D6DBE1;background:#fff;color:#fff}
+.qd-steps .rq-st i svg{width:11px;height:11px}
+.qd-steps .rq-st.done i{background:#10B981;border-color:#10B981}
+.qd-steps .rq-st.part i{background:#FFF7E6;border-color:#F59E0B}
+.qd-steps .rq-st.bad i{background:#FEF2F2;border-color:#FCA5A5;color:#DC2626}
+.qd-steps .rq-st div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;padding-top:1px}
+.qd-steps .rq-st b{font-size:13px;font-weight:700;color:var(--ink)}.qd-steps .rq-st.todo b{color:var(--slate);font-weight:600}
+.qd-steps .rq-st small{font-size:12px;color:var(--mute);line-height:1.45}
+.sd-late{color:#DC2626;font-weight:600}
+.sd-bar{display:block;height:6px;margin-top:6px;border-radius:999px;background:#F1F2F4;overflow:hidden}.sd-bar span{display:block;height:100%;border-radius:inherit;background:#10B981}
+.sd-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px}.sd-empty .btn-sm{display:inline-flex;align-items:center;gap:6px}.sd-empty svg{width:15px;height:15px}
+@media (max-width:900px){.qd-ov{grid-template-columns:1fr;padding:18px}.qd-side{position:static}}
 .state.s-draft i{background:#94A3B8}.state.s-sent i{background:#3B82F6}.state.s-dis i{background:#CBD5E1}.state.s-dis{color:var(--mute)}.state.s-req i{background:#F59E0B}
 .sd-t td.sd-desc{color:var(--slate);max-width:260px;overflow-wrap:anywhere}
 .qd-t td .state+small{display:block;margin-top:3px;font-size:12px;color:var(--mute)}
@@ -15537,7 +15570,7 @@ function toQuotation(s){
 }
 
 /* ---------- Sale Details: the Quotation Details panel (header with info lines and actions, tabs, sections), filled from the saved sale ---------- */
-var detailId=null, sdTab='services';
+var detailId=null, sdTab='overview';
 var SD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
   return {user:v('<circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/>'),mail:v('<rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="m4 7 8 6 8-6"/>'),
     phone:v('<path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5 5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4Z"/>'),
@@ -15547,6 +15580,7 @@ var SD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill=
     down:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
     dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>'}; })();
 var MAIL_EV=['sent','resent','send_failed','reminder','reminder_failed'];
+var SD_TICK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>', SD_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>';
 function badge(st0){ var x=STATUS[st0]||[st0,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
 /* the header actions: the list menu's rules (status, permissions, edit requests); Log is the Activities tab here, Disable and Delete stay in the list */
 function detailActions(s){
@@ -15576,7 +15610,7 @@ function openDetail(id,tab){
   var s=byId(id);
   if(!s) return toast('This sale no longer exists.',true);
   if(!inScope(s)) return toast('You don’t have access to this sale.',true);
-  detailId=id; sdTab=tab||'services'; paintDetail();
+  detailId=id; sdTab=tab||'overview'; paintDetail();
 }
 function closeDetail(){ detailId=null; closeOv(); }
 function paintDetail(keep){
@@ -15587,41 +15621,51 @@ function paintDetail(keep){
   var c=client(s), cr=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0], T=savedTotals(s), items=s.items||[], dis=s.status==='disabled';
   var hist=s.history||[], pays=s.payments||[], mails=hist.filter(function(e){ return MAIL_EV.indexOf(e.type)>=0; });
   var when=function(t){ return whenOf(t).replace(' · ',', '); };
-  var tabs=[['services','Services',items.length],['payments','Payments',pays.length],['notes','Notes and documents'],['emails','Emails',mails.length],['activity','Activities',hist.length]];
-  if(!tabs.some(function(t){ return t[0]===sdTab; })) sdTab='services';
+  var tabs=[['overview','Overview'],['payments','Payments',pays.length],['emails','Emails',mails.length],['activity','Activities',hist.length]];
+  if(!tabs.some(function(t){ return t[0]===sdTab; })) sdTab='overview';
 
-  /* header: the sale information, each fact once */
-  var dc=function(icon,html,tip){ return html?'<span class="dc"'+(tip?' title="'+tip+'"':'')+'><i class="dci">'+icon+'</i>'+html+'</span>':''; };
-  var copy=function(v){ return '<button class="copy" data-copy="'+esc(v)+'" title="Copy" aria-label="Copy">'+SD_IC.copy+'</button>'; };
-  var who=cr?'<button class="qd-cl" data-sd="client" title="Open the client record">'+esc(c.name)+'</button>':esc(c.name)+(s.clientId!=null?' <small>(no longer on file)</small>':'');
-  var on=s.onName&&s.onName!==c.name?' <small>on the name of</small> '+esc(s.onName):'';
-  var ps=payStatus(s), er=s.editRequest;
-  var head='<div class="cl-dhead"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+badge(s.status)+(dis?'':'<span class="state p-'+ps+'"><i></i>'+PAY[ps]+'</span>')+
-        (er&&er.status==='pending'?'<span class="state s-req"><i></i>Edit requested</span>':'')+'</h2>'+
-      '<div class="dmetaline">'+dc(SD_IC.user,who+on)+(c.email?dc(SD_IC.mail,'<a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>'+copy(c.email)):'')+
-        (cr&&cr.phone?dc(SD_IC.phone,esc(cr.phone)+copy(cr.phone)):'')+'</div>'+
-      '<div class="dmetaline">'+dc(SD_IC.cal,dmyOf(s.date)+' <small>due</small> '+dmyOf(s.due),'Invoice date and due date')+dc(SD_IC.branch,esc(s.branch||''),'Branch')+
-        dc(SD_IC.staff,esc(s.accountant||'')+(s.accountant2?' <small>with</small> '+esc(s.accountant2):''),'Staff and additional accountant')+
-        dc(SD_IC.clock,'Created by '+esc(s.by||'—')+', '+when(s.at||s.date)+(s.quotationId?' <small>from quotation</small> '+esc(s.quotationId):''))+'</div></div>'+
-    '<div class="dhead-acts">'+detailActions(s).map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+esc(a[1])+'</button>'; }).join('')+
+  /* header: the number, status and payment status; the one next step, the PDF, then the other actions */
+  var ps=payStatus(s), er=s.editRequest, A=detailActions(s).filter(function(a){ return a[0]!=='pdf'; });
+  var main=A.filter(function(a){ return a[0]==='pay'; })[0]||A.filter(function(a){ return a[0]==='send'; })[0], more=A.filter(function(a){ return a!==main; });
+  var who=cr?'<button class="sd-cl" data-sd="client" title="Open the client record">'+SD_IC.user+esc(c.name)+'</button>':'<span class="sd-cl gone">'+SD_IC.user+esc(c.name)+(s.clientId!=null?' <small>(no longer on file)</small>':'')+'</span>';
+  var head='<div class="cl-dhead qd-head sd-head"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+badge(s.status)+(dis?'':'<span class="state p-'+ps+'"><i></i>'+PAY[ps]+'</span>')+
+        (er&&er.status==='pending'?'<span class="state s-req"><i></i>Edit requested</span>':'')+'</h2>'+who+'</div>'+
+    '<div class="dhead-acts">'+(main?'<button class="btn-primary qd-main" data-sa="'+main[0]+'">'+MI[main[0]]+esc(main[1])+'</button>':'')+
+      '<button class="btn-ghost" data-sa="pdf">'+MI.pdf+'PDF</button>'+
+      more.map(function(a){ return '<button class="btn-ghost" data-sa="'+a[0]+'">'+(MI[a[0]]||'')+esc(a[1])+'</button>'; }).join('')+
       '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
     var o=t[0]===sdTab; return '<button role="tab" aria-selected="'+o+'" class="'+(o?'on':'')+'" data-stab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
 
   var b='';
-  if(sdTab==='services'){
-    var credit=r2(pays.filter(function(p){ return !p.void&&p.type==='Client Credit'; }).reduce(function(a,p){ return a+p.amount; },0));
-    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. '+(s.gstMode==='none'?'No GST applied.':s.gstMode==='mixed'?'GST applies to some lines; rates include it.':'Rates include GST.')+'</p></div>'+
-      '<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t sd-t"><thead><tr><th>Category</th><th>Item Details</th><th>Description</th><th class="r">Fee</th><th class="r">Quantity</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
-      (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0, fee=feeOf(x), cn=catName(x);
-        return '<tr><td>'+(cn?esc(cn):'<span class="cl-muted">—</span>')+'</td><td><b>'+esc(x.name)+'</b></td><td class="sd-desc">'+(x.desc?esc(x.desc):'<span class="cl-muted">—</span>')+'</td>'+
-          '<td class="r num">'+(fee!=null?money(fee):'<span class="cl-muted">—</span>')+'</td><td class="r num">'+n+'</td><td class="r num">'+money(pr)+'</td><td class="r num">'+money(n*pr)+'</td></tr>'; }).join('')
-        :'<tr><td colspan="7" class="cl-muted">No services on this sale</td></tr>')+
-      '</tbody></table></div>'+
-      '<dl class="qf-tot qd-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div><div><dt>Discount'+(s.discountType==='%'&&s.discountPct?' ('+s.discountPct+'%)':'')+'</dt><dd>'+(T.disc?'−'+money(T.disc):money(0))+'</dd></div>'+
-        '<div><dt>'+(s.gstMode==='none'?'GST':'GST applied (10%)')+'</dt><dd>'+(s.gstMode==='none'?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
-        '<div class="sd-paid"><dt>Amount Paid'+(credit?'<small>incl. '+money(credit)+' client credit</small>':'')+'</dt><dd>'+money(paidOf(s))+'</dd></div>'+
-        '<div class="sl-pendrow"><dt>Pending Amount</dt><dd>'+(dis?'<span class="cl-muted">— Disabled</span>':money(pendingOf(s)))+'</dd></div></dl></section>';
+  if(sdTab==='overview'){
+    /* the invoice itself; beside it only what the invoice doesn't say */
+    var row=function(label,html){ return '<div><dt>'+label+'</dt><dd>'+(html||'<span class="cl-muted">—</span>')+'</dd></div>'; };
+    var by=function(e){ return e.by==='System'?'Automatically':'by '+esc(e.by||'—'); };
+    var step=function(cls,label,sub,extra){ return '<li class="rq-st '+cls+'"><i>'+(cls==='done'?SD_TICK:cls==='bad'?SD_X:'')+'</i><div><b>'+label+'</b><small>'+sub+'</small>'+(extra||'')+'</div></li>'; };
+    var made=hist.filter(function(e){ return e.type==='created'; })[0], sends=hist.filter(function(e){ return (e.type==='sent'||e.type==='resent')&&e.ok!==false; });
+    var rems=hist.filter(function(e){ return e.type==='reminder'&&e.ok!==false; }), lastRem=rems[rems.length-1];
+    var live=pays.filter(function(p){ return !p.void; }), lastPay=live.slice().sort(function(a,z){ return z.at-a.at; })[0];
+    var pct=s.amount>0?Math.min(100,Math.round(paidOf(s)/s.amount*100)):0, days=Math.round((new Date(isoDay(s.due)+'T00:00:00')-new Date(isoDay(Date.now())+'T00:00:00'))/DAY);
+    var dueTxt=days<0?'<span class="sd-late">Overdue by '+(-days)+' day'+(days===-1?'':'s')+'</span>':days===0?'Due today':'Due in '+days+' day'+(days===1?'':'s');
+    var bar='<span class="sd-bar" role="img" aria-label="'+pct+'% paid"><span style="width:'+pct+'%"></span></span>';
+    var payStep=dis?step('bad','Disabled','No payments can be taken')
+      :ps==='paid'?step('done','Paid in full',lastPay?dmyOf(lastPay.at)+' · '+esc(lastPay.type):'')
+      :step(live.length?'part':'todo',live.length?'Part paid · '+pct+'%':'Awaiting payment',dueTxt+(lastPay?'<br>Last payment '+dmyOf(lastPay.at)+' · '+esc(lastPay.type):''),bar);
+    var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):'by '+esc(s.by||'—')+'<br>'+when(s.at||s.date))+(s.quotationId?'<br>From quotation '+esc(s.quotationId):''))+
+      (sends.length?sends.map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join(''):step('todo','Not sent yet','Email the invoice to the client'))+
+      (lastRem?step('done',rems.length>1?rems.length+' reminders sent':'Reminder sent','Last sent '+(lastRem.by==='System'?'automatically':'by '+esc(lastRem.by||'—'))+'<br>'+when(lastRem.t)):'')+payStep;
+    var d=s.doc;
+    b='<div class="qd-ov"><div class="qd-paper">'+invoiceHtml(s)+'</div>'+
+      '<aside class="qd-side">'+
+        '<section class="qd-grp"><h4>Progress</h4><ul class="rq-steps qd-steps">'+steps+'</ul></section>'+
+        '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(s.branch||''))+row('Internal company',esc(s.company||(s.companies&&s.companies[0])||''))+
+          row('Staff',esc(s.accountant||''))+row('Additional accountant',esc(s.accountant2||''))+'</dl></section>'+
+        (d||s.referral?'<section class="qd-grp"><h4>Internal</h4><dl>'+
+          (d?row('Document','<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><button class="name-link" data-doc="open" title="Open '+esc(d.name)+'"><b class="name">'+esc(d.name)+'</b></button><small>'+fsizeOf(d.size)+'</small></span>'+
+            '<button type="button" class="sf-rm" data-doc="down" title="Download" aria-label="Download '+esc(d.name)+'">'+SD_IC.down+'</button></div>'):'')+
+          (s.referral?row('Referral',esc(s.referral)):'')+'</dl></section>':'')+
+      '</aside></div>';
   }
   if(sdTab==='payments'){
     b=pays.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Payment date</th><th>Reference</th><th>Payment type</th><th class="r">Amount received</th><th>Recorded by</th><th>Status</th></tr></thead><tbody>'+
@@ -15630,17 +15674,8 @@ function paintDetail(keep){
           return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+(p.doc?'<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'" title="Open '+esc(p.doc.name)+'">'+esc(p.doc.name)+'</button>':'')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
             '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span></td></tr>'; }).join('')+
         '</tbody></table></div></section>'
-      :'<section class="vsec"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p></section>';
-  }
-  if(sdTab==='notes'){
-    var d=s.doc;
-    b='<section class="vsec"><h3>On the invoice</h3><dl class="fgrid sd-one"><div><dt>Customer Notes</dt><dd>'+(s.customerNotes?'<p>'+esc(s.customerNotes)+'</p>':'<span class="cl-muted">No notes for the client</span>')+'</dd></div>'+
-        '<div><dt>Terms &amp; Conditions</dt><dd>'+(s.terms?'<p>'+esc(s.terms)+'</p>':'<span class="cl-muted">No terms and conditions</span>')+'</dd></div></dl></section>'+
-      '<section class="vsec"><h3>Internal</h3><dl class="fgrid sd-one"><div><dt>Document</dt><dd>'+
-        (d?'<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><button class="name-link" data-doc="open" title="Open '+esc(d.name)+'"><b class="name">'+esc(d.name)+'</b></button><small>'+fsizeOf(d.size)+'</small></span>'+
-            '<button type="button" class="sf-rm" data-doc="down" title="Download" aria-label="Download '+esc(d.name)+'">'+SD_IC.down+'</button></div>'
-          :'<span class="cl-muted">No document uploaded</span>')+'</dd></div>'+
-        '<div><dt>Referrals</dt><dd>'+(s.referral?esc(s.referral):'<span class="cl-muted">No referral</span>')+'</dd></div></dl></section>';
+      :'<section class="vsec sd-empty"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p>'+
+        (!dis&&main&&main[0]==='pay'?'<button class="btn-primary btn-sm" data-sa="pay">'+MI.pay+'Add payment</button>':'')+'</section>';
   }
   if(sdTab==='emails'){
     b=mails.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Email</th><th>Recipient</th><th>Date and time</th><th>Result</th><th>Sent by</th></tr></thead><tbody>'+
@@ -15658,6 +15693,7 @@ function paintDetail(keep){
       :'<p class="cl-muted">No activity has been recorded for this sale yet.</p>')+'</section>';
   }
 
+  ensureQuoteCss(document);
   ov.innerHTML='<div class="drawer qd-drawer sd-drawer" role="dialog" aria-modal="true" aria-labelledby="sd-t">'+head+tabsH+'<div class="cl-vbody" id="sd-b" role="tabpanel" tabindex="0">'+b+'</div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   document.getElementById('sd-b').scrollTop=y;

@@ -15198,7 +15198,7 @@ function paintSaleForm(focusId){
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-ghost" id="sf-draft">'+(SF.wasSent?'Save':'Save as draft')+'</button><button class="btn-primary" id="sf-go">'+(SF.wasSent?'Save & resend':'Save & send')+'</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-ghost" id="sf-draft">Save</button><button class="btn-primary" id="sf-go">Send</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
   if(SF.locked){
     var it=ov.querySelector('.qf-items'); if(it) it.insertAdjacentHTML('beforebegin','<p class="sl-lockn">'+I.info+'This sale is paid in full, so its services and amounts can’t be changed. You can still update the other details.</p>');

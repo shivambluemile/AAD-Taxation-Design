@@ -14464,6 +14464,7 @@ table,td,th{font-size:13.5px}
 .qf2 .qf-one{padding:0}.qf2 .qf-sec{padding:20px 22px;min-width:0}.qf2 .qf-one>.qf-sec+.qf-sec,.qf2 .qf-one>.qf-bottom{padding-top:4px}
 .qf2 .qf-one .qf-bottom{gap:0}
 .qf2 .qf-one>.ferr{margin:0 22px 16px}
+.qf-tdef{display:flex;align-items:center;gap:9px;margin-top:10px;font-size:13px;color:var(--slate);cursor:pointer}
 .qf-pf{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#F9FAFB}
 .qf-pf .cl-av{width:40px;height:40px;font-size:13px}
 .qf-pf-b{min-width:0;flex:1}.qf-pf-b>b{display:block;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -15078,6 +15079,8 @@ function saleProfile(c,name){
   return '<div class="qf-pf">'+clAv({id:rc.rec.id,name:nm})+'<div class="qf-pf-b"><b>'+esc(nm)+'</b>'+
     '<div class="qf-pf-m">'+it(SD_IC.mail,rc.email,'Email')+it(SD_IC.phone,rc.phone,'Phone')+it('<em>ABN</em>',rc.abn,'ABN')+'</div></div></div>';
 }
+var SALE_TERMS_KEY='aad-sale-terms-default';
+function saleTerms(){ try{ return localStorage.getItem(SALE_TERMS_KEY)||localStorage.getItem('aad-quote-terms-default')||''; }catch(e){ return ''; } }
 function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
 /* never reuse an invoice number, including ones a quotation already points to */
 function nextSaleId(){ var qs=quotes(), ids=st.list.map(function(s){ return s.id; }).concat(qs?qs.list.map(function(q){ return q.invoiceId; }).filter(Boolean):[]);
@@ -15102,9 +15105,9 @@ function openSaleForm(id){
       clientId:s.clientId,onName:s.onName||client(s).name,branch:s.branch||'',accountant:s.accountant||'',accountant2:s.accountant2||'',date:isoDay(s.date),due:isoDay(s.due),
       items:(s.items&&s.items.length?s.items:[blankLine()]).map(function(x){ var v=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
         return {cat:x.cat!=null?String(x.cat):(v&&v.cats&&v.cats[0]!=null?String(v.cats[0]):''),svcId:v?v.id:null,name:x.name||'',desc:x.desc||'',qty:String(x.qty!=null?x.qty:1),price:x.price!=null?String(x.price):'',gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
-      showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||'',company:s.company||''
+      showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',termsDefault:!!s.terms&&s.terms===saleTerms(),referral:s.referral||'',company:s.company||''
     }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
-      items:[blankLine()],company:'',showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
+      items:[blankLine()],company:'',showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:saleTerms(),termsDefault:!!saleTerms(),referral:''}};
   SF.d.useCredit=false; SF.d.credit='';
   if(!SF.d.company){ var c0=branchCos(SF.d.branch); if(c0.length===1) SF.d.company=c0[0]; }   // one company for the branch: chosen for you
   SF.locked=!!s&&paidOf(s)>0&&pendingOf(s)<=0; SF.wasSent=!!s&&s.status==='sent';   // paid in full: the money side can't change, the other details can
@@ -15178,7 +15181,8 @@ function paintSaleForm(focusId){
       card('Document','',doc+err('doc'))+
       '<div class="qf-bottom">'+
         '<section class="qf-sec qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
-          '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea></div>'+
+          '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea>'+
+            '<label class="qf-tdef"><input type="checkbox" id="sf-tdef"'+(d.termsDefault?' checked':'')+'><span>Use these terms by default on every new sale</span></label></div>'+
           '<div><label class="flabel" for="sf-ref">Referrals</label><input class="fin plain sm" id="sf-ref" data-sf="referral" maxlength="120" value="'+esc(d.referral)+'" placeholder="Who referred this sale, e.g. a referral partner"></div></section>'+
         '<section class="qf-sec qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
           '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
@@ -15212,6 +15216,7 @@ function liveTotals(){
 }
 function wireSaleForm(focusId){
   var d=SF.d, touch=function(){ SF.dirty=true; };
+  var tdf=document.getElementById('sf-tdef'); if(tdf) tdf.onchange=function(){ d.termsDefault=tdf.checked; touch(); };
   var repaint=function(fid){ var keep=document.getElementById('sf-body').scrollTop; paintSaleForm(); document.getElementById('sf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-sf]'),function(el){
     var k=el.getAttribute('data-sf'), live=el.tagName==='TEXTAREA'||el.type==='text'||el.id==='sf-ref';
@@ -15330,6 +15335,7 @@ function submitSale(andSend){
     if(!SF.isNew&&(!s||s.status==='disabled')) return fail('This sale can no longer be edited.');
     var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
     var doc=d.doc?{name:d.doc.name,size:d.doc.size,type:d.doc.type,key:key||d.doc.key||null}:null;
+    try{ var tt=d.terms.trim(); if(d.termsDefault&&tt) localStorage.setItem(SALE_TERMS_KEY,tt); else if(!d.termsDefault&&saleTerms()===tt) localStorage.removeItem(SALE_TERMS_KEY); }catch(e0){}   // the default for new sales
     var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,company:d.company,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
       items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price)),gst:x.gst!==false}; }),
       subtotal:T.sub,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'?num(d.discount):null,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};

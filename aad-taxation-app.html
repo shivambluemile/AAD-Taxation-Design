@@ -14467,6 +14467,29 @@ table,td,th{font-size:13.5px}
 .sl-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .sl-form .fin,.sl-mail .fin{height:42px}
 .sl-mail{display:flex;flex-direction:column;gap:14px}
+#dlg.overlay>.modal.pm-modal{width:min(600px,96vw);max-width:min(600px,96vw);display:flex;flex-direction:column;max-height:calc(100vh - 32px)}.pm-modal>.modal-body{flex:1;min-height:0;overflow-y:auto}.pm-modal>.modal-head,.pm-modal>.modal-foot{flex-shrink:0}
+.pm-sub{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.pm{display:flex;flex-direction:column;gap:16px}
+.pm-sum{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;background:#FAFBFC}
+.pm-sum>div{padding:12px 16px}.pm-sum>div+div{border-left:1px solid var(--line)}
+.pm-sum span{display:block;font-size:12px;color:var(--mute)}.pm-sum b{display:block;margin-top:3px;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.pm-sum .due b{color:var(--orange-ink)}
+.pm-amt{display:flex;align-items:center;height:48px;border:1px solid #D6DBE1;border-radius:10px;background:#fff;padding:0 6px 0 14px;transition:border-color .15s,box-shadow .15s}
+.pm-amt:focus-within{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+.pm-amt>span{font-size:18px;font-weight:600;color:var(--mute);margin-right:6px}
+.pm-amt input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.pm-full{flex-shrink:0;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:12.5px;font-weight:600;color:var(--slate);cursor:pointer}.pm-full:hover{border-color:var(--orange);color:var(--orange-ink)}
+.pm-left{margin:6px 0 0;font-size:12.5px;color:var(--mute);min-height:18px}.pm-left.ok{color:#047857;font-weight:600}
+.pm-types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pm-type{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.pm-type i{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:#F6F7F9;color:var(--slate)}
+.pm-type b{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25}.pm-type small{font-size:11.5px;color:var(--mute);margin-top:-4px}
+.pm-type:hover:not(:disabled){border-color:#F3C9A4}
+.pm-type.on{border-color:var(--orange);background:var(--orange-soft);box-shadow:0 0 0 1px var(--orange) inset}.pm-type.on i{background:#fff;color:var(--orange-ink)}
+.pm-type:disabled{opacity:.5;cursor:not-allowed}
+.pm-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pm-tnote{display:block;font-size:12px;color:var(--mute);font-style:italic;margin-top:2px}.pm-tdoc{display:block;font-size:12px;margin-top:2px}
+@media (max-width:560px){.pm-types{grid-template-columns:1fr 1fr}.pm-g2{grid-template-columns:1fr}.pm-sum b{font-size:14px}}
 .sl-att{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--slate);background:#FAFBFC;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
 .sl-quote{margin-top:8px;padding:10px 12px;background:#FAFBFC;border-radius:8px;color:var(--slate)}
 .sl-h3{font-family:'Manrope';font-size:14.5px;font-weight:800;margin:0 0 10px;color:var(--ink)}
@@ -15308,18 +15331,59 @@ function commit(s,okMsg){ if(!save()){ reload(); render(); return toast('Couldn�
 
 /* ---------- Add Payment: full or part, never more than is owed, recorded once ---------- */
 var paying=false;
+var PAY_IC=(function(){ var g=function(p){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>'; };
+  return {'Bank Transfer':g('<path d="M3 10h18"/><path d="m12 3 9 5H3z"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/>'),
+    'EFTPOS / Card':g('<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6.5 15h3"/>'),
+    'Cash':g('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'),
+    'Client Credit':g('<path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7"/><path d="M2.5 8h19v4h-19z"/><path d="M12 8v12"/><path d="M12 8S10.5 3.5 8 4.5 9 8 12 8Zm0 0s1.5-4.5 4-3.5S15 8 12 8Z"/>')}; })();
 function addPayment(s){
-  var pend=pendingOf(s), today=isoDay(Date.now());
-  modal('<div class="confirm-body"><h3 id="m-t">Add payment · '+esc(s.id)+'</h3><p><strong>'+esc(client(s).name)+'</strong> owes <strong>'+money(pend)+'</strong> of '+money(s.amount)+'.</p>'+
-    '<div class="sl-form"><div><label class="flabel" for="p-amt">Amount <span class="req-star">*</span></label><input class="fin plain" id="p-amt" inputmode="decimal" value="'+pend.toFixed(2)+'"><span class="ferr" id="p-amt-e"></span></div>'+
-      '<div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div>'+
-      '<div><label class="flabel" for="p-type">Payment type <span class="req-star">*</span></label><div class="sel"><select id="p-type">'+PAY_TYPES.map(function(t){ var b=t==='Client Credit'?creditOf(s.clientId):null; return '<option value="'+t+'"'+(b===0?' disabled':'')+'>'+t+(b!=null?' ('+money(b)+' available)':'')+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
-      '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div></div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Record payment</button></div>');
-  document.getElementById('m-no').onclick=closeDlg;
+  var pend=pendingOf(s), today=isoDay(Date.now()), paid=r2(s.amount-pend), bal=creditOf(s.clientId), P={type:'Bank Transfer',doc:null};
+  modal('<div class="modal-head"><div><h2 id="m-t">Add payment</h2><p class="pm-sub">'+esc(s.id)+' · '+esc(client(s).name)+'</p></div><button data-x aria-label="Close">'+I.close+'</button></div>'+
+    '<div class="modal-body pm">'+
+      '<div class="pm-sum"><div><span>Sale total</span><b>'+money(s.amount)+'</b></div><div><span>Paid so far</span><b>'+money(paid)+'</b></div><div class="due"><span>Pending</span><b>'+money(pend)+'</b></div></div>'+
+      '<div><label class="flabel" for="p-amt">Amount received <span class="req-star">*</span></label>'+
+        '<div class="pm-amt"><span>$</span><input id="p-amt" inputmode="decimal" autocomplete="off" value="'+pend.toFixed(2)+'"><button type="button" class="pm-full" id="p-full">Full amount</button></div>'+
+        '<span class="ferr" id="p-amt-e"></span><p class="pm-left" id="p-left"></p></div>'+
+      '<div><span class="flabel" id="p-type-l">Payment mode <span class="req-star">*</span></span><div class="pm-types" role="radiogroup" aria-labelledby="p-type-l">'+
+        PAY_TYPES.map(function(t){ var cr=t==='Client Credit', off=cr&&!(bal>0);
+          return '<button type="button" class="pm-type'+(t===P.type?' on':'')+'" role="radio" aria-checked="'+(t===P.type)+'" data-pt="'+esc(t)+'"'+(off?' disabled title="This client has no credit"':'')+'>'+
+            '<i>'+PAY_IC[t]+'</i><b>'+esc(t)+'</b>'+(cr?'<small>'+money(bal)+' available</small>':'')+'</button>'; }).join('')+'</div></div>'+
+      '<div class="pm-g2"><div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div>'+
+        '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div>'+
+      '<div><label class="flabel" for="p-note">Note</label><textarea class="ftext" id="p-note" rows="2" maxlength="300" placeholder="Anything the team should know about this payment"></textarea></div>'+
+      '<div><span class="flabel">Proof of payment</span><div id="p-doc"></div><span class="ferr" id="p-doc-e"></span></div>'+
+    '</div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Record payment</button></div>',true);
+  dlg.querySelector('.modal').classList.add('pm-modal');
+  var amtEl=document.getElementById('p-amt'), left=document.getElementById('p-left');
+  var amtOf=function(){ return Number(String(amtEl.value).replace(/[$,\s]/g,'')); };
+  var paintLeft=function(){ var a=amtOf(), rest=r2(pend-(a>0?a:0));
+    left.className='pm-left'+(a>0&&rest===0?' ok':'');
+    left.textContent=!(a>0)||rest<0?'':rest===0?'This pays the sale in full':money(rest)+' will still be pending after this payment'; };
+  var paintDoc=function(){ var d=P.doc, box=document.getElementById('p-doc');
+    box.innerHTML=d?'<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><b title="'+esc(d.name)+'">'+esc(d.name)+'</b><small>'+fsizeOf(d.size)+'</small></span><button type="button" class="sf-rm" id="p-docrm" title="Remove" aria-label="Remove '+esc(d.name)+'">'+MI['delete']+'</button></div>'
+      :'<label class="sf-drop" id="p-drop"><input type="file" id="p-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden><span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>Receipt or remittance · PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
+    var e=document.getElementById('p-doc-e'); e.classList.remove('show');
+    var take=function(fl){ if(!fl) return; var x=(fl.name.split('.').pop()||'').toLowerCase();
+      if(DOC_EXT.indexOf(x)<0) return fieldErr('p-doc-e','Upload a PDF, JPG, PNG or Word file');
+      if(fl.size>DOC_MAX) return fieldErr('p-doc-e','“'+fl.name+'” is '+fsizeOf(fl.size)+'. Files must be 5 MB or smaller.');
+      P.doc={name:fl.name,size:fl.size,file:fl}; paintDoc(); };
+    if(d){ document.getElementById('p-docrm').onclick=function(){ P.doc=null; paintDoc(); }; return; }
+    var drop=document.getElementById('p-drop'), fin=document.getElementById('p-file');
+    fin.onchange=function(){ take(fin.files[0]); };
+    drop.ondragover=function(ev){ ev.preventDefault(); drop.classList.add('drag'); };
+    drop.ondragleave=function(){ drop.classList.remove('drag'); };
+    drop.ondrop=function(ev){ ev.preventDefault(); drop.classList.remove('drag'); take(ev.dataTransfer.files[0]); }; };
+  paintLeft(); paintDoc();
+  amtEl.oninput=function(){ document.getElementById('p-amt-e').classList.remove('show'); paintLeft(); };
+  document.getElementById('p-full').onclick=function(){ amtEl.value=(P.type==='Client Credit'?Math.min(pend,bal):pend).toFixed(2); paintLeft(); amtEl.focus(); };
+  dlg.querySelectorAll('[data-pt]').forEach(function(b){ b.onclick=function(){ P.type=b.getAttribute('data-pt');
+    dlg.querySelectorAll('[data-pt]').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-checked',on); });
+    if(P.type==='Client Credit'&&amtOf()>bal){ amtEl.value=Math.min(pend,bal).toFixed(2); paintLeft(); } }; });
+  dlg.querySelector('[data-x]').onclick=closeDlg; document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){
     if(paying) return;
-    var go=this, amt=Number(String(document.getElementById('p-amt').value).replace(/[$,\s]/g,'')), d=document.getElementById('p-date').value, type=document.getElementById('p-type').value, ref=document.getElementById('p-ref').value.trim();
+    var go=this, amt=amtOf(), d=document.getElementById('p-date').value, type=P.type, ref=document.getElementById('p-ref').value.trim(), note=document.getElementById('p-note').value.trim();
     ['p-amt-e','p-date-e'].forEach(function(x){ document.getElementById(x).classList.remove('show'); });
     reload(); var x=byId(s.id), owed=x?pendingOf(x):0;
     if(!x||x.status==='disabled'){ closeDlg(); render(); return toast('This sale can no longer take payments.',true); }
@@ -15329,15 +15393,30 @@ function addPayment(s){
     if(d<isoDay(x.date)) return fieldErr('p-date-e','The payment can’t be before the sale date');
     if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit');
     paying=true; go.disabled=true;
-    try{
-      if(type==='Client Credit'&&!spendCredit(x.clientId,amt,x.id)){ closeDlg(); return toast('The client’s credit couldn’t be used. Nothing was changed.',true); }
-      var t=d===today?Date.now():new Date(d+'T12:00:00').getTime();
-      x.payments.push({id:'P'+Date.now().toString(36),amount:r2(amt),type:type,at:t,by:ME.name,ref:ref});
-      log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});
-      try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+type+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
-      commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id);
-    } finally { paying=false; }
+    var t=d===today?Date.now():new Date(d+'T12:00:00').getTime(), pid='P'+Date.now().toString(36);
+    var stored=P.doc?putSaleFile(x.id+':'+pid,P.doc.file):Promise.resolve(null);
+    stored.then(function(key){
+      try{
+        if(type==='Client Credit'&&!spendCredit(x.clientId,amt,x.id)){ closeDlg(); return toast('The client’s credit couldn’t be used. Nothing was changed.',true); }
+        var p={id:pid,amount:r2(amt),type:type,at:t,by:ME.name,ref:ref}; if(note) p.note=note; if(key) p.doc={name:P.doc.name,size:P.doc.size,key:key};
+        x.payments.push(p);
+        log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});
+        try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+type+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
+        commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id);
+      } finally { paying=false; }
+    },function(){ paying=false; go.disabled=false; fieldErr('p-doc-e','The file couldn’t be stored. Try again, or remove it.'); });
   };
+}
+/* a payment's proof document, from this browser's storage */
+function openPayDoc(d){
+  var gone=function(){ toast('“'+d.name+'” isn’t stored in this browser, so it can’t be opened here.',true); };
+  getSaleFile(d.key).then(function(blob){
+    if(!blob) return gone();
+    var url=URL.createObjectURL(blob), ext=(d.name.split('.').pop()||'').toLowerCase();
+    if(['pdf','jpg','jpeg','png'].indexOf(ext)>=0){ if(!window.open(url,'_blank')) toast('Allow pop-ups to open the document',true); }
+    else { var a=document.createElement('a'); a.href=url; a.download=d.name; document.body.appendChild(a); a.click(); a.remove(); }
+    setTimeout(function(){ URL.revokeObjectURL(url); },60000);
+  },gone);
 }
 
 /* ---------- Send / Resend / Reminder: by email, with the invoice attached; success only when the email service accepts it ---------- */
@@ -15548,7 +15627,7 @@ function paintDetail(keep){
     b=pays.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Payment date</th><th>Reference</th><th>Payment type</th><th class="r">Amount received</th><th>Recorded by</th><th>Status</th></tr></thead><tbody>'+
         pays.slice().sort(function(a,z){ return z.at-a.at; }).map(function(p){
           var stt=p.void?['Voided','p-overdue']:p.type==='Client Credit'?['Credit applied','p-partial']:['Received','p-paid'];
-          return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
+          return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+(p.doc?'<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'" title="Open '+esc(p.doc.name)+'">'+esc(p.doc.name)+'</button>':'')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
             '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span></td></tr>'; }).join('')+
         '</tbody></table></div></section>'
       :'<section class="vsec"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p></section>';
@@ -15588,6 +15667,7 @@ function paintDetail(keep){
   ov.querySelectorAll('.sd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   ov.querySelectorAll('[data-doc]').forEach(function(x){ x.onclick=function(){ openDoc(s,x.getAttribute('data-doc')==='down'); }; });
+  ov.querySelectorAll('[data-pdoc]').forEach(function(x){ x.onclick=function(){ var p=(s.payments||[]).filter(function(y){ return y.id===x.getAttribute('data-pdoc'); })[0]; if(p&&p.doc) openPayDoc(p.doc); }; });
   var vc=ov.querySelector('[data-sd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+s.clientId); }catch(e){} };
   if(!keep) document.getElementById('sd-x').focus();
 }

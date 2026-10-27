@@ -3106,13 +3106,13 @@ tbody tr:hover{background:#FCFCFD}
 .ky-b{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px}
 .ky-ban{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:10px}.ky-ban b{display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:700}.ky-ban span{font-size:12.5px}.ky-ban svg{width:15px;height:15px}
 .ky-ban.ok{background:#ECFDF5;color:#047857}.ky-ban.warn{background:#FFF7E6;color:#B4690E}.ky-ban.bad{background:#FEF2F2;color:#B91C1C}.ky-ban.none{background:#F6F7F9;color:var(--slate);font-size:13px}
-.ky-file{display:grid;grid-template-columns:44px minmax(0,1.3fr) minmax(0,1.2fr) minmax(170px,auto) auto;align-items:center;column-gap:22px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.ky-file{display:grid;grid-template-columns:44px minmax(0,1.3fr) minmax(0,1.3fr) minmax(170px,auto) auto;align-items:center;column-gap:22px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#fff}
 .ky-ext{width:44px;height:44px;border-radius:8px;background:#FEE2E2;color:#DC2626;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .ky-fn{min-width:0}.ky-name{display:block;max-width:100%;padding:0;border:0;background:none;text-align:left;font:inherit;font-size:14px;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}.ky-name:hover{color:var(--orange-ink)}.ky-fn small{display:block;font-size:12px;color:var(--mute);margin-top:3px}
 .ky-col{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}.ky-lbl{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7A8597}.ky-col b{font-size:13px;font-weight:600;color:var(--ink)}
 .ky-who{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);min-width:0;max-width:100%}.ky-who em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ky-who i{width:22px;height:22px;border-radius:50%;background:#E8EEFC;color:#3B5BDB;font-style:normal;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-.ky-role{font-size:11px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:999px;padding:1px 8px}
-.ky-acts{display:flex;gap:8px;justify-content:flex-end}.ky-acts .btn-ghost{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px}.ky-acts svg{width:15px;height:15px}
+.ky-role{flex-shrink:0;font-size:11px;font-weight:600;color:#2563EB;background:#EFF6FF;border-radius:999px;padding:1px 8px}
+.ky-acts{display:flex;gap:4px;justify-content:flex-end}.ky-ib{width:32px;height:32px;border:0;border-radius:8px;background:none;color:#475569;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}.ky-ib:hover{background:#F6F7F9;color:var(--orange-ink)}.ky-ib svg{width:18px;height:18px}.ky-acts .btn-ghost{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px}.ky-acts svg{width:15px;height:15px}
 .ky-ver{margin:4px 0 0;font-size:12.5px;color:var(--mute)}.ky-ver b{color:var(--slate);font-weight:600}
 .ky-yr+.ky-yr{border-top:1px solid var(--line)}.ky-yh{display:grid;grid-template-columns:20px minmax(0,1fr) minmax(0,1.2fr) auto auto;align-items:center;gap:14px;width:100%;padding:14px 20px;border:0;background:none;text-align:left;font:inherit;cursor:pointer}.ky-yh:hover{background:#FAFBFC}
 .ky-chev{color:var(--mute);transform:rotate(-90deg);transition:transform .15s;display:inline-flex}.ky-yr.open .ky-chev{transform:none}
@@ -6425,9 +6425,9 @@ function kycFileRow(c,rec,f,a,view){
   var x=String(f.name||'').split('.').pop().toUpperCase(), by=f.by||rec.by, at=f.at||kycUploadedAt(rec);
   return '<div class="ky-file"><span class="ky-ext">'+esc(x)+'</span>'+
     '<div class="ky-fn">'+(view?'<button type="button" class="ky-name" data-kpv="'+a+'" title="'+esc(f.name)+'">'+esc(f.name)+'</button>':'<b class="ky-name" title="'+esc(f.name)+'">'+esc(f.name)+'</b>')+'<small>'+(f.size?fsize(f.size):'')+'</small></div>'+
-    '<div class="ky-col"><span class="ky-lbl">Uploaded by</span><span class="ky-who" title="'+esc(by)+'"><i>'+esc(kycIni(by))+'</i><em>'+esc(by)+'</em></span><span class="ky-role">'+kycWho(c,by)+'</span></div>'+
+    '<div class="ky-col"><span class="ky-lbl">Uploaded by</span><span class="ky-who" title="'+esc(by)+' · '+kycWho(c,by)+'"><i>'+esc(kycIni(by))+'</i><em>'+esc(by)+'</em><span class="ky-role">'+kycWho(c,by)+'</span></span></div>'+
     '<div class="ky-col"><span class="ky-lbl">Uploaded on</span><b>'+whenOf(at)+'</b></div>'+
-    '<div class="ky-acts">'+(view?'<button type="button" class="btn-ghost btn-sm" data-kpv="'+a+'">'+I.eye+'View</button><button type="button" class="btn-ghost btn-sm" data-kdl="'+a+'">'+OI.dl+'Download</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+'</div></div>';
+    '<div class="ky-acts">'+(view?'<button type="button" class="ky-ib" data-kpv="'+a+'" title="View" aria-label="View '+esc(f.name)+'">'+I.eye+'</button><button type="button" class="ky-ib" data-kdl="'+a+'" title="Download" aria-label="Download '+esc(f.name)+'">'+OI.dl+'</button>':'<span class="cl-muted kyc-lock">Restricted</span>')+'</div></div>';
 }
 function kycTab(c){
   var recs=kycRecs(c), cur=recs[0], now=Date.now(), view=canViewKyc(), st=cur?kycState(cur):'none';
@@ -6448,7 +6448,7 @@ function kycTab(c){
   /* earlier checks, newest first, by financial year */
   var past=recs.slice(1);
   if(past.length){
-    h+='<div class="ky-card"><div class="ky-h"><div><h3>Previous Years KYC History</h3><p>Select a year to view its documents</p></div></div>'+past.map(function(rec,i){
+    h+='<div class="ky-card"><div class="ky-h"><div><h3>History</h3></div></div>'+past.map(function(rec,i){
       var vi=i+1, newer=recs[vi-1], ex2=kycExpiresAt(rec), lapsed=ex2<kycUploadedAt(newer), k=c.id+'|'+(rec.id||vi), open=!!kycYrOpen[k], m=(rec.files||[]).length, nt=kycNoteOf(c,rec);
       return '<div class="ky-yr'+(open?' open':'')+'"><button type="button" class="ky-yh" data-kyyr="'+esc(k)+'" aria-expanded="'+open+'"><span class="ky-chev">'+CD_I.chev+'</span>'+
           '<span class="ky-yt"><b>FY '+fyLabel(fyStart(fromIso(rec.date)))+'</b><small>'+m+' KYC document'+(m===1?'':'s')+'</small></span>'+
@@ -14415,6 +14415,15 @@ table,td,th{font-size:13.5px}
 .qf-tot .sd-paid dt small{display:block;font-size:11.5px;color:var(--faint);margin-top:2px}
 /* Add / Edit Sale: the Add Quotation drawer, plus a Fee column, one document and the financial summary */
 .drawer.sl-sf{max-width:min(1040px,96vw)}
+.sl-table tr.sl-over td{background:#FEF2F2}.sl-table tr.sl-over:hover td{background:#FDE8E8}
+.sl-lockn{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#F6F7F9;font-size:13px;color:var(--slate)}.sl-lockn svg{width:15px;height:15px;flex-shrink:0}
+.qf-rate{display:flex;flex-direction:column;gap:7px;min-width:0}
+.qf-lgst{display:flex;justify-content:flex-start;align-items:center}
+.qf-gck{display:inline-flex;align-items:center;gap:6px;padding:2px 2px 2px 0;font-size:12px;font-weight:600;color:var(--mute);background:none;border:0;cursor:pointer}
+.qf-gck i{width:15px;height:15px;border-radius:4px;border:1.5px solid #CBD5E1;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.qf-gck i svg{opacity:0}.qf-gck.on{color:var(--slate)}.qf-gck.on i{background:var(--orange);border-color:var(--orange)}.qf-gck.on i svg{opacity:1}
+.qf-gck:hover{color:var(--ink)}.qf-gck:hover i{border-color:#94A3B8}.qf-gck.on:hover i{border-color:var(--orange-ink)}.qf-gck[disabled]{cursor:default;opacity:.7}
+.qf-gck:focus-visible{outline:none}.qf-gck:focus-visible i{box-shadow:0 0 0 3px rgba(241,137,52,.25)}
 .sl-sf .qf-thead,.sl-sf .qf-row{grid-template-columns:18px 136px minmax(0,1.3fr) minmax(0,1.5fr) 84px 76px 120px 100px 34px}
 .sl-fee{color:var(--mute);font-weight:500}
 .sl-dates{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -14648,10 +14657,14 @@ function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" 
    Clients store, staff and branches from the Staff module, services from Settings: nothing is copied. */
 var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disabled','s-dis']};
 var PAY={unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid',overdue:'Overdue'};
-var PAY_TYPES=['Bank Transfer','Card','Cash','Cheque','Direct Debit','Client Credit'];
+var PAY_TYPES=['Bank Transfer','EFTPOS / Card','Cash','Client Credit'];   // older payments keep the type they were recorded with
 var EV={created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
-  payment:'Payment recorded',disabled:'Sale disabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
+  payment:'Payment recorded',disabled:'Sale disabled',enabled:'Sale enabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
 var DUE_DAYS=14, DAY=864e5;
+/* the companies a sale can be issued from, per branch. PROTOTYPE ONLY: the same sample spread as Quotations, until branches record their own */
+var INTERNAL_COS=['AAD888 Services Pty Ltd','AAD Taxation Pty Ltd','AAD Advisory Pty Ltd','AAD Bookkeeping Pty Ltd','AAD Business Services Pty Ltd','AAD SMSF Services Pty Ltd','AAD Wealth Partners Pty Ltd'];
+var BRANCH_CO_COUNT=[2,1,3,5,2,4,7,6];
+function branchCos(b){ if(!b) return []; var i=BRANCHES.indexOf(b); return INTERNAL_COS.slice(0,i<0?1:BRANCH_CO_COUNT[i%BRANCH_CO_COUNT.length]); }
 var content=document.getElementById('content'), ov=document.getElementById('overlay'), dlg=document.getElementById('dlg');
 function canManage(s){ return isManager()||s.accountant===ME.name||s.by===ME.name; }
 function inScope(s){ return isManager()||s.accountant===ME.name||s.accountant2===ME.name||s.by===ME.name||s.branch===ME.branch; }
@@ -14755,7 +14768,7 @@ var has=function(list,v){ return list.indexOf(v)>=0; };
 function filtered(){
   var f=state.applied, q=f.q.trim().toLowerCase(), bad=Object.keys(state.errs).length, lo=bad||f.min===''?null:+f.min, hi=bad||f.max===''?null:+f.max;
   return st.list.filter(inScope).filter(function(s){
-    if(f.status&&s.status!==f.status) return false;
+    if(f.status==='enabled'){ if(s.status==='disabled') return false; } else if(f.status&&s.status!==f.status) return false;
     if(f.pay&&payStatus(s)!==f.pay) return false;
     if(f.acc.length&&!has(f.acc,s.accountant)&&!has(f.acc,s.accountant2)) return false;
     if(f.branch.length&&!has(f.branch,s.branch)) return false;
@@ -14783,15 +14796,15 @@ function render(){
     document.getElementById('sl-retry').onclick=function(){ reload(); render(); }; wireHead(); return;
   }
   var f=state.f, e=state.errs, rows=filtered(), live=rows.filter(function(s){ return s.status!=='disabled'; }), page=rows.slice((state.page-1)*state.per,state.page*state.per);
-  var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(rows.reduce(function(a,s){ return a+receivedOf(s); },0)), owed=r2(live.reduce(function(a,s){ return a+pendingOf(s); },0));
+  var sales=r2(live.reduce(function(a,s){ return a+s.amount; },0)), got=r2(live.reduce(function(a,s){ return a+receivedOf(s); },0)), owed=r2(live.reduce(function(a,s){ return a+pendingOf(s); },0));
   var h=head()+'<dl class="qt-stats sl-stats"><div class="stat" title="Total billed for the sales below, excluding disabled sales"><dt>Sales Amount</dt><dd>'+money(sales)+'</dd></div>'+
-    '<div class="stat" title="Payments received against the sales below. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div>'+
+    '<div class="stat" title="Payments received against the sales below, excluding disabled sales. Client credit applied to an invoice isn’t counted again."><dt>Payment Received</dt><dd>'+money(got)+'</dd></div>'+
     '<div class="stat" title="Still owed on the sales below, after payments and client credit"><dt>Pending Amount</dt><dd>'+money(owed)+'</dd></div></dl>';
   h+='<div class="filterbar sl-fbar"><div class="search">'+I.search+'<input type="search" id="q" placeholder="Search by invoice no, client name or entity name" aria-label="Search sales" value="'+esc(f.q)+'"></div><div class="filters">'+
     '<span class="lbl">'+I.filter+'Filter By:</span>'+
     rangeHtml(f)+
     selF('f-pay','Payment Status',Object.keys(PAY).map(function(k){ return [k,PAY[k]]; }),f.pay)+
-    selF('f-status','All Status',Object.keys(STATUS).map(function(k){ return [k,STATUS[k][0]]; }),f.status)+
+    selF('f-status','All Status',[['enabled','Enabled'],['draft','Draft (not sent)'],['sent','Sent'],['disabled','Disabled']],f.status)+
     '<button type="button" class="rbtn mf-btn'+(advCount(f)?' set':'')+'" id="f-more" aria-haspopup="dialog">'+I.filter+'<span>More Filters</span>'+(advCount(f)?'<b class="mf-n">'+advCount(f)+'</b>':'')+'</button>'+
     '</div></div>'+
     chipsHtml(f);
@@ -14940,6 +14953,7 @@ function actionsFor(s){
   a.push(['pdf','PDF']); a.push(['log','Log']);
   if(!dis&&m) a.push(['quote','Convert To Quotation']);
   if(!dis&&isManager()) a.push(['disable','Disable','danger']);
+  if(dis&&isManager()) a.push(['enable','Enable']);
   if(isManager()&&!(s.payments||[]).length&&s.status!=='sent'&&!s.quotationId) a.push(['delete','Delete','danger']);
   return a;
 }
@@ -14948,7 +14962,7 @@ var MI=(function(){ var s=function(p){ return '<svg width="16" height="16" viewB
     send:s('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>'),resend:s('<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>'),pay:s('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>'),
     remind:s('<path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/>'),pdf:s('<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/>'),
     log:s('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),quote:s('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>'),
-    disable:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>')}; })();
+    disable:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),enable:s('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>'),'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>')}; })();
 var menuEl=null;
 function closeMenu(){ if(menuEl){ var b=content.querySelector('[data-menu="'+menuEl.dataset.s+'"]'); if(b) b.setAttribute('aria-expanded','false'); menuEl.remove(); menuEl=null; } }
 function openMenu(btn){
@@ -14977,26 +14991,28 @@ function doAction(k,id){
   reload(); var s=byId(id); if(!s){ render(); return toast('This sale no longer exists.',true); }
   ({edit:function(){ openSaleForm(s.id); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
     pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ if(detailId===s.id&&ov.querySelector('.sd-drawer')){ sdTab='activity'; paintDetail(); } else openDetail(s.id,'activity'); },
-    quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
+    quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },enable:function(){ enableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
 }
 /* ---------- Add Sale / Edit Sale: the same form as Add Quotation, with the sale's own fields ---------- */
 var SF=null;   // {id, isNew, d:{...}, errs:{}, dirty, busy}
 function catalogAll(){ try{ return loadCatalog(); }catch(e){ return {categories:[],services:[]}; } }
 function svcById(id){ return catalogAll().services.filter(function(s){ return s.id===id; })[0]; }
 function num(v){ var x=parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,'')); return isFinite(x)?x:NaN; }
-function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:''}; }
+function blankLine(){ return {cat:'',svcId:null,name:'',desc:'',qty:'1',price:'',gst:true}; }
 /* the invoice is made out to the client, or for a company one of its directors (as on quotations) */
 function nameOptions(c){ if(!c) return []; var o=[c.name]; (c.type==='company'&&c.directors||[]).forEach(function(x){ if(x.name&&o.indexOf(x.name)<0) o.push(x.name); }); return o; }
 /* never reuse an invoice number, including ones a quotation already points to */
 function nextSaleId(){ var qs=quotes(), ids=st.list.map(function(s){ return s.id; }).concat(qs?qs.list.map(function(q){ return q.invoiceId; }).filter(Boolean):[]);
   var n=ids.reduce(function(m,id){ return Math.max(m,+String(id).replace(/\D/g,'')||0); },2000)+1; return 'INV-'+n; }
-/* rates include GST, as everywhere in the app: lines add up to the sub total, a discount comes off it, and GST is the 1/11 share of the total */
+/* rates include GST, as everywhere in the app: lines add up to the sub total and a discount comes off it.
+   Each line says whether GST applies (Apply GST); GST is 1/11 of those lines, after the discount is shared across all lines (as on quotations) */
 function saleTotals(d,paid){
   var sub=r2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&q>0&&p>=0?q*p:0); },0));
+  var base=r2(d.items.reduce(function(a,x){ var q=num(x.qty), p=num(x.price); return a+(x.svcId&&x.gst!==false&&q>0&&p>=0?q*p:0); },0));
   var v=d.showDisc?num(d.discount):0; if(!(v>0)) v=0;
   var disc=d.discType==='%'?sub*Math.min(v,100)/100:v; disc=Math.min(disc,sub);
   var cr=d.useCredit?num(d.credit):0; if(!(cr>0)) cr=0;
-  var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:d.gst===false?0:r2(total/11),total:total,credit:r2(cr),pending:Math.max(0,r2(total-(paid||0)-cr))};
+  var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:sub>0?r2(base*(total/sub)/11):0,anyGst:base>0,total:total,credit:r2(cr),pending:Math.max(0,r2(total-(paid||0)-cr))};
 }
 function formClient(){ return SF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(SF.d.clientId); })[0]:null; }
 function openSaleForm(id){
@@ -15007,11 +15023,13 @@ function openSaleForm(id){
   SF={id:s?s.id:nextSaleId(),isNew:!s,errs:{},dirty:false,busy:false,pick:'',paid:s?paidOf(s):0,d:s?{
       clientId:s.clientId,onName:s.onName||client(s).name,branch:s.branch||'',accountant:s.accountant||'',accountant2:s.accountant2||'',date:isoDay(s.date),due:isoDay(s.due),
       items:(s.items&&s.items.length?s.items:[blankLine()]).map(function(x){ var v=x.svcId?svcById(x.svcId):catalogAll().services.filter(function(c){ return c.name===x.name; })[0];
-        return {cat:x.cat!=null?String(x.cat):(v&&v.cats&&v.cats[0]!=null?String(v.cats[0]):''),svcId:v?v.id:null,name:x.name||'',desc:x.desc||'',qty:String(x.qty!=null?x.qty:1),price:x.price!=null?String(x.price):''}; }),
-      showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||'',gst:s.gstMode!=='none'
+        return {cat:x.cat!=null?String(x.cat):(v&&v.cats&&v.cats[0]!=null?String(v.cats[0]):''),svcId:v?v.id:null,name:x.name||'',desc:x.desc||'',qty:String(x.qty!=null?x.qty:1),price:x.price!=null?String(x.price):'',gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
+      showDisc:!!s.discountAmt,discType:s.discountType==='%'?'%':'$',discount:s.discountAmt?String(s.discountType==='%'?s.discountPct:s.discountAmt):'',doc:s.doc||null,customerNotes:s.customerNotes||'',terms:s.terms||'',referral:s.referral||'',company:s.company||''
     }:{clientId:null,onName:'',branch:me&&me.branches[0]||ME.branch||'',accountant:me?me.name:'',accountant2:'',date:today,due:isoDay(Date.now()+DUE_DAYS*DAY),
-      items:[blankLine()],gst:true,showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
+      items:[blankLine()],company:'',showDisc:false,discType:'$',discount:'',doc:null,customerNotes:'',terms:'',referral:''}};
   SF.d.useCredit=false; SF.d.credit='';
+  if(!SF.d.company){ var c0=branchCos(SF.d.branch); if(c0.length===1) SF.d.company=c0[0]; }   // one company for the branch: chosen for you
+  SF.locked=!!s&&paidOf(s)>0&&pendingOf(s)<=0; SF.wasSent=!!s&&s.status==='sent';   // paid in full: the money side can't change, the other details can
   paintSaleForm();
 }
 function clientMatches(q){
@@ -15052,7 +15070,8 @@ function paintSaleForm(focusId){
       '<div><label class="sr" for="sf-d'+i+'">Description, line '+(i+1)+'</label><textarea class="ftext qf-ta" id="sf-d'+i+'" data-desc="'+i+'" rows="1" maxlength="300" placeholder="Description">'+esc(x.desc)+'</textarea></div>'+
       '<div class="qf-line sl-fee" title="The fee for this service in Settings → Services. The rate can’t be lower.">'+(fee!=null?money(fee):'<span class="ar-dash">—</span>')+'</div>'+
       '<div><label class="sr" for="sf-q'+i+'">Quantity, line '+(i+1)+'</label><input class="fin plain sm qf-n'+(e['q'+i]?' bad':'')+'" id="sf-q'+i+'" data-qty="'+i+'" type="number" min="1" step="1" inputmode="decimal" value="'+esc(x.qty)+'"></div>'+
-      '<div class="qf-price"><label class="sr" for="sf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="sf-p'+i+'" data-price="'+i+'" type="number" min="'+(fee||0)+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+fee+'"':' placeholder="0.00" disabled')+'></div>'+
+      '<div class="qf-rate"><div class="qf-price"><label class="sr" for="sf-p'+i+'">Rate, line '+(i+1)+'</label><span class="qf-cur">$</span><input class="fin plain sm qf-n'+(e['p'+i]?' bad':'')+'" id="sf-p'+i+'" data-price="'+i+'" type="number" min="'+(fee||0)+'" step="0.01" inputmode="decimal" value="'+esc(x.price)+'"'+(x.svcId?' placeholder="'+fee+'"':' placeholder="0.00" disabled')+'></div>'+
+        '<div class="qf-lgst"><button type="button" class="qf-gck'+(x.gst!==false?' on':'')+'" data-lgst="'+i+'" role="checkbox" aria-checked="'+(x.gst!==false)+'" aria-label="Apply GST, line '+(i+1)+'" title="'+(x.gst!==false?'GST applied (included in the rate)':'No GST on this line')+'"><i><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg></i>Apply GST</button></div></div>'+
       '<div class="qf-line num">'+money(amt)+'</div>'+
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+MI['delete']+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
@@ -15069,14 +15088,15 @@ function paintSaleForm(focusId){
         field('Invoice on the name of',true,c?sel('sf-on','onName',names,d.onName,'Invoice on the name of'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Choose the client first</option></select>'+I.chev+'</div>','onName','sf-on')+'</div>')+
       card('Assignment and dates','','<div class="stack"><div class="g3">'+
           field('Select branch',true,sel('sf-br','branch',BRANCHES,d.branch,'Select'),'branch','sf-br')+
-          field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+
-          field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
-        '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
+          field('Internal company',true,d.branch?sel('sf-co','company',branchCos(d.branch),d.company,'Select'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Select a branch first</option></select>'+I.chev+'</div>','company','sf-co')+
+          field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+'</div>'+
+        '<div class="g3">'+field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
+        '</div><div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div></div>')+
       card('Services','',
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
-        '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>','<label class="qf-gstt"><span>Include GST</span><button type="button" class="toggle sm'+(d.gst===false?'':' on')+'" data-gstsw role="switch" aria-checked="'+(d.gst!==false)+'" aria-label="Include GST"></button></label>')+
+        '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>')+
       card('Document','',doc+err('doc'))+
       '<div class="qf-bottom">'+
         '<section class="qf-card qf-notes"><div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
@@ -15087,7 +15107,7 @@ function paintSaleForm(focusId){
             '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
             '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
-          '<div><dt>'+(d.gst===false?'GST':'GST applied (10%)')+'</dt><dd>'+(d.gst===false?'Not applied':money(T.gst))+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
+          '<div><dt>'+(T.anyGst?'GST applied (10%)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           (function(){ var bal=c?creditOf(c.id):0; if(!bal&&!d.useCredit) return '';
             return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" aria-label="Client credit to apply, up to '+money(bal)+'"></span>'+
               '<button type="button" class="sl-drm" id="sf-crrm" title="Don’t apply credit" aria-label="Don’t apply credit">'+I.close+'</button></span>':'')+'</dt>'+
@@ -15096,14 +15116,19 @@ function paintSaleForm(focusId){
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
     '</div>'+
-    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-primary" id="sf-go">Submit</button></div></div>';
+    '<div class="modal-foot"><button class="btn-ghost" id="sf-cancel">Cancel</button><button class="btn-ghost" id="sf-draft">'+(SF.wasSent?'Save':'Save as draft')+'</button><button class="btn-primary" id="sf-go">'+(SF.wasSent?'Save & resend':'Save & send')+'</button></div></div>';
   ov.classList.add('open','as-drawer'); document.body.style.overflow='hidden';
+  if(SF.locked){
+    var it=ov.querySelector('.qf-items'); if(it) it.insertAdjacentHTML('beforebegin','<p class="sl-lockn">'+I.info+'This sale is paid in full, so its services and amounts can’t be changed. You can still update the other details.</p>');
+    [].forEach.call(ov.querySelectorAll('.qf-items input,.qf-items select,.qf-items textarea,.qf-items button,#sf-discadd,#sf-disc,#sf-dt,#sf-discrm,#sf-cradd,#sf-cr,#sf-crrm'),function(x){ x.disabled=true; });
+  }
   wireSaleForm(focusId);
 }
 function liveTotals(){
   var d=SF.d, T=saleTotals(d,SF.paid);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
-  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,d.gst===false?'Not applied':money(T.gst),money(T.total)];
+  var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,T.anyGst?money(T.gst):'Not applied',money(T.total)];
+  var gl=ov.querySelectorAll('.qf-tot > div > dt')[2]; if(gl) gl.textContent=T.anyGst?'GST applied (10%)':'GST';
   if(ov.querySelector('.sl-crrow')) vals.push(d.useCredit?'−'+money(T.credit):null); vals.push(money(T.pending));
   [].forEach.call(dd,function(x,i){ if(vals[i]!=null) x.textContent=vals[i]; });
 }
@@ -15112,7 +15137,8 @@ function wireSaleForm(focusId){
   var repaint=function(fid){ var keep=document.getElementById('sf-body').scrollTop; paintSaleForm(); document.getElementById('sf-body').scrollTop=keep; var f=fid&&document.getElementById(fid); if(f) f.focus(); };
   [].forEach.call(ov.querySelectorAll('[data-sf]'),function(el){
     var k=el.getAttribute('data-sf'), live=el.tagName==='TEXTAREA'||el.type==='text'||el.id==='sf-ref';
-    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete SF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2=''; if(!live) repaint(el.id); };
+    el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete SF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2='';
+      if(k==='branch'){ var cos=branchCos(d.branch); if(cos.indexOf(d.company)<0) d.company=cos.length===1?cos[0]:''; delete SF.errs.company; } if(!live) repaint(el.id); };
   });
   var pick=document.getElementById('sf-q');
   if(pick){
@@ -15161,7 +15187,8 @@ function wireSaleForm(focusId){
   /* discount: a dollar amount off the sub total, as on quotations */
   var da=document.getElementById('sf-discadd'); if(da) da.onclick=function(){ d.showDisc=true; touch(); repaint('sf-disc'); };
   var dr=document.getElementById('sf-discrm'); if(dr) dr.onclick=function(){ d.showDisc=false; d.discount=''; delete SF.errs.discount; touch(); repaint(); };
-  var gsw=ov.querySelector('[data-gstsw]'); if(gsw) gsw.onclick=function(){ d.gst=d.gst===false; touch(); repaint(); var n=ov.querySelector('[data-gstsw]'); if(n) n.focus(); };
+  [].forEach.call(ov.querySelectorAll('[data-lgst]'),function(b){ b.onclick=function(){ var x=d.items[+b.getAttribute('data-lgst')]; x.gst=x.gst===false; touch();
+    b.classList.toggle('on',x.gst!==false); b.setAttribute('aria-checked',x.gst!==false); b.title=x.gst!==false?'GST applied (included in the rate)':'No GST on this line'; liveTotals(); }; });
   var dt=document.getElementById('sf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete SF.errs.discount; touch(); repaint('sf-disc'); };
   var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; if(SF.errs.discount){ delete SF.errs.discount; var g=di.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-derr'); if(er) er.remove(); } touch(); liveTotals(); };
   /* document: one file, picked or dropped */
@@ -15177,14 +15204,17 @@ function wireSaleForm(focusId){
     dz.ondrop=function(ev){ ev.preventDefault(); dz.classList.remove('drag'); if(ev.dataTransfer.files.length>1){ SF.errs.doc='Upload one document at a time.'; return repaint(); } take(ev.dataTransfer.files[0]); }; }
   var rmd=document.getElementById('sf-docrm'); if(rmd) rmd.onclick=function(){ d.doc=null; touch(); repaint(); };
   document.getElementById('sf-x').onclick=leaveSaleForm; document.getElementById('sf-cancel').onclick=leaveSaleForm;
-  document.getElementById('sf-go').onclick=submitSale;
+  document.getElementById('sf-go').onclick=function(){ submitSale(true); };
+  document.getElementById('sf-draft').onclick=function(){ submitSale(false); };
   if(focusId){ var f=document.getElementById(focusId); if(f) f.focus(); }
 }
 function checkSale(){
   var d=SF.d, e={}, T=saleTotals(d,SF.paid), filled=d.items.filter(function(x){ return x.svcId; });
+  if(SF.locked){ d.showDisc=false; d.useCredit=false; }
   if(d.clientId==null||!formClient()) e.client='Choose the client this sale is for';
   else if(!d.onName) e.onName='Choose who the invoice is made out to';
   if(!d.branch) e.branch='Choose the branch';
+  else if(!d.company) e.company='Choose the internal company';
   if(!d.accountant) e.accountant='Choose the staff member';
   if(d.accountant2&&d.accountant2===d.accountant) e.accountant2='Choose a different accountant, or leave this empty';
   if(!d.date) e.date='Enter the invoice date';
@@ -15196,7 +15226,7 @@ function checkSale(){
     else if(x.price===''||!isFinite(p)) e['p'+i]='Enter the rate';
     else if(p<min) e['p'+i]='The rate can’t be below the '+money(min)+' fee set in Settings → Services';
   });
-  if(!filled.length) e.items='Add at least one line';
+  if(!filled.length&&!SF.locked) e.items='Add at least one line';
   if(d.showDisc){ var dv=num(d.discount), isP=d.discType==='%';
     if(d.discount===''||!isFinite(dv)||dv<=0) e.discount=isP?'Enter a percentage above 0, or remove the discount':'Enter the discount in dollars, or remove it';
     else if(isP&&dv>100) e.discount='The percentage can’t be more than 100';
@@ -15210,21 +15240,22 @@ function checkSale(){
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
   return e;
 }
-function submitSale(){
+function submitSale(andSend){
   if(SF.busy) return;                                    // one save per click, however many clicks
   SF.errs=checkSale();
   if(Object.keys(SF.errs).length){ paintSaleForm(); var b=ov.querySelector('.bad, .ferr.show'); if(b){ b.scrollIntoView({block:'center'}); if(b.focus) b.focus(); } return toast('Fix the highlighted fields to save the sale',true); }
-  SF.busy=true; var go=document.getElementById('sf-go'); go.disabled=true; go.textContent='Saving…';
-  var d=SF.d, fail=function(msg){ SF.busy=false; var g=document.getElementById('sf-go'); if(g){ g.disabled=false; g.textContent='Submit'; } toast(msg,true); };
+  SF.busy=true; var go=document.getElementById(andSend?'sf-go':'sf-draft'), label=go.textContent; go.disabled=true; go.textContent='Saving…';
+  var d=SF.d, fail=function(msg){ SF.busy=false; var g=document.getElementById(andSend?'sf-go':'sf-draft'); if(g){ g.disabled=false; g.textContent=label; } toast(msg,true); };
   var store=d.doc&&d.doc.file?putSaleFile('sale-'+SF.id+'-'+Date.now(),d.doc.file):Promise.resolve(null);
   store.then(function(key){
     reload(); var c=formClient(), T=saleTotals(d,SF.paid), s=SF.isNew?null:byId(SF.id);
     if(!SF.isNew&&(!s||s.status==='disabled')) return fail('This sale can no longer be edited.');
     var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
     var doc=d.doc?{name:d.doc.name,size:d.doc.size,type:d.doc.type,key:key||d.doc.key||null}:null;
-    var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
-      items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price))}; }),
-      subtotal:T.sub,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'?num(d.discount):null,gst:T.gst,gstMode:d.gst===false?'none':'incl',amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};
+    var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,company:d.company,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
+      items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price)),gst:x.gst!==false}; }),
+      subtotal:T.sub,discountAmt:T.disc,discountType:d.showDisc&&T.disc?d.discType:'',discountPct:d.showDisc&&d.discType==='%'?num(d.discount):null,gst:T.gst,gstMode:!T.anyGst?'none':d.items.every(function(x){ return !x.svcId||x.gst!==false; })?'incl':'mixed',amount:T.total,doc:doc,customerNotes:d.customerNotes.trim(),terms:d.terms.trim(),referral:d.referral.trim()};
+    if(SF.locked) ['items','subtotal','discountAmt','discountType','discountPct','gst','gstMode','amount'].forEach(function(k){ delete fields[k]; });   // paid in full: amounts stay as they were
     if(SF.isNew){
       if(byId(SF.id)) SF.id=nextSaleId();               // the number was taken meanwhile
       s={id:SF.id,by:ME.name,at:Date.now(),status:'draft',payments:[],history:[]}; for(var k in fields) s[k]=fields[k];
@@ -15233,16 +15264,17 @@ function submitSale(){
     } else {
       var was=money(s.amount); for(var k2 in fields) s[k2]=fields[k2];
       if(s.editRequest&&s.editRequest.status==='approved'&&s.editRequest.by===ME.name) s.editRequest.status='used';   // an approved request covers one edit
-      log(s,'edited',{note:was===money(T.total)?money(T.total):was+' → '+money(T.total)});
+      log(s,'edited',{note:SF.locked?'Details updated (paid in full, amounts unchanged)':was===money(T.total)?money(T.total):was+' → '+money(T.total)});
     }
-    var cr=T.credit;
+    var cr=SF.locked?0:T.credit;
     if(cr>0){
       if(!spendCredit(c.id,cr,s.id)){ reload(); return fail('The client’s credit changed meanwhile. Check the amount and try again.'); }
       s.payments.push({id:'P'+Date.now().toString(36),amount:cr,type:'Client Credit',at:Date.now(),by:ME.name,ref:''});
       log(s,'payment',{note:money(cr)+' · Client Credit'+(pendingOf(s)<=0?' · paid in full':' · '+money(pendingOf(s))+' still owed')});
     }
     if(!save()){ if(cr>0) unspendCredit(s.id); reload(); return fail('Couldn’t save the sale. Nothing was changed.'); }
-    var id=s.id, isNew=SF.isNew; SF=null; closeOv(); render(); toast((isNew?'Sale '+id+' added':'Sale '+id+' updated')+(cr>0?' · '+money(cr)+' credit applied':''));
+    var id=s.id, isNew=SF.isNew, was=s.status; SF=null; closeOv(); render(); toast((isNew?'Sale '+id+' added':'Sale '+id+' updated')+(cr>0?' · '+money(cr)+' credit applied':''));
+    if(andSend){ var sv=byId(id); if(sv) sendInvoice(sv,was==='sent'); }   // Save & send: the email step straight after
   },function(){ fail('The document couldn’t be stored. Try again, or remove it.'); });
 }
 /* documents are kept in this browser's private storage (IndexedDB) next to the sale */
@@ -15298,6 +15330,7 @@ function addPayment(s){
       var t=d===today?Date.now():new Date(d+'T12:00:00').getTime();
       x.payments.push({id:'P'+Date.now().toString(36),amount:r2(amt),type:type,at:t,by:ME.name,ref:ref});
       log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});
+      try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+type+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
       commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id);
     } finally { paying=false; }
   };
@@ -15338,6 +15371,21 @@ function mailDialog(s,kind){
   };
 }
 function sendInvoice(s,again){ mailDialog(s,again?'resend':'send'); }
+var AUTO_REM=[['due',0,'on the due date'],['d7',7,'7 days after the due date']];
+function autoReminders(){
+  if(!st) return; var today=isoDay(Date.now());
+  st.list.forEach(function(s){
+    if(s.status!=='sent'||pendingOf(s)<=0) return; var c=client(s); if(!validEmail(c.email||'')) return;
+    s.autoRem=s.autoRem||{};
+    AUTO_REM.forEach(function(r0){ if(s.autoRem[r0[0]]||isoDay(s.due+r0[1]*DAY)>today) return;
+      s.autoRem[r0[0]]=Date.now();
+      var body='Hi '+c.name+',\n\nThis is a friendly reminder that '+money(pendingOf(s))+' is still owing on invoice '+s.id+', due '+dmyOf(s.due)+'.\n\nThe invoice is attached. If you’ve already paid, thank you and please ignore this email.\n\nKind regards,\n'+FIRM.name;
+      deliver({email:{to:c.email,subject:'Payment reminder: invoice '+s.id+' from '+FIRM.name,body:body,attachment:s.id+'.pdf'}}).then(function(res){
+        reload(); var x=byId(s.id); if(!x) return; x.autoRem=x.autoRem||{}; x.autoRem[r0[0]]=Date.now();
+        log(x,res.ok?'reminder':'reminder_failed',{by:'System',note:'To '+c.email+' · automatic reminder '+r0[2]+(res.ok?' · '+money(pendingOf(x))+' owing':' · '+(res.error||'not accepted')),ok:!!res.ok,to:c.email}); save(); render(); }); });
+  });
+  save();
+}
 function sendReminder(s){ mailDialog(s,'remind'); }
 
 /* ---------- edits on finalised sales go through an edit request ---------- */
@@ -15347,7 +15395,9 @@ function requestEdit(s){
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Send request</button></div>');
   document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){ var n=document.getElementById('r-n').value.trim(); if(!n) return document.getElementById('r-e').classList.add('show');
-    reload(); var x=byId(s.id); x.editRequest={by:ME.name,at:Date.now(),reason:n,status:'pending'}; log(x,'edit_requested',{note:n}); commit(x,'Edit request sent'); };
+    reload(); var x=byId(s.id); x.editRequest={by:ME.name,at:Date.now(),reason:n,status:'pending'}; log(x,'edit_requested',{note:n});
+    try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':editreq:'+x.editRequest.at,kind:'pay',tone:'warn',aud:'admin',title:'Edit request waiting',desc:ME.name+' asked to edit '+x.id+': “'+n+'”',go:{mod:'sales',id:x.id}}); }catch(e){}
+    commit(x,'Edit request sent'); };
 }
 function reviewEdit(s){
   var r=s.editRequest;
@@ -15369,6 +15419,15 @@ function disableSale(s){
   document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){ var n=document.getElementById('d-n').value.trim(); if(!n) return document.getElementById('d-e').classList.add('show');
     reload(); var x=byId(s.id); if(!x||x.status==='disabled'){ closeDlg(); return render(); } x.status='disabled'; log(x,'disabled',{note:n}); commit(x,x.id+' disabled'); };
+}
+/* Enable: a disabled sale goes back to Sent (if it was sent) or Not sent, and counts again */
+function enableSale(s){
+  modal('<div class="confirm-body"><h3 id="m-t">Enable '+esc(s.id)+'?</h3><p>The sale for <strong>'+esc(client(s).name)+'</strong> counts towards sales and what’s owed again, and can take payments and be sent.</p>'+
+    '<label class="flabel" for="d-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="d-n" rows="3" maxlength="300"></textarea><span class="ferr" id="d-e">Add a reason</span></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Enable sale</button></div>');
+  document.getElementById('m-no').onclick=closeDlg;
+  document.getElementById('m-go').onclick=function(){ var n=document.getElementById('d-n').value.trim(); if(!n) return document.getElementById('d-e').classList.add('show');
+    reload(); var x=byId(s.id); if(!x||x.status!=='disabled'){ closeDlg(); return render(); } x.status=x.sentAt?'sent':'draft'; log(x,'enabled',{note:n}); commit(x,x.id+' enabled'); };
 }
 function deleteSale(s){
   modal('<div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="m-t">Delete '+esc(s.id)+'?</h3><p>The sale for <strong>'+esc(client(s).name)+'</strong> of '+money(s.amount)+' and its history are removed. This can’t be undone.</p></div>'+
@@ -15408,7 +15467,7 @@ var MAIL_EV=['sent','resent','send_failed','reminder','reminder_failed'];
 function badge(st0){ var x=STATUS[st0]||[st0,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
 /* the header actions: the list menu's rules (status, permissions, edit requests); Log is the Activities tab here, Disable and Delete stay in the list */
 function detailActions(s){
-  var lab={edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation'};
+  var lab={edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation',enable:'Enable'};
   return actionsFor(s).filter(function(a){ return lab[a[0]]; }).map(function(a){ return [a[0],lab[a[0]]]; });
 }
 /* the saved totals; older sales (converted from quotations) have only the amount */
@@ -15469,7 +15528,7 @@ function paintDetail(keep){
   var b='';
   if(sdTab==='services'){
     var credit=r2(pays.filter(function(p){ return !p.void&&p.type==='Client Credit'; }).reduce(function(a,p){ return a+p.amount; },0));
-    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. '+(s.gstMode==='none'?'No GST applied.':'Rates include GST.')+'</p></div>'+
+    b='<div class="vbar"><p><b>'+items.length+'</b> service'+(items.length===1?'':'s')+'. '+(s.gstMode==='none'?'No GST applied.':s.gstMode==='mixed'?'GST applies to some lines; rates include it.':'Rates include GST.')+'</p></div>'+
       '<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t sd-t"><thead><tr><th>Category</th><th>Item Details</th><th>Description</th><th class="r">Fee</th><th class="r">Quantity</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>'+
       (items.length?items.map(function(x){ var n=+x.qty||0, pr=+x.price||0, fee=feeOf(x), cn=catName(x);
         return '<tr><td>'+(cn?esc(cn):'<span class="cl-muted">—</span>')+'</td><td><b>'+esc(x.name)+'</b></td><td class="sd-desc">'+(x.desc?esc(x.desc):'<span class="cl-muted">—</span>')+'</td>'+
@@ -15594,7 +15653,7 @@ function exportPdf(){
   var list=filtered(); if(!list.length) return toast('There are no sales to export with these filters.',true);
   var f=state.applied, live=list.filter(function(s){ return s.status!=='disabled'; });
   var tbl='<div class="ex"><h1>Sales</h1><p>'+escH(f.range==='custom'||f.from||f.to?fmtRange(f.from,f.to):'All dates')+' · '+list.length+' sale'+(list.length===1?'':'s')+' · exported '+whenOf(Date.now())+' by '+escH(ME.name)+'</p>'+
-    '<dl><div><dt>Sales Amount</dt><dd>'+money(live.reduce(function(a,s){ return a+s.amount; },0))+'</dd></div><div><dt>Payment Received</dt><dd>'+money(list.reduce(function(a,s){ return a+receivedOf(s); },0))+'</dd></div></dl>'+
+    '<dl><div><dt>Sales Amount</dt><dd>'+money(live.reduce(function(a,s){ return a+s.amount; },0))+'</dd></div><div><dt>Payment Received</dt><dd>'+money(live.reduce(function(a,s){ return a+receivedOf(s); },0))+'</dd></div><div><dt>Pending Amount</dt><dd>'+money(live.reduce(function(a,s){ return a+pendingOf(s); },0))+'</dd></div></dl>'+
     '<table><thead><tr>'+['Sale ID','Client','Date','Sale','Pending','Branch','Accountant','Additional Accountant','Created By'].map(function(x){ return '<th>'+x+'</th>'; }).join('')+'</tr></thead><tbody>'+
     list.map(function(s){ return '<tr><td>'+escH(s.id)+'</td><td>'+escH(client(s).name)+'</td><td>'+dmyOf(s.date)+'</td><td class="r">'+money(s.amount)+'</td><td class="r">'+(s.status==='disabled'?'Disabled':money(pendingOf(s)))+'</td><td>'+escH(s.branch||'')+'</td><td>'+escH(s.accountant||'')+'</td><td>'+escH(s.accountant2||'—')+'</td><td>'+escH(s.by||'')+'</td></tr>'; }).join('')+'</tbody></table></div>';
   var css='.ex{background:#fff;max-width:1100px;margin:0 auto;padding:28px 32px;font-size:12px;color:#111}.ex h1{font-family:Manrope;font-size:22px;margin:0 0 4px}.ex p{color:#555;margin:0 0 14px}'+
@@ -15610,7 +15669,7 @@ RANGES=[[['today','Today'],['this_week','This Week'],['this_month','This Month']
 /* the date range above writes into the filters being chosen; Filter applies them */
 state.f=blank(); state.applied=state.f;
 content.innerHTML=head()+'<div class="card"><div class="empty"><h3>Loading sales…</h3></div></div>';
-setTimeout(function(){ reload(); render(); },0);
+setTimeout(function(){ reload(); render(); autoReminders(); },0);   // due reminders go out when Sales opens
 window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'){ reload(); if(!dlg.classList.contains('open')) render(); } });
 /* a notification opens one sale: parent.AADShow from the shell, or an intent left before this page loaded */
 window.AADShow=function(id){ if(!st.list.length) reload(); if(byId(id)) openDetail(id); else toast('This sale no longer exists.',true); };

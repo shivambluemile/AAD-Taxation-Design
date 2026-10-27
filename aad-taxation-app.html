@@ -14413,7 +14413,7 @@ table,td,th{font-size:13.5px}
 .sd-head{flex-wrap:wrap;row-gap:12px}.sd-head .dpmain{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;flex:1 1 260px}.sd-head h2{display:flex;align-items:center;flex-wrap:wrap;gap:8px;white-space:nowrap}
 .sd-cl{display:inline-flex;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--orange-ink);cursor:pointer}.sd-cl:hover{text-decoration:underline}.sd-cl.gone{color:var(--slate);cursor:default}.sd-cl.gone:hover{text-decoration:none}
 .sd-cl svg{width:15px;height:15px;flex-shrink:0}
-.sd-head{position:relative;padding-right:64px}.sd-head .dhead-acts{flex-wrap:wrap}.sd-head #sd-x{position:absolute;top:20px;right:20px}
+.sd-head{position:relative}.sd-head .dhead-acts{flex-wrap:wrap;margin-right:44px}.sd-head #sd-x{position:absolute;top:20px;right:20px}
 .sd-head .dhead-acts .btn-ghost,.sd-head .dhead-acts .btn-primary{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;font-size:13px}
 .sd-head .dhead-acts svg{width:15px;height:15px;flex-shrink:0}
 .qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
@@ -15151,7 +15151,7 @@ function paintSaleForm(focusId){
           field('Internal company',true,d.branch?sel('sf-co','company',branchCos(d.branch),d.company,'Select'):'<div class="sf-sel"><select class="fin plain sm" disabled><option>Select a branch first</option></select>'+I.chev+'</div>','company','sf-co')+
           field('Select staff',true,sel('sf-acc','accountant',staff,d.accountant,'Select'),'accountant','sf-acc')+'</div>'+
         '<div class="g3">'+field('Additional accountant',false,sel('sf-acc2','accountant2',staff.filter(function(n){ return n!==d.accountant; }),d.accountant2,'Select'),'accountant2','sf-acc2')+'</div>'+
-        '</div><div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
+        '<div class="g3">'+field('Invoice date',true,'<input class="fin plain sm'+(e.date?' bad':'')+'" id="sf-date" data-sf="date" type="date" value="'+esc(d.date)+'">','date','sf-date')+
           field('Due date',true,'<input class="fin plain sm'+(e.due?' bad':'')+'" id="sf-due" data-sf="due" type="date" value="'+esc(d.due)+'"'+(d.date?' min="'+d.date+'"':'')+'>','due','sf-due')+'</div></div>')+
       card('Services','',
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Fee</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+

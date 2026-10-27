@@ -14530,7 +14530,7 @@ table,td,th{font-size:13.5px}
 .pm-type.on{border-color:var(--orange);background:var(--orange-soft);box-shadow:0 0 0 1px var(--orange) inset}.pm-type.on i{background:#fff;color:var(--orange-ink)}
 .pm-type:disabled{opacity:.5;cursor:not-allowed}
 .pm-g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.pm-tnote{display:block;font-size:12px;color:var(--mute);font-style:italic;margin-top:2px}.pm-tdoc{display:block;font-size:12px;margin-top:2px}
+.pm-tnote{display:block;font-size:12px;color:var(--mute);font-style:italic;margin-top:2px}.pm-tdoc{display:inline-flex;align-items:center;gap:5px;max-width:100%;margin-top:3px;padding:0;border:0;background:none;font:inherit;font-size:12px;font-weight:500;color:var(--ink);text-align:left;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pm-tdoc svg{width:13px;height:13px;flex-shrink:0;color:var(--mute)}.pm-tdoc:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}.pm-tdoc:hover svg{color:var(--orange-ink)}
 @media (max-width:560px){.pm-types{grid-template-columns:1fr 1fr}.pm-g2{grid-template-columns:1fr}.pm-sum b{font-size:14px}}
 .sl-att{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--slate);background:#FAFBFC;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
 .sl-quote{margin-top:8px;padding:10px 12px;background:#FAFBFC;border-radius:8px;color:var(--slate)}
@@ -15856,7 +15856,7 @@ function paintDetail(keep){
     b=pays.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Payment date</th><th>Reference</th><th>Payment type</th><th class="r">Amount received</th><th>Recorded by</th><th>Status</th></tr></thead><tbody>'+
         pays.slice().sort(function(a,z){ return z.at-a.at; }).map(function(p){
           var stt=p.void?['Voided','p-overdue']:p.type==='Client Credit'?['Credit applied','p-partial']:['Received','p-paid'];
-          return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+(p.doc?'<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'" title="Open '+esc(p.doc.name)+'">'+esc(p.doc.name)+'</button>':'')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
+          return '<tr><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+(p.doc?'<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'" title="Open '+esc(p.doc.name)+'">'+SI.pdf+esc(p.doc.name)+'</button>':'')+'</td><td>'+esc(p.type)+'</td><td class="r num">'+money(p.amount)+'</td>'+
             '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span></td></tr>'; }).join('')+
         '</tbody></table></div></section>'
       :'<section class="vsec sd-empty"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p>'+

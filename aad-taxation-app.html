@@ -14440,7 +14440,7 @@ table,td,th{font-size:13.5px}
 .qd-steps .rq-st b{font-size:13px;font-weight:700;color:var(--ink)}.qd-steps .rq-st.todo b{color:var(--slate);font-weight:600}
 .qd-steps .rq-st small{font-size:12px;color:var(--mute);line-height:1.45}
 .sd-late{color:#DC2626;font-weight:600}
-.sd-bar{display:block;height:6px;margin-top:6px;border-radius:999px;background:#F1F2F4;overflow:hidden}.sd-bar span{display:block;height:100%;border-radius:inherit;background:#10B981}
+
 .sd-empty{display:flex;flex-direction:column;align-items:flex-start;gap:12px}.sd-empty .btn-sm{display:inline-flex;align-items:center;gap:6px}.sd-empty svg{width:15px;height:15px}
 @media (max-width:900px){.qd-ov{grid-template-columns:1fr;padding:18px}.qd-side{position:static}}
 .state.s-draft i{background:#94A3B8}.state.s-sent i{background:#3B82F6}.state.s-dis i{background:#CBD5E1}.state.s-dis{color:var(--mute)}.state.s-req i{background:#F59E0B}
@@ -14727,7 +14727,7 @@ function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" 
    place that reads or writes them; swap its two functions for the sales API without touching the screen. Clients come from the
    Clients store, staff and branches from the Staff module, services from Settings: nothing is copied. */
 var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disabled','s-dis']};
-var PAY={unpaid:'Unpaid',partial:'Partially Paid',paid:'Paid',overdue:'Overdue'};
+var PAY={unpaid:'Unpaid',paid:'Paid',overdue:'Overdue'};   // a sale is paid in full at once: there's no part-paid state
 var PAY_TYPES=['Bank Transfer','EFTPOS / Card','Cash','Client Credit'];   // older payments keep the type they were recorded with
 var EV={created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
   payment:'Payment recorded',disabled:'Sale disabled',enabled:'Sale enabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
@@ -14778,6 +14778,7 @@ function normalise(s){
   if(s.accountant==null) s.accountant=q?q.accountant||'':'';
   if(s.accountant2==null) s.accountant2=q?q.accountant2||'':'';
   if(!s.history) s.history=[{type:'created',by:s.by||'',t:s.at||s.date,note:s.quotationId?'Converted from quotation '+s.quotationId:'',ok:true}];
+  if(s.dev&&s.payments.length&&pendingOf(s)>0){ s.payments=[]; s.history=s.history.filter(function(e){ return e.type!=='payment'; }); }   // DEVELOPMENT DATA only
   return s;
 }
 
@@ -14789,7 +14790,7 @@ var DevData={
     var now=Date.now(), has=function(id){ return v.list.some(function(x){ return x.id===id; }); };
     /* quotations already marked Invoiced get their sale */
     var qs=quotes(); (qs?qs.list:[]).forEach(function(q){ if(q.invoiceId&&!has(q.invoiceId)) v.list.push({id:q.invoiceId,quotationId:q.id,clientId:q.clientId,branch:q.branch,items:q.items,amount:q.amount,by:ME.name,at:(q.history||[]).slice(-1)[0]?q.history.slice(-1)[0].t:now,accountant:q.accountant,accountant2:q.accountant2||'',dev:true}); });
-    var plan=['paid','partial','unpaid','overdue','paid','unpaid','partial','overdue','paid','draft','paid','partial','unpaid','disabled','overdue','paid','credit','draft','unpaid','paid'];
+    var plan=['paid','unpaid','unpaid','overdue','paid','unpaid','paid','overdue','paid','draft','paid','unpaid','unpaid','disabled','overdue','paid','credit','draft','unpaid','paid'];
     plan.forEach(function(p,i){
       var id='INV-'+(2101+i); if(has(id)) return;
       var c=cl[(i*3)%cl.length], who=ASSIGNABLE[i%ASSIGNABLE.length], by=ASSIGNABLE[(i+2)%ASSIGNABLE.length].name, made=now-(58-i*3)*DAY-(i*41%8)*36e5;
@@ -14801,8 +14802,7 @@ var DevData={
       if(p!=='draft'){ log(s,'sent',{by:who.name,t:made+36e5,note:'To '+(c.email||'the client')}); s.sentAt=made+36e5; }
       var pay=function(a,type,days){ var t=made+days*DAY; s.payments.push({id:'P'+id+s.payments.length,amount:r2(a),type:type,at:t,by:who.name,ref:type==='Bank Transfer'?'TRF-'+(4400+i):''}); log(s,'payment',{by:who.name,t:t,note:money(a)+' · '+type}); };
       if(p==='paid') pay(amt,PAY_TYPES[i%3],4);
-      if(p==='partial'||p==='overdue'&&i%2) pay(amt*0.4,'Bank Transfer',5);
-      if(p==='credit'){ pay(Math.min(50,amt),'Client Credit',2); pay(amt-Math.min(50,amt),'Card',6); }
+      if(p==='credit') pay(amt,'Client Credit',2);
       if(p==='disabled'){ s.status='disabled'; log(s,'disabled',{by:ME.name,t:made+2*DAY,note:'Raised for the wrong client'}); }
       var cap=now-36e5; s.history.forEach(function(e){ if(e.t>cap) e.t=cap; }); s.payments.forEach(function(x){ if(x.at>cap) x.at=cap; });
       v.list.push(s);
@@ -14822,7 +14822,7 @@ function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
 function paidOf(s){ return r2((s.payments||[]).filter(function(p){ return !p.void; }).reduce(function(a,p){ return a+p.amount; },0)); }
 function receivedOf(s){ return r2((s.payments||[]).filter(function(p){ return !p.void&&p.type!=='Client Credit'; }).reduce(function(a,p){ return a+p.amount; },0)); }   // money in; client credit was received earlier
 function pendingOf(s){ return s.status==='disabled'?0:Math.max(0,r2(s.amount-paidOf(s))); }
-function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); if(p<=0) return 'paid'; if(isoDay(s.due)<isoDay(Date.now())) return 'overdue'; return paidOf(s)>0?'partial':'unpaid'; }
+function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); if(p<=0) return 'paid'; if(isoDay(s.due)<isoDay(Date.now())) return 'overdue'; return 'unpaid'; }
 
 /* ---------- filters: chosen above the table, applied with Filter ---------- */
 var DEFAULT_RANGE='this_month';
@@ -15845,12 +15845,11 @@ function paintDetail(keep){
     var made=hist.filter(function(e){ return e.type==='created'; })[0], sends=hist.filter(function(e){ return (e.type==='sent'||e.type==='resent')&&e.ok!==false; });
     var rems=hist.filter(function(e){ return e.type==='reminder'&&e.ok!==false; }), lastRem=rems[rems.length-1];
     var live=pays.filter(function(p){ return !p.void; }), lastPay=live.slice().sort(function(a,z){ return z.at-a.at; })[0];
-    var pct=s.amount>0?Math.min(100,Math.round(paidOf(s)/s.amount*100)):0, days=Math.round((new Date(isoDay(s.due)+'T00:00:00')-new Date(isoDay(Date.now())+'T00:00:00'))/DAY);
+    var days=Math.round((new Date(isoDay(s.due)+'T00:00:00')-new Date(isoDay(Date.now())+'T00:00:00'))/DAY);
     var dueTxt=days<0?'<span class="sd-late">Overdue by '+(-days)+' day'+(days===-1?'':'s')+'</span>':days===0?'Due today':'Due in '+days+' day'+(days===1?'':'s');
-    var bar='<span class="sd-bar" role="img" aria-label="'+pct+'% paid"><span style="width:'+pct+'%"></span></span>';
     var payStep=dis?step('bad','Disabled','No payments can be taken')
       :ps==='paid'?step('done','Paid in full',lastPay?dmyOf(lastPay.at)+' · '+esc(lastPay.type):'')
-      :step(live.length?'part':'todo',live.length?'Part paid · '+pct+'%':'Awaiting payment',dueTxt+(lastPay?'<br>Last payment '+dmyOf(lastPay.at)+' · '+esc(lastPay.type):''),bar);
+      :step('todo','Awaiting payment',dueTxt);
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):'by '+esc(s.by||'—')+'<br>'+when(s.at||s.date))+(s.quotationId?'<br>From quotation '+esc(s.quotationId):''))+
       (sends.length?sends.map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join(''):step('todo','Not sent yet','Email the invoice to the client'))+
       (lastRem?step('done',rems.length>1?rems.length+' reminders sent':'Reminder sent','Last sent '+(lastRem.by==='System'?'automatically':'by '+esc(lastRem.by||'—'))+'<br>'+when(lastRem.t)):'')+payStep;
@@ -20316,11 +20315,11 @@ var ACCOUNTANTS=['John Lee','Sarah Lee','Alex Ray','Priya Nair','Tom Hardy'];
 var ROLE_NAMES=['Accountant','Book Keeping','Tax Consultant','Receptionist','Branch Manager'];
 var STAFF_NAMES=['Alexander Doe','Jonny Walker','Matthew Ross','Perry Janes','Guy Hawkins','Robert Fox','Emma Stone','Liam Chen'];
 function branchSales(b){
-  var out=[], pays=['Paid','Unpaid','Partially paid'];
+  var out=[], pays=['Paid','Unpaid'];   // sales are paid in full at once
   var now=new Date(), amts=[800,1200,450,200,950,650,1500,300,720,560];
   for(var i=0;i<24;i++){
     var amt=amts[(i+b.id)%10];
-    var pay=pays[(Math.floor(i/6)+b.id)%3], pend=pay==='Paid'?0:pay==='Unpaid'?amt:Math.round(amt*0.25);
+    var pay=pays[(Math.floor(i/6)+b.id)%2], pend=pay==='Paid'?0:amt;
     var dt=new Date(now.getFullYear(), now.getMonth()-(i%6), 1+((i*5+b.id)%27));
     var paid=pay==='Paid';
     out.push({
@@ -20414,13 +20413,13 @@ function branchDetail(id,tab){
     var h='<div class="mini-bar">'+searchBox('Search by sale ID')+
       '<span class="lbl">'+I.filter+'Filter By:</span>'+selv('tfm','All months',monthOptions(),ui.fm)+
       sel('tf1','All Accountants',ACCOUNTANTS,ui.f1)+
-      sel('tf2','All Payment Status',['Paid','Unpaid','Partially paid'],ui.f2)+clearBtn()+'</div>';
+      sel('tf2','All Payment Status',['Paid','Unpaid'],ui.f2)+clearBtn()+'</div>';
 
     var total=rows.reduce(function(a,x){return a+x.amt;},0), pend=rows.reduce(function(a,x){return a+x.pend;},0);
-    var cnt={Paid:0,Unpaid:0,'Partially paid':0}; rows.forEach(function(x){cnt[x.pay]++;});
+    var cnt={Paid:0,Unpaid:0}; rows.forEach(function(x){cnt[x.pay]++;});
     var n=rows.length||1;
     var pct=function(k){ return Math.round(cnt[k]/n*100); };
-    var cols={Paid:'#059669',Unpaid:'#E11D48','Partially paid':'#F59E0B'};
+    var cols={Paid:'#059669',Unpaid:'#E11D48'};
 
     h+='<div class="ins">'+
       '<dl class="k"><dt>Total sales</dt><dd>'+money(total).replace('.00','')+'</dd></dl>'+

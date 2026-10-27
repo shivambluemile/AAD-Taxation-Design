@@ -14521,6 +14521,8 @@ table,td,th{font-size:13.5px}
 .pm-amt>span{font-size:18px;font-weight:600;color:var(--mute);margin-right:6px}
 .pm-amt input{flex:1;min-width:0;border:0;outline:0;background:none;font:inherit;font-size:20px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .pm-full{flex-shrink:0;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;font-size:12.5px;font-weight:600;color:var(--slate);cursor:pointer}.pm-full:hover{border-color:var(--orange);color:var(--orange-ink)}
+.pm-amt.is-ro{background:#F9FAFB}.pm-amt.is-ro:focus-within{border-color:#D6DBE1;box-shadow:none}.pm-amt.is-ro input{cursor:default}
+.sl-crlow{font-size:12.5px}
 .pm-left{margin:6px 0 0;font-size:12.5px;color:var(--mute);min-height:18px}.pm-left.ok{color:#047857;font-weight:600}
 .pm-types{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .pm-type{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
@@ -15190,10 +15192,10 @@ function paintSaleForm(focusId){
             '<button type="button" class="sl-drm" id="sf-discrm" title="Remove discount" aria-label="Remove discount">'+I.close+'</button></span>':'')+'</dt><dd>'+(d.showDisc?'−'+money(T.disc):'<button type="button" class="linkbtn" id="sf-discadd">'+I.plus+'Add discount</button>')+'</dd></div>'+
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>'+(T.anyGst?'GST applied (10%)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
-          (function(){ var bal=c?creditOf(c.id):0; if(!bal&&!d.useCredit) return '';
-            return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" aria-label="Client credit to apply, up to '+money(bal)+'"></span>'+
+          (function(){ var bal=c?creditOf(c.id):0, owed=Math.max(0,r2(T.total-SF.paid)); if(!bal&&!d.useCredit) return '';
+            return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" readonly aria-readonly="true" aria-label="Client credit applied: the full amount"></span>'+
               '<button type="button" class="sl-drm" id="sf-crrm" title="Don’t apply credit" aria-label="Don’t apply credit">'+I.close+'</button></span>':'')+'</dt>'+
-              '<dd>'+(d.useCredit?'−'+money(T.credit):'<button type="button" class="linkbtn" id="sf-cradd">'+I.plus+'Apply '+money(bal)+' credit</button>')+'</dd></div>'+
+              '<dd>'+(d.useCredit?'−'+money(T.credit):owed>0&&r2(bal)>=owed?'<button type="button" class="linkbtn" id="sf-cradd">'+I.plus+'Pay in full with credit</button>':'<span class="cl-muted sl-crlow" title="Credit can only pay the full amount">'+money(bal)+' available</span>')+'</dd></div>'+
               (e.credit?'<p class="ferr show sl-derr sl-crerr">'+esc(e.credit)+'</p>':''); })()+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
@@ -15207,7 +15209,9 @@ function paintSaleForm(focusId){
   wireSaleForm(focusId);
 }
 function liveTotals(){
-  var d=SF.d, T=saleTotals(d,SF.paid);
+  var d=SF.d;
+  if(d.useCredit){ d.credit=Math.max(0,r2(saleTotals(d,SF.paid).total-SF.paid)).toFixed(2); var ci=document.getElementById('sf-cr'); if(ci) ci.value=d.credit; }   // credit always pays the whole amount
+  var T=saleTotals(d,SF.paid);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
   var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,T.anyGst?money(T.gst):'Not applied',money(T.total)];
   var gl=ov.querySelectorAll('.qf-tot > div > dt')[2]; if(gl) gl.textContent=T.anyGst?'GST applied (10%)':'GST';
@@ -15235,7 +15239,7 @@ function wireSaleForm(focusId){
   function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.useCredit=false; d.credit=''; delete SF.errs.credit; SF.pick=''; delete SF.errs.client; delete SF.errs.onName; touch(); repaint('sf-on'); }
   var chg=document.getElementById('sf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint('sf-q'); };
   var ca=document.getElementById('sf-cradd'); if(ca) ca.onclick=function(){ var c=formClient(), T=saleTotals(d,SF.paid), owed=Math.max(0,r2(T.total-SF.paid));
-    d.useCredit=true; d.credit=Math.min(creditOf(c&&c.id),owed||creditOf(c&&c.id)).toFixed(2); touch(); repaint('sf-cr'); };
+    if(!(owed>0)||creditOf(c&&c.id)<owed) return; d.useCredit=true; d.credit=owed.toFixed(2); touch(); repaint(); };
   var crm=document.getElementById('sf-crrm'); if(crm) crm.onclick=function(){ d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint(); };
   var ci=document.getElementById('sf-cr'); if(ci) ci.oninput=function(){ d.credit=ci.value; if(SF.errs.credit){ delete SF.errs.credit; var g=ci.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-crerr'); if(er) er.remove(); } touch(); liveTotals(); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
@@ -15318,8 +15322,8 @@ function checkSale(){
   if(SF.paid>0&&T.total<SF.paid) e.total='The total can’t be less than the '+money(SF.paid)+' already paid';
   if(d.useCredit&&!e.total){ var cv=num(d.credit), bal=creditOf(d.clientId), owed=Math.max(0,r2(T.total-SF.paid));
     if(d.credit===''||!isFinite(cv)||cv<=0) e.credit='Enter the credit to apply, or remove it';
-    else if(r2(cv)>bal) e.credit='The client has only '+money(bal)+' credit';
-    else if(r2(cv)>owed) e.credit='That’s more than the '+money(owed)+' owed on this sale'; }
+    else if(r2(owed)>bal) e.credit='The client has only '+money(bal)+' credit, which doesn’t cover the full '+money(owed)+'. Remove the credit.';
+    else if(r2(cv)!==r2(owed)) e.credit='Credit must pay the full '+money(owed); }
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
   return e;
 }
@@ -15399,11 +15403,11 @@ function addPayment(s){
     '<div class="modal-body pm">'+
       '<div class="pm-sum"><div><span>Sale total</span><b>'+money(s.amount)+'</b></div><div><span>Paid so far</span><b>'+money(paid)+'</b></div><div class="due"><span>Pending</span><b>'+money(pend)+'</b></div></div>'+
       '<div><label class="flabel" for="p-amt">Amount received <span class="req-star">*</span></label>'+
-        '<div class="pm-amt"><span>$</span><input id="p-amt" inputmode="decimal" autocomplete="off" value="'+pend.toFixed(2)+'"><button type="button" class="pm-full" id="p-full">Full amount</button></div>'+
-        '<span class="ferr" id="p-amt-e"></span><p class="pm-left" id="p-left"></p></div>'+
+        '<div class="pm-amt is-ro"><span>$</span><input id="p-amt" value="'+pend.toFixed(2)+'" readonly aria-readonly="true"></div>'+
+        '<span class="ferr" id="p-amt-e"></span><p class="pm-left">The full amount is paid at once. Part payments aren’t accepted.</p></div>'+
       '<div><span class="flabel" id="p-type-l">Payment mode <span class="req-star">*</span></span><div class="pm-types" role="radiogroup" aria-labelledby="p-type-l">'+
-        PAY_TYPES.map(function(t){ var cr=t==='Client Credit', off=cr&&!(bal>0);
-          return '<button type="button" class="pm-type'+(t===P.type?' on':'')+'" role="radio" aria-checked="'+(t===P.type)+'" data-pt="'+esc(t)+'"'+(off?' disabled title="This client has no credit"':'')+'>'+
+        PAY_TYPES.map(function(t){ var cr=t==='Client Credit', off=cr&&r2(bal)<r2(pend);
+          return '<button type="button" class="pm-type'+(t===P.type?' on':'')+'" role="radio" aria-checked="'+(t===P.type)+'" data-pt="'+esc(t)+'"'+(off?' disabled title="'+(bal>0?'Not enough credit to pay the full amount':'This client has no credit')+'"':'')+'>'+
             '<i>'+PAY_IC[t]+'</i><b>'+esc(t)+'</b>'+(cr?'<small>'+money(bal)+' available</small>':'')+'</button>'; }).join('')+'</div></div>'+
       '<div class="pm-g2"><div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div>'+
         '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div>'+
@@ -15414,9 +15418,7 @@ function addPayment(s){
   dlg.querySelector('.modal').classList.add('pm-modal');
   var amtEl=document.getElementById('p-amt'), left=document.getElementById('p-left');
   var amtOf=function(){ return Number(String(amtEl.value).replace(/[$,\s]/g,'')); };
-  var paintLeft=function(){ var a=amtOf(), rest=r2(pend-(a>0?a:0));
-    left.className='pm-left'+(a>0&&rest===0?' ok':'');
-    left.textContent=!(a>0)||rest<0?'':rest===0?'This pays the sale in full':money(rest)+' will still be pending after this payment'; };
+  var paintLeft=function(){};
   var paintDoc=function(){ var d=P.doc, box=document.getElementById('p-doc');
     box.innerHTML=d?'<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><b title="'+esc(d.name)+'">'+esc(d.name)+'</b><small>'+fsizeOf(d.size)+'</small></span><button type="button" class="sf-rm" id="p-docrm" title="Remove" aria-label="Remove '+esc(d.name)+'">'+MI['delete']+'</button></div>'
       :'<label class="sf-drop" id="p-drop"><input type="file" id="p-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden><span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>Receipt or remittance · PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
@@ -15432,11 +15434,10 @@ function addPayment(s){
     drop.ondragleave=function(){ drop.classList.remove('drag'); };
     drop.ondrop=function(ev){ ev.preventDefault(); drop.classList.remove('drag'); take(ev.dataTransfer.files[0]); }; };
   paintLeft(); paintDoc();
-  amtEl.oninput=function(){ document.getElementById('p-amt-e').classList.remove('show'); paintLeft(); };
-  document.getElementById('p-full').onclick=function(){ amtEl.value=(P.type==='Client Credit'?Math.min(pend,bal):pend).toFixed(2); paintLeft(); amtEl.focus(); };
+
   dlg.querySelectorAll('[data-pt]').forEach(function(b){ b.onclick=function(){ P.type=b.getAttribute('data-pt');
     dlg.querySelectorAll('[data-pt]').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-checked',on); });
-    if(P.type==='Client Credit'&&amtOf()>bal){ amtEl.value=Math.min(pend,bal).toFixed(2); paintLeft(); } }; });
+ }; });
   dlg.querySelector('[data-x]').onclick=closeDlg; document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){
     if(paying) return;
@@ -15445,10 +15446,10 @@ function addPayment(s){
     reload(); var x=byId(s.id), owed=x?pendingOf(x):0;
     if(!x||x.status==='disabled'){ closeDlg(); render(); return toast('This sale can no longer take payments.',true); }
     if(!(amt>0)) return fieldErr('p-amt-e','Enter an amount above $0');
-    if(r2(amt)>owed) return fieldErr('p-amt-e','That’s more than the '+money(owed)+' still owed');
+    if(r2(amt)!==r2(owed)){ amtEl.value=owed.toFixed(2); return fieldErr('p-amt-e','The amount owed is now '+money(owed)+'. Check it and record the payment again.'); }
     if(!d||d>today) return fieldErr('p-date-e','Choose a date that isn’t in the future');
     if(d<isoDay(x.date)) return fieldErr('p-date-e','The payment can’t be before the sale date');
-    if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit');
+    if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit, which doesn’t cover the full amount');
     paying=true; go.disabled=true;
     var t=d===today?Date.now():new Date(d+'T12:00:00').getTime(), pid='P'+Date.now().toString(36);
     var stored=P.doc?putSaleFile(x.id+':'+pid,P.doc.file):Promise.resolve(null);

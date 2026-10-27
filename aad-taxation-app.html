@@ -15652,7 +15652,8 @@ function sendScreen(body,foot,cfg){
 function mailDialog(s,kind){
   var c=client(s), cr=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0]||{}, rem=kind==='remind', again=kind==='resend';
   var ctx=tplCtx({name:c.name,type:cr.type,entity:cr.entity,services:(s.items||[]).map(function(x){ return {name:x.name,price:(+x.qty||1)*(+x.price||0)}; }),staff:ME.name,kind:'invoice'});
-  ctx.invoice_number=s.id; ctx.invoice_amount=money(s.amount); ctx.amount_owing=money(pendingOf(s)); ctx.due_date=dmyOf(s.due); ctx.total_fee=money(s.amount);
+  var token=s.token||newToken(), link=portalLink('invoice',token);
+  ctx.invoice_link=link; ctx.invoice_number=s.id; ctx.invoice_amount=money(s.amount); ctx.amount_owing=money(pendingOf(s)); ctx.due_date=dmyOf(s.due); ctx.total_fee=money(s.amount);
   var title=rem?'Send payment reminder':again?'Resend invoice':'Send invoice';
   ov.innerHTML='<div class="drawer sf" role="dialog" aria-modal="true" aria-labelledby="ms-t">'+
     '<div class="modal-head"><h2 id="ms-t">'+title+' · '+esc(s.id)+'</h2><button id="ms-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -15665,11 +15666,23 @@ function mailDialog(s,kind){
       reload(); var x=byId(s.id); if(!x){ closeOv(); render(); return; }
       var to=[rec.emailTo,rec.smsTo].filter(Boolean).join(' and ');
       if(!rec.ok){ log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(rec.error||'The message couldn’t be delivered'),ok:false,to:rec.emailTo||rec.smsTo}); save(); return; }
+      x.token=token;
       if(rem) log(x,'reminder',{note:'To '+to+' · '+money(pendingOf(x))+' owing',to:rec.emailTo||rec.smsTo});
       else { var was=x.status; x.status='sent'; x.sentAt=Date.now(); log(x,was==='sent'?'resent':'sent',{note:'To '+to+(rec.emailTo?' · invoice '+x.id+'.pdf attached':''),to:rec.emailTo||rec.smsTo}); }
       if(!save()){ reload(); toast('The message went out but the sale couldn’t be updated. Try again.',true); return; }
-      closeOv(); render(); toast(rem?'Reminder sent to '+to:'Invoice '+x.id+' sent to '+to);
+      render(); sentPanel(x,to,link,rem);
     }});
+}
+/* PROTOTYPE ONLY: after sending, the link the client received, so the team can open the client's page */
+function sentPanel(x,to,link,rem){
+  var b=document.getElementById('msb'), f=document.getElementById('ms-foot'); if(!b) return;
+  document.getElementById('ms-t').textContent=(rem?'Reminder sent · ':'Invoice sent · ')+x.id;
+  b.innerHTML='<p class="qs-done">'+(rem?'The payment reminder for '+esc(x.id):esc(x.id))+' was sent to <b>'+esc(to)+'</b>. Please copy the below link on the next browser tab to view the invoice as the client sees it:</p>'+
+    '<div class="qs-lk"><span title="'+esc(link)+'">'+esc(link)+'</span><button class="act" id="ms-copy" title="Copy link" aria-label="Copy link">'+SD_IC.copy+'</button></div>'+
+    '<p class="rq-proto">This panel won’t be shown in the real design. It’s only here in the prototype to give you the link to preview what the client receives.</p>';
+  f.innerHTML='<span></span><button class="btn-primary" id="ms-done">Done</button>';
+  document.getElementById('ms-done').onclick=closeOv;
+  document.getElementById('ms-copy').onclick=function(){ try{ navigator.clipboard.writeText(link).then(function(){ toast('Link copied'); },function(){ toast('Link copied'); }); }catch(e){ toast('Link copied'); } };
 }
 function sendInvoice(s,again){ mailDialog(s,again?'resend':'send'); }
 var AUTO_REM=[['due',0,'on the due date'],['d7',7,'7 days after the due date']];
@@ -21106,14 +21119,14 @@ var SHORTCODES = [
   ['total_fee','Total fees'],['onboarding_link','Onboarding link'],['signing_link','Signing link'],['expiry_date','Link expiry date'],
   ['staff_name','Staff name'],['firm_name','Firm name'],['firm_phone','Firm phone'],
   ['quote_number','Quotation number'],['quote_amount','Quotation amount'],['valid_until','Valid until'],['quote_link','Quotation link'],
-  ['invoice_number','Invoice number'],['invoice_amount','Invoice amount'],['amount_owing','Amount owing'],['due_date','Due date']
+  ['invoice_number','Invoice number'],['invoice_amount','Invoice amount'],['amount_owing','Amount owing'],['due_date','Due date'],['invoice_link','Invoice link']
 ];
 /* which messages each shortcode belongs to (a code that isn't listed works everywhere) */
 var CODE_KINDS={onboarding_link:['onboarding'],signing_link:['engagement'],expiry_date:['onboarding','engagement'],
   quote_number:['quotation'],quote_amount:['quotation'],valid_until:['quotation'],quote_link:['quotation'],
-  invoice_number:['invoice'],invoice_amount:['invoice'],amount_owing:['invoice'],due_date:['invoice']};
+  invoice_number:['invoice'],invoice_amount:['invoice'],amount_owing:['invoice'],due_date:['invoice'],invoice_link:['invoice']};
 function codesFor(kind){ return SHORTCODES.filter(function(c){ var k=CODE_KINDS[c[0]]; return !k||k.indexOf(kind)>=0; }); }
-var LINK_CODE={engagement:'{signing_link}',onboarding:'{onboarding_link}',quotation:'{quote_link}'};   // every message must carry its link
+var LINK_CODE={engagement:'{signing_link}',onboarding:'{onboarding_link}',quotation:'{quote_link}',invoice:'{invoice_link}'};   // every message must carry its link
 var EMAIL_TEMPLATES = [
   { id:'eng-std', kind:'engagement', name:'Engagement letter · signature request',
     subject:'Please sign your engagement letter with {firm_name}',
@@ -21135,10 +21148,10 @@ var EMAIL_TEMPLATES = [
     body:'Hi {first_name},\n\nA quick reminder that your quotation {quote_number} for {quote_amount} is valid until {valid_until}. You can view and accept it here:\n{quote_link}\n\nThanks,\n{staff_name}' },
   { id:'inv-std', kind:'invoice', name:'Invoice · send to client',
     subject:'Invoice {invoice_number} from {firm_name}',
-    body:'Hi {first_name},\n\nPlease find attached invoice {invoice_number} for {invoice_amount}, due {due_date}.\n\nServices:\n{services}\n\nIf you have any questions, call us on {firm_phone}.\n\nKind regards,\n{staff_name}\n{firm_name}' },
+    body:'Hi {first_name},\n\nPlease find attached invoice {invoice_number} for {invoice_amount}, due {due_date}.\n\nServices:\n{services}\n\nView it online:\n{invoice_link}\n\nIf you have any questions, call us on {firm_phone}.\n\nKind regards,\n{staff_name}\n{firm_name}' },
   { id:'inv-rem', kind:'invoice', name:'Invoice · payment reminder',
     subject:'Payment reminder: invoice {invoice_number} from {firm_name}',
-    body:'Hi {first_name},\n\nThis is a friendly reminder that {amount_owing} is still owing on invoice {invoice_number}, due {due_date}.\n\nThe invoice is attached. If you’ve already paid, thank you and please ignore this email.\n\nKind regards,\n{staff_name}\n{firm_name}' }
+    body:'Hi {first_name},\n\nThis is a friendly reminder that {amount_owing} is still owing on invoice {invoice_number}, due {due_date}.\n\nThe invoice is attached, and you can view it here:\n{invoice_link}\n\nIf you’ve already paid, thank you and please ignore this email.\n\nKind regards,\n{staff_name}\n{firm_name}' }
 ];
 var SMS_TEMPLATES = [
   { id:'eng-sms', kind:'engagement', name:'Engagement letter · signature request', body:'Hi {first_name}, your {firm_name} engagement letter is ready to sign: {signing_link} (expires {expiry_date})' },
@@ -21146,8 +21159,8 @@ var SMS_TEMPLATES = [
   { id:'onb-sms-rem', kind:'onboarding', name:'Client onboarding · reminder', body:'Reminder from {firm_name}: finish your onboarding at {onboarding_link}' },
   { id:'qt-sms', kind:'quotation', name:'Quotation · send to client', body:'Hi {first_name}, your {firm_name} quotation {quote_number} for {quote_amount} is ready to view and accept: {quote_link} (valid until {valid_until})' },
   { id:'qt-sms-rem', kind:'quotation', name:'Quotation · reminder', body:'Reminder from {firm_name}: quotation {quote_number} is valid until {valid_until}. View it at {quote_link}' },
-  { id:'inv-sms', kind:'invoice', name:'Invoice · send to client', body:'Hi {first_name}, {firm_name} has emailed you invoice {invoice_number} for {invoice_amount}, due {due_date}.' },
-  { id:'inv-sms-rem', kind:'invoice', name:'Invoice · payment reminder', body:'Reminder from {firm_name}: {amount_owing} is still owing on invoice {invoice_number}, due {due_date}. Thank you.' }
+  { id:'inv-sms', kind:'invoice', name:'Invoice · send to client', body:'Hi {first_name}, your {firm_name} invoice {invoice_number} for {invoice_amount} is due {due_date}. View it here: {invoice_link}' },
+  { id:'inv-sms-rem', kind:'invoice', name:'Invoice · payment reminder', body:'Reminder from {firm_name}: {amount_owing} is still owing on invoice {invoice_number}, due {due_date}. View it at {invoice_link}' }
 ];
 function fillTpl(text,ctx){ return String(text||'').replace(/\{([a-z_]+)\}/g,function(m,k){ return ctx[k]!=null?String(ctx[k]):m; }); }
 function tplCtx(o){                                   // o: {name,type,entity,services,staff,link,kind,expires}
@@ -22142,6 +22155,33 @@ function quoteDeclined(q,c,doc){
     '<div class="qw-acts"><button type="button" class="btn pri" id="qw-pdf">'+IC.dl+'Download PDF</button></div></div>';
   document.getElementById('qw-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }
+/* ================= invoice page: the client views the invoice that was sent and can download it ================= */
+var INV_KEY='aad-invoices-v1';
+function invoiceNow(){ try{ var v=JSON.parse(localStorage.getItem(INV_KEY)||'null'); return v&&Array.isArray(v.list)?v.list.filter(function(x){ return x.token===TOKEN; })[0]:null; }catch(err){ return null; } }
+function invoiceDocOf(s,c){
+  var paid=Math.round((s.payments||[]).filter(function(p){ return !p.void; }).reduce(function(a,p){ return a+(+p.amount||0); },0)*100)/100;
+  var pend=s.status==='disabled'?0:Math.max(0,Math.round((s.amount-paid)*100)/100), to=s.onName||c.name;
+  var sub=s.subtotal!=null?s.subtotal:(s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0);
+  var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>: '+money(paid)+'</dd></div><div><dt>Balance due</dt><dd>: '+money(pend)+'</dd></div></dl>'+
+    '<p class="qd2-note">'+(pend>0?'Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.':'This invoice is paid in full. Thank you.')+'</p>';
+  return {kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
+    company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
+    items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
+    T:{sub:sub,disc:Math.round((+s.discountAmt||0)*100)/100,gst:s.gstMode==='none'?0:Math.round(s.amount/11*100)/100,total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:null,_pend:pend};
+}
+function paintInvoice(){
+  var s=invoiceNow();
+  if(!s) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
+  if(s.status!=='sent') return closed('x','This invoice isn’t available','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
+  ensureQuoteCss(document);
+  var c=quoteClient(s), doc=invoiceDocOf(s,c), paid=doc._pend<=0;
+  document.body.classList.add('qr-page');
+  app.innerHTML='<div class="hello"><h1>'+(paid?'This invoice is paid':'Your invoice is ready')+'</h1><p>Invoice '+e(s.id)+(paid?'':' · Due '+dmyOf(s.due))+'</p></div>'+
+    '<div class="card qr"><div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Invoice document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
+      '<div class="qw-acts"><button type="button" class="btn pri" id="iv-pdf">'+IC.dl+'Download PDF</button></div></div></div>';
+  document.getElementById('iv-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+}
+if(KIND==='invoice') paintInvoice();
 if(KIND==='quote') paintQuote();
 if(KIND==='onboard') bootOnboard();
 function bootOnboard(){
@@ -22934,7 +22974,7 @@ function submit(){
   if(window.innerWidth <= 860) document.body.classList.add('collapsed');
   window.AADPortalSrc=function(){ return source('portal'); };      // Clients uses this for Show Link previews
   // a client's secure link (#portal/onboard|sign|quote/<token>) opens only the client-facing page
-  var pm=(location.hash||'').match(/^#portal\/(onboard|sign|quote)\/([a-f0-9]{20,})$/);
+  var pm=(location.hash||'').match(/^#portal\/(onboard|sign|quote|invoice)\/([a-f0-9]{20,})$/);
   if(pm){
     document.body.classList.add('portal-mode');
     var pf=document.createElement('iframe'); pf.className='portal-frame'; pf.title='Client onboarding';

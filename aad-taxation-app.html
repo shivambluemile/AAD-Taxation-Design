@@ -14504,7 +14504,7 @@ table,td,th{font-size:13.5px}
 .sl-table th.r,.sl-table td.r{text-align:right}
 .sl-table .ar-sub{display:block;font-size:11px;color:var(--faint);margin-top:3px;white-space:nowrap}
 .sl-pend .ar-sub{display:flex;justify-content:flex-end}
-.state.p-unpaid i{background:#94A3B8}.state.p-partial i{background:#F59E0B}.state.p-paid i{background:#10B981}.state.p-overdue i{background:#FF5966}.state.p-overdue{color:#BE123C}
+.state.p-unpaid i{background:#94A3B8}.state.p-partial i{background:#F59E0B}.state.p-paid i{background:#10B981}.state.p-overdue i{background:#FF5966}.state.p-overdue{color:#BE123C}.state.p-failed i{background:#DC2626}.state.p-failed{color:#B91C1C}
 .sl-dis td,.sl-dis .qt-cn,.sl-dis .name-link .name{color:var(--faint)}
 .sl-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .sl-form .fin,.sl-mail .fin{height:42px}
@@ -14727,9 +14727,9 @@ function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" 
    place that reads or writes them; swap its two functions for the sales API without touching the screen. Clients come from the
    Clients store, staff and branches from the Staff module, services from Settings: nothing is copied. */
 var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disabled','s-dis']};
-var PAY={unpaid:'Unpaid',paid:'Paid',overdue:'Overdue'};   // a sale is paid in full at once: there's no part-paid state
+var PAY={unpaid:'Unpaid',paid:'Paid',overdue:'Overdue',failed:'Payment failed'};   // a sale is paid in full at once: there's no part-paid state
 var PAY_TYPES=['Bank Transfer','EFTPOS / Card','Cash','Client Credit'];   // older payments keep the type they were recorded with
-var EV={created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
+var EV={pay_failed:'Online payment failed',receipt_sent:'Payment confirmation sent',receipt_failed:'Payment confirmation not sent',client_paid:'Client says they’ve paid',link_revoked:'Client link revoked',created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
   payment:'Payment recorded',disabled:'Sale disabled',enabled:'Sale enabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
 var DUE_DAYS=14, DAY=864e5;
 /* the companies a sale can be issued from, per branch. PROTOTYPE ONLY: the same sample spread as Quotations, until branches record their own */
@@ -14822,7 +14822,9 @@ function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
 function paidOf(s){ return r2((s.payments||[]).filter(function(p){ return !p.void; }).reduce(function(a,p){ return a+p.amount; },0)); }
 function receivedOf(s){ return r2((s.payments||[]).filter(function(p){ return !p.void&&p.type!=='Client Credit'; }).reduce(function(a,p){ return a+p.amount; },0)); }   // money in; client credit was received earlier
 function pendingOf(s){ return s.status==='disabled'?0:Math.max(0,r2(s.amount-paidOf(s))); }
-function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); if(p<=0) return 'paid'; if(isoDay(s.due)<isoDay(Date.now())) return 'overdue'; return 'unpaid'; }
+function payStatus(s){ if(s.status==='disabled') return ''; var p=pendingOf(s); if(p<=0) return 'paid'; if(s.payFail&&s.payFail.at>lastPaidAt(s)) return 'failed'; if(isoDay(s.due)<isoDay(Date.now())) return 'overdue'; return 'unpaid'; }
+function lastPaidAt(s){ return (s.payments||[]).filter(function(p){ return !p.void; }).reduce(function(a,p){ return Math.max(a,p.at||0); },0); }
+function lastPayment(s){ return (s.payments||[]).filter(function(p){ return !p.void; }).slice().sort(function(a,z){ return z.at-a.at; })[0]||null; }
 
 /* ---------- filters: chosen above the table, applied with Filter ---------- */
 var DEFAULT_RANGE='this_month';
@@ -15022,6 +15024,9 @@ function actionsFor(s){
   if(!dis&&m&&pend>0) a.push(['pay','Add Payment']);
   if(!dis&&m&&pend>0&&s.status==='sent') a.push(['remind','Send Reminder']);
   a.push(['pdf','PDF']); a.push(['log','Log']);
+  if(pend<=0&&lastPayment(s)) a.push(['receipt','Download receipt']);
+  if(!dis&&s.status==='sent'&&s.token) a.push(['view','View client page']);
+  if(!dis&&isManager()&&s.token) a.push(['revoke','Revoke client link','danger']);
   if(!dis&&m) a.push(['quote','Convert To Quotation']);
   if(!dis&&isManager()) a.push(['disable','Disable','danger']);
   if(dis&&isManager()) a.push(['enable','Enable']);
@@ -15033,7 +15038,9 @@ var MI=(function(){ var s=function(p){ return '<svg width="16" height="16" viewB
     send:s('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/>'),resend:s('<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>'),pay:s('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>'),
     remind:s('<path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"/><path d="M13.7 20a2 2 0 0 1-3.4 0"/>'),pdf:s('<path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/>'),
     log:s('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),quote:s('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>'),
-    disable:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),enable:s('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>'),'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>')}; })();
+    disable:s('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),enable:s('<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/>'),'delete':s('<path d="M3 6h18"/><path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6"/><path d="M5.5 6l1 13.2A2 2 0 0 0 8.5 21h7a2 2 0 0 0 2-1.8L18.5 6"/><path d="M10 10.5v6M14 10.5v6"/>'),
+    receipt:s('<path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/>'),view:s('<path d="M14 4h6v6"/><path d="M20 4 11 13"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'),
+    revoke:s('<path d="M10 14a4 4 0 0 0 5.7 0l1.5-1.5M14 10a4 4 0 0 0-5.7 0L6.8 11.5"/><path d="M4 4l16 16"/>')}; })();
 var menuEl=null;
 function closeMenu(){ if(menuEl){ var b=content.querySelector('[data-menu="'+menuEl.dataset.s+'"]'); if(b) b.setAttribute('aria-expanded','false'); menuEl.remove(); menuEl=null; } }
 function openMenu(btn){
@@ -15062,7 +15069,10 @@ function doAction(k,id){
   reload(); var s=byId(id); if(!s){ render(); return toast('This sale no longer exists.',true); }
   ({edit:function(){ openSaleForm(s.id); },request:function(){ requestEdit(s); },review:function(){ reviewEdit(s); },send:function(){ sendInvoice(s,false); },resend:function(){ sendInvoice(s,true); },
     pay:function(){ addPayment(s); },remind:function(){ sendReminder(s); },pdf:function(){ if(!printInvoice(s)) toast('Allow pop-ups to open the PDF',true); },log:function(){ if(detailId===s.id&&ov.querySelector('.sd-drawer')){ sdTab='activity'; paintDetail(); } else openDetail(s.id,'activity'); },
-    quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },enable:function(){ enableSale(s); },'delete':function(){ deleteSale(s); }}[k]||function(){})();
+    quote:function(){ toQuotation(s); },disable:function(){ disableSale(s); },enable:function(){ enableSale(s); },'delete':function(){ deleteSale(s); },
+    receipt:function(){ var p=lastPayment(s); if(p&&!printReceipt(receiptOf(s,p,client(s).name))) toast('Allow pop-ups to download the receipt',true); },
+    view:function(){ if(!window.open(portalLink('invoice',s.token),'_blank')) toast('Allow pop-ups to open the client page',true); },
+    revoke:function(){ revokeLink(s); }}[k]||function(){})();
 }
 /* ---------- Add Sale / Edit Sale: the same form as Add Quotation, with the sale's own fields ---------- */
 var SF=null;   // {id, isNew, d:{...}, errs:{}, dirty, busy}
@@ -15449,6 +15459,7 @@ function addPayment(s){
     if(r2(amt)!==r2(owed)){ amtEl.value=owed.toFixed(2); return fieldErr('p-amt-e','The amount owed is now '+money(owed)+'. Check it and record the payment again.'); }
     if(!d||d>today) return fieldErr('p-date-e','Choose a date that isn’t in the future');
     if(d<isoDay(x.date)) return fieldErr('p-date-e','The payment can’t be before the sale date');
+    if(ref&&(x.payments||[]).some(function(p){ return !p.void&&String(p.ref||'').trim().toLowerCase()===ref.toLowerCase(); })) return fieldErr('p-amt-e','A payment with reference “'+ref+'” is already recorded on this sale');
     if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit, which doesn’t cover the full amount');
     paying=true; go.disabled=true;
     var t=d===today?Date.now():new Date(d+'T12:00:00').getTime(), pid='P'+Date.now().toString(36);
@@ -15460,10 +15471,28 @@ function addPayment(s){
         x.payments.push(p);
         log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});
         try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+type+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
-        commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id);
+        if(commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id)&&pendingOf(x)<=0) sendConfirmation(x.id,p.id);
       } finally { paying=false; }
     },function(){ paying=false; go.disabled=false; fieldErr('p-doc-e','The file couldn’t be stored. Try again, or remove it.'); });
   };
+}
+/* the payment confirmation email to the client, with the receipt attached; logged in Emails either way */
+function sendConfirmation(id,pid){
+  reload(); var x=byId(id); if(!x) return; var p=(x.payments||[]).filter(function(y){ return y.id===pid; })[0]; if(!p) return;
+  var c=client(x), m=receiptOf(x,p,c.name);
+  if(!validEmail(c.email||'')){ log(x,'receipt_failed',{ok:false,note:'No email address on file for '+c.name}); save(); render(); return; }
+  var body='Hi '+c.name+',\n\nThank you. We’ve received your payment of '+money(p.amount)+' for invoice '+x.id+' by '+p.type+' on '+dmyOf(p.at)+'. Invoice '+x.id+' is now paid in full.\n\nYour receipt '+m.no+' is attached.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name;
+  deliver({email:{to:c.email,subject:'Payment received: invoice '+x.id+' from '+FIRM.name,body:body,attachment:'Receipt '+m.no+'.pdf'}}).then(function(res){
+    reload(); var y=byId(id); if(!y) return;
+    log(y,res.ok?'receipt_sent':'receipt_failed',{ok:!!res.ok,to:c.email,note:'To '+c.email+' · '+(res.ok?'receipt '+m.no+' attached':(res.error||'not accepted'))}); save(); render();
+  });
+}
+/* stops the client's link working; a new send makes a new one */
+function revokeLink(s){
+  modal('<div class="confirm-body"><h3 id="m-t">Revoke the client link for '+esc(s.id)+'?</h3><p>The link already sent to the client stops working. Sending the invoice again creates a new link.</p></div>'+
+    '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-danger" id="m-go">Revoke link</button></div>');
+  document.getElementById('m-no').onclick=closeDlg;
+  document.getElementById('m-go').onclick=function(){ reload(); var x=byId(s.id); if(!x) return closeDlg(); delete x.token; delete x.tokenExp; log(x,'link_revoked',{note:'The client’s link no longer works'}); commit(x,'Client link revoked'); };
 }
 /* a payment's proof document, from this browser's storage */
 function openPayDoc(d){
@@ -15667,7 +15696,7 @@ function mailDialog(s,kind){
       reload(); var x=byId(s.id); if(!x){ closeOv(); render(); return; }
       var to=[rec.emailTo,rec.smsTo].filter(Boolean).join(' and ');
       if(!rec.ok){ log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(rec.error||'The message couldn’t be delivered'),ok:false,to:rec.emailTo||rec.smsTo}); save(); return; }
-      x.token=token;
+      x.token=token; x.tokenExp=Date.now()+INVOICE_LINK_DAYS*DAY;
       if(rem) log(x,'reminder',{note:'To '+to+' · '+money(pendingOf(x))+' owing',to:rec.emailTo||rec.smsTo});
       else { var was=x.status; x.status='sent'; x.sentAt=Date.now(); log(x,was==='sent'?'resent':'sent',{note:'To '+to+(rec.emailTo?' · invoice '+x.id+'.pdf attached':''),to:rec.emailTo||rec.smsTo}); }
       if(!save()){ reload(); toast('The message went out but the sale couldn’t be updated. Try again.',true); return; }
@@ -15778,12 +15807,12 @@ var SD_IC=(function(){ var v=function(p){ return '<svg viewBox="0 0 24 24" fill=
     copy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>',
     down:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>',
     dot:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>'}; })();
-var MAIL_EV=['sent','resent','send_failed','reminder','reminder_failed'];
+var MAIL_EV=['sent','resent','send_failed','reminder','reminder_failed','receipt_sent','receipt_failed'];
 var SD_TICK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>', SD_X='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>';
 function badge(st0){ var x=STATUS[st0]||[st0,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
 /* the header actions: the list menu's rules (status, permissions, edit requests); Log is the Activities tab here, Disable and Delete stay in the list */
 function detailActions(s){
-  var lab={edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation',enable:'Enable'};
+  var lab={receipt:'Receipt',view:'Client page',revoke:'Revoke link',edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation',enable:'Enable'};
   return actionsFor(s).filter(function(a){ return lab[a[0]]; }).map(function(a){ return [a[0],lab[a[0]]]; });
 }
 /* the saved totals; older sales (converted from quotations) have only the amount */
@@ -15849,6 +15878,7 @@ function paintDetail(keep){
     var dueTxt=days<0?'<span class="sd-late">Overdue by '+(-days)+' day'+(days===-1?'':'s')+'</span>':days===0?'Due today':'Due in '+days+' day'+(days===1?'':'s');
     var payStep=dis?step('bad','Disabled','No payments can be taken')
       :ps==='paid'?step('done','Paid in full',lastPay?dmyOf(lastPay.at)+' · '+esc(lastPay.type):'')
+      :ps==='failed'?step('bad','Online payment failed',when(s.payFail.at)+'<br>'+esc(s.payFail.reason||'')+'<br>'+dueTxt)
       :step('todo','Awaiting payment',dueTxt);
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):'by '+esc(s.by||'—')+'<br>'+when(s.at||s.date))+(s.quotationId?'<br>From quotation '+esc(s.quotationId):''))+
       (sends.length?sends.map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join(''):step('todo','Not sent yet','Email the invoice to the client'))+
@@ -15878,7 +15908,7 @@ function paintDetail(keep){
   if(sdTab==='emails'){
     b=mails.length?'<section class="vsec"><div class="qf-tbl qd-tbl"><table class="qd-t"><thead><tr><th>Email</th><th>Recipient</th><th>Date and time</th><th>Result</th><th>Sent by</th></tr></thead><tbody>'+
         mails.slice().sort(function(a,z){ return z.t-a.t; }).map(function(e){ var rem=/^reminder/.test(e.type), why=mailWhy(e), to=mailTo(e);
-          return '<tr><td><b>'+(rem?'Payment reminder':e.type==='resent'?'Invoice resent':'Invoice')+'</b></td><td>'+(to?esc(to):'<span class="cl-muted">—</span>')+'</td><td class="num">'+when(e.t)+'</td>'+
+          return '<tr><td><b>'+(rem?'Payment reminder':/^receipt/.test(e.type)?'Payment confirmation':e.type==='resent'?'Invoice resent':'Invoice')+'</b></td><td>'+(to?esc(to):'<span class="cl-muted">—</span>')+'</td><td class="num">'+when(e.t)+'</td>'+
             '<td>'+(e.ok===false?'<span class="state p-overdue"><i></i>Not sent</span>'+(why?'<small>'+esc(why)+'</small>':''):'<span class="state p-paid"><i></i>Sent</span>')+'</td><td>'+esc(e.by||'—')+'</td></tr>'; }).join('')+
         '</tbody></table></div></section>'
       :'<section class="vsec"><p class="cl-muted">The invoice hasn’t been emailed yet.</p></section>';
@@ -21511,6 +21541,43 @@ function printQuote(m){
     '<scr'+'ipt>setTimeout(function(){window.print()},700)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
   w.document.close(); return true;
 }
+/* ---------- payments: online gateway and receipts (Sales and the client's invoice page) ----------
+   PAY_GATEWAY is the online card checkout. It is NOT connected in this prototype: a server must create the checkout session
+   (for example Stripe Checkout) for the amount it reads from the saved sale, and mark the sale paid only from a verified,
+   signature-checked webhook, once per payment id. Until then Pay Now records the attempt as failed and offers bank transfer. */
+var PAY_GATEWAY=null;   // e.g. {provider:'stripe', checkoutUrl:'/api/invoices/:token/checkout'} once the backend exists
+var INVOICE_LINK_DAYS=90;   // a client's invoice link stops working this long after the last send
+function receiptOf(s,p,cname){
+  var list=(s.payments||[]).filter(function(x){ return !x.void; }), i=list.indexOf(p);
+  return {no:'RCT-'+String(s.id).replace(/^INV-/,'')+'-'+(i<0?1:i+1),saleId:s.id,at:p.at,to:s.onName||cname||'',method:p.type,ref:p.ref||'',amount:p.amount,total:s.amount,company:s.company||'AAD Taxation',branch:s.branch||''};
+}
+var RECEIPT_CSS='.rc-doc{max-width:640px;margin:0 auto;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:36px 40px;font-family:Inter,Arial,sans-serif;color:#111827}'+
+  '.rc-h{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-bottom:20px;border-bottom:3px solid #F18934}.rc-h img{height:56px}'+
+  '.rc-t{text-align:right}.rc-t b{display:block;font-family:Manrope,Inter,sans-serif;font-size:20px;font-weight:800}.rc-t span{display:block;margin-top:4px;font-size:12.5px;color:#6B7280}'+
+  '.rc-ok{display:flex;align-items:center;gap:10px;margin:22px 0;padding:12px 16px;border-radius:10px;background:#ECFDF5;color:#047857;font-size:14px;font-weight:600}'+
+  '.rc-ok i{width:22px;height:22px;border-radius:50%;background:#10B981;color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px}'+
+  '.rc-dl{margin:0;display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}.rc-dl dt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6B7280;margin-bottom:3px}.rc-dl dd{margin:0;font-size:14px;font-weight:600}'+
+  '.rc-amt{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding:16px 18px;border-radius:10px;background:#FFF7ED}.rc-amt span{font-size:13px;color:#9A3412;font-weight:600}.rc-amt b{font-size:22px;color:#C2410C}'+
+  '.rc-from{margin-top:24px;padding-top:16px;border-top:1px solid #E5E7EB;font-size:12.5px;color:#6B7280;line-height:1.6}.rc-from b{color:#111827}'+
+  '.rc-thanks{margin:16px 0 0;text-align:center;font-size:12px;color:#9CA3AF}';
+function receiptHtml(m){
+  var kv=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+v+'</dd></div>'; };
+  return '<div class="rc-doc"><div class="rc-h"><img src="'+DOC_LOGO+'" alt="AAD Taxation"><div class="rc-t"><b>Payment receipt</b><span>'+escH(m.no)+'</span></div></div>'+
+    '<div class="rc-ok"><i>✓</i>Payment received in full. Thank you.</div>'+
+    '<dl class="rc-dl">'+kv('Received from',escH(m.to))+kv('Invoice',escH(m.saleId))+kv('Payment date',dmyOf(m.at))+kv('Payment method',escH(m.method))+
+      kv('Reference',m.ref?escH(m.ref):'—')+kv('Invoice total',money(m.total))+'</dl>'+
+    '<div class="rc-amt"><span>Amount paid</span><b>'+money(m.amount)+'</b></div>'+
+    '<div class="rc-from"><b>'+escH(m.company)+'</b>'+(m.branch?' · '+escH(m.branch)+' branch':'')+'<br>'+DOC_FROM.phone+' · '+DOC_FROM.email+' · '+DOC_FROM.web+'</div>'+
+    '<p class="rc-thanks">This receipt confirms the payment above. Keep it for your records.</p></div>';
+}
+function printReceipt(m){
+  var w=window.open('','_blank'); if(!w) return false;
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Receipt '+escH(m.no)+' · '+escH(FIRM.name)+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">'+
+    '<style>*{box-sizing:border-box}body{margin:0;background:#E5E7EB;padding:24px}'+RECEIPT_CSS+'@page{size:A4;margin:16mm}@media print{body{background:#fff;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.rc-doc{border:0}}</style></head><body>'+receiptHtml(m)+
+    '<scr'+'ipt>setTimeout(function(){window.print()},700)</scr'+'ipt></body></html>');   // split so the page loader doesn't read it as the end of this script
+  w.document.close(); return true;
+}
 function escH(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); }
 var LETTER_CSS =
   '.el-doc{container-type:inline-size;display:flex;flex-direction:column;gap:14px;width:100%;max-width:794px;margin:0 auto}'+
@@ -21727,6 +21794,16 @@ button{background:none;border:0;cursor:pointer}
 .ty{text-align:center;padding:40px 36px 34px}
 .qw-eyebrow{font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--green,#059669);margin-bottom:6px}
 .qw-acts{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.qw-acts .btn{display:inline-flex;align-items:center;gap:8px}
+.iv-due{margin:0 0 14px;font-size:14px;color:var(--slate)}.iv-due b{font-size:20px;color:var(--ink);margin-left:6px}
+.iv-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.iv-opt{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:inherit;text-align:left;cursor:pointer}
+.iv-opt b{font-size:14px;color:var(--ink)}.iv-opt small{font-size:12px;color:var(--mute);line-height:1.4}.iv-opt.on{border-color:var(--orange);background:#FFFBF7}
+.iv-hint{margin:14px 0 0;font-size:12.5px;color:var(--mute);line-height:1.5}
+.iv-bank{margin:12px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#FAFBFC}
+.iv-bank dt{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}.iv-bank dd{margin:2px 0 0;font-size:14px;font-weight:600;color:var(--ink)}
+.qr .note{margin-top:18px}
+@media (max-width:560px){.iv-opts,.iv-bank{grid-template-columns:1fr}}
 .qv-acts{display:flex;gap:8px;flex-wrap:wrap}
 .ty-art{width:240px;max-width:80%;height:auto;display:block;margin:0 auto 10px}
 .ty-env{animation:tyFloat 3.2s ease-in-out infinite}.ty-lines{animation:tyLines 3.2s ease-in-out infinite}
@@ -22169,17 +22246,59 @@ function invoiceDocOf(s,c){
     items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
     T:{sub:sub,disc:Math.round((+s.discountAmt||0)*100)/100,gst:s.gstMode==='none'?0:Math.round(s.amount/11*100)/100,total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:null,_pend:pend};
 }
+var ivNote='';   // the message after a payment attempt or a "we've paid" note, shown above the buttons
+function saveInvoice(fn){ try{ var v=JSON.parse(localStorage.getItem(INV_KEY)||'null'); var x=v&&v.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return false; fn(x); localStorage.setItem(INV_KEY,JSON.stringify(v)); return x; }catch(err){ return false; } }
+function ivLog(x,type,note,ok){ (x.history=x.history||[]).push({type:type,by:x.onName||'Client',t:Date.now(),note:note,ok:ok!==false}); }
 function paintInvoice(){
   var s=invoiceNow();
   if(!s) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
+  if(s.tokenExp&&Date.now()>s.tokenExp) return closed('x','This link has expired','Contact '+FIRM.name+' on '+FIRM.phone+' and we’ll send you a new one.');
   if(s.status!=='sent') return closed('x','This invoice isn’t available','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
   ensureQuoteCss(document);
   var c=quoteClient(s), doc=invoiceDocOf(s,c), paid=doc._pend<=0;
   document.body.classList.add('qr-page');
   app.innerHTML='<div class="hello"><h1>'+(paid?'This invoice is paid':'Your invoice is ready')+'</h1><p>Invoice '+e(s.id)+(paid?'':' · Due '+dmyOf(s.due))+'</p></div>'+
     '<div class="card qr"><div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Invoice document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
-      '<div class="qw-acts"><button type="button" class="btn pri" id="iv-pdf">'+IC.dl+'Download PDF</button></div></div></div>';
+      (paid?'<div class="note ok">'+IC.tick+'<span>Payment received in full. Thank you.</span></div>':ivNote)+
+      '<div class="qw-acts">'+(paid?'<button type="button" class="btn sec" id="iv-pdf">'+IC.dl+'Download invoice</button><button type="button" class="btn pri" id="iv-rc">'+IC.dl+'Download receipt</button>'
+        :'<button type="button" class="btn sec" id="iv-pdf">'+IC.dl+'Download PDF</button><button type="button" class="btn pri" id="iv-pay">Pay now · '+money(doc._pend)+'</button>')+'</div></div></div>';
   document.getElementById('iv-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+  var rc=document.getElementById('iv-rc'); if(rc) rc.onclick=function(){ var l=(s.payments||[]).filter(function(p){ return !p.void; }).sort(function(a,z){ return z.at-a.at; })[0]; if(l&&!printReceipt(receiptOf(s,l,c.name))) toast('Allow pop-ups to download the receipt',true); };
+  var pn=document.getElementById('iv-pay'); if(pn) pn.onclick=function(){ payDialog(s,doc._pend); };
+}
+/* Pay now: card online (through the gateway) or bank transfer. The amount always comes from the saved sale */
+function payDialog(s,pend){
+  var o=document.createElement('div'); o.className='qp-ov'; o.id='iv-ov'; var how='card';
+  var bank='<dl class="iv-bank"><div><dt>Account name</dt><dd>'+DOC_PAY.name+'</dd></div><div><dt>BSB</dt><dd>'+DOC_PAY.bsb+'</dd></div><div><dt>Account number</dt><dd>'+DOC_PAY.acc+'</dd></div><div><dt>Reference</dt><dd>'+e(s.id)+'</dd></div><div><dt>Amount</dt><dd>'+money(pend)+'</dd></div></dl>';
+  var paint=function(){
+    o.innerHTML='<div class="qp-modal" role="dialog" aria-modal="true" aria-labelledby="iv-t">'+
+      '<div class="qp-mh"><h2 id="iv-t">Pay invoice '+e(s.id)+'</h2><button type="button" class="qp-mx" id="iv-x" aria-label="Close">'+IC.x+'</button></div>'+
+      '<div class="qp-mb"><p class="iv-due">Amount due <b>'+money(pend)+'</b></p><div class="iv-opts" role="radiogroup" aria-label="How would you like to pay?">'+
+        [['card','Card','Pay online with a debit or credit card'],['bank','Bank transfer','Transfer from your bank, quoting '+e(s.id)]].map(function(x){ var on=how===x[0];
+          return '<button type="button" class="iv-opt'+(on?' on':'')+'" role="radio" aria-checked="'+on+'" data-how="'+x[0]+'"><b>'+x[1]+'</b><small>'+x[2]+'</small></button>'; }).join('')+'</div>'+
+        (how==='bank'?'<p class="iv-hint">Use these details in your banking app. The payment is confirmed once it reaches our account.</p>'+bank:'<p class="iv-hint">You’ll pay the full amount on a secure checkout page. Your card details are never shared with us.</p>')+'</div>'+
+      '<div class="qp-mf"><button type="button" class="btn sec" id="iv-cancel">Cancel</button>'+
+        (how==='bank'?'<button type="button" class="btn pri" id="iv-sent">I’ve made the payment</button>':'<button type="button" class="btn pri" id="iv-go">Continue to secure checkout</button>')+'</div></div>';
+    var close=function(){ o.remove(); };
+    o.querySelector('#iv-x').onclick=close; o.querySelector('#iv-cancel').onclick=close;
+    [].forEach.call(o.querySelectorAll('[data-how]'),function(b){ b.onclick=function(){ how=b.getAttribute('data-how'); paint(); }; });
+    var go=o.querySelector('#iv-go'); if(go) go.onclick=function(){
+      /* the real checkout is opened by the server for the saved balance; without it, nothing is charged and the attempt is recorded as failed */
+      if(PAY_GATEWAY&&PAY_GATEWAY.checkoutUrl){ location.href=PAY_GATEWAY.checkoutUrl.replace(':token',TOKEN); return; }
+      var reason='Online card payments aren’t available yet';
+      saveInvoice(function(x){ x.payFail={at:Date.now(),reason:reason}; ivLog(x,'pay_failed',reason+' · '+money(pend)+' not charged',false); });
+      try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+s.id+':fail:'+Date.now(),kind:'pay',tone:'bad',aud:'admin',title:'Online payment failed',desc:s.id+': '+reason,go:{mod:'sales',id:s.id}}); }catch(err){}
+      ivNote='<div class="note bad"><span><b>Your payment didn’t go through.</b> '+reason+', and nothing was charged. You can pay by bank transfer instead: BSB '+DOC_PAY.bsb+', account '+DOC_PAY.acc+', reference '+e(s.id)+'.</span></div>';
+      close(); paintInvoice(); window.scrollTo(0,document.body.scrollHeight);
+    };
+    var sent=o.querySelector('#iv-sent'); if(sent) sent.onclick=function(){
+      saveInvoice(function(x){ ivLog(x,'client_paid','Paid '+money(pend)+' by bank transfer, reference '+x.id+' (to be confirmed)'); });
+      try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+s.id+':told:'+Date.now(),kind:'pay',tone:'warn',aud:'admin',title:'Client says they’ve paid',desc:s.id+': '+money(pend)+' by bank transfer. Check the account and record the payment.',go:{mod:'sales',id:s.id}}); }catch(err){}
+      ivNote='<div class="note ok">'+IC.tick+'<span>Thanks for letting us know. We’ll confirm your payment and email your receipt once it reaches our account.</span></div>';
+      close(); paintInvoice(); window.scrollTo(0,document.body.scrollHeight);
+    };
+  };
+  paint(); document.body.appendChild(o);
 }
 if(KIND==='invoice') paintInvoice();
 if(KIND==='quote') paintQuote();

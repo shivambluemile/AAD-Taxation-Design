@@ -14479,7 +14479,18 @@ table,td,th{font-size:13.5px}
 .sd-drawer .fgrid.sd-one{grid-template-columns:1fr;gap:18px}
 .sd-drawer .fgrid.sd-one p{margin:0;color:var(--ink)}
 .sd-drawer .sf-file{max-width:460px}
-.sf-refs{display:flex;flex-wrap:wrap;gap:6px}
+.sf-ms{position:relative}
+.pm-kv{display:flex;margin:0;padding-bottom:12px;border-bottom:1px solid var(--line)}.pm-kv>div{flex:1;padding:0 16px;border-left:1px solid var(--line)}.pm-kv>div:first-child{padding-left:0;border-left:0}
+.pm-kv dt{font-size:12px;color:var(--mute);font-weight:500}.pm-kv dd{margin:2px 0 0;font-family:Manrope,Inter,sans-serif;font-size:17px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}.pm-kv .due dd{color:var(--orange-ink)}
+.pm-note{margin:-6px 0 0;font-size:12.5px;color:var(--mute)}.pm-note b{color:var(--green);font-weight:600}
+.pm-crbox{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#F7FBF9}
+.pm-crck{display:flex;align-items:center;gap:10px;cursor:pointer}.pm-crck b{display:block;font-size:13.5px;font-weight:600;color:var(--ink)}.pm-crck small{display:block;font-size:12px;color:var(--green);font-weight:600}
+.pm-crin{display:flex;align-items:center;gap:4px;height:36px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:#fff;width:140px}.pm-crin[hidden]{display:none}.pm-crin:focus-within{border-color:var(--orange)}
+.pm-crin span{color:var(--mute);font-size:13px}.pm-crin input{border:0;outline:0;width:100%;text-align:right;font:inherit;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;background:none}.sf-mst{display:flex!important;flex-wrap:wrap;align-items:center;gap:6px;min-height:40px;height:auto!important;padding:5px 34px 5px 8px!important;cursor:pointer;position:relative}
+.sf-mst>svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--mute)}.sf-ms.open .sf-mst{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+.sf-msph{padding-left:6px;color:#9AA3B1;font-size:13.5px}.sf-tag{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 4px 0 10px;border-radius:999px;background:var(--orange-soft);color:var(--orange-ink);font-size:12.5px;font-weight:600}
+.sf-tag button{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;color:inherit}.sf-tag button:hover{background:rgba(194,99,15,.12)}.sf-tag button svg{width:11px;height:11px}
+.sf-msd{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30}
 .pmx-row{cursor:pointer}.pmx-row:hover td,.pmx-row.on td{background:#FFF9F3}.pmx-n{display:inline-flex;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:#F1F2F4;font-size:11px;font-weight:700;align-items:center;justify-content:center}.mf-tg.on .pmx-n{background:#fff}
 .pmx-table td{vertical-align:middle}.pmx-cl{text-align:left}.pmx-owe{color:var(--red);font-weight:700}.pmx-in{color:var(--green);font-weight:700}.pmx-even{color:var(--mute);font-weight:600}.pmx-out{color:var(--red)}.pmx-late{color:var(--red)!important;font-size:11.5px;font-weight:600}
 .pmx-pager{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-size:12.5px;color:var(--mute);border-top:1px solid var(--line)}
@@ -14487,7 +14498,8 @@ table,td,th{font-size:13.5px}
 .pmx-head{align-items:flex-start;gap:16px;flex-wrap:wrap}.pmx-head .qt-person{gap:12px;align-items:center}.pmx-head h1{margin:0;font-size:22px}.pmx-sub{margin:2px 0 0;font-size:12.5px;color:var(--mute)}.pmx-head .ph-acts{flex-wrap:wrap;gap:8px}.pmx-head .ph-acts svg{width:15px;height:15px}
 .pmx-stats .stat.pmx-s-owe dd{color:var(--red)}.pmx-stats .stat.pmx-s-in dd{color:var(--green)}.pmx-stats .pmx-s-net dd span{font-size:13px}
 .pmx-hint{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 12px;border-radius:8px;background:#FFF7ED;border:1px solid #FED7AA;color:#9A3412;font-size:12.5px}.pmx-hint svg{width:15px;height:15px;flex-shrink:0}
-.pmx-card{padding:0;overflow:hidden}.pmx-card .btabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.pmx-card .btabs button{padding:12px 12px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;align-items:center}.pmx-card .btabs button:hover{color:var(--ink)}.pmx-card .btabs button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}.pmx-card .tab-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;margin-left:7px;border-radius:999px;background:#F3F4F6;color:var(--mute);font-size:11px;font-weight:700}.pmx-card .btabs button.on .tab-n{background:var(--orange-soft);color:var(--orange-ink)}.pmx-card .btabs{padding:0 16px}.pmx-body{overflow-x:auto}.pmd-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 14px}.pmd-sum .stat{background:#fff;padding:10px 14px;min-width:0}.pmd-sum dt{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pmd-sum dd{margin:4px 0 0;font-family:Manrope,Inter,sans-serif;font-size:16px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}.pmd-sum .pmx-s-owe dd{color:var(--red)}.pmd-sum .pmx-s-in dd{color:var(--green)}.pmd-drawer .pmx-hint{margin:-4px 0 14px}.pmd-drawer .sd-head .dhead-acts .btn-ghost svg{width:15px;height:15px}
+.pmx-card{padding:0;overflow:hidden}.pmx-card .btabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}.pmx-card .btabs button{padding:12px 12px;font-size:13.5px;font-weight:600;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;align-items:center}.pmx-card .btabs button:hover{color:var(--ink)}.pmx-card .btabs button.on{color:var(--orange-ink);border-bottom-color:var(--orange)}.pmx-card .tab-n{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 6px;margin-left:7px;border-radius:999px;background:#F3F4F6;color:var(--mute);font-size:11px;font-weight:700}.pmx-card .btabs button.on .tab-n{background:var(--orange-soft);color:var(--orange-ink)}.pmx-card .btabs{padding:0 16px}.pmx-body{overflow-x:auto}.sd-head .dpmain{flex:1 1 auto!important;min-width:0}.sd-head .dpmain h2{white-space:normal;overflow-wrap:anywhere;min-width:0}.sd-head .sd-cl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}.sd-head .dhead-acts{flex:0 0 auto!important;flex-wrap:nowrap!important}.sd-head .dhead-acts>*{white-space:nowrap}
+.pmd-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:0 0 14px}.pmd-sum .stat{background:#fff;padding:10px 14px;min-width:0}.pmd-sum dt{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pmd-sum dd{margin:4px 0 0;font-family:Manrope,Inter,sans-serif;font-size:16px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}.pmd-sum .pmx-s-owe dd{color:var(--red)}.pmd-sum .pmx-s-in dd{color:var(--green)}.pmd-drawer .pmx-hint{margin:-4px 0 14px}.pmd-drawer .sd-head .dhead-acts .btn-ghost svg{width:15px;height:15px}
 .pmx-t small{display:block;font-size:11.5px;color:var(--mute);margin-top:2px}.pmx-empty{padding:28px 16px;text-align:center}.pmx-foot{margin:0;padding:10px 14px;font-size:12px;color:var(--mute);border-top:1px solid var(--line)}
 .pmx-led .pmx-bad td{background:#FFFBFB}.pmx-k{display:inline-flex;height:22px;align-items:center;padding:0 8px;border-radius:999px;font-size:11.5px;font-weight:600;background:#F1F2F4;color:var(--slate);white-space:nowrap}
 .pmx-k.k-overpayment,.pmx-k.k-unallocated,.pmx-k.k-opening,.pmx-k.k-returned{background:var(--green-soft);color:var(--green)}.pmx-k.k-applied{background:#EEF2FF;color:#4338CA}.pmx-k.k-refund,.pmx-k.k-reversal{background:#FEF2F2;color:var(--red)}
@@ -14502,6 +14514,23 @@ table,td,th{font-size:13.5px}
 .sl-other dt,.sl-other dd{color:var(--mute)!important;font-size:12.5px!important}.sl-allown dt,.sl-allown dd{font-weight:700!important;color:var(--ink)!important}
 .sl-cown{color:var(--orange-ink)!important;font-weight:600}
 .sd-tot{border-top:1px dashed var(--line);padding-top:6px}.sd-tot dt,.sd-tot dd{font-weight:700;color:var(--ink)}.sd-cr{color:var(--green);font-weight:700}.sd-stmt{margin-top:8px;font-size:12.5px}.sd-refs{display:flex;flex-wrap:wrap;gap:4px}.sd-refs span{display:inline-flex;height:22px;align-items:center;padding:0 8px;border-radius:999px;background:#F6F7F9;border:1px solid var(--line);font-size:12px;font-weight:600}
+.sf-fc{position:relative}.sf-fcrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sf-fcrow small{font-size:12px;color:var(--mute)}
+.sf-fc.drag .sf-fcrow{outline:2px dashed var(--orange);outline-offset:4px;border-radius:8px}
+.sf-fcount{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:8px;background:var(--orange-soft);color:var(--orange-ink);font-size:13px;font-weight:600}
+.sf-fcount svg{width:13px;height:13px;transition:transform .15s}.sf-fcount.on svg{transform:rotate(180deg)}.sf-fcount:hover{filter:brightness(.97)}
+.sf-fpop{position:absolute;left:0;top:calc(100% + 6px);z-index:30;width:min(460px,100%);border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 10px 24px rgba(15,23,42,.1);overflow:hidden}.sf-fpop[hidden]{display:none}
+.sf-fpop .sf-frow:last-of-type{border-bottom:1px solid var(--line)}.sf-fpopf{margin:0;padding:8px 12px;font-size:11.5px;color:var(--mute);background:#FAFBFC}
+.sf-fbox{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden;transition:background .15s,box-shadow .15s}.sf-fbox.drag{background:var(--orange-soft);box-shadow:0 0 0 2px var(--orange)}
+.sf-frow{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 12px;border-bottom:1px solid var(--line)}.sf-frow .ar-ft{flex-shrink:0}
+.sf-fmeta{min-width:0;flex:1}.sf-fmeta b{display:block;font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sf-fmeta small{display:block;font-size:11.5px;color:var(--mute);margin-top:1px}
+.sf-fopen{cursor:pointer}.sf-fopen:hover{color:var(--orange-ink);text-decoration:underline;text-underline-offset:2px}.sf-facts{display:flex;gap:4px;flex-shrink:0}.sf-facts .act svg{width:15px;height:15px}
+.sf-fadd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0;padding:10px 12px;cursor:pointer}.sf-fadd:hover{background:#FFFAF5}.sf-fadd.off{cursor:default;background:none}
+.sf-faddl{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--orange-ink)}.sf-faddl svg{width:13px;height:13px}.sf-fadd small{font-size:12px;color:var(--mute)}
+.sf-fbox.ro .sf-frow:last-child{border-bottom:0}.sf-fbox>.sf-frow:last-child:not(:only-child){border-bottom:1px solid var(--line)}
+.sf-att{border-radius:8px;transition:background .15s,box-shadow .15s}.sf-att.drag{background:var(--orange-soft);box-shadow:0 0 0 2px var(--orange)}.sf-attrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sf-attrow small{font-size:12px;color:var(--mute)}
+.sf-attlist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sf-attf{display:inline-flex;align-items:center;gap:7px;max-width:100%;height:32px;padding:0 4px 0 6px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:12.5px}
+.sf-attf .ar-ft{height:20px;font-size:9.5px;padding:0 5px}.sf-attf b{font-weight:600;color:var(--ink);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sf-attf small{color:var(--mute);font-size:11.5px;white-space:nowrap}
+.sf-attf button{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;color:var(--mute)}.sf-attf button:hover{background:#FEF2F2;color:var(--red)}.sf-attf button svg{width:12px;height:12px}
 .sf-docs{border-radius:10px;transition:background .15s,box-shadow .15s}.sf-docs.drag{background:var(--orange-soft);box-shadow:0 0 0 2px var(--orange) inset}
 .sf-dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}.sf-dgrid .sf-file{padding:8px 8px 8px 10px;gap:10px;min-width:0}.sf-dgrid .sf-fn{min-width:0;overflow:hidden}.sf-dgrid .sf-fn b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sf-dhint{display:flex;align-items:center;gap:6px;margin:8px 0 0;font-size:12px;color:var(--mute)}.sf-dhint svg{width:14px;height:14px}
@@ -14791,7 +14820,10 @@ function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" 
    Clients store, staff and branches from the Staff module, services from Settings: nothing is copied. */
 var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disabled','s-dis']};
 var PAY={unpaid:'Unpaid',partial:'Partially paid',paid:'Paid',overdue:'Overdue',failed:'Payment failed'};   // an invoice can be paid in several payments
-var PAY_TYPES=['Bank Transfer','EFTPOS / Card','Cash','Client Credit'];   // older payments keep the type they were recorded with
+/* payment modes are set in Settings → Payment Modes; Client Credit is always there. Older payments keep the type they were recorded with */
+var PM_KEY='aad-payment-modes-v1';
+function payModes(){ var v=null; try{ v=JSON.parse(localStorage.getItem(PM_KEY)||'null'); }catch(e){} return Array.isArray(v)&&v.length?v.filter(function(x){ return x.active!==false; }).map(function(x){ return x.name; }):['Bank Transfer','EFTPOS / Card','Cash']; }
+var PAY_TYPES=payModes().concat(['Client Credit']);
 var EV={client_accepted:'Signed and accepted by the client',client_declined:'Declined by the client',pay_failed:'Online payment failed',receipt_sent:'Payment confirmation sent',receipt_failed:'Payment confirmation not sent',client_paid:'Client says they’ve paid',link_revoked:'Client link revoked',created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
   payment:'Payment recorded',payment_deleted:'Payment deleted',credit_added:'Overpayment kept as client credit',disabled:'Sale disabled',enabled:'Sale enabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
 var DUE_DAYS=14, DAY=864e5;
@@ -14889,7 +14921,7 @@ var DevData={
 
 /* ---------- load ---------- */
 var st=null, loadErr=null, clients=[];
-function reload(){ try{ st=SaleStore.load(); clients=loadClients(); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
+function reload(){ PAY_TYPES=payModes().concat(['Client Credit']); PM_METHODS=payModes(); try{ st=SaleStore.load(); clients=loadClients(); st.list.forEach(normalise); loadErr=null; }catch(e){ st=null; loadErr=e; } }
 function save(){ return SaleStore.save(st); }
 function client(s){ var c=clients.filter(function(x){ return String(x.id)===String(s.clientId); })[0]; return c?{id:c.id,name:c.name,email:c.email||'',type:c.type,entity:c.entity}:{name:s.clientName||'Client no longer on file',email:'',entity:''}; }
 function byId(id){ return st.list.filter(function(s){ return s.id===id; })[0]; }
@@ -15191,7 +15223,7 @@ function saleTotals(d,paid){
   var total=r2(sub-disc); return {sub:sub,disc:r2(disc),gst:sub>0?r2(base*(total/sub)/11):0,anyGst:base>0,total:total,credit:r2(cr),pending:Math.max(0,r2(total-(paid||0)-cr))};
 }
 function formClient(){ return SF.d.clientId!=null?clients.filter(function(c){ return String(c.id)===String(SF.d.clientId); })[0]:null; }
-function openSaleForm(id){
+function openSaleForm(id){ FILE_OPEN.sf=false;
   reload(); var s=id?byId(id):null;
   if(id&&!s) return toast('This sale no longer exists.',true);
   if(s&&s.status==='disabled') return toast('A disabled sale can’t be edited.',true);
@@ -15220,6 +15252,46 @@ function clientMatches(q){
 /* the upload rules and look of Add Shift's documents (Attendance): PDF, JPG, PNG or Word, 5 MB */
 var DOC_EXT=['pdf','jpg','jpeg','png','doc','docx'], DOC_MAX=5*1048576;
 var DOC_LIMIT=10;
+var CLIP='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 11-8.6 8.6a5 5 0 0 1-7-7l8.5-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.3-2.3l7.9-8"/></svg>';
+function upWhen(t){ return t?whenOf(t).replace(' · ',', '):''; }
+/* one uploader for every file field: Upload files button, a hint, and the files as chips */
+/* the file field: Attach files, and a "2 files attached" pill that opens the list (download, remove). Files can be dropped on it */
+var FILE_OPEN={};
+function fileField(id,files,hint,max){ var room=files.length<max, open=!!FILE_OPEN[id]&&files.length>0;
+  return '<div class="sf-fc" id="'+id+'-drop"><div class="sf-fcrow">'+
+      (room?'<label class="btn-ghost btn-sm sf-upbtn" for="'+id+'-file">'+CLIP+'Attach files</label><input type="file" id="'+id+'-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple hidden>':'')+
+      (files.length?'<button type="button" class="sf-fcount'+(open?' on':'')+'" data-'+id+'tog aria-expanded="'+open+'">'+files.length+' file'+(files.length===1?'':'s')+' attached'+I.chev+'</button>':'<small>'+hint+'</small>')+
+    '</div>'+
+    (files.length?'<div class="sf-fpop"'+(open?'':' hidden')+'>'+files.map(function(x,i){ return fileRow(x,i,id,true); }).join('')+'<p class="sf-fpopf">'+files.length+' of '+max+' files · '+hint+'</p></div>':'')+'</div>'; }
+/* one file: type, name, size, when and who uploaded it; download, and remove while editing */
+function fileRow(x,i,id,edit){
+  return '<div class="sf-frow">'+ftag(x.name)+'<div class="sf-fmeta"><b title="'+esc(x.name)+'">'+esc(x.name)+'</b><small>'+fsizeOf(x.size)+(x.at?' · '+upWhen(x.at):'')+(x.by?' · '+esc(x.by):'')+'</small></div>'+
+    '<span class="sf-facts"><button type="button" class="act" data-'+id+'dl="'+i+'" title="Download" aria-label="Download '+esc(x.name)+'">'+SD_IC.down+'</button>'+
+    (edit?'<button type="button" class="act danger" data-'+id+'rm="'+i+'" title="Remove" aria-label="Remove '+esc(x.name)+'">'+MI['delete']+'</button>':'')+'</span></div>'; }
+/* a file picked in this form downloads from the browser; a saved one from storage */
+/* a click outside an open file list closes it */
+document.addEventListener('mousedown',function(e){ [].forEach.call(document.querySelectorAll('.sf-fc'),function(fc){ var p=fc.querySelector('.sf-fpop'); if(p&&!p.hidden&&!fc.contains(e.target)){ p.hidden=true; FILE_OPEN[fc.id.replace(/-drop$/,'')]=false; var t=fc.querySelector('.sf-fcount'); if(t){ t.classList.remove('on'); t.setAttribute('aria-expanded','false'); } } }); });
+function downloadFile(x){ if(!x) return; if(x.file){ var u=URL.createObjectURL(x.file), a=document.createElement('a'); a.href=u; a.download=x.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(u); },30000); } else openDoc(x,true); }
+/* checks picked or dropped files; returns the messages for any that can't be added */
+function addFiles(list,files,max){ var bad=[];
+  [].slice.call(files||[]).forEach(function(f){ var ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(list.length>=max) bad.push('Only '+max+' files can be attached');
+    else if(DOC_EXT.indexOf(ext)<0) bad.push(f.name+' isn’t a PDF, JPG, PNG or Word file');
+    else if(f.size>DOC_MAX) bad.push(f.name+' is larger than 5 MB');
+    else if(!f.size) bad.push(f.name+' is empty');
+    else if(list.some(function(x){ return x.name===f.name&&x.size===f.size; })) bad.push(f.name+' is already attached');
+    else list.push({name:f.name,size:f.size,type:f.type||ext,file:f,at:Date.now(),by:ME.name}); });
+  return bad.filter(function(x,i){ return bad.indexOf(x)===i; }).join('. ')+(bad.length?'.':''); }
+function wireFiles(root,id,list,after){
+  var fi=root.querySelector('#'+id+'-file'), dz=root.querySelector('#'+id+'-drop'), go=function(files){ var n=list.length, m=addFiles(list,files,DOC_LIMIT); if(list.length>n) FILE_OPEN[id]=true; after(m); };
+  var tg=root.querySelector('[data-'+id+'tog]'); if(tg) tg.onclick=function(){ var p=dz.querySelector('.sf-fpop'); FILE_OPEN[id]=p.hidden; p.hidden=!p.hidden; tg.classList.toggle('on',!p.hidden); tg.setAttribute('aria-expanded',String(!p.hidden)); };
+  if(fi&&dz){ fi.onchange=function(){ go(fi.files); fi.value=''; };
+    dz.ondragover=function(ev){ ev.preventDefault(); dz.classList.add('drag'); }; dz.ondragleave=function(){ dz.classList.remove('drag'); };
+    dz.ondrop=function(ev){ ev.preventDefault(); dz.classList.remove('drag'); go(ev.dataTransfer.files); }; }
+  [].forEach.call(root.querySelectorAll('[data-'+id+'rm]'),function(b){ b.onclick=function(){ list.splice(+b.getAttribute('data-'+id+'rm'),1); after(''); }; });
+  [].forEach.call(root.querySelectorAll('[data-'+id+'dl]'),function(b){ b.onclick=function(){ downloadFile(list[+b.getAttribute('data-'+id+'dl')]); }; });
+}
+function payDocs(p){ return p.docs&&p.docs.length?p.docs:p.doc?[p.doc]:[]; }
 var REFERRAL_SERVICES=['Business Loan','Home Loan','Vehicle Loan','Asset Loan','Public & Products Liability','Property Damage Cover'];
 var DOC_UP='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>';
 var FT={pdf:['PDF','#FDECEC','#C2410C'],jpg:['JPG','#E8F1FD','#2563EB'],jpeg:['JPG','#E8F1FD','#2563EB'],png:['PNG','#E8F1FD','#2563EB'],doc:['DOC','#EEF2FF','#4F46E5'],docx:['DOC','#EEF2FF','#4F46E5']};
@@ -15253,11 +15325,8 @@ function paintSaleForm(focusId){
       '<div class="qf-rm"><button type="button" class="act danger" data-rm="'+i+'" title="Remove line" aria-label="Remove line '+(i+1)+'"'+(d.items.length===1&&!x.svcId?' disabled':'')+'>'+MI['delete']+'</button></div>'+
       (lineErr?'<span class="ferr show qf-rerr">'+esc(lineErr)+'</span>':'')+'</div>';
   }).join('');
-  var room=d.docs.length<DOC_LIMIT;
-  var doc='<div class="sf-docs'+(d.docs.length?'':' empty')+'" id="sf-drop">'+(d.docs.length?'<div class="sf-dgrid">'+d.docs.map(function(x,i){ return '<div class="sf-file">'+ftag(x.name)+'<span class="sf-fn"><b title="'+esc(x.name)+'">'+esc(x.name)+'</b><small>'+fsizeOf(x.size)+'</small></span>'+
-      '<button type="button" class="sf-rm" data-docrm="'+i+'" title="Remove" aria-label="Remove '+esc(x.name)+'">'+MI['delete']+'</button></div>'; }).join('')+'</div>'+(room?'<p class="sf-dhint">'+DOC_UP+'Drop more files here, or use Upload files</p>':'')
-    :'<label class="sf-dzone" for="sf-file"><span class="sf-dic">'+DOC_UP+'</span><span><b>Drag files here or click to upload</b><small>Engagement letters, ID, statements · PDF, JPG, PNG or Word · up to 5 MB each</small></span></label>')+'</div>'+err('doc');
-  var docBtn=room?'<label class="btn-ghost btn-sm sf-upbtn" for="sf-file">'+I.plus+'Upload files</label><input type="file" id="sf-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple hidden>':'<span class="sf-dfull">'+DOC_LIMIT+' of '+DOC_LIMIT+' files</span>';
+  /* documents: the shared uploader; files can also be dropped on the field */
+  var doc=fileField('sf',d.docs,'PDF, JPG, PNG or Word, 5 MB each',DOC_LIMIT)+err('doc');
   var card=function(title,sub,body,extra){ return '<section class="qf-sec"><div class="qf-ch"><div><h3>'+title+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(extra||'')+'</div>'+body+'</section>'; };
   ov.innerHTML='<div class="drawer sf qf qf2 sl-sf" role="dialog" aria-modal="true" aria-labelledby="sf-t">'+
     '<div class="modal-head"><div><h2 id="sf-t">'+(SF.isNew?'Add Sale':'Edit Sale · '+esc(SF.id))+'</h2></div><button id="sf-x" aria-label="Close">'+I.close+'</button></div>'+
@@ -15276,14 +15345,18 @@ function paintSaleForm(focusId){
         '<div class="qf-items"><div class="qf-tbl" role="table" aria-label="Sale lines"><div class="qf-thead" aria-hidden="true"><span></span><span>Category</span><span>Item</span><span>Description</span><span class="r">Qty</span><span class="r">Rate</span><span class="r">Amount</span><span></span></div>'+
         '<div class="qf-rows">'+lines+'</div></div>'+err('items')+
         '<button type="button" class="qf-add" id="sf-add"'+(d.items.length>=svc.length?' disabled':'')+'>'+I.plus+'Add another line</button></div>')+
-      card('Documents'+(d.docs.length?' <span class="sf-dn">'+d.docs.length+'</span>':''),'Files kept with this sale for the team. They aren’t sent to the client.',doc,docBtn)+
       '<div class="qf-bottom">'+
         '<section class="qf-sec qf-notes">'+
           '<div><label class="flabel" for="sf-cn">Customer notes</label><textarea class="ftext" id="sf-cn" data-sf="customerNotes" rows="3" maxlength="500" placeholder="Thanks for your business.">'+esc(d.customerNotes)+'</textarea><small class="qf-hint">Shown on the invoice.</small></div>'+
           '<div><label class="flabel" for="sf-tc">Terms and conditions</label><textarea class="ftext" id="sf-tc" data-sf="terms" rows="4" maxlength="2000" placeholder="Enter the terms and conditions of your business to be displayed in your transaction">'+esc(d.terms)+'</textarea>'+
             '<label class="qf-tdef"><input type="checkbox" id="sf-tdef"'+(d.termsDefault?' checked':'')+'><span>Use these terms by default on every new sale</span></label></div>'+
-          '<div><span class="flabel">Referrals</span><div class="sf-refs" role="group" aria-label="Referred services">'+REFERRAL_SERVICES.concat(d.referrals.filter(function(x){ return REFERRAL_SERVICES.indexOf(x)<0; })).map(function(v){ var on=d.referrals.indexOf(v)>=0;
-            return '<button type="button" class="mf-tg'+(on?' on':'')+'" data-ref="'+esc(v)+'" aria-pressed="'+on+'">'+(on?I.tick:'')+esc(v)+'</button>'; }).join('')+'</div><small class="qf-hint">Choose every service the client was referred for.</small></div>'+'</section>'+
+          '<div><span class="flabel">Documents</span>'+doc+'<small class="qf-hint">Kept with this sale for the team; not sent to the client.</small></div>'+
+          '<div><label class="flabel" for="sf-ref">Referrals</label><div class="sf-ms'+(SF.refOpen?' open':'')+'">'+
+            '<div class="fin plain sm sf-mst" id="sf-ref" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="'+!!SF.refOpen+'" aria-controls="sf-refl">'+
+              (d.referrals.length?d.referrals.map(function(v){ return '<span class="sf-tag">'+esc(v)+'<button type="button" data-refx="'+esc(v)+'" aria-label="Remove '+esc(v)+'">'+I.close+'</button></span>'; }).join(''):'<span class="sf-msph">Select services</span>')+I.chev+'</div>'+
+            (SF.refOpen?'<div class="mf-drop sf-msd"><div class="mf-dlist" id="sf-refl" role="listbox" aria-multiselectable="true">'+REFERRAL_SERVICES.concat(d.referrals.filter(function(x){ return REFERRAL_SERVICES.indexOf(x)<0; })).map(function(v){
+              return '<label class="mf-dopt"><input type="checkbox" data-refck="'+esc(v)+'"'+(d.referrals.indexOf(v)>=0?' checked':'')+'><span>'+esc(v)+'</span></label>'; }).join('')+'</div></div>':'')+
+          '</div><small class="qf-hint">Choose every service the client was referred for.</small></div>'+'</section>'+
         '<section class="qf-sec qf-sum"><h3>Summary</h3><dl class="qf-tot"><div><dt>Subtotal</dt><dd>'+money(T.sub)+'</dd></div>'+
           '<div class="sl-disc"><dt>Discount'+(d.showDisc?'<span class="sl-dctl"><span class="sl-dgrp'+(e.discount?' bad':'')+'"><input id="sf-disc" type="text" inputmode="decimal" autocomplete="off" placeholder="0" value="'+esc(d.discount)+'" aria-label="Discount amount">'+
             '<select id="sf-dt" aria-label="Discount type"><option value="$"'+(d.discType==='%'?'':' selected')+'>$</option><option value="%"'+(d.discType==='%'?' selected':'')+'>%</option></select></span>'+
@@ -15327,7 +15400,14 @@ function wireSaleForm(focusId){
     el[live?'oninput':'onchange']=function(){ d[k]=el.value; delete SF.errs[k]; touch(); if(k==='accountant'&&d.accountant2===d.accountant) d.accountant2='';
       if(k==='branch'){ var cos=branchCos(d.branch); if(cos.indexOf(d.company)<0) d.company=cos.length===1?cos[0]:''; delete SF.errs.company; } if(!live) repaint(el.id); };
   });
-  [].forEach.call(ov.querySelectorAll('[data-ref]'),function(b){ b.onclick=function(){ var v=b.getAttribute('data-ref'), i=d.referrals.indexOf(v); if(i<0) d.referrals.push(v); else d.referrals.splice(i,1); touch(); repaint(); var n=ov.querySelector('[data-ref="'+CSS.escape(v)+'"]'); if(n) n.focus(); }; });
+  /* referrals: open the list, tick services, remove a tag; a click elsewhere or Escape closes the list */
+  var rf=document.getElementById('sf-ref'), toggleRef=function(open){ SF.refOpen=open; repaint(open?null:'sf-ref'); if(open){ var f=ov.querySelector('[data-refck]'); if(f) f.focus(); } };
+  if(rf){ rf.onclick=function(ev){ if(ev.target.closest('[data-refx]')) return; toggleRef(!SF.refOpen); };
+    rf.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '||ev.key==='ArrowDown'){ ev.preventDefault(); toggleRef(true); } if(ev.key==='Escape'&&SF.refOpen){ ev.stopPropagation(); toggleRef(false); } }; }
+  [].forEach.call(ov.querySelectorAll('[data-refx]'),function(b){ b.onclick=function(ev){ ev.stopPropagation(); var i=d.referrals.indexOf(b.getAttribute('data-refx')); if(i>=0) d.referrals.splice(i,1); touch(); repaint('sf-ref'); }; });
+  [].forEach.call(ov.querySelectorAll('[data-refck]'),function(c){ c.onchange=function(){ var v=c.getAttribute('data-refck'), i=d.referrals.indexOf(v); if(c.checked&&i<0) d.referrals.push(v); if(!c.checked&&i>=0) d.referrals.splice(i,1); touch(); repaint(); var n=ov.querySelector('[data-refck="'+CSS.escape(v)+'"]'); if(n) n.focus(); };
+    c.onkeydown=function(ev){ if(ev.key==='Escape'){ ev.stopPropagation(); toggleRef(false); } }; });
+  var sfb=document.getElementById('sf-body'); if(sfb) sfb.onmousedown=function(ev){ if(SF.refOpen&&!ev.target.closest('.sf-ms')){ SF.refOpen=false; var m=ov.querySelector('.sf-ms'); if(m){ m.classList.remove('open'); var dd=m.querySelector('.sf-msd'); if(dd) dd.remove(); var t=m.querySelector('.sf-mst'); if(t) t.setAttribute('aria-expanded','false'); } } };
   var pick=document.getElementById('sf-q');
   if(pick){
     var list=document.getElementById('sf-list');
@@ -15380,21 +15460,7 @@ function wireSaleForm(focusId){
   var dt=document.getElementById('sf-dt'); if(dt) dt.onchange=function(){ d.discType=dt.value; delete SF.errs.discount; touch(); repaint('sf-disc'); };
   var di=document.getElementById('sf-disc'); if(di) di.oninput=function(){ d.discount=di.value; if(SF.errs.discount){ delete SF.errs.discount; var g=di.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-derr'); if(er) er.remove(); } touch(); liveTotals(); };
   /* documents: several files, picked or dropped together; each is checked on its own */
-  var take=function(files){ var bad=[];
-    [].slice.call(files||[]).forEach(function(f){ var ext=(f.name.split('.').pop()||'').toLowerCase();
-      if(d.docs.length>=DOC_LIMIT) bad.push('Only '+DOC_LIMIT+' files can be attached');
-      else if(DOC_EXT.indexOf(ext)<0) bad.push(f.name+' isn’t a PDF, JPG, PNG or Word file');
-      else if(f.size>DOC_MAX) bad.push(f.name+' is larger than 5 MB');
-      else if(!f.size) bad.push(f.name+' is empty');
-      else if(d.docs.some(function(x){ return x.name===f.name&&x.size===f.size; })) bad.push(f.name+' is already attached');
-      else { d.docs.push({name:f.name,size:f.size,type:f.type||ext,file:f}); touch(); } });
-    if(bad.length) SF.errs.doc=bad.filter(function(x,i){ return bad.indexOf(x)===i; }).join('. ')+'.'; else delete SF.errs.doc;
-    repaint(); };
-  var fi=document.getElementById('sf-file'), dz=document.getElementById('sf-drop');
-  if(fi&&dz){ fi.onchange=function(){ take(fi.files); fi.value=''; };
-    dz.ondragover=function(ev){ ev.preventDefault(); dz.classList.add('drag'); }; dz.ondragleave=function(){ dz.classList.remove('drag'); };
-    dz.ondrop=function(ev){ ev.preventDefault(); dz.classList.remove('drag'); take(ev.dataTransfer.files); }; }
-  [].forEach.call(ov.querySelectorAll('[data-docrm]'),function(b){ b.onclick=function(){ d.docs.splice(+b.getAttribute('data-docrm'),1); delete SF.errs.doc; touch(); repaint(); }; });
+  wireFiles(ov,'sf',d.docs,function(msg){ if(msg) SF.errs.doc=msg; else delete SF.errs.doc; touch(); repaint(); });
   document.getElementById('sf-x').onclick=leaveSaleForm; document.getElementById('sf-cancel').onclick=leaveSaleForm;
   document.getElementById('sf-go').onclick=function(){ submitSale(true); };
   document.getElementById('sf-draft').onclick=function(){ submitSale(false); };
@@ -15443,7 +15509,7 @@ function submitSale(andSend){
     reload(); var c=formClient(), T=saleTotals(d,SF.paid), s=SF.isNew?null:byId(SF.id);
     if(!SF.isNew&&(!s||s.status==='disabled')) return fail('This sale can no longer be edited.');
     var at=function(iso){ var now=new Date(), x=new Date(iso+'T00:00:00'); x.setHours(now.getHours(),now.getMinutes(),0,0); return x.getTime(); };
-    var docs=d.docs.map(function(x,i){ return {name:x.name,size:x.size,type:x.type,key:keys[i]||null}; });
+    var docs=d.docs.map(function(x,i){ return {name:x.name,size:x.size,type:x.type,key:keys[i]||null,at:x.at||null,by:x.by||null}; });
     try{ var tt=d.terms.trim(); if(d.termsDefault&&tt) localStorage.setItem(SALE_TERMS_KEY,tt); else if(!d.termsDefault&&saleTerms()===tt) localStorage.removeItem(SALE_TERMS_KEY); }catch(e0){}   // the default for new sales
     var fields={clientId:c.id,clientName:c.name,onName:d.onName,branch:d.branch,company:d.company,accountant:d.accountant,accountant2:d.accountant2||'',date:at(d.date),due:new Date(d.due+'T23:59:00').getTime(),
       items:d.items.filter(function(x){ return x.svcId; }).map(function(x){ var v=svcById(x.svcId); return {cat:x.cat,svcId:x.svcId,name:x.name,desc:x.desc.trim(),fee:v?v.price:null,qty:num(x.qty),price:r2(num(x.price)),gst:x.gst!==false}; }),
@@ -15502,22 +15568,25 @@ var PAY_IC=(function(){ var g=function(p){ return '<svg width="18" height="18" v
     'EFTPOS / Card':g('<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6.5 15h3"/>'),
     'Cash':g('<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'),
     'Client Credit':g('<path d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7"/><path d="M2.5 8h19v4h-19z"/><path d="M12 8v12"/><path d="M12 8S10.5 3.5 8 4.5 9 8 12 8Zm0 0s1.5-4.5 4-3.5S15 8 12 8Z"/>')}; })();
+/* Add payment: money received, client credit, or both together. Credit is used first; the money pays the rest,
+   and anything over what's owed is kept as client credit */
 function addPayment(s){
-  var pend=pendingOf(s), today=isoDay(Date.now()), paid=r2(s.amount-pend), bal=creditOf(s.clientId), P={type:'Bank Transfer',doc:null};
+  FILE_OPEN.pd=false;
+  var pend=pendingOf(s), today=isoDay(Date.now()), paid=r2(s.amount-pend), bal=creditOf(s.clientId), modes=PAY_TYPES.filter(function(t){ return t!=='Client Credit'; }), P={type:modes[0],docs:[],useCr:false};
   modal('<div class="modal-head"><div><h2 id="m-t">Add payment</h2><p class="pm-sub">'+esc(s.id)+' · '+esc(client(s).name)+'</p></div><button data-x aria-label="Close">'+I.close+'</button></div>'+
     '<div class="modal-body pm">'+
-      '<div class="pm-sum"><div><span>Sale total</span><b>'+money(s.amount)+'</b></div><div><span>Paid so far</span><b>'+money(paid)+'</b></div><div class="due"><span>Pending</span><b>'+money(pend)+'</b></div></div>'+
-      (function(){ var o=owedBy(s.clientId,s.id), n=unpaidCount(s.clientId,s.id); if(!(bal>0)&&!(o>0)) return '';
-        return '<div class="pm-client">'+(bal>0?'<span class="pm-cr">'+money(bal)+' credit available</span>':'')+(o>0?'<span>'+money(o)+' owing on '+n+' other invoice'+(n===1?'':'s')+'</span>':'')+'</div>'; })()+
-      '<div><label class="flabel" for="p-amt">Amount received <span class="req-star">*</span></label>'+
+      (function(){ var o=owedBy(s.clientId,s.id), n=unpaidCount(s.clientId,s.id);
+        return '<dl class="pm-kv"><div><dt>Sale total</dt><dd>'+money(s.amount)+'</dd></div><div><dt>Paid so far</dt><dd>'+money(paid)+'</dd></div><div class="due"><dt>Pending</dt><dd>'+money(pend)+'</dd></div></dl>'+
+          (o>0?'<p class="pm-note">'+money(o)+' owing on '+n+' other invoice'+(n===1?'':'s')+'</p>':''); })()+
+      (bal>0?'<div class="pm-crbox"><label class="pm-crck"><input type="checkbox" id="p-cru"><span><b>Use client credit</b><small>'+money(bal)+' available</small></span></label>'+
+        '<div class="pm-crin" id="p-crw" hidden><span>$</span><input id="p-cr" inputmode="decimal" autocomplete="off" value="'+Math.min(bal,pend).toFixed(2)+'" aria-label="Credit to use"></div></div><span class="ferr" id="p-cr-e"></span>':'')+
+      '<div><label class="flabel" for="p-amt" id="p-amt-l">Amount received <span class="req-star">*</span></label>'+
         '<div class="pm-amt"><span>$</span><input id="p-amt" inputmode="decimal" autocomplete="off" value="'+pend.toFixed(2)+'"><button type="button" class="pm-full" id="p-full">Full amount</button></div>'+
         '<span class="ferr" id="p-amt-e"></span><p class="pm-left" id="p-left"></p></div>'+
-      '<div><span class="flabel" id="p-type-l">Payment mode <span class="req-star">*</span></span><div class="pm-types" role="radiogroup" aria-labelledby="p-type-l">'+
-        PAY_TYPES.map(function(t){ var cr=t==='Client Credit', off=cr&&!(bal>0);
-          return '<button type="button" class="pm-type'+(t===P.type?' on':'')+'" role="radio" aria-checked="'+(t===P.type)+'" data-pt="'+esc(t)+'"'+(off?' disabled title="This client has no credit"':'')+'>'+
-            '<i>'+PAY_IC[t]+'</i><b>'+esc(t)+'</b>'+(cr?'<small>'+money(bal)+' available</small>':'')+'</button>'; }).join('')+'</div></div>'+
-      '<div class="pm-g2"><div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div>'+
-        '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div></div>'+
+      '<div class="pm-g2" id="p-how"><div><label class="flabel" for="p-type">Payment mode <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain" id="p-type">'+
+          modes.map(function(t){ return '<option value="'+esc(t)+'">'+esc(t)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+        '<div><label class="flabel" for="p-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="p-date" value="'+today+'" max="'+today+'" min="'+isoDay(s.date)+'"><span class="ferr" id="p-date-e"></span></div></div>'+
+      '<div><label class="flabel" for="p-ref">Reference</label><input class="fin plain" id="p-ref" maxlength="60" placeholder="e.g. bank receipt number"></div>'+
       '<div><label class="flabel" for="p-note">Note</label><textarea class="ftext" id="p-note" rows="2" maxlength="300" placeholder="Anything the team should know about this payment"></textarea></div>'+
       '<div><span class="flabel">Proof of payment</span><div id="p-doc"></div><span class="ferr" id="p-doc-e"></span></div>'+
       (validEmail(client(s).email||'')?'<label class="qf-tdef pm-mail"><input type="checkbox" id="p-mail" checked><span>Email the receipt for this payment to '+esc(client(s).email)+'</span></label>'
@@ -15525,62 +15594,63 @@ function addPayment(s){
     '</div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go">Record payment</button></div>',true);
   dlg.querySelector('.modal').classList.add('pm-modal');
-  var amtEl=document.getElementById('p-amt'), left=document.getElementById('p-left');
-  var amtOf=function(){ return Number(String(amtEl.value).replace(/[$,\s]/g,'')); };
-  var paintLeft=function(){ var a=amtOf(), rest=r2(pend-(a>0?a:0));
-    left.className='pm-left'+(a>0&&rest<=0?' ok':'');
-    left.textContent=!(a>0)?'':rest<0?(P.type==='Client Credit'?'':'This pays the invoice in full. The extra '+money(-rest)+' is kept as client credit for other invoices.'):rest===0?'This pays the invoice in full':money(rest)+' will still be pending after this payment'; };
-  var paintDoc=function(){ var d=P.doc, box=document.getElementById('p-doc');
-    box.innerHTML=d?'<div class="sf-file">'+ftag(d.name)+'<span class="sf-fn"><b title="'+esc(d.name)+'">'+esc(d.name)+'</b><small>'+fsizeOf(d.size)+'</small></span><button type="button" class="sf-rm" id="p-docrm" title="Remove" aria-label="Remove '+esc(d.name)+'">'+MI['delete']+'</button></div>'
-      :'<label class="sf-drop" id="p-drop"><input type="file" id="p-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" hidden><span class="sf-dic">'+DOC_UP+'</span><span><b>Click to upload or drag a file here</b><small>Receipt or remittance · PDF, JPG, PNG or Word · up to 5 MB</small></span></label>';
-    var e=document.getElementById('p-doc-e'); e.classList.remove('show');
-    var take=function(fl){ if(!fl) return; var x=(fl.name.split('.').pop()||'').toLowerCase();
-      if(DOC_EXT.indexOf(x)<0) return fieldErr('p-doc-e','Upload a PDF, JPG, PNG or Word file');
-      if(fl.size>DOC_MAX) return fieldErr('p-doc-e','“'+fl.name+'” is '+fsizeOf(fl.size)+'. Files must be 5 MB or smaller.');
-      P.doc={name:fl.name,size:fl.size,file:fl}; paintDoc(); };
-    if(d){ document.getElementById('p-docrm').onclick=function(){ P.doc=null; paintDoc(); }; return; }
-    var drop=document.getElementById('p-drop'), fin=document.getElementById('p-file');
-    fin.onchange=function(){ take(fin.files[0]); };
-    drop.ondragover=function(ev){ ev.preventDefault(); drop.classList.add('drag'); };
-    drop.ondragleave=function(){ drop.classList.remove('drag'); };
-    drop.ondrop=function(ev){ ev.preventDefault(); drop.classList.remove('drag'); take(ev.dataTransfer.files[0]); }; };
+  var num=function(el){ var v=Number(String(el.value).replace(/[$,\s]/g,'')); return isNaN(v)?NaN:v; };
+  var amtEl=document.getElementById('p-amt'), left=document.getElementById('p-left'), crEl=document.getElementById('p-cr');
+  var crOf=function(){ if(!P.useCr) return 0; var v=num(crEl); return v>0?v:0; }, amtOf=function(){ var v=num(amtEl); return v>0?v:0; };
+  var paintLeft=function(){ var c=crOf(), a=amtOf(), rest=r2(pend-c-a);
+    left.className='pm-left'+(c+a>0&&rest<=0?' ok':'');
+    left.textContent=!(c+a>0)?'':rest<0?'This pays the invoice in full. The extra '+money(-rest)+' is kept as client credit for other invoices.'
+      :rest===0?(c>0&&a>0?money(c)+' credit and '+money(a)+' received pay the invoice in full':c>0?'The credit pays the invoice in full':'This pays the invoice in full'):money(rest)+' will still be pending after this payment'; };
+  /* proof of payment: the shared uploader, several files */
+  var paintDoc=function(msg){ var box=document.getElementById('p-doc'); box.innerHTML=fileField('pd',P.docs,'receipt or remittance · PDF, JPG, PNG or Word',DOC_LIMIT);
+    var e=document.getElementById('p-doc-e'); if(msg) fieldErr('p-doc-e',msg); else e.classList.remove('show');
+    wireFiles(box,'pd',P.docs,function(m){ paintDoc(m); }); };
   paintLeft(); paintDoc();
   amtEl.oninput=function(){ document.getElementById('p-amt-e').classList.remove('show'); paintLeft(); };
-  document.getElementById('p-full').onclick=function(){ amtEl.value=(P.type==='Client Credit'?Math.min(pend,bal):pend).toFixed(2); paintLeft(); amtEl.focus(); };
-  dlg.querySelectorAll('[data-pt]').forEach(function(b){ b.onclick=function(){ P.type=b.getAttribute('data-pt');
-    dlg.querySelectorAll('[data-pt]').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-checked',on); });
-    if(P.type==='Client Credit'&&amtOf()>Math.min(pend,bal)){ amtEl.value=Math.min(pend,bal).toFixed(2); } paintLeft(); }; });
+  document.getElementById('p-full').onclick=function(){ amtEl.value=Math.max(0,r2(pend-crOf())).toFixed(2); paintLeft(); amtEl.focus(); };
+  document.getElementById('p-type').onchange=function(){ P.type=this.value; };
+  var cu=document.getElementById('p-cru');
+  if(cu){ cu.onchange=function(){ P.useCr=cu.checked; document.getElementById('p-crw').hidden=!cu.checked; document.getElementById('p-cr-e').classList.remove('show');
+      if(cu.checked){ crEl.value=Math.min(bal,pend).toFixed(2); amtEl.value=Math.max(0,r2(pend-crOf())).toFixed(2); crEl.focus(); } else amtEl.value=pend.toFixed(2);
+      paintLeft(); };
+    crEl.oninput=function(){ document.getElementById('p-cr-e').classList.remove('show'); amtEl.value=Math.max(0,r2(pend-crOf())).toFixed(2); paintLeft(); }; }
   dlg.querySelector('[data-x]').onclick=closeDlg; document.getElementById('m-no').onclick=closeDlg;
   document.getElementById('m-go').onclick=function(){
     if(paying) return;
-    var go=this, mail=document.getElementById('p-mail'), mailIt=!!(mail&&mail.checked), amt=amtOf(), d=document.getElementById('p-date').value, type=P.type, ref=document.getElementById('p-ref').value.trim(), note=document.getElementById('p-note').value.trim();
-    ['p-amt-e','p-date-e'].forEach(function(x){ document.getElementById(x).classList.remove('show'); });
+    var go=this, mail=document.getElementById('p-mail'), mailIt=!!(mail&&mail.checked), cr=r2(crOf()), amt=r2(amtOf()), d=document.getElementById('p-date').value, type=P.type, ref=document.getElementById('p-ref').value.trim(), note=document.getElementById('p-note').value.trim();
+    ['p-amt-e','p-date-e','p-cr-e'].forEach(function(x){ var e=document.getElementById(x); if(e) e.classList.remove('show'); });
     reload(); var x=byId(s.id), owed=x?pendingOf(x):0;
     if(!x||x.status==='disabled'){ closeDlg(); render(); return toast('This sale can no longer take payments.',true); }
-    if(!(amt>0)) return fieldErr('p-amt-e','Enter an amount above $0');
-    if(type==='Client Credit'&&r2(amt)>r2(owed)) return fieldErr('p-amt-e','Credit can pay up to the '+money(owed)+' still owed');
-    if(r2(amt)>r2(owed)+100000) return fieldErr('p-amt-e','Check the amount: it’s far more than the '+money(owed)+' owed');
+    if(P.useCr){ if(!(cr>0)||isNaN(num(crEl))) return fieldErr('p-cr-e','Enter the credit to use, or untick Use client credit');
+      if(cr>creditOf(x.clientId)) return fieldErr('p-cr-e','The client has only '+money(creditOf(x.clientId))+' credit');
+      if(cr>r2(owed)) return fieldErr('p-cr-e','Credit can pay up to the '+money(owed)+' still owed'); }
+    if(String(amtEl.value).trim()&&isNaN(num(amtEl))) return fieldErr('p-amt-e','Enter the amount as a number');
+    if(!(amt>0)&&!(cr>0)) return fieldErr('p-amt-e','Enter an amount above $0');
+    if(amt>r2(owed-cr)+100000) return fieldErr('p-amt-e','Check the amount: it’s far more than the '+money(owed)+' owed');
     if(!d||d>today) return fieldErr('p-date-e','Choose a date that isn’t in the future');
     if(d<isoDay(x.date)) return fieldErr('p-date-e','The payment can’t be before the sale date');
-    if(ref&&(x.payments||[]).some(function(p){ return !p.void&&String(p.ref||'').trim().toLowerCase()===ref.toLowerCase(); })) return fieldErr('p-amt-e','A payment with reference “'+ref+'” is already recorded on this sale');
-    if(type==='Client Credit'&&r2(amt)>creditOf(x.clientId)) return fieldErr('p-amt-e','The client has only '+money(creditOf(x.clientId))+' credit');
+    if(amt>0&&ref&&(x.payments||[]).some(function(p){ return !p.void&&String(p.ref||'').trim().toLowerCase()===ref.toLowerCase(); })) return fieldErr('p-amt-e','A payment with reference “'+ref+'” is already recorded on this sale');
     paying=true; go.disabled=true;
     var t=d===today?Date.now():new Date(d+'T12:00:00').getTime(), pid='P'+Date.now().toString(36);
-    var stored=P.doc?putSaleFile(x.id+':'+pid,P.doc.file):Promise.resolve(null);
-    stored.then(function(key){
+    var stored=Promise.all(P.docs.map(function(f,i){ return putSaleFile(x.id+':'+pid+':'+i,f.file); }));
+    stored.then(function(keys){
       try{
-        if(type==='Client Credit'&&!spendCredit(x.clientId,amt,x.id)){ closeDlg(); return toast('The client’s credit couldn’t be used. Nothing was changed.',true); }
-        var put=Math.min(r2(amt),r2(owed)), extra=r2(amt-put);   // what the invoice takes; the rest is the client's credit
-        var p={id:pid,amount:put,type:type,at:t,by:ME.name,ref:ref}; if(note) p.note=note; if(key) p.doc={name:P.doc.name,size:P.doc.size,key:key};
-        if(extra>0){ p.received=r2(amt); p.overpay=extra; var cv=loadCredit(); cv.list.push({clientId:x.clientId,amount:extra,at:t,by:ME.name,saleId:x.id,pid:pid,kind:'overpayment',note:'Overpaid '+x.id+(ref?' · ref '+ref:'')});
-          if(!saveCredit(cv)){ closeDlg(); return toast('The extra couldn’t be kept as credit. Nothing was changed.',true); } }
-        x.payments.push(p);
-        if(extra>0) log(x,'credit_added',{note:money(extra)+' overpaid · kept as credit for '+client(x).name});
-        log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')});
-        try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+type+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
-        if(commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(amt)+' recorded on '+x.id)&&mailIt) sendConfirmation(x.id,p.id);
+        var last=null, docs=P.docs.length?P.docs.map(function(f,i){ return {name:f.name,size:f.size,key:keys[i],at:f.at,by:ME.name}; }):null;
+        if(cr>0){ if(!spendCredit(x.clientId,cr,x.id)){ closeDlg(); return toast('The client’s credit couldn’t be used. Nothing was changed.',true); }
+          last={id:pid+'c',amount:cr,type:'Client Credit',at:t,by:ME.name,ref:''}; if(note&&!(amt>0)) last.note=note; if(docs&&!(amt>0)) last.docs=docs; x.payments.push(last);
+          log(x,'payment',{note:money(cr)+' · Client Credit'+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')}); }
+        if(amt>0){ var owe2=pendingOf(x), put=Math.min(amt,owe2), extra=r2(amt-put);   // what the invoice takes; the rest is the client's credit
+          var p={id:pid,amount:put,type:type,at:t,by:ME.name,ref:ref}; if(note) p.note=note; if(docs) p.docs=docs;
+          if(extra>0){ p.received=amt; p.overpay=extra; var cv=loadCredit(); cv.list.push({clientId:x.clientId,amount:extra,at:t,by:ME.name,saleId:x.id,pid:pid,kind:'overpayment',note:'Overpaid '+x.id+(ref?' · ref '+ref:'')});
+            if(!saveCredit(cv)){ closeDlg(); return toast('The extra couldn’t be kept as credit. Nothing was changed.',true); } }
+          x.payments.push(p); last=p;
+          if(extra>0) log(x,'credit_added',{note:money(extra)+' overpaid · kept as credit for '+client(x).name});
+          log(x,'payment',{note:money(amt)+' · '+type+(ref?' · ref '+ref:'')+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed')}); }
+        var tot=r2(cr+amt), how=cr>0&&amt>0?money(cr)+' credit + '+money(amt)+' '+type:cr>0?money(cr)+' client credit':money(amt)+' '+type;
+        try{ parent.AADNotify&&parent.AADNotify({id:'pay:'+x.id+':rec:'+t,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:how+' on '+x.id+' for '+client(x).name+(pendingOf(x)<=0?' · paid in full':' · '+money(pendingOf(x))+' still owed'),go:{mod:'sales',id:x.id}}); }catch(e){}
+        if(commit(x,pendingOf(x)<=0?x.id+' is paid in full':money(tot)+' recorded on '+x.id)&&mailIt&&last) sendConfirmation(x.id,last.id);
       } finally { paying=false; }
-    },function(){ paying=false; go.disabled=false; fieldErr('p-doc-e','The file couldn’t be stored. Try again, or remove it.'); });
+    },function(){ paying=false; go.disabled=false; fieldErr('p-doc-e','A file couldn’t be stored. Try again, or remove it.'); });
   };
 }
 /* the payment confirmation email to the client, with that payment's receipt attached; logged in Log & Activities either way. manual: sent from the Payments tab, so say how it went */
@@ -15588,7 +15658,7 @@ function sendConfirmation(id,pid,manual){
   reload(); var x=byId(id); if(!x) return; var p=(x.payments||[]).filter(function(y){ return y.id===pid; })[0]; if(!p) return;
   var c=client(x), m=receiptOf(x,p,c.name);
   if(!validEmail(c.email||'')){ log(x,'receipt_failed',{ok:false,note:'No email address on file for '+c.name}); save(); render(); if(manual) toast('No email address on file for '+c.name,true); return; }
-  var body='Hi '+c.name+',\n\nThank you. We’ve received your payment of '+money(p.amount)+' for invoice '+x.id+' by '+p.type+' on '+dmyOf(p.at)+'. '+(m.balance>0?money(m.balance)+' is still due on invoice '+x.id+', by '+dmyOf(x.due)+'.':'Invoice '+x.id+' is now paid in full.')+'\n\nYour receipt '+m.no+' is attached.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name;
+  var body='Hi '+c.name+',\n\nThank you. We’ve received your payment of '+money(p.amount)+' for invoice '+x.id+' by '+p.type+' on '+upWhen(p.at)+'. '+(m.balance>0?money(m.balance)+' is still due on invoice '+x.id+', by '+dmyOf(x.due)+'.':'Invoice '+x.id+' is now paid in full.')+'\n\nYour receipt '+m.no+' is attached.\n\nKind regards,\n'+ME.name+'\n'+FIRM.name;
   deliver({email:{to:c.email,subject:'Payment received: invoice '+x.id+' from '+FIRM.name,body:body,attachment:'Receipt '+m.no+'.pdf'}}).then(function(res){
     reload(); var y=byId(id); if(!y) return;
     log(y,res.ok?'receipt_sent':'receipt_failed',{ok:!!res.ok,to:c.email,note:'To '+c.email+' · '+(res.ok?'receipt '+m.no+' attached':(res.error||'not accepted'))}); save(); render();
@@ -15598,7 +15668,7 @@ function sendConfirmation(id,pid,manual){
 /* Send receipt: emails one payment's receipt to the client again (or for the first time) */
 function sendReceipt(s,p){
   var c=client(s), m=receiptOf(s,p,c.name), ok=validEmail(c.email||'');
-  modal('<div class="confirm-body"><h3 id="m-t">Send receipt '+esc(m.no)+'?</h3><p>'+(ok?'The receipt for the <strong>'+money(p.amount)+'</strong> payment of '+dmyOf(p.at)+' is emailed to <strong>'+esc(c.email)+'</strong> as a PDF.'+(m.balance>0?' The email says '+money(m.balance)+' is still due.':'')
+  modal('<div class="confirm-body"><h3 id="m-t">Send receipt '+esc(m.no)+'?</h3><p>'+(ok?'The receipt for the <strong>'+money(p.amount)+'</strong> payment of '+upWhen(p.at)+' is emailed to <strong>'+esc(c.email)+'</strong> as a PDF.'+(m.balance>0?' The email says '+money(m.balance)+' is still due.':'')
       :'<strong>'+esc(c.name)+'</strong> has no email address on file. Add one to the client record, or download the receipt and send it yourself.')+'</p></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button>'+(ok?'<button class="btn-primary" id="m-go">Send receipt</button>':'')+'</div>');
   document.getElementById('m-no').onclick=closeDlg;
@@ -15606,7 +15676,7 @@ function sendReceipt(s,p){
 }
 /* Delete payment (managers): for a payment recorded by mistake. It stays in the list as Deleted, with who and why, and stops counting; client credit goes back to the client */
 function deletePayment(s,p){
-  modal('<div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="m-t">Delete the '+money(p.amount)+' payment?</h3><p>The '+esc(p.type)+' payment of '+dmyOf(p.at)+(p.ref?' (ref '+esc(p.ref)+')':'')+' on '+esc(s.id)+' stops counting, so '+money(r2(pendingOf(s)+p.amount))+' will be pending. '+
+  modal('<div class="confirm-body"><div class="warn">'+I.warn+'</div><h3 id="m-t">Delete the '+money(p.amount)+' payment?</h3><p>The '+esc(p.type)+' payment of '+upWhen(p.at)+(p.ref?' (ref '+esc(p.ref)+')':'')+' on '+esc(s.id)+' stops counting, so '+money(r2(pendingOf(s)+p.amount))+' will be pending. '+
       (p.type==='Client Credit'?'The '+money(p.amount)+' credit goes back to '+esc(client(s).name)+'. ':'')+(p.overpay>0?'The '+money(p.overpay)+' extra kept as credit is taken back. ':'')+'It stays in the list as Deleted.</p>'+
     '<label class="flabel" for="d-n" style="margin-top:12px">Reason <span class="req-star">*</span></label><textarea class="ftext" id="d-n" rows="3" maxlength="300" placeholder="e.g. Recorded against the wrong invoice"></textarea><span class="ferr" id="d-e">Add a reason</span></div>'+
     '<div class="modal-foot"><button class="btn-ghost" id="m-no">Keep payment</button><button class="btn-danger" id="m-go">Delete payment</button></div>');
@@ -16014,9 +16084,9 @@ function paintDetail(keep){
     var pct=s.amount>0?Math.min(100,Math.round(paidOf(s)/s.amount*100)):0, days=Math.round((new Date(isoDay(s.due)+'T00:00:00')-new Date(isoDay(Date.now())+'T00:00:00'))/DAY);
     var dueTxt=days<0?'<span class="sd-late">Overdue by '+(-days)+' day'+(days===-1?'':'s')+'</span>':days===0?'Due today':'Due in '+days+' day'+(days===1?'':'s');
     var payStep=dis?step('bad','Disabled','No payments can be taken')
-      :ps==='paid'?step('done','Paid in full',lastPay?dmyOf(lastPay.at)+' · '+esc(lastPay.type):'')
+      :ps==='paid'?step('done','Paid in full',lastPay?upWhen(lastPay.at)+' · '+esc(lastPay.type):'')
       :ps==='failed'?step('bad','Online payment failed',when(s.payFail.at)+'<br>'+esc(s.payFail.reason||'')+'<br>'+dueTxt)
-      :live.length?step('part','Part paid · '+money(paidOf(s))+' of '+money(s.amount),money(pendingOf(s))+' still due · '+dueTxt+'<br>'+live.length+' payment'+(live.length===1?'':'s')+', last '+dmyOf(lastPay.at),'<span class="sd-bar" role="img" aria-label="'+pct+'% paid"><span style="width:'+pct+'%"></span></span>')
+      :live.length?step('part','Part paid · '+money(paidOf(s))+' of '+money(s.amount),money(pendingOf(s))+' still due · '+dueTxt+'<br>'+live.length+' payment'+(live.length===1?'':'s')+', last '+upWhen(lastPay.at),'<span class="sd-bar" role="img" aria-label="'+pct+'% paid"><span style="width:'+pct+'%"></span></span>')
       :step('todo','Awaiting payment',dueTxt);
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):'by '+esc(s.by||'—')+'<br>'+when(s.at||s.date))+(s.quotationId?'<br>From quotation '+esc(s.quotationId):''))+
       (sends.length?sends.map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join(''):step('todo','Not sent yet','Email the invoice to the client'))+
@@ -16035,8 +16105,7 @@ function paintDetail(keep){
         '<section class="qd-grp"><h4>Assigned to</h4><dl>'+row('Branch',esc(s.branch||''))+row('Internal company',esc(s.company||(s.companies&&s.companies[0])||''))+
           row('Accountant',esc(s.accountant||''))+row('Additional accountant',esc(s.accountant2||''))+'</dl></section>'+
         (dd.length||rf.length?'<section class="qd-grp"><h4>Internal</h4><dl>'+
-          (dd.length?row(dd.length>1?'Documents ('+dd.length+')':'Document','<div class="sf-files">'+dd.map(function(x,i){ return '<div class="sf-file">'+ftag(x.name)+'<span class="sf-fn"><button class="name-link" data-doc="'+i+'" title="Open '+esc(x.name)+'"><b class="name">'+esc(x.name)+'</b></button><small>'+fsizeOf(x.size)+'</small></span>'+
-            '<button type="button" class="sf-rm" data-docdl="'+i+'" title="Download" aria-label="Download '+esc(x.name)+'">'+SD_IC.down+'</button></div>'; }).join('')+'</div>'):'')+
+          (dd.length?row(dd.length>1?'Documents ('+dd.length+')':'Document','<div class="sf-fbox ro">'+dd.map(function(x,i){ return fileRow(x,i,'sdd',false).replace('<b title="','<b data-doc="'+i+'" class="sf-fopen" title="Open '); }).join('')+'</div>'):'')+
           (rf.length?row(rf.length>1?'Referrals ('+rf.length+')':'Referral','<div class="sd-refs">'+rf.map(function(x){ return '<span>'+esc(x)+'</span>'; }).join('')+'</div>'):'')+'</dl></section>':'')+
       '</aside></div>';
   }
@@ -16048,9 +16117,9 @@ function paintDetail(keep){
           var stt=p.void?['Deleted','p-overdue']:p.type==='Client Credit'?['Credit applied','p-partial']:['Received','p-paid'], m=receiptOf(s,p,cn);
           var acts=p.void?'':'<button type="button" class="act" data-prc="'+esc(p.id)+'" title="Download receipt '+esc(m.no)+' (PDF)" aria-label="Download receipt '+esc(m.no)+'">'+MI.pdf+'</button>'+
             '<button type="button" class="act" data-psend="'+esc(p.id)+'" title="Send receipt '+esc(m.no)+' to the client" aria-label="Send receipt '+esc(m.no)+' to the client">'+MI.send+'</button>'+
-            (canDel?'<button type="button" class="act danger" data-pdel="'+esc(p.id)+'" title="Delete payment" aria-label="Delete the '+money(p.amount)+' payment of '+dmyOf(p.at)+'">'+MI['delete']+'</button>':'');
-          return '<tr'+(p.void?' class="sd-pvoid"':'')+'><td class="num sd-rno">'+esc(m.no)+'</td><td class="num">'+dmyOf(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+(p.doc?'<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'" title="Open '+esc(p.doc.name)+'">'+SI.pdf+esc(p.doc.name)+'</button>':'')+'</td><td>'+esc(p.type)+'</td>'+
-            '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span>'+(p.void?'<small>'+esc((p.voidBy||'—')+' · '+dmyOf(p.voidAt||p.at))+(p.voidReason?'<br>'+esc(p.voidReason):'')+'</small>':'')+'</td><td class="r num sd-pamt">'+money(p.amount)+'</td><td class="r"><div class="sd-pacts">'+acts+'</div></td></tr>'; }).join('')+
+            (canDel?'<button type="button" class="act danger" data-pdel="'+esc(p.id)+'" title="Delete payment" aria-label="Delete the '+money(p.amount)+' payment of '+upWhen(p.at)+'">'+MI['delete']+'</button>':'');
+          return '<tr'+(p.void?' class="sd-pvoid"':'')+'><td class="num sd-rno">'+esc(m.no)+'</td><td class="num">'+upWhen(p.at)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+(p.note?'<small class="pm-tnote">'+esc(p.note)+'</small>':'')+payDocs(p).map(function(f,i){ return '<button type="button" class="name-link pm-tdoc" data-pdoc="'+esc(p.id)+'|'+i+'" title="Open '+esc(f.name)+(f.at?' · uploaded '+upWhen(f.at):'')+'">'+SI.pdf+esc(f.name)+'</button>'; }).join('')+'</td><td>'+esc(p.type)+'</td>'+
+            '<td>'+esc(p.by||'—')+'</td><td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span>'+(p.void?'<small>'+esc((p.voidBy||'—')+' · '+upWhen(p.voidAt||p.at))+(p.voidReason?'<br>'+esc(p.voidReason):'')+'</small>':'')+'</td><td class="r num sd-pamt">'+money(p.amount)+'</td><td class="r"><div class="sd-pacts">'+acts+'</div></td></tr>'; }).join('')+
         '</tbody></table></div></section>'
       :'<section class="vsec sd-empty"><p class="cl-muted">'+(dis?'This sale is disabled and can’t take payments.':'No payments have been recorded for this sale yet.')+'</p>'+
         (!dis&&main&&main[0]==='pay'?'<button class="btn-primary btn-sm" data-sa="pay">'+MI.pay+'Add payment</button>':'')+'</section>';
@@ -16080,13 +16149,13 @@ function paintDetail(keep){
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
   ov.querySelectorAll('[data-doc]').forEach(function(x){ x.onclick=function(){ openDoc(docsOf(s)[+x.getAttribute('data-doc')],false); }; });
   var stm=ov.querySelector('[data-sd="stmt"]'); if(stm) stm.onclick=function(){ try{ parent.AADOpen('payments','#client/'+s.clientId); }catch(e){} };
-  ov.querySelectorAll('[data-docdl]').forEach(function(x){ x.onclick=function(){ openDoc(docsOf(s)[+x.getAttribute('data-docdl')],true); }; });
+  ov.querySelectorAll('[data-sdddl]').forEach(function(x){ x.onclick=function(){ openDoc(docsOf(s)[+x.getAttribute('data-sdddl')],true); }; });
   ov.querySelectorAll('[data-slog]').forEach(function(x){ x.onclick=function(){ sdLog=x.getAttribute('data-slog'); paintDetail(true); }; });
   var payOf=function(x,k){ return (s.payments||[]).filter(function(y){ return y.id===x.getAttribute(k); })[0]; };
   ov.querySelectorAll('[data-prc]').forEach(function(x){ x.onclick=function(){ var p=payOf(x,'data-prc'); if(p&&!printReceipt(receiptOf(s,p,client(s).name))) toast('Allow pop-ups to download the receipt',true); }; });
   ov.querySelectorAll('[data-psend]').forEach(function(x){ x.onclick=function(){ var p=payOf(x,'data-psend'); if(p) sendReceipt(s,p); }; });
   ov.querySelectorAll('[data-pdel]').forEach(function(x){ x.onclick=function(){ var p=payOf(x,'data-pdel'); if(p) deletePayment(s,p); }; });
-  ov.querySelectorAll('[data-pdoc]').forEach(function(x){ x.onclick=function(){ var p=(s.payments||[]).filter(function(y){ return y.id===x.getAttribute('data-pdoc'); })[0]; if(p&&p.doc) openPayDoc(p.doc); }; });
+  ov.querySelectorAll('[data-pdoc]').forEach(function(x){ x.onclick=function(){ var k=x.getAttribute('data-pdoc').split('|'), p=(s.payments||[]).filter(function(y){ return y.id===k[0]; })[0], f=p&&payDocs(p)[+k[1]||0]; if(f) openPayDoc(f); }; });
   var vc=ov.querySelector('[data-sd="client"]'); if(vc) vc.onclick=function(){ try{ parent.AADOpen('clients','#/clients/'+s.clientId); }catch(e){} };
   if(!keep) document.getElementById('sd-x').focus();
 }
@@ -16177,7 +16246,7 @@ function exportPdf(){
    The same invoices (aad-invoices-v1) and client credit ledger (aad-client-credit-v1) as Sales: nothing is copied.
    This page opens in its own frame (window.AAD_MODE='payments'); Sale Details, Add payment and receipts are the Sales ones. */
 var PMX={q:'',show:'',branch:'',cid:null,tab:'invoices'};
-var PM_METHODS=['Bank Transfer','EFTPOS / Card','Cash'];
+var PM_METHODS=payModes();
 function pmClient(cid){ return clients.filter(function(c){ return String(c.id)===String(cid); })[0]||null; }
 /* a client's numbers: invoices, money in, what's owed, credit */
 function pmTotals(cid){
@@ -16226,7 +16295,7 @@ function renderPayments(){
       '<td class="num r">'+t.n+'</td><td class="num r">'+money(t.inv)+'</td><td class="num r">'+money(t.paid)+'</td>'+
       '<td class="num r">'+(t.owe>0?'<b class="pmx-owe">'+money(t.owe)+'</b>'+(t.over?'<small class="ar-sub pmx-late">'+t.over+' overdue</small>':''):'<span class="ar-dash">'+money(0)+'</span>')+'</td>'+
       '<td class="num r">'+(t.cr>0?'<b class="pmx-in">'+money(t.cr)+'</b>'+(t.un>0?'<small class="ar-sub">'+money(t.un)+' unallocated</small>':''):'<span class="ar-dash">'+money(0)+'</span>')+'</td>'+
-      '<td>'+pmNet(t)+'</td><td class="num nowrap">'+(t.last?dmyOf(t.last):'<span class="ar-dash">—</span>')+'</td></tr>'; });
+      '<td>'+pmNet(t)+'</td><td class="num nowrap">'+(t.last?upWhen(t.last):'<span class="ar-dash">—</span>')+'</td></tr>'; });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;
   var qi=document.getElementById('q'); qi.oninput=function(){ PMX.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
@@ -16277,11 +16346,11 @@ function renderStatement(){
   var led=pmLedger(c.id);
   var tabs=[['invoices','Invoices',list.length],['payments','Payments',pays.length],['credit','Credit & adjustments',crs.length],['statement','Statement',led.length]];
   if(!tabs.some(function(x){ return x[0]===PMX.tab; })) PMX.tab='invoices';
+  /* Apply credit and Record Payment as buttons; the rest in the ⋮ menu, as in Sale Details */
   var acts=(t.cr>0&&t.owe>0?'<button class="btn-ghost" id="pm-apply">'+MI.receipt+'Apply credit</button>':'')+
-    (t.cr>0?'<button class="btn-ghost" id="pm-refund">'+MI.resend+'Refund credit</button>':'')+
-    (isManager()?'<button class="btn-ghost" id="pm-adj">'+MI.edit+'Adjust credit</button>':'')+
-    '<button class="btn-ghost sd-pdf" id="pm-stpdf" title="Download the statement as a PDF">'+MI.pdf+'Statement</button>'+
-    '<button class="btn-primary qd-main" id="pm-rec2">'+MI.pay+'Record Payment</button>';
+    '<button class="btn-primary qd-main" id="pm-rec2">'+MI.pay+'Record Payment</button>'+
+    '<button class="qt-more sd-more" id="pm-more" data-menu="pmd" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for '+esc(c.name)+'" title="More actions">'+I.dots+'</button>';
+  var more=[t.cr>0?['refund','Refund credit',MI.resend]:null,isManager()?['adj','Adjust credit',MI.edit]:null,['stpdf','Download statement',MI.pdf]].filter(Boolean);
   var badge=t.net>0?'<span class="state p-overdue"><i></i>Owes '+money(t.net)+'</span>':t.net<0?'<span class="state p-paid"><i></i>In credit '+money(-t.net)+'</span>':'<span class="state p-partial"><i></i>Settled</span>';
   var head='<div class="cl-dhead qd-head sd-head"><div class="dpmain"><h2 id="pmd-t">'+esc(c.name)+' '+badge+'</h2>'+
       '<button class="sd-cl" id="pmd-cl" title="Open the client record">'+SD_IC.user+esc([c.email,c.phone].filter(Boolean).join(' · ')||'Open client record')+'</button></div>'+
@@ -16302,17 +16371,17 @@ function renderStatement(){
         '<td class="r"><div class="sd-pacts">'+(!dis&&pend>0&&canManage(s)?'<button type="button" class="act" data-pmpay="'+esc(s.id)+'" title="Add payment to '+esc(s.id)+'" aria-label="Add payment to '+esc(s.id)+'">'+MI.pay+'</button>':'')+
           '<button type="button" class="act" data-pminv="'+esc(s.id)+'" title="Download '+esc(s.id)+' (PDF)" aria-label="Download '+esc(s.id)+'">'+MI.pdf+'</button></div></td></tr>'; }).join('')):empty('No invoices for this client yet.');
   if(PMX.tab==='payments') b=pays.length?tbl('<th>Receipt</th><th>Payment date</th><th>Invoice</th><th>Payment type</th><th>Reference</th><th>Status</th><th class="r">Amount</th><th class="r">Actions</th>',pays.map(function(x){
-      if(x.fail) return '<tr class="sd-pvoid"><td>—</td><td class="num">'+dmyOf(x.fail.at)+'</td><td>'+esc(x.s.id)+'</td><td>Online card</td><td>—</td><td><span class="state p-failed"><i></i>Failed</span><small>'+esc(x.fail.reason||'')+'</small></td><td class="r num">—</td><td></td></tr>';
+      if(x.fail) return '<tr class="sd-pvoid"><td>—</td><td class="num">'+upWhen(x.fail.at)+'</td><td>'+esc(x.s.id)+'</td><td>Online card</td><td>—</td><td><span class="state p-failed"><i></i>Failed</span><small>'+esc(x.fail.reason||'')+'</small></td><td class="r num">—</td><td></td></tr>';
       var p=x.p, m=receiptOf(x.s,p,client(x.s).name), stt=p.void?['Reversed','p-overdue']:p.type==='Client Credit'?['Credit applied','p-partial']:['Received','p-paid'];
-      return '<tr'+(p.void?' class="sd-pvoid"':'')+'><td class="num sd-rno">'+esc(m.no)+'</td><td class="num">'+dmyOf(p.at)+'</td><td><button class="name-link" data-pms="'+esc(x.s.id)+'">'+esc(x.s.id)+'</button></td><td>'+esc(p.type)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+'</td>'+
+      return '<tr'+(p.void?' class="sd-pvoid"':'')+'><td class="num sd-rno">'+esc(m.no)+'</td><td class="num">'+upWhen(p.at)+'</td><td><button class="name-link" data-pms="'+esc(x.s.id)+'">'+esc(x.s.id)+'</button></td><td>'+esc(p.type)+'</td><td>'+(p.ref?esc(p.ref):'<span class="cl-muted">—</span>')+'</td>'+
         '<td><span class="state '+stt[1]+'"><i></i>'+stt[0]+'</span>'+(p.void?'<small>'+esc(p.voidReason||'')+'</small>':p.overpay>0?'<small>'+money(p.received)+' received · '+money(p.overpay)+' to credit</small>':p.group?'<small>Part of one payment across invoices</small>':'')+'</td>'+
         '<td class="r num sd-pamt">'+money(p.amount)+'</td><td class="r"><div class="sd-pacts">'+(p.void?'':'<button type="button" class="act" data-pmrc="'+esc(x.s.id)+'|'+esc(p.id)+'" title="Download receipt '+esc(m.no)+' (PDF)" aria-label="Download receipt '+esc(m.no)+'">'+MI.pdf+'</button>')+'</div></td></tr>'; }).join('')):empty('No payments recorded for this client yet.');
   if(PMX.tab==='credit') b=crs.length?tbl('<th>Date</th><th>Type</th><th>Invoice</th><th>Details</th><th>Recorded by</th><th class="r">In</th><th class="r">Out</th><th class="r">Credit balance</th>',crs.map(function(e){ var k=crKind(e);
-      return '<tr><td class="num">'+dmyOf(e.at)+'</td><td><span class="pmx-k k-'+k+'">'+esc(CR_KIND[k])+'</span></td><td>'+(e.saleId?'<button class="name-link" data-pms="'+esc(e.saleId)+'">'+esc(e.saleId)+'</button>':'<span class="cl-muted">—</span>')+'</td>'+
+      return '<tr><td class="num">'+upWhen(e.at)+'</td><td><span class="pmx-k k-'+k+'">'+esc(CR_KIND[k])+'</span></td><td>'+(e.saleId?'<button class="name-link" data-pms="'+esc(e.saleId)+'">'+esc(e.saleId)+'</button>':'<span class="cl-muted">—</span>')+'</td>'+
         '<td>'+esc(e.note||'')+(e.ref?'<small>Ref '+esc(e.ref)+'</small>':'')+(e.method?'<small>'+esc(e.method)+'</small>':'')+'</td><td>'+esc(e.by||'—')+'</td>'+
         '<td class="r num pmx-in">'+(e.amount>0?money(e.amount):'')+'</td><td class="r num pmx-out">'+(e.amount<0?money(-e.amount):'')+'</td><td class="r num sd-pamt">'+money(e._bal)+'</td></tr>'; }).join('')):empty('No credit has been created or used for this client.');
   if(PMX.tab==='statement') b=led.length?tbl('<th>Date</th><th>Details</th><th>Invoice</th><th class="r">Debit</th><th class="r">Credit</th><th class="r">Balance</th>',led.slice().reverse().map(function(e){
-      return '<tr'+(e.bad?' class="pmx-bad"':'')+'><td class="num">'+dmyOf(e.t)+'</td><td>'+esc(e.what)+(e.ref?'<small>Ref '+esc(e.ref)+'</small>':'')+(e.info?'<small>'+esc(e.info)+'</small>':'')+(e.note&&e.what.indexOf(e.note)<0?'<small>'+esc(e.note)+'</small>':'')+'</td>'+
+      return '<tr'+(e.bad?' class="pmx-bad"':'')+'><td class="num">'+upWhen(e.t)+'</td><td>'+esc(e.what)+(e.ref?'<small>Ref '+esc(e.ref)+'</small>':'')+(e.info?'<small>'+esc(e.info)+'</small>':'')+(e.note&&e.what.indexOf(e.note)<0?'<small>'+esc(e.note)+'</small>':'')+'</td>'+
         '<td>'+(e.sale?'<button class="name-link" data-pms="'+esc(e.sale)+'">'+esc(e.sale)+'</button>':'<span class="cl-muted">—</span>')+'</td><td class="r num">'+(e.dr?money(e.dr):'')+'</td><td class="r num">'+(e.cr?money(e.cr):'')+'</td>'+
         '<td class="r num sd-pamt">'+(e.bal<0?money(-e.bal)+' CR':money(e.bal))+'</td></tr>'; }).join(''))+'<p class="pmx-foot">A positive balance is owed by '+esc(c.name)+'; CR is credit held for the client.</p>':empty('Nothing has happened on this account yet.');
   var prev=document.getElementById('sd-b'), y=prev&&ov.querySelector('.pmd-drawer')?prev.scrollTop:0;
@@ -16330,9 +16399,16 @@ function renderStatement(){
     if(p&&!printReceipt(receiptOf(s,p,client(s).name))) toast('Allow pop-ups to download the receipt',true); }; });
   document.getElementById('pm-rec2').onclick=function(){ recordClientPayment(c.id); };
   var ap=document.getElementById('pm-apply'); if(ap) ap.onclick=function(){ applyClientCredit(c.id); };
-  var rf=document.getElementById('pm-refund'); if(rf) rf.onclick=function(){ refundCredit(c.id); };
-  var aj=document.getElementById('pm-adj'); if(aj) aj.onclick=function(){ adjustCredit(c.id); };
-  document.getElementById('pm-stpdf').onclick=function(){ pmStatementPdf(c,t,led); };
+  var mb=document.getElementById('pm-more');
+  mb.onclick=function(){ if(menuEl&&menuEl.dataset.s==='pmd') return closeMenu(); closeMenu();
+    menuEl=document.createElement('div'); menuEl.className='qt-menu'; menuEl.setAttribute('role','menu'); menuEl.dataset.s='pmd'; menuEl.style.zIndex='130';
+    menuEl.innerHTML=more.map(function(a){ return '<button role="menuitem" data-pma="'+a[0]+'">'+a[2]+'<span>'+a[1]+'</span></button>'; }).join('');
+    document.body.appendChild(menuEl); var r=mb.getBoundingClientRect(); menuEl.style.top=(r.bottom+4)+'px'; menuEl.style.left=Math.max(8,r.right-menuEl.offsetWidth)+'px';
+    mb.setAttribute('aria-expanded','true'); menuEl.querySelector('button').focus();
+    menuEl.onkeydown=function(e){ if(e.key==='Escape'){ e.stopPropagation(); closeMenu(); mb.setAttribute('aria-expanded','false'); mb.focus(); } };
+    [].forEach.call(menuEl.querySelectorAll('[data-pma]'),function(b){ b.onclick=function(){ var k=b.getAttribute('data-pma'); closeMenu(); mb.setAttribute('aria-expanded','false');
+      if(k==='refund') refundCredit(c.id); else if(k==='adj') adjustCredit(c.id); else pmStatementPdf(c,t,led); }; }); };
+
 }
 /* the open invoices, oldest due first, with how much of an amount goes to each */
 function pmAllocRows(open,max,label){
@@ -16353,60 +16429,82 @@ function pmAllocs(){ return [].map.call(dlg.querySelectorAll('[data-alloc]'),fun
 
 /* Record payment: one amount received, split across the client's invoices; anything left is kept as unallocated credit */
 function recordClientPayment(cid){
-  reload(); var today=isoDay(Date.now()), P={cid:cid,type:'Bank Transfer'};
+  reload(); var today=isoDay(Date.now()), P={cid:cid,type:PM_METHODS[0],useCr:false};
   var paint=function(){
-    var c=P.cid!=null?pmClient(P.cid):null, t=c?pmTotals(c.id):null, open=t?t.open.slice().sort(function(a,z){ return a.due-z.due; }):[];
+    var c=P.cid!=null?pmClient(P.cid):null, t=c?pmTotals(c.id):null, open=t?t.open.slice().sort(function(a,z){ return a.due-z.due; }):[], canCr=!!(t&&t.cr>0&&open.length);
+    if(!canCr) P.useCr=false;
+    var crDef=canCr?Math.min(t.cr,t.owe):0, crNow=P.useCr?(P.cr!=null?Number(P.cr)||0:crDef):0, amtDef=t&&t.owe>0?Math.max(0,r2(t.owe-crNow)):0;
     var pick=c?'<div class="qf-chosen"><b>'+esc(c.name)+'</b>'+(cid==null?'<button type="button" class="act" id="r-chg" title="Change client" aria-label="Change client">'+I.close+'</button>':'')+'</div>'
       :'<div class="sf-sel"><select class="fin plain" id="r-cl"><option value="">Choose the client</option>'+clients.filter(function(x){ return x.active!==false; }).slice().sort(function(a,b){ return a.name.localeCompare(b.name); }).map(function(x){ return '<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>'; }).join('')+'</select>'+I.chev+'</div>';
-    modal('<div class="modal-head"><div><h2 id="m-t">Record payment</h2><p class="pm-sub">Money received from a client. Split it across their invoices; anything left is kept as credit.</p></div><button data-x aria-label="Close">'+I.close+'</button></div>'+
+    modal('<div class="modal-head"><div><h2 id="m-t">Record payment</h2><p class="pm-sub">Money received from a client, client credit, or both. Split it across their invoices; any money left is kept as credit.</p></div><button data-x aria-label="Close">'+I.close+'</button></div>'+
       '<div class="modal-body pm">'+
         '<div><span class="flabel">Client <span class="req-star">*</span></span>'+pick+'<span class="ferr" id="r-cl-e"></span></div>'+
-        (c?'<div class="pm-client">'+(t.owe>0?'<span>'+money(t.owe)+' owing on '+open.length+' invoice'+(open.length===1?'':'s')+'</span>':'<span>Nothing owing</span>')+(t.cr>0?'<span class="pm-cr">'+money(t.cr)+' credit available</span>':'')+'</div>':'')+
-        '<div class="pm-g2"><div><label class="flabel" for="r-amt">Amount received <span class="req-star">*</span></label><div class="pm-amt"><span>$</span><input id="r-amt" inputmode="decimal" autocomplete="off" value="'+(P.amt!=null?esc(P.amt):t&&t.owe>0?t.owe.toFixed(2):'')+'"></div><span class="ferr" id="r-amt-e"></span></div>'+
+        (c?'<div class="pm-client">'+(t.owe>0?'<span>'+money(t.owe)+' owing on '+open.length+' invoice'+(open.length===1?'':'s')+'</span>':'<span>Nothing owing</span>')+(t.cr>0&&!canCr?'<span class="pm-cr">'+money(t.cr)+' credit available</span>':'')+'</div>':'')+
+        (canCr?'<div class="pm-crbox"><label class="pm-crck"><input type="checkbox" id="r-cru"'+(P.useCr?' checked':'')+'><span><b>Use client credit</b><small>'+money(t.cr)+' available</small></span></label>'+
+          '<div class="pm-crin" id="r-crw"'+(P.useCr?'':' hidden')+'><span>$</span><input id="r-cr" inputmode="decimal" autocomplete="off" value="'+(P.useCr?crNow.toFixed(2):crDef.toFixed(2))+'" aria-label="Credit to use"></div></div><span class="ferr" id="r-cr-e"></span>':'')+
+        '<div class="pm-g2"><div><label class="flabel" for="r-amt">Amount received'+(P.useCr?'':' <span class="req-star">*</span>')+'</label><div class="pm-amt"><span>$</span><input id="r-amt" inputmode="decimal" autocomplete="off" value="'+(P.amt!=null?esc(P.amt):amtDef?amtDef.toFixed(2):'')+'"></div><span class="ferr" id="r-amt-e"></span></div>'+
           '<div><label class="flabel" for="r-date">Payment date <span class="req-star">*</span></label><input class="fin plain" type="date" id="r-date" value="'+(P.date||today)+'" max="'+today+'"><span class="ferr" id="r-date-e"></span></div></div>'+
-        '<div><span class="flabel" id="r-type-l">Payment mode <span class="req-star">*</span></span><div class="pm-types pmx-types" role="radiogroup" aria-labelledby="r-type-l">'+PM_METHODS.map(function(m){ var on=m===P.type; return '<button type="button" class="pm-type'+(on?' on':'')+'" role="radio" aria-checked="'+on+'" data-rt="'+esc(m)+'"><i>'+PAY_IC[m]+'</i><b>'+esc(m)+'</b></button>'; }).join('')+'</div></div>'+
-        '<div class="pm-g2"><div><label class="flabel" for="r-ref">Reference</label><input class="fin plain" id="r-ref" maxlength="60" placeholder="e.g. bank receipt number" value="'+esc(P.ref||'')+'"></div><div><label class="flabel" for="r-note">Note</label><input class="fin plain" id="r-note" maxlength="200" placeholder="Optional" value="'+esc(P.note||'')+'"></div></div>'+
+        '<div><label class="flabel" for="r-type">Payment mode <span class="req-star">*</span></label><div class="sf-sel"><select class="fin plain" id="r-type">'+PM_METHODS.map(function(m){ return '<option'+(m===P.type?' selected':'')+'>'+esc(m)+'</option>'; }).join('')+'</select>'+I.chev+'</div></div>'+
+        '<div><label class="flabel" for="r-ref">Reference</label><input class="fin plain" id="r-ref" maxlength="60" placeholder="e.g. bank receipt number" value="'+esc(P.ref||'')+'"></div>'+
+        '<div><label class="flabel" for="r-note">Note</label><textarea class="ftext" id="r-note" rows="2" maxlength="300" placeholder="Anything the team should know about this payment">'+esc(P.note||'')+'</textarea></div>'+
         (c?(open.length?'<div><div class="pmx-alh"><span class="flabel">Allocate to invoices</span><button type="button" class="linkbtn" id="r-auto">Oldest first</button></div>'+
-            '<table class="qd-t pmx-alloc"><thead><tr><th>Invoice</th><th>Due</th><th class="r">Owing</th><th class="r">Allocate</th></tr></thead><tbody>'+pmAllocRows(open,P.amt!=null?Number(P.amt)||0:t.owe,'Amount')+'</tbody></table>'+
+            '<table class="qd-t pmx-alloc"><thead><tr><th>Invoice</th><th>Due</th><th class="r">Owing</th><th class="r">Allocate</th></tr></thead><tbody>'+pmAllocRows(open,(P.amt!=null?Number(P.amt)||0:amtDef)+crNow,'Amount')+'</tbody></table>'+
             '<p class="pmx-alsum" id="r-sum"></p><span class="ferr" id="r-al-e"></span></div>'
           :'<p class="pm-left">'+esc(c.name)+' has no unpaid invoices. The whole amount is kept as unallocated credit, ready for their next invoice.</p>'):'')+
         (c&&validEmail(c.email||'')&&open.length?'<label class="qf-tdef pm-mail"><input type="checkbox" id="r-mail" checked><span>Email a receipt for each invoice paid to '+esc(c.email)+'</span></label>':'')+
       '</div><div class="modal-foot"><button class="btn-ghost" id="m-no">Cancel</button><button class="btn-primary" id="m-go"'+(c?'':' disabled')+'>Record payment</button></div>',true);
     dlg.querySelector('.modal').classList.add('pm-modal');
-    var amtEl=document.getElementById('r-amt'), total=function(){ var v=Number(String(amtEl.value).replace(/[$,\s]/g,'')); return v>0?v:0; };
-    var sumEl=document.getElementById('r-sum'), psum=function(){ if(!sumEl) return; var a=pmAllocSum(), left=r2(total()-a);
-      sumEl.className='pmx-alsum'+(left<0?' bad':''); sumEl.innerHTML='Allocated <b>'+money(a)+'</b> of '+money(total())+' · '+(left<0?'<b>'+money(-left)+' more than received</b>':left>0?'<b>'+money(left)+'</b> kept as unallocated credit':'nothing left over'); };
-    var keep=function(){ P.amt=amtEl.value; P.date=document.getElementById('r-date').value; P.ref=document.getElementById('r-ref').value; P.note=document.getElementById('r-note').value; };
-    amtEl.oninput=function(){ document.getElementById('r-amt-e').classList.remove('show'); if(sumEl) pmAllocAuto(total()); psum(); };
-    pmAllocWire(total,psum); psum();
-    var au=document.getElementById('r-auto'); if(au) au.onclick=function(){ pmAllocAuto(total()); psum(); };
-    var cl=document.getElementById('r-cl'); if(cl) cl.onchange=function(){ keep(); P.cid=cl.value||null; P.amt=null; paint(); };
-    var chg=document.getElementById('r-chg'); if(chg) chg.onclick=function(){ keep(); P.cid=null; P.amt=null; paint(); };
-    dlg.querySelectorAll('[data-rt]').forEach(function(b){ b.onclick=function(){ P.type=b.getAttribute('data-rt'); dlg.querySelectorAll('[data-rt]').forEach(function(x){ var on=x===b; x.classList.toggle('on',on); x.setAttribute('aria-checked',on); }); }; });
+    var num=function(el){ var v=Number(String(el.value).replace(/[$,\s]/g,'')); return isNaN(v)?NaN:v; };
+    var amtEl=document.getElementById('r-amt'), crEl=document.getElementById('r-cr');
+    var money_=function(){ var v=num(amtEl); return v>0?v:0; }, cred=function(){ if(!P.useCr||!crEl) return 0; var v=num(crEl); return v>0?v:0; }, pool=function(){ return r2(money_()+cred()); };
+    var sumEl=document.getElementById('r-sum'), psum=function(){ if(!sumEl) return; var a=pmAllocSum(), cr=cred(), m=money_(), left=r2(pool()-a), unusedCr=Math.max(0,r2(cr-a)), leftMoney=r2(m-Math.max(0,a-cr));
+      sumEl.className='pmx-alsum'+(left<0?' bad':'');
+      sumEl.innerHTML='Allocated <b>'+money(a)+'</b> of '+money(pool())+(cr>0?' ('+money(cr)+' credit'+(m>0?' + '+money(m)+' received':'')+')':'')+' · '+
+        (left<0?'<b>'+money(-left)+' more than available</b>':leftMoney>0?'<b>'+money(leftMoney)+'</b> kept as unallocated credit':unusedCr>0?money(unusedCr)+' credit not used':'nothing left over'); };
+    var keep=function(){ P.amt=amtEl.value; P.date=document.getElementById('r-date').value; P.ref=document.getElementById('r-ref').value; P.note=document.getElementById('r-note').value; if(crEl) P.cr=crEl.value; };
+    amtEl.oninput=function(){ document.getElementById('r-amt-e').classList.remove('show'); if(sumEl) pmAllocAuto(pool()); psum(); };
+    var cu=document.getElementById('r-cru');
+    if(cu){ cu.onchange=function(){ P.useCr=cu.checked; document.getElementById('r-crw').hidden=!cu.checked; document.getElementById('r-cr-e').classList.remove('show');
+        if(cu.checked){ crEl.value=crDef.toFixed(2); amtEl.value=Math.max(0,r2(t.owe-crDef)).toFixed(2); crEl.focus(); } else amtEl.value=t.owe.toFixed(2);
+        if(sumEl) pmAllocAuto(pool()); psum(); };
+      crEl.oninput=function(){ document.getElementById('r-cr-e').classList.remove('show'); amtEl.value=Math.max(0,r2(t.owe-cred())).toFixed(2); if(sumEl) pmAllocAuto(pool()); psum(); }; }
+    pmAllocWire(pool,psum); psum();
+    var au=document.getElementById('r-auto'); if(au) au.onclick=function(){ pmAllocAuto(pool()); psum(); };
+    var cl=document.getElementById('r-cl'); if(cl) cl.onchange=function(){ keep(); P.cid=cl.value||null; P.amt=null; P.cr=null; P.useCr=false; paint(); };
+    var chg=document.getElementById('r-chg'); if(chg) chg.onclick=function(){ keep(); P.cid=null; P.amt=null; P.cr=null; P.useCr=false; paint(); };
+    document.getElementById('r-type').onchange=function(){ P.type=this.value; };
     dlg.querySelector('[data-x]').onclick=closeDlg; document.getElementById('m-no').onclick=closeDlg;
     document.getElementById('m-go').onclick=function(){
-      if(paying) return; ['r-amt-e','r-date-e','r-al-e','r-cl-e'].forEach(function(x){ var e=document.getElementById(x); if(e) e.classList.remove('show'); });
-      var amt=r2(total()), d=document.getElementById('r-date').value, ref=document.getElementById('r-ref').value.trim(), note=document.getElementById('r-note').value.trim(), mail=document.getElementById('r-mail');
+      if(paying) return; ['r-amt-e','r-date-e','r-al-e','r-cl-e','r-cr-e'].forEach(function(x){ var e=document.getElementById(x); if(e) e.classList.remove('show'); });
+      var amt=r2(money_()), cr=r2(cred()), d=document.getElementById('r-date').value, ref=document.getElementById('r-ref').value.trim(), note=document.getElementById('r-note').value.trim(), mail=document.getElementById('r-mail');
       if(!c) return fieldErr('r-cl-e','Choose the client');
-      if(!(amt>0)) return fieldErr('r-amt-e','Enter the amount received');
+      if(P.useCr){ if(!(cr>0)||isNaN(num(crEl))) return fieldErr('r-cr-e','Enter the credit to use, or untick Use client credit');
+        if(cr>creditOf(c.id)) return fieldErr('r-cr-e','The client has only '+money(creditOf(c.id))+' credit'); }
+      if(String(amtEl.value).trim()&&isNaN(num(amtEl))) return fieldErr('r-amt-e','Enter the amount as a number');
+      if(!(amt>0)&&!(cr>0)) return fieldErr('r-amt-e','Enter the amount received');
       if(!d||d>today) return fieldErr('r-date-e','Choose a date that isn’t in the future');
       if(sumEl&&!pmAllocCheck('r-al-e')) return;
       var al=sumEl?pmAllocs():[], used=r2(al.reduce(function(a,x){ return a+x.amt; },0));
-      if(used>amt) return fieldErr('r-al-e','The invoices add up to '+money(used)+', more than the '+money(amt)+' received');
-      reload(); var bad=al.filter(function(x){ var s=byId(x.id); return !s||s.status==='disabled'||r2(x.amt)>pendingOf(s); })[0];
+      if(used>r2(amt+cr)) return fieldErr('r-al-e','The invoices add up to '+money(used)+', more than the '+money(r2(amt+cr))+' available');
+      if(cr>0&&!(used>0)) return fieldErr('r-al-e','Allocate the credit to at least one invoice');
+      reload(); var bad=al.filter(function(x){ var s0=byId(x.id); return !s0||s0.status==='disabled'||r2(x.amt)>pendingOf(s0); })[0];
       if(bad){ closeDlg(); render(); return toast(bad.id+' changed meanwhile. Nothing was recorded; try again.',true); }
       paying=true;
       try{
-        var at=d===today?Date.now():new Date(d+'T12:00:00').getTime(), grp='G'+Date.now().toString(36), left=r2(amt-used), ids=[];
+        /* credit is used first, invoice by invoice; the money pays the rest; money not allocated is kept as unallocated credit */
+        var at=d===today?Date.now():new Date(d+'T12:00:00').getTime(), grp='G'+Date.now().toString(36), crLeft=Math.min(cr,used), crUsed=crLeft, moneyUsed=r2(used-crUsed), left=r2(amt-moneyUsed), ids=[];
         if(left>0){ var cv=loadCredit(); cv.list.push({clientId:c.id,amount:left,at:at,by:ME.name,kind:'unallocated',ref:ref,method:P.type,group:grp,note:(al.length?'Left over from '+money(amt)+' received':money(amt)+' received with no invoice to pay')+(note?' · '+note:'')});
           if(!saveCredit(cv)){ return toast('The payment couldn’t be saved. Nothing was changed.',true); } }
-        al.forEach(function(x,i){ var s=byId(x.id), pid='P'+Date.now().toString(36)+i;
-          var p={id:pid,amount:x.amt,type:P.type,at:at,by:ME.name,ref:ref,group:grp}; if(note) p.note=note; if(al.length>1||left>0) p.received=x.amt;
-          s.payments.push(p); ids.push([s.id,pid]);
-          log(s,'payment',{note:money(x.amt)+' · '+P.type+(ref?' · ref '+ref:'')+(al.length>1||left>0?' · part of '+money(amt)+' received':'')+(pendingOf(s)<=0?' · paid in full':' · '+money(pendingOf(s))+' still owed')}); });
+        al.forEach(function(x,k){ var s0=byId(x.id), useC=r2(Math.min(x.amt,crLeft)), useM=r2(x.amt-useC); crLeft=r2(crLeft-useC);
+          if(useC>0){ if(!spendCredit(c.id,useC,s0.id)) return; var pc={id:'P'+Date.now().toString(36)+k+'c',amount:useC,type:'Client Credit',at:at,by:ME.name,ref:'',group:grp}; s0.payments.push(pc); if(!(useM>0)) ids.push([s0.id,pc.id]);
+            log(s0,'payment',{note:money(useC)+' · Client Credit'+(pendingOf(s0)<=0?' · paid in full':' · '+money(pendingOf(s0))+' still owed')}); }
+          if(useM>0){ var p={id:'P'+Date.now().toString(36)+k,amount:useM,type:P.type,at:at,by:ME.name,ref:ref,group:grp}; if(note) p.note=note; if(al.length>1||left>0) p.received=useM;
+            s0.payments.push(p); ids.push([s0.id,p.id]);
+            log(s0,'payment',{note:money(useM)+' · '+P.type+(ref?' · ref '+ref:'')+(al.length>1||left>0?' · part of '+money(amt)+' received':'')+(pendingOf(s0)<=0?' · paid in full':' · '+money(pendingOf(s0))+' still owed')}); } });
         if(!save()){ reload(); render(); return toast('Couldn’t save the payment. Nothing was changed.',true); }
-        try{ parent.AADNotify&&parent.AADNotify({id:'pay:client:'+c.id+':'+at,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:money(amt)+' '+P.type+' from '+c.name+(al.length?' across '+al.length+' invoice'+(al.length===1?'':'s'):'')+(left>0?' · '+money(left)+' kept as credit':''),go:{mod:'sales',id:al.length?al[0].id:''}}); }catch(e){}
-        closeDlg(); render(); toast(money(amt)+' recorded'+(al.length?' on '+al.length+' invoice'+(al.length===1?'':'s'):'')+(left>0?' · '+money(left)+' kept as credit':''));
+        var how=(crUsed>0?money(crUsed)+' credit':'')+(crUsed>0&&amt>0?' + ':'')+(amt>0?money(amt)+' '+P.type:'');
+        try{ parent.AADNotify&&parent.AADNotify({id:'pay:client:'+c.id+':'+at,kind:'pay',tone:'ok',aud:'admin',title:'Payment recorded',desc:how+' from '+c.name+(al.length?' across '+al.length+' invoice'+(al.length===1?'':'s'):'')+(left>0?' · '+money(left)+' kept as credit':''),go:{mod:'sales',id:al.length?al[0].id:''}}); }catch(e){}
+        closeDlg(); render(); toast(how+' recorded'+(al.length?' on '+al.length+' invoice'+(al.length===1?'':'s'):'')+(left>0?' · '+money(left)+' kept as credit':''));
         if(mail&&mail.checked) ids.forEach(function(x){ sendConfirmation(x[0],x[1]); });
       } finally { paying=false; }
     };
@@ -16488,7 +16586,7 @@ function adjustCredit(cid){
 function pmExport(rows,kind){
   if(!rows.length) return toast('There are no clients to export.',true);
   var head=['Client','Email','Invoices','Invoiced','Paid','Outstanding','Credit','Unallocated','Position','Last payment'];
-  var data=rows.map(function(r){ var t=r.t; return [r.c.name,r.c.email||'',t.n,t.inv.toFixed(2),t.paid.toFixed(2),t.owe.toFixed(2),t.cr.toFixed(2),t.un.toFixed(2),t.net>0?'Owes '+t.net.toFixed(2):t.net<0?'In credit '+(-t.net).toFixed(2):'Settled',t.last?dmyOf(t.last):'']; });
+  var data=rows.map(function(r){ var t=r.t; return [r.c.name,r.c.email||'',t.n,t.inv.toFixed(2),t.paid.toFixed(2),t.owe.toFixed(2),t.cr.toFixed(2),t.un.toFixed(2),t.net>0?'Owes '+t.net.toFixed(2):t.net<0?'In credit '+(-t.net).toFixed(2):'Settled',t.last?upWhen(t.last):'']; });
   if(kind==='csv'){ var q=function(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
     var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+[head].concat(data).map(function(r){ return r.map(q).join(','); }).join('\r\n')],{type:'text/csv;charset=utf-8'})); a.download='client-payments-'+dmyOf(Date.now())+'.csv';
     document.body.appendChild(a); a.click(); a.remove(); return toast('Exported '+data.length+' client'+(data.length===1?'':'s')+' to CSV'); }
@@ -16504,7 +16602,7 @@ function pmStatementPdf(c,t,led){
   var tbl='<div class="ex"><h1>Statement of account</h1><p>'+escH(c.name)+(c.email?' · '+escH(c.email):'')+' · at '+dmyOf(Date.now())+' · '+escH(FIRM.name)+'</p>'+
     '<dl><div><dt>Total invoiced</dt><dd>'+money(t.inv)+'</dd></div><div><dt>Total paid</dt><dd>'+money(t.paid)+'</dd></div><div><dt>Outstanding</dt><dd>'+money(t.owe)+'</dd></div><div><dt>Credit available</dt><dd>'+money(t.cr)+'</dd></div><div><dt>Position</dt><dd>'+(t.net>0?'Owes '+money(t.net):t.net<0?'In credit '+money(-t.net):'Settled')+'</dd></div></dl>'+
     '<table><thead><tr><th>Date</th><th>Details</th><th>Invoice</th><th class="r">Debit</th><th class="r">Credit</th><th class="r">Balance</th></tr></thead><tbody>'+
-    led.map(function(e){ return '<tr><td>'+dmyOf(e.t)+'</td><td>'+escH(e.what)+(e.ref?' · ref '+escH(e.ref):'')+'</td><td>'+escH(e.sale||'')+'</td><td class="r">'+(e.dr?money(e.dr):'')+'</td><td class="r">'+(e.cr?money(e.cr):'')+'</td><td class="r">'+(e.bal<0?money(-e.bal)+' CR':money(e.bal))+'</td></tr>'; }).join('')+'</tbody></table></div>';
+    led.map(function(e){ return '<tr><td>'+upWhen(e.t)+'</td><td>'+escH(e.what)+(e.ref?' · ref '+escH(e.ref):'')+'</td><td>'+escH(e.sale||'')+'</td><td class="r">'+(e.dr?money(e.dr):'')+'</td><td class="r">'+(e.cr?money(e.cr):'')+'</td><td class="r">'+(e.bal<0?money(-e.bal)+' CR':money(e.bal))+'</td></tr>'; }).join('')+'</tbody></table></div>';
   if(!printPage('Statement · '+c.name,tbl,PM_PRINT_CSS)) toast('Allow pop-ups to download the statement',true);
 }
 
@@ -16518,7 +16616,7 @@ function pmFromHash(){ var m=(location.hash||'').match(/^#client\/(.+)$/); if(PA
 pmFromHash();
 setTimeout(function(){ reload(); render(); if(!PAYMODE) autoReminders(); },0);   // due reminders go out when Sales opens
 window.addEventListener('hashchange',function(){ if(!PAYMODE) return; var m=(location.hash||'').match(/^#client\/(.+)$/); if(m&&String(PMX.cid)!==decodeURIComponent(m[1])){ pmFromHash(); reload(); render(); } });
-window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'||e.key===CR_KEY){ reload(); if(!dlg.classList.contains('open')) render(); } });
+window.addEventListener('storage',function(e){ if(e.key===INV_KEY||e.key==='aad-quotations-v1'||e.key==='aad-clients-v1'||e.key===CR_KEY||e.key===PM_KEY){ reload(); if(!dlg.classList.contains('open')) render(); } });
 /* a notification opens one sale: parent.AADShow from the shell, or an intent left before this page loaded */
 window.AADShow=function(id){ if(!st.list.length) reload(); if(byId(id)) openDetail(id); else toast('This sale no longer exists.',true); };
 if(!PAYMODE) setTimeout(function(){ try{ var want=parent.AADTakeIntent&&parent.AADTakeIntent('sales'); if(want) window.AADShow(want.view); }catch(e){} },0);
@@ -19974,6 +20072,9 @@ var CATALOGUE = [
     { key:'branches', name:'Branches', desc:'All the branches are in this folder.', icon:'bldg', kind:'branches' },
     { key:'services', name:'Services', desc:'All the services offered to clients.', icon:'tag', kind:'services' },
     { key:'categories', name:'Categories', desc:'Groups used to organise services.', icon:'folder', kind:'categories' }
+  ]},
+  { group:'Finance', items:[
+    { key:'payment-modes', name:'Payment Modes', desc:'How clients can pay; offered when recording payments.', icon:'tag' }
   ]}
 ];
 var BY_KEY = {};
@@ -20010,6 +20111,11 @@ Object.keys(SIMPLE_SEED).forEach(function(k){
   SIMPLE[k] = SIMPLE_SEED[k].map(function(n,i){ return { id:i+1, name:n, active:(i%7!==3) }; });
 });
 var simpleSeq = {};
+/* payment modes: Sales and Payments offer the active ones (Client Credit is built in, not listed here); kept in aad-payment-modes-v1 */
+var PM_KEY='aad-payment-modes-v1';
+SIMPLE['payment-modes']=(function(){ try{ var v=JSON.parse(localStorage.getItem(PM_KEY)||'null'); if(Array.isArray(v)&&v.length) return v; }catch(e){}
+  return ['Bank Transfer','EFTPOS / Card','Cash'].map(function(n,i){ return {id:i+1,name:n,active:true}; }); })();
+function persistSimple(key){ if(key==='payment-modes'){ try{ localStorage.setItem(PM_KEY,JSON.stringify(SIMPLE[key])); }catch(e){} } }
 
 /* =========================================================
    App state
@@ -21096,6 +21202,7 @@ function simpleModal(item,id){
     var el=document.getElementById('s-name'), err=document.getElementById('s-err');
     draft.name=el.value.trim();
     if(!draft.name){ err.textContent='Name is required'; err.classList.add('show'); el.classList.add('bad'); el.focus(); return; }
+    if(item.key==='payment-modes'&&draft.name.toLowerCase()==='client credit'){ err.textContent='Client Credit is built in'; err.classList.add('show'); el.classList.add('bad'); el.focus(); return; }
     if(list.some(function(r){ return r.name.toLowerCase()===draft.name.toLowerCase() && r.id!==id; })){
       err.textContent='Already exists'; err.classList.add('show'); el.classList.add('bad'); el.focus(); return;
     }
@@ -21105,7 +21212,7 @@ function simpleModal(item,id){
       list.unshift({id:simpleSeq[item.key],name:draft.name,active:draft.active});
       toast(label+' added');
     }
-    closeModal(); render();
+    persistSimple(item.key); closeModal(); render();
   };
 }
 
@@ -21125,7 +21232,7 @@ function confirmDelete(kind,id){
   );
   document.getElementById('yes').onclick=function(){
     if(kind==='doc'){ DOCS=DOCS.filter(function(d){return d.id!==id;}); }
-    else { SIMPLE[kind]=SIMPLE[kind].filter(function(r){return r.id!==id;}); }
+    else { SIMPLE[kind]=SIMPLE[kind].filter(function(r){return r.id!==id;}); persistSimple(kind); }
     closeModal(); render(); toast('“'+name+'” deleted');
   };
 }
@@ -22065,7 +22172,7 @@ function receiptHtml(m){
   var kv=function(l,v){ return '<div><dt>'+l+'</dt><dd>'+v+'</dd></div>'; };
   return '<div class="rc-doc"><div class="rc-h"><img src="'+DOC_LOGO+'" alt="AAD Taxation"><div class="rc-t"><b>Payment receipt</b><span>'+escH(m.no)+'</span></div></div>'+
     '<div class="rc-ok"><i>✓</i>'+(m.balance>0?'Part payment received. Thank you.':'Payment received in full. Thank you.')+'</div>'+
-    '<dl class="rc-dl">'+kv('Received from',escH(m.to))+kv('Invoice',escH(m.saleId))+kv('Payment date',dmyOf(m.at))+kv('Payment method',escH(m.method))+
+    '<dl class="rc-dl">'+kv('Received from',escH(m.to))+kv('Invoice',escH(m.saleId))+kv('Payment date',whenOf(m.at).replace(' · ',', '))+kv('Payment method',escH(m.method))+
       kv('Reference',m.ref?escH(m.ref):'—')+kv('Invoice total',money(m.total))+(m.paid!=null?kv('Paid to date',money(m.paid))+kv('Balance due',money(m.balance)):'')+'</dl>'+
     (m.credit>0?'<dl class="rc-dl rc-x">'+kv('Amount received',money(m.received))+kv('Kept as credit on your account',money(m.credit))+'</dl>':'')+
     '<div class="rc-amt"><span>'+(m.credit>0?'Applied to this invoice':'Amount paid')+'</span><b>'+money(m.amount)+'</b></div>'+

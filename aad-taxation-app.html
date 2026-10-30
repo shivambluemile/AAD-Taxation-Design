@@ -22201,7 +22201,7 @@ function paintQuote(){
           '<label class="l">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
           '<label class="l qa-sl" for="qa-c">Comment</label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
           '<span class="err" id="qa-e" hidden></span>'+
-          '<div class="qa-sf"><p class="qa-alt">Not what you need? <button type="button" class="qa-dl" id="qa-no">Decline this quotation</button></p><button type="button" class="btn pri" id="qa-ok">'+IC.tick+'Sign and accept</button></div></div>')+
+          '<div class="qa-sf"><p class="qa-alt">Not what you need? <button type="button" class="qa-dl" id="qa-no">Decline this quotation</button></p><button type="button" class="btn pri" id="qa-ok">Sign and accept</button></div></div>')+
     '</div>'+
   '</div>';
   var ok=document.getElementById('qa-ok'); if(!ok) return;
@@ -22338,7 +22338,7 @@ function paintInvoice(){
         '<label class="l">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
         '<label class="l qa-sl" for="qa-c">Comment</label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
         '<span class="err" id="qa-e" hidden></span>'+
-        '<div class="qa-sf"><p class="qa-alt">Something not right? <button type="button" class="qa-dl" id="qa-no">Decline this invoice</button></p><button type="button" class="btn pri" id="qa-ok">'+IC.tick+'Sign and accept</button></div></div>'+
+        '<div class="qa-sf"><p class="qa-alt">Something not right? <button type="button" class="qa-dl" id="qa-no">Decline this invoice</button></p><button type="button" class="btn pri" id="qa-ok">Sign and accept</button></div></div>'+
     '</div></div>';
   var ok=document.getElementById('qa-ok'), er=document.getElementById('qa-e'), pad=sigPad(document.getElementById('qa-pad'),who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
   var fail=function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } };

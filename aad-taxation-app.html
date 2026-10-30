@@ -14418,6 +14418,9 @@ table,td,th{font-size:13.5px}
 .sd-head .dhead-acts svg{width:15px;height:15px;flex-shrink:0}
 .sd-head .sd-more{width:34px;height:34px;border:1px solid var(--line);border-radius:8px;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--slate);cursor:pointer}
 .sd-head .sd-more svg{width:18px;height:18px}
+.sd-head .sd-sep{width:1px;height:22px;background:var(--line);margin:0 2px}
+.sd-head{flex-wrap:nowrap!important;align-items:flex-start}.sd-head .dpmain{flex:0 0 auto}
+.sd-head .dhead-acts{flex:1 1 auto;justify-content:flex-end!important;min-width:0;gap:8px}.sd-head .dhead-acts .btn-ghost,.sd-head .dhead-acts .btn-primary{white-space:nowrap}
 .qd-ov{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding:24px 32px 32px;align-items:start;background:#fff;min-height:100%}
 .qd-paper{min-width:0}
 .qd-paper .qf-doc{max-width:794px;margin:0 auto;box-shadow:none;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -14512,7 +14515,9 @@ table,td,th{font-size:13.5px}
 .qf-tot .sl-pendrow{border-top:1px dashed var(--line);margin-top:6px;padding-top:9px;font-weight:600}.qf-tot .sl-pendrow dt{color:var(--ink)}
 @media (max-width:900px){.sl-sf .qf-row{grid-template-columns:1fr 1fr}.sl-sf .sl-fee{justify-content:flex-start}}
 /* Sales uses the shared list styles (filter bar, stats, table, ⋮ menu); only what's specific to sales is here */
-.sl-stats{grid-template-columns:repeat(3,minmax(0,240px))}
+.sl-stats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sl-stats .stat{display:inline-flex;align-items:baseline;gap:8px;padding:7px 12px;border-radius:8px}
+.sl-stats dt{margin:0;font-size:10.5px}.sl-stats dd{font-size:14px}
 .sl-price input{width:118px;height:42px;background:var(--field);border:1px solid var(--field);border-radius:8px;padding:0 14px;font-size:14px;color:#4B5563}
 .sl-price input::placeholder{color:#6B7280}.sl-price input:focus{outline:none;border-color:var(--orange);background:#fff}
 .sl-price input.bad{border-color:#F3A3A3;background:#FFF7F7}
@@ -14557,7 +14562,7 @@ table,td,th{font-size:13.5px}
 .sl-mini{width:100%;border-collapse:collapse;font-size:12.5px}
 .sl-mini th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#64748B;padding:6px 8px;border-bottom:1px solid var(--line)}
 .sl-mini td{padding:7px 8px;border-bottom:1px solid var(--line-soft,#F1F2F4)}.sl-mini .r{text-align:right}.sl-mini .tot td{font-weight:700;border-bottom:0}
-@media (max-width:700px){.sl-stats{grid-template-columns:1fr 1fr}.sl-form{grid-template-columns:1fr}}
+@media (max-width:700px){.sl-form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -14746,7 +14751,7 @@ function selHtml(id,all,opts,val){ return '<div class="sel"><select id="'+id+'" 
 var STATUS={draft:['Not sent','s-draft'],sent:['Sent','s-sent'],disabled:['Disabled','s-dis']};
 var PAY={unpaid:'Unpaid',partial:'Partially paid',paid:'Paid',overdue:'Overdue',failed:'Payment failed'};   // an invoice can be paid in several payments
 var PAY_TYPES=['Bank Transfer','EFTPOS / Card','Cash','Client Credit'];   // older payments keep the type they were recorded with
-var EV={pay_failed:'Online payment failed',receipt_sent:'Payment confirmation sent',receipt_failed:'Payment confirmation not sent',client_paid:'Client says they’ve paid',link_revoked:'Client link revoked',created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
+var EV={client_accepted:'Signed and accepted by the client',client_declined:'Declined by the client',pay_failed:'Online payment failed',receipt_sent:'Payment confirmation sent',receipt_failed:'Payment confirmation not sent',client_paid:'Client says they’ve paid',link_revoked:'Client link revoked',created:'Sale created',edited:'Sale edited',sent:'Invoice sent',resent:'Invoice resent',send_failed:'Email not sent',reminder:'Payment reminder sent',reminder_failed:'Reminder not sent',
   payment:'Payment recorded',payment_deleted:'Payment deleted',disabled:'Sale disabled',enabled:'Sale enabled',to_quote:'Quotation created from this sale',edit_requested:'Edit requested',edit_approved:'Edit request approved',edit_declined:'Edit request declined'};
 var DUE_DAYS=14, DAY=864e5;
 /* the companies a sale can be issued from, per branch. PROTOTYPE ONLY: the same sample spread as Quotations, until branches record their own */
@@ -15039,12 +15044,9 @@ function actionsFor(s){
   if(!dis&&isManager()&&er&&er.status==='pending') a.push(['review','Review edit request']);
   if(!dis&&m) a.push(s.status==='sent'?['resend','Resend']:['send','Send']);
   if(!dis&&m&&pend>0) a.push(['pay','Add Payment']);
-  if(!dis&&m&&pend>0&&s.status==='sent') a.push(['remind','Send Reminder']);
-  a.push(['pdf','PDF']); a.push(['log','Log']);
+  a.push(['pdf','PDF']);
   if(lastPayment(s)) a.push(['receipt',(s.payments||[]).filter(function(p){ return !p.void; }).length>1?'Receipts':'Download receipt']);
-  if(!dis&&s.status==='sent'&&s.token) a.push(['view','View client page']);
-  if(!dis&&isManager()&&s.token) a.push(['revoke','Revoke client link','danger']);
-  if(!dis&&m) a.push(['quote','Convert To Quotation']);
+  if(!dis&&m&&!s.quotationId&&!(s.history||[]).some(function(e){ return e.type==='to_quote'; })) a.push(['quote','Convert To Quotation']);   // once only, and not for a sale that came from a quotation
   if(!dis&&isManager()) a.push(['disable','Disable','danger']);
   if(dis&&isManager()) a.push(['enable','Enable']);
   if(isManager()&&!(s.payments||[]).length&&s.status!=='sent'&&!s.quotationId) a.push(['delete','Delete','danger']);
@@ -15224,9 +15226,9 @@ function paintSaleForm(focusId){
           (e.discount?'<p class="ferr show sl-derr">'+esc(e.discount)+'</p>':'')+
           '<div><dt>'+(T.anyGst?'GST applied (10%)':'GST')+'</dt><dd>'+(T.anyGst?money(T.gst):'Not applied')+'</dd></div><div class="t"><dt>Total ($)</dt><dd>'+money(T.total)+'</dd></div>'+
           (function(){ var bal=c?creditOf(c.id):0, owed=Math.max(0,r2(T.total-SF.paid)); if(!bal&&!d.useCredit) return '';
-            return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" readonly aria-readonly="true" aria-label="Client credit applied: the full amount"></span>'+
+            return '<div class="sl-disc sl-crrow"><dt>Client credit'+(d.useCredit?'<span class="sl-dctl"><span class="sl-dgrp'+(e.credit?' bad':'')+'"><input id="sf-cr" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" value="'+esc(d.credit)+'" aria-label="Client credit to apply, up to '+money(Math.min(bal,owed))+'"></span>'+
               '<button type="button" class="sl-drm" id="sf-crrm" title="Don’t apply credit" aria-label="Don’t apply credit">'+I.close+'</button></span>':'')+'</dt>'+
-              '<dd>'+(d.useCredit?'−'+money(T.credit):owed>0&&r2(bal)>=owed?'<button type="button" class="linkbtn" id="sf-cradd">'+I.plus+'Pay in full with credit</button>':'<span class="cl-muted sl-crlow" title="Credit can only pay the full amount">'+money(bal)+' available</span>')+'</dd></div>'+
+              '<dd>'+(d.useCredit?'−'+money(T.credit):owed>0?'<button type="button" class="linkbtn" id="sf-cradd">'+I.plus+'Apply '+money(Math.min(bal,owed))+' credit</button>':'<span class="cl-muted sl-crlow">'+money(bal)+' available</span>')+'</dd></div>'+
               (e.credit?'<p class="ferr show sl-derr sl-crerr">'+esc(e.credit)+'</p>':''); })()+
           '<div class="sl-pendrow"><dt>Pending amount</dt><dd>'+money(T.pending)+'</dd></div></dl></section>'+
       '</div>'+err('total')+
@@ -15241,7 +15243,6 @@ function paintSaleForm(focusId){
 }
 function liveTotals(){
   var d=SF.d;
-  if(d.useCredit){ d.credit=Math.max(0,r2(saleTotals(d,SF.paid).total-SF.paid)).toFixed(2); var ci=document.getElementById('sf-cr'); if(ci) ci.value=d.credit; }   // credit always pays the whole amount
   var T=saleTotals(d,SF.paid);
   [].forEach.call(ov.querySelectorAll('.qf-row'),function(row,i){ var x=d.items[i], q=num(x.qty), p=num(x.price), el=row.querySelector('.qf-line.num'); if(el) el.textContent=money(x.svcId&&q>0&&p>=0?q*p:0); });
   var dd=ov.querySelectorAll('.qf-tot > div > dd'), vals=[money(T.sub),d.showDisc?'−'+money(T.disc):null,T.anyGst?money(T.gst):'Not applied',money(T.total)];
@@ -15270,7 +15271,7 @@ function wireSaleForm(focusId){
   function choose(cid){ var c=clients.filter(function(x){ return String(x.id)===String(cid); })[0]; if(!c) return; d.clientId=c.id; d.onName=c.name; d.useCredit=false; d.credit=''; delete SF.errs.credit; SF.pick=''; delete SF.errs.client; delete SF.errs.onName; touch(); repaint('sf-on'); }
   var chg=document.getElementById('sf-chg'); if(chg) chg.onclick=function(){ d.clientId=null; d.onName=''; d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint('sf-q'); };
   var ca=document.getElementById('sf-cradd'); if(ca) ca.onclick=function(){ var c=formClient(), T=saleTotals(d,SF.paid), owed=Math.max(0,r2(T.total-SF.paid));
-    if(!(owed>0)||creditOf(c&&c.id)<owed) return; d.useCredit=true; d.credit=owed.toFixed(2); touch(); repaint(); };
+    if(!(owed>0)||!(creditOf(c&&c.id)>0)) return; d.useCredit=true; d.credit=Math.min(creditOf(c.id),owed).toFixed(2); touch(); repaint('sf-cr'); };   // as much as covers it; the rest stays pending
   var crm=document.getElementById('sf-crrm'); if(crm) crm.onclick=function(){ d.useCredit=false; d.credit=''; delete SF.errs.credit; touch(); repaint(); };
   var ci=document.getElementById('sf-cr'); if(ci) ci.oninput=function(){ d.credit=ci.value; if(SF.errs.credit){ delete SF.errs.credit; var g=ci.closest('.sl-dgrp'); if(g) g.classList.remove('bad'); var er=ov.querySelector('.sl-crerr'); if(er) er.remove(); } touch(); liveTotals(); };
   [].forEach.call(ov.querySelectorAll('[data-cat]'),function(el){ el.onchange=function(){ var i=+el.getAttribute('data-cat'), x=d.items[i]; x.cat=el.value;
@@ -15353,8 +15354,8 @@ function checkSale(){
   if(SF.paid>0&&T.total<SF.paid) e.total='The total can’t be less than the '+money(SF.paid)+' already paid';
   if(d.useCredit&&!e.total){ var cv=num(d.credit), bal=creditOf(d.clientId), owed=Math.max(0,r2(T.total-SF.paid));
     if(d.credit===''||!isFinite(cv)||cv<=0) e.credit='Enter the credit to apply, or remove it';
-    else if(r2(owed)>bal) e.credit='The client has only '+money(bal)+' credit, which doesn’t cover the full '+money(owed)+'. Remove the credit.';
-    else if(r2(cv)!==r2(owed)) e.credit='Credit must pay the full '+money(owed); }
+    else if(r2(cv)>bal) e.credit='The client has only '+money(bal)+' credit';
+    else if(r2(cv)>owed) e.credit='That’s more than the '+money(owed)+' owed on this sale'; }
   if(SF.errs.doc&&!d.doc) e.doc=SF.errs.doc;
   return e;
 }
@@ -15748,6 +15749,7 @@ function mailDialog(s,kind){
       var to=[rec.emailTo,rec.smsTo].filter(Boolean).join(' and ');
       if(!rec.ok){ log(x,rem?'reminder_failed':'send_failed',{note:'To '+to+' · '+(rec.error||'The message couldn’t be delivered'),ok:false,to:rec.emailTo||rec.smsTo}); save(); return; }
       x.token=token; x.tokenExp=Date.now()+INVOICE_LINK_DAYS*DAY;
+      if(!rem&&x.clientResponse==='declined'){ delete x.clientResponse; delete x.respondedAt; delete x.clientComment; }   // sent again after a decline: the client answers again
       if(rem) log(x,'reminder',{note:'To '+to+' · '+money(pendingOf(x))+' owing',to:rec.emailTo||rec.smsTo});
       else { var was=x.status; x.status='sent'; x.sentAt=Date.now(); log(x,was==='sent'?'resent':'sent',{note:'To '+to+(rec.emailTo?' · invoice '+x.id+'.pdf attached':''),to:rec.emailTo||rec.smsTo}); }
       if(!save()){ reload(); toast('The message went out but the sale couldn’t be updated. Try again.',true); return; }
@@ -15863,8 +15865,8 @@ var SD_TICK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 function badge(st0){ var x=STATUS[st0]||[st0,'']; return '<span class="state '+x[1]+'"><i></i>'+x[0]+'</span>'; }
 /* the header actions: the list menu's rules (status, permissions, edit requests); Log is the Activities tab here, Disable and Delete stay in the list */
 function detailActions(s){
-  var lab={receipt:'Receipt',view:'Client page',revoke:'Revoke link',edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend invoice',pay:'Add Payment',remind:'Send reminder',pdf:'Invoice PDF',quote:'Convert to quotation',enable:'Enable'};
-  return actionsFor(s).filter(function(a){ return lab[a[0]]; }).map(function(a){ return [a[0],lab[a[0]]]; });
+  var lab={edit:'Edit',request:'Request edit',review:'Review edit request',send:'Send invoice',resend:'Resend',pay:'Add Payment',pdf:'PDF',quote:'Convert to quotation',enable:'Enable','delete':'Delete'};
+  return actionsFor(s).map(function(a){ return [a[0],lab[a[0]],a[2]]; }).filter(function(a){ return a[1]; });   // receipts live on the Payments tab; Disable stays in the list's ⋮ menu
 }
 /* the saved totals; older sales (converted from quotations) have only the amount */
 function savedTotals(s){
@@ -15903,14 +15905,15 @@ function paintDetail(keep){
   var tabs=[['overview','Overview'],['payments','Payments',pays.filter(function(p){ return !p.void; }).length],['activity','Log & Activities',hist.length]];
   if(!tabs.some(function(t){ return t[0]===sdTab; })) sdTab='overview';
 
-  /* header: the number, status and payment status; the one next step, the PDF, then the other actions */
+  /* header: the number, status and payment status; every action as a button (no ⋮): risky ones first, set apart, then the rest, the PDF, and the one next step last */
   var ps=payStatus(s), er=s.editRequest, A=detailActions(s).filter(function(a){ return a[0]!=='pdf'; });
   var main=A.filter(function(a){ return a[0]==='pay'; })[0]||A.filter(function(a){ return a[0]==='send'; })[0], more=A.filter(function(a){ return a!==main; });
+  var abtn=function(a){ return '<button class="btn-ghost'+(a[2]?' danger':'')+'" data-sa="'+a[0]+'">'+MI[a[0]]+esc(a[1])+'</button>'; };
+  var risky=more.filter(function(a){ return a[2]; }), safe=more.filter(function(a){ return !a[2]; });
   var who=cr?'<button class="sd-cl" data-sd="client" title="Open the client record">'+SD_IC.user+esc(c.name)+'</button>':'<span class="sd-cl gone">'+SD_IC.user+esc(c.name)+(s.clientId!=null?' <small>(no longer on file)</small>':'')+'</span>';
-  var head='<div class="cl-dhead qd-head sd-head"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+badge(s.status)+(dis?'':'<span class="state p-'+ps+'"><i></i>'+PAY[ps]+'</span>')+
-        (er&&er.status==='pending'?'<span class="state s-req"><i></i>Edit requested</span>':'')+'</h2>'+who+'</div>'+
-    '<div class="dhead-acts"><button class="btn-ghost sd-pdf" data-sa="pdf" title="Download the invoice as a PDF">'+MI.pdf+'PDF</button>'+(main?'<button class="btn-primary qd-main" data-sa="'+main[0]+'">'+MI[main[0]]+esc(main[1])+'</button>':'')+
-      '<button class="qt-more sd-more" data-menu="'+esc(s.id)+'" data-skip="pdf'+(main?','+main[0]:'')+'" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for '+esc(s.id)+'" title="More actions">'+I.dots+'</button>'+
+  var head='<div class="cl-dhead qd-head sd-head"><div class="dpmain"><h2 id="sd-t">'+esc(s.id)+' '+(function(){ var k=pendingOf(s)<=0?'paid':paidOf(s)>0?'partial':'unpaid'; return '<span class="state p-'+k+'"><i></i>'+PAY[k]+'</span>'; })()+'</h2>'+who+'</div>'+
+    '<div class="dhead-acts">'+risky.map(abtn).join('')+(risky.length&&(safe.length||main)?'<span class="sd-sep" aria-hidden="true"></span>':'')+safe.map(abtn).join('')+
+      '<button class="btn-ghost sd-pdf" data-sa="pdf" title="Download the invoice as a PDF">'+MI.pdf+'PDF</button>'+(main?'<button class="btn-primary qd-main" data-sa="'+main[0]+'">'+MI[main[0]]+esc(main[1])+'</button>':'')+
       '<button class="x" id="sd-x" aria-label="Back to Sales" title="Back to Sales">'+I.close+'</button></div></div>';
   var tabsH='<div class="btabs" role="tablist" aria-label="Sale details">'+tabs.map(function(t){
     var o=t[0]===sdTab; return '<button role="tab" aria-selected="'+o+'" class="'+(o?'on':'')+'" data-stab="'+t[0]+'">'+t[1]+(t[2]!=null?'<span class="tab-n">'+t[2]+'</span>':'')+'</button>'; }).join('')+'</div>';
@@ -15933,6 +15936,9 @@ function paintDetail(keep){
       :step('todo','Awaiting payment',dueTxt);
     var steps=step('done','Created',(made?by(made)+'<br>'+when(made.t):'by '+esc(s.by||'—')+'<br>'+when(s.at||s.date))+(s.quotationId?'<br>From quotation '+esc(s.quotationId):''))+
       (sends.length?sends.map(function(e,i){ return step('done',i?'Resent':'Sent',by(e)+'<br>'+when(e.t)); }).join(''):step('todo','Not sent yet','Email the invoice to the client'))+
+      (s.signature?step('done','Signed by the client','by '+esc(s.signedBy||'—')+'<br>'+when(s.signedAt)+(s.clientComment&&s.clientComment.text?'<br>“'+esc(s.clientComment.text)+'”':''))
+        :s.clientResponse==='declined'?step('bad','Declined by the client',when(s.respondedAt)+(s.clientComment&&s.clientComment.text?'<br>“'+esc(s.clientComment.text)+'”':'')+'<br>Edit and resend the invoice')
+        :sends.length&&!dis?step('todo','Awaiting the client’s signature','The client signs through the invoice link'):'')+
       (lastRem?step('done',rems.length>1?rems.length+' reminders sent':'Reminder sent','Last sent '+(lastRem.by==='System'?'automatically':'by '+esc(lastRem.by||'—'))+'<br>'+when(lastRem.t)):'')+payStep;
     var d=s.doc;
     b='<div class="qd-ov"><div class="qd-paper">'+invoiceHtml(s)+'</div>'+
@@ -15980,7 +15986,6 @@ function paintDetail(keep){
   document.getElementById('sd-x').onclick=closeDetail;
   ov.querySelectorAll('[data-stab]').forEach(function(t){ t.onclick=function(){ sdTab=t.getAttribute('data-stab'); paintDetail(); }; });
   ov.querySelectorAll('[data-sa]').forEach(function(x){ x.onclick=function(){ doAction(x.getAttribute('data-sa'),detailId); }; });
-  var sm=ov.querySelector('.sd-more'); if(sm) sm.onclick=function(){ openMenu(sm); };
   var sb=document.getElementById('sd-b'); if(sb) sb.addEventListener('scroll',closeMenu);
   ov.querySelectorAll('.sd-drawer .copy').forEach(function(x){ x.onclick=function(){ var v=x.getAttribute('data-copy');
     try{ navigator.clipboard.writeText(v).then(function(){ toast('Copied'); },function(){ toast('Copied'); }); }catch(e){ toast('Copied'); } }; });
@@ -16025,11 +16030,12 @@ document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if
 function invoiceHtml(s){
   var c=client(s), sub=s.subtotal!=null?s.subtotal:r2((s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0)), to=s.onName||c.name;
   var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>'+money(paidOf(s))+'</dd></div><div><dt>Balance due</dt><dd>'+money(pendingOf(s))+'</dd></div></dl>'+
-    (s.status==='disabled'?'<p class="qd2-note"><b>This invoice has been disabled.</b></p>':'<p class="qd2-note">Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.</p>');
+    (s.status==='disabled'?'<p class="qd2-note"><b>This invoice has been disabled.</b></p>':pendingOf(s)<=0?'<p class="qd2-note">This invoice is paid in full. Thank you.</p>'
+      :'<p class="qd2-note">Please pay '+(paidOf(s)>0?'the balance of '+money(pendingOf(s))+' ':'')+'by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.</p>');
   var m={kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
     company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
     items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
-    T:{sub:sub,disc:r2(+s.discountAmt||0),gst:s.gstMode==='none'?0:r2(s.amount/11),total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:null};
+    T:{sub:sub,disc:r2(+s.discountAmt||0),gst:s.gstMode==='none'?0:r2(s.amount/11),total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:s.signature?{name:s.signedBy||'',sig:s.signature,at:s.signedAt}:null};
   return quoteDocHtml(m);
 }
 function printPage(title,inner,extraCss){
@@ -22247,11 +22253,11 @@ function answerQuote(to,note,btn,done,sig){
 /* Decline: a dialog asking for the reason (required) */
 function closeDecline(){ var o=document.getElementById('qd-ov'); if(o) o.remove(); document.removeEventListener('keydown',declineKeys,true); var r=document.getElementById('qa-no'); if(r) r.focus(); }
 function declineKeys(ev){ if(ev.key==='Escape'&&!qBusy){ ev.preventDefault(); closeDecline(); } }
-function declineDialog(){
+function declineDialog(noun,answer){ noun=noun||'quotation'; answer=answer||answerQuote;
   var o=document.createElement('div'); o.className='qp-ov'; o.id='qd-ov';
   o.innerHTML='<div class="qp-modal" role="dialog" aria-modal="true" aria-labelledby="qd-t" aria-describedby="qd-d">'+
-    '<div class="qp-mh"><h2 id="qd-t">Decline this quotation?</h2><button type="button" class="qp-mx" id="qd-x" aria-label="Close">'+IC.x+'</button></div>'+
-    '<div class="qp-mb"><p id="qd-d">Please tell us why you are declining this quotation. Your feedback will be shared with your accountant.</p>'+
+    '<div class="qp-mh"><h2 id="qd-t">Decline this '+noun+'?</h2><button type="button" class="qp-mx" id="qd-x" aria-label="Close">'+IC.x+'</button></div>'+
+    '<div class="qp-mb"><p id="qd-d">Please tell us why you are declining this '+noun+'. Your feedback will be shared with your accountant.</p>'+
       '<label class="l" for="qd-r">Reason for declining <span class="req">*</span></label>'+
       '<textarea class="in qp-ta" id="qd-r" rows="4" maxlength="500" placeholder="Share your reason for declining..." aria-required="true" aria-describedby="qd-e"></textarea>'+
       '<span class="err" id="qd-e" hidden></span></div>'+
@@ -22270,7 +22276,7 @@ function declineDialog(){
   document.getElementById('qd-go').onclick=function(){
     var note=ta.value.trim();
     if(!note){ er.textContent='Enter a reason for declining'; er.hidden=false; ta.classList.add('bad'); ta.focus(); return; }
-    answerQuote('rejected',note,this,function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } });
+    answer(answer===answerQuote?'rejected':'declined',note,this,function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } });
   };
 }
 /* confirmations: no decision can be made again */
@@ -22301,30 +22307,91 @@ function invoiceDocOf(s,c){
   var pend=s.status==='disabled'?0:Math.max(0,Math.round((s.amount-paid)*100)/100), to=s.onName||c.name;
   var sub=s.subtotal!=null?s.subtotal:(s.items||[]).reduce(function(a,x){ return a+(+x.qty||0)*(+x.price||0); },0);
   var pay='<dl class="qd2-tot qd2-paid"><div><dt>Paid</dt><dd>'+money(paid)+'</dd></div><div><dt>Balance due</dt><dd>'+money(pend)+'</dd></div></dl>'+
-    '<p class="qd2-note">'+(pend>0?'Please pay by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.':'This invoice is paid in full. Thank you.')+'</p>';
+    '<p class="qd2-note">'+(pend>0?'Please pay '+(paid>0?'the balance of '+money(pend)+' ':'')+'by '+dmyOf(s.due)+', quoting '+escH(s.id)+'.':'This invoice is paid in full. Thank you.')+'</p>';
   return {kind:'invoice',extra:pay,id:s.id,dateTxt:dmyOf(s.date),dueTxt:dmyOf(s.due),to:to,toSub:to!==c.name?c.name:'',attn:'',phone:s.contactPhone||c.phone||'',abn:s.abn||'',email:s.contactEmail||c.email||'',branch:s.branch||'',
     company:s.company||(s.companies&&s.companies[0])||'',discPct:s.discountType==='%'?s.discountPct:null,
     items:(s.items||[]).map(function(x){ return {cat:docCatName(x),name:x.name,desc:x.desc||'',qty:+x.qty||0,price:+x.price||0,gst:x.gst!=null?x.gst!==false:s.gstMode!=='none'}; }),
-    T:{sub:sub,disc:Math.round((+s.discountAmt||0)*100)/100,gst:s.gstMode==='none'?0:Math.round(s.amount/11*100)/100,total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:null,_pend:pend};
+    T:{sub:sub,disc:Math.round((+s.discountAmt||0)*100)/100,gst:s.gstMode==='none'?0:Math.round(s.amount/11*100)/100,total:s.amount},noGst:s.gstMode==='none',notes:s.customerNotes||'',terms:s.terms||'',sign:s.signature?{name:s.signedBy||'',sig:s.signature,at:s.signedAt}:null,_pend:pend};
 }
 var ivNote='';   // the message after a payment attempt or a "we've paid" note, shown above the buttons
 function saveInvoice(fn){ try{ var v=JSON.parse(localStorage.getItem(INV_KEY)||'null'); var x=v&&v.list.filter(function(y){ return y.token===TOKEN; })[0]; if(!x) return false; fn(x); localStorage.setItem(INV_KEY,JSON.stringify(v)); return x; }catch(err){ return false; } }
 function ivLog(x,type,note,ok){ (x.history=x.history||[]).push({type:type,by:x.onName||'Client',t:Date.now(),note:note,ok:ok!==false}); }
+/* the client's invoice page, as the quotation page: open: the invoice, then their signature, a comment and Sign and accept (or Decline, with a reason);
+   accepted / declined: a confirmation. The saved invoice is re-read before the answer is recorded */
+var ivBusy=false;
+function invoiceState(s){ return s.clientResponse==='declined'?'declined':s.signature?'accepted':'open'; }
+function invoiceWho(s,c){ var dir=c.type==='company'&&c.directors&&c.directors[0]&&c.directors[0].name; return s.onName||dir||c.name; }
 function paintInvoice(){
+  document.body.classList.remove('qr-page');
   var s=invoiceNow();
   if(!s) return closed('x','This link isn’t valid','Check you opened the most recent email from '+FIRM.name+', or contact us on '+FIRM.phone+'.');
   if(s.tokenExp&&Date.now()>s.tokenExp) return closed('x','This link has expired','Contact '+FIRM.name+' on '+FIRM.phone+' and we’ll send you a new one.');
   if(s.status!=='sent') return closed('x','This invoice isn’t available','Please contact '+FIRM.name+' on '+FIRM.phone+' if you have any questions.');
   ensureQuoteCss(document);
-  var c=quoteClient(s), doc=invoiceDocOf(s,c), paid=doc._pend<=0;
+  var c=quoteClient(s), doc=invoiceDocOf(s,c), state=invoiceState(s), who=invoiceWho(s,c);
+  if(state==='accepted') return invoiceAccepted(s,c,doc);
+  if(state==='declined') return invoiceDeclined(s,c,doc);
   document.body.classList.add('qr-page');
-  app.innerHTML='<div class="hello"><h1>'+(paid?'This invoice is paid':'Your invoice is ready')+'</h1><p>Invoice '+e(s.id)+(paid?'':' · Due '+dmyOf(s.due))+'</p></div>'+
+  app.innerHTML='<div class="hello"><h1>Your invoice is ready</h1><p>Invoice '+e(s.id)+' · Due '+dmyOf(s.due)+(s.accountant?' · Prepared by '+e(s.accountant):'')+'</p></div>'+
     '<div class="card qr"><div class="qr-docw"><div class="qr-dv" tabindex="0" aria-label="Invoice document"><div class="qv-doc">'+quoteDocHtml(doc)+'</div></div>'+
-      '<div class="iv-foot">'+(paid?'<div class="note ok">'+IC.tick+'<span>Payment received in full. Thank you.</span></div>':ivNote)+
-      '<div class="qw-acts">'+(paid?'<button type="button" class="btn sec" id="iv-pdf">'+IC.dl+'Download invoice</button><button type="button" class="btn pri" id="iv-rc">'+IC.dl+'Download receipt</button>'
-        :'<button type="button" class="btn pri" id="iv-pdf">'+IC.dl+'Download PDF</button>')+'</div></div></div></div>';   // no online payment here: the client downloads the invoice, as on a quotation
-  var pdf=document.getElementById('iv-pdf'); if(pdf) pdf.onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
-  var rc=document.getElementById('iv-rc'); if(rc) rc.onclick=function(){ var l=(s.payments||[]).filter(function(p){ return !p.void; }).sort(function(a,z){ return z.at-a.at; })[0]; if(l&&!printReceipt(receiptOf(s,l,c.name))) toast('Allow pop-ups to download the receipt',true); };
+      '<div class="qa-sign" id="qa-sign">'+
+        '<label class="l">Signature of '+e(who)+' <span class="req">*</span></label><div id="qa-pad"></div>'+
+        '<label class="l qa-sl" for="qa-c">Comment</label><textarea class="in qp-ta" id="qa-c" rows="3" maxlength="500" placeholder="Add a comment for your accountant"></textarea>'+
+        '<span class="err" id="qa-e" hidden></span>'+
+        '<div class="qa-sf"><p class="qa-alt">Something not right? <button type="button" class="qa-dl" id="qa-no">Decline this invoice</button></p><button type="button" class="btn pri" id="qa-ok">'+IC.tick+'Sign and accept</button></div></div>'+
+    '</div></div>';
+  var ok=document.getElementById('qa-ok'), er=document.getElementById('qa-e'), pad=sigPad(document.getElementById('qa-pad'),who,{modes:[['draw','Draw'],['type','Select'],['upload','Upload']]});
+  var fail=function(msg){ if(msg){ er.textContent=msg; er.hidden=false; } };
+  ok.onclick=function(){ if(ivBusy) return; er.hidden=true; var sig=pad&&pad.value(who);
+    if(!sig){ fail('Draw your signature, select a style, or upload a signature image'); return; }
+    answerInvoice('accepted',document.getElementById('qa-c').value.trim(),ok,fail,sig); };
+  document.getElementById('qa-no').onclick=function(){ if(!ivBusy) declineDialog('invoice',answerInvoice); };
+}
+/* records the answer once: the invoice is read again and must still be open */
+function answerInvoice(to,note,btn,done,sig){
+  if(ivBusy) return; ivBusy=true;
+  btn.disabled=true; btn.classList.add('busy'); var html=btn.innerHTML; btn.textContent=to==='accepted'?'Accepting…':'Sending…';
+  var others='#qa-no,#qd-go,#qd-x,#qd-cancel';
+  [].forEach.call(document.querySelectorAll(others),function(x){ x.disabled=true; });
+  setTimeout(function(){
+    var reset=function(msg){ ivBusy=false; btn.disabled=false; btn.classList.remove('busy'); btn.innerHTML=html; [].forEach.call(document.querySelectorAll(others),function(x){ x.disabled=false; }); done(msg); };
+    if(PREVIEW){ reset('Preview only: in the real link this '+(to==='accepted'?'accepts':'declines')+' the invoice'); return; }
+    var all; try{ all=JSON.parse(localStorage.getItem(INV_KEY)||'null'); }catch(err){ all=null; }
+    var x=all&&Array.isArray(all.list)&&all.list.filter(function(y){ return y.token===TOKEN; })[0];
+    if(!x||x.status!=='sent'||invoiceState(x)!=='open'){ ivBusy=false; closeDecline(); paintInvoice(); window.scrollTo(0,0); return; }   // already answered or changed meanwhile
+    var c=quoteClient(x), who=invoiceWho(x,c), at=Date.now();
+    x.clientResponse=to; x.respondedAt=at; x.clientComment=note?{text:note,by:who,at:at,type:to}:null;
+    if(sig&&to==='accepted'){ x.signature=sig; x.signedBy=sig.name||who; x.signedAt=at; }   // printed in the Acceptance block of the invoice
+    (x.history=x.history||[]).push({type:to==='accepted'?'client_accepted':'client_declined',by:who,t:at,note:(to==='accepted'?'Signed and accepted':'Declined')+' through the invoice link'+(note?' · “'+note+'”':''),ok:true});
+    try{ localStorage.setItem(INV_KEY,JSON.stringify(all)); }catch(err){ reset('We couldn’t record your answer. Please try again.'); return; }
+    try{ parent.AADNotify&&parent.AADNotify({id:'sale:'+x.id+':'+to+':'+at,kind:'pay',tone:to==='accepted'?'ok':'bad',aud:'admin',at:at,
+      title:'Invoice '+(to==='accepted'?'signed and accepted':'declined'),desc:x.id+' was '+(to==='accepted'?'signed and accepted':'declined')+' by '+who+'.'+(note?' “'+note+'”':''),go:{mod:'sales',id:x.id}}); }catch(err){}
+    ivBusy=false; closeDecline(); paintInvoice(); window.scrollTo(0,0);
+  },600);
+}
+/* confirmations: no decision can be made again; the signed invoice and any receipt can be downloaded */
+function r2c(n){ return Math.round(n*100)/100; }
+function invoiceAccepted(s,c,doc){
+  var paid=doc._pend<=0, live=(s.payments||[]).filter(function(p){ return !p.void; }).sort(function(a,z){ return z.at-a.at; });
+  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big">'+IC.tick+'</div><h2>Invoice '+e(s.id)+' has been accepted</h2>'+
+    '<p>Thank you. We’ve let '+(s.accountant?e(s.accountant)+', your accountant,':'your accountant')+' know, and a signed copy of this invoice is available below for your records.</p>'+
+    '<dl class="qp-rcpt"><div><dt>Invoice number</dt><dd>'+e(s.id)+'</dd></div><div><dt>Invoiced to</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total amount</dt><dd>'+money(doc.T.total)+'</dd></div>'+
+      (live.length?'<div><dt>Paid so far</dt><dd>'+money(r2c(doc.T.total-doc._pend))+'</dd></div><div><dt>Balance due</dt><dd>'+money(doc._pend)+'</dd></div>':'')+(paid?'':'<div><dt>Due date</dt><dd>'+dmyOf(s.due)+'</dd></div>')+'</dl>'+
+    (paid?'<div class="note ok">'+IC.tick+'<span>Payment received in full. Thank you.</span></div>'
+      :'<div class="qp-next"><b>What happens next</b><ol><li>Pay '+(live.length?'the remaining ':'')+money(doc._pend)+' by '+dmyOf(s.due)+' using the bank details on the invoice. You can pay in more than one payment.</li><li>Quote '+e(s.id)+' as the payment reference.</li><li>We’ll email you a receipt for each payment we receive.</li></ol></div>')+
+    '<div class="qw-acts"><button type="button" class="btn '+(live.length?'sec':'pri')+'" id="iv-pdf">'+IC.dl+'Download invoice</button>'+(live.length?'<button type="button" class="btn pri" id="iv-rc">'+IC.dl+'Download receipt</button>':'')+'</div></div>';
+  document.getElementById('iv-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
+  var rc=document.getElementById('iv-rc'); if(rc) rc.onclick=function(){ if(!printReceipt(receiptOf(s,live[0],c.name))) toast('Allow pop-ups to download the receipt',true); };
+}
+function invoiceDeclined(s,c,doc){
+  var why=s.clientComment&&s.clientComment.text;
+  app.innerHTML='<div class="card done qp-done qp-res" role="status"><div class="big bad">'+IC.x+'</div><h2>You’ve declined this invoice</h2>'+
+    '<p>Thank you for letting us know. We’ve shared your feedback with '+(s.accountant?e(s.accountant)+', your accountant':'your accountant')+'.</p>'+
+    '<dl class="qp-rcpt"><div><dt>Invoice</dt><dd>'+e(s.id)+'</dd></div><div><dt>Invoiced to</dt><dd>'+e(doc.to||c.name)+'</dd></div><div><dt>Total</dt><dd>'+money(doc.T.total)+'</dd></div><div><dt>Declined on</dt><dd>'+(s.respondedAt?whenOf(s.respondedAt):'—')+'</dd></div></dl>'+
+    (why?'<div class="qp-why"><b>Your reason</b><p>“'+e(why)+'”</p></div>':'')+
+    '<p class="qp-change">Need to talk it through? Call '+FIRM.name+' on '+FIRM.phone+' and we’ll send you an updated invoice.</p>'+
+    '<div class="qw-acts"><button type="button" class="btn pri" id="iv-pdf">'+IC.dl+'Download PDF</button></div></div>';
+  document.getElementById('iv-pdf').onclick=function(){ if(!printQuote(doc)) toast('Allow pop-ups to download the PDF',true); };
 }
 /* Pay now: card online (through the gateway) or bank transfer. The amount always comes from the saved sale */
 function payDialog(s,pend){

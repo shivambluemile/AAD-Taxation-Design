@@ -14514,6 +14514,18 @@ table,td,th{font-size:13.5px}
 .sl-other dt,.sl-other dd{color:var(--mute)!important;font-size:12.5px!important}.sl-allown dt,.sl-allown dd{font-weight:700!important;color:var(--ink)!important}
 .sl-cown{color:var(--orange-ink)!important;font-weight:600}
 .sd-tot{border-top:1px dashed var(--line);padding-top:6px}.sd-tot dt,.sd-tot dd{font-weight:700;color:var(--ink)}.sd-cr{color:var(--green);font-weight:700}.sd-stmt{margin-top:8px;font-size:12.5px}.sd-refs{display:flex;flex-wrap:wrap;gap:4px}.sd-refs span{display:inline-flex;height:22px;align-items:center;padding:0 8px;border-radius:999px;background:#F6F7F9;border:1px solid var(--line);font-size:12px;font-weight:600}
+.pm-modal{display:flex;flex-direction:column;max-height:calc(100vh - 32px)}.pm-modal>.modal-head,.pm-modal>.modal-foot{flex-shrink:0}.pm-modal>.modal-body{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important}
+.dz-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:96px;padding:14px 16px;border:2px dashed #D6DBE1;border-radius:12px;background:#FAFBFC;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.dz-area:hover,.dz.drag .dz-area{border-color:var(--orange);background:#FFF8F1}.dz.drag .dz-area{box-shadow:0 0 0 4px var(--orange-soft)}
+.dz-area .dz-ic{width:36px;height:36px;border-radius:50%;background:var(--orange-soft);color:var(--orange-ink);display:flex;align-items:center;justify-content:center;margin-bottom:2px}.dz-area .dz-ic svg{width:18px;height:18px}
+.dz-area b{font-size:14px;font-weight:600;color:var(--ink)}.dz-area b u{color:var(--orange-ink);text-underline-offset:2px}.dz-area small{font-size:12px;color:var(--mute)}
+.dz-area.sm{min-height:0;flex-direction:row;gap:10px;padding:12px 16px}.dz-area.sm .dz-ic{width:32px;height:32px;margin:0}.dz-area.sm .dz-ic svg{width:16px;height:16px}.dz-area.sm b{font-size:13px}.dz-area.sm small{display:none}
+.dz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.dz-tile{position:relative;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.dz-thumb{display:flex;align-items:center;justify-content:center;height:80px;background:#F3F4F6 center/cover no-repeat}.dz-thumb.dz-doc .ar-ft{transform:scale(1.4)}
+.dz-meta{padding:6px 8px}.dz-meta b{display:block;font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dz-meta small{display:block;font-size:10.5px;color:var(--mute)}
+.dz-x{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(17,24,39,.65);color:#fff;display:flex;align-items:center;justify-content:center}.dz-x:hover{background:var(--red)}.dz-x svg{width:11px;height:11px}
+.dz-full{margin:0;font-size:12px;color:var(--mute)}
 .sf-fc{position:relative}.sf-fcrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sf-fcrow small{font-size:12px;color:var(--mute)}
 .sf-fc.drag .sf-fcrow{outline:2px dashed var(--orange);outline-offset:4px;border-radius:8px}
 .sf-fcount{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:8px;background:var(--orange-soft);color:var(--orange-ink);font-size:13px;font-weight:600}
@@ -15263,6 +15275,17 @@ function fileField(id,files,hint,max){ var room=files.length<max, open=!!FILE_OP
       (files.length?'<button type="button" class="sf-fcount'+(open?' on':'')+'" data-'+id+'tog aria-expanded="'+open+'">'+files.length+' file'+(files.length===1?'':'s')+' attached'+I.chev+'</button>':'<small>'+hint+'</small>')+
     '</div>'+
     (files.length?'<div class="sf-fpop"'+(open?'':' hidden')+'>'+files.map(function(x,i){ return fileRow(x,i,id,true); }).join('')+'<p class="sf-fpopf">'+files.length+' of '+max+' files · '+hint+'</p></div>':'')+'</div>'; }
+/* a drop zone (Dropify style): a large dashed area to click or drop files on; picked files show as tiles, images with a preview */
+function dropZone(id,files,hint,max){ var room=files.length<max;
+  var tiles=files.map(function(x,i){ var ext=(x.name.split('.').pop()||'').toLowerCase(), img=x.file&&['jpg','jpeg','png'].indexOf(ext)>=0;
+    if(img&&!x.url) x.url=URL.createObjectURL(x.file);
+    return '<div class="dz-tile">'+(img?'<span class="dz-thumb" style="background-image:url('+x.url+')"></span>':'<span class="dz-thumb dz-doc">'+ftag(x.name)+'</span>')+
+      '<div class="dz-meta"><b title="'+esc(x.name)+'">'+esc(x.name)+'</b><small>'+fsizeOf(x.size)+(x.at?' · '+upWhen(x.at):'')+'</small></div>'+
+      '<button type="button" class="dz-x" data-'+id+'rm="'+i+'" title="Remove" aria-label="Remove '+esc(x.name)+'">'+I.close+'</button></div>'; }).join('');
+  return '<div class="dz" id="'+id+'-drop">'+
+    (room?'<label class="dz-area'+(files.length?' sm':'')+'" for="'+id+'-file"><span class="dz-ic">'+DOC_UP+'</span><b>'+(files.length?'Drop more files here or <u>browse</u>':'Drag and drop files here or <u>browse</u>')+'</b><small>'+hint+' · up to 5 MB each · '+max+' files max</small></label>'+
+      '<input type="file" id="'+id+'-file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" multiple hidden>':'<p class="dz-full">'+max+' of '+max+' files added</p>')+
+    (files.length?'<div class="dz-grid">'+tiles+'</div>':'')+'</div>'; }
 /* one file: type, name, size, when and who uploaded it; download, and remove while editing */
 function fileRow(x,i,id,edit){
   return '<div class="sf-frow">'+ftag(x.name)+'<div class="sf-fmeta"><b title="'+esc(x.name)+'">'+esc(x.name)+'</b><small>'+fsizeOf(x.size)+(x.at?' · '+upWhen(x.at):'')+(x.by?' · '+esc(x.by):'')+'</small></div>'+
@@ -15602,7 +15625,7 @@ function addPayment(s){
     left.textContent=!(c+a>0)?'':rest<0?'This pays the invoice in full. The extra '+money(-rest)+' is kept as client credit for other invoices.'
       :rest===0?(c>0&&a>0?money(c)+' credit and '+money(a)+' received pay the invoice in full':c>0?'The credit pays the invoice in full':'This pays the invoice in full'):money(rest)+' will still be pending after this payment'; };
   /* proof of payment: the shared uploader, several files */
-  var paintDoc=function(msg){ var box=document.getElementById('p-doc'); box.innerHTML=fileField('pd',P.docs,'receipt or remittance · PDF, JPG, PNG or Word',DOC_LIMIT);
+  var paintDoc=function(msg){ var box=document.getElementById('p-doc'); box.innerHTML=dropZone('pd',P.docs,'Receipt or remittance · PDF, JPG, PNG or Word',DOC_LIMIT);
     var e=document.getElementById('p-doc-e'); if(msg) fieldErr('p-doc-e',msg); else e.classList.remove('show');
     wireFiles(box,'pd',P.docs,function(m){ paintDoc(m); }); };
   paintLeft(); paintDoc();
@@ -16126,9 +16149,9 @@ function paintDetail(keep){
   }
   if(sdTab==='activity'){
     /* the full log: emails (invoice, reminders, receipts) sit here with everything else; the chips narrow it to emails */
-    var mails=hist.filter(function(e){ return MAIL_EV.indexOf(e.type)>=0; }), list=(sdLog==='email'?mails:hist).slice().sort(function(a,z){ return z.t-a.t; });
+    var mails=hist.filter(function(e){ return MAIL_EV.indexOf(e.type)>=0; }), list=hist.slice().sort(function(a,z){ return z.t-a.t; });
     var chip=function(k,l,n){ return '<button type="button" class="sd-chip'+(sdLog===k?' on':'')+'" data-slog="'+k+'" aria-pressed="'+(sdLog===k)+'">'+l+'<span>'+n+'</span></button>'; };
-    b='<section class="vsec"><div class="sd-chips" role="group" aria-label="Show">'+chip('all','All activity',hist.length)+chip('email','Emails',mails.length)+'</div>'+(list.length?'<div class="timeline">'+list.map(function(e){
+    b='<section class="vsec">'+(list.length?'<div class="timeline">'+list.map(function(e){
       var isMail=MAIL_EV.indexOf(e.type)>=0, to=isMail?mailTo(e):'';
       return '<div class="tlitem'+(e.ok===false?' bad':'')+'"><span class="dot">'+SD_IC.dot+'</span><div class="tlttl">'+esc(EV[e.type]||e.type)+
           (isMail?'<span class="sd-mtag'+(e.ok===false?' bad':'')+'">'+SD_IC.mail+(e.ok===false?'Email not sent':'Email')+'</span>':'')+'</div>'+

@@ -16310,15 +16310,15 @@ function renderPayments(){
       selF('f-bal','Balance Status',[['owing','Owing'],['overdue','Overdue'],['credit','In credit'],['both','Owing and in credit'],['settled','Settled']],PMX.show)+
       selF('f-br','All Branches',BRANCHES.map(function(b){ return [b,b]; }),PMX.branch)+
       (filt?'<button type="button" class="clearf" id="clearf">'+I.close+'Clear filters</button>':'')+'</div></div>'+
-    '<div class="card ar-table qt-table pmx-table"><table><thead><tr><th>Client</th><th class="r">Invoices</th><th class="r">Invoiced</th><th class="r">Paid</th><th class="r">Outstanding</th><th class="r">Credit</th><th>Position</th><th>Last Payment</th></tr></thead><tbody>';
-  if(!all.length&&!q) h+='<tr><td colspan="8"><div class="empty"><h3>No payments yet</h3><p>Clients appear here once they have an invoice or credit.</p></div></td></tr>';
-  else if(!page.length) h+='<tr><td colspan="8"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="pm-clear2">Clear Filter</button></div></td></tr>';
+    '<div class="card ar-table qt-table pmx-table"><table><thead><tr><th>Client</th><th class="r">Invoices</th><th class="r">Invoiced</th><th class="r">Paid</th><th class="r">Outstanding</th><th class="r">Credit</th><th>Last Payment</th></tr></thead><tbody>';
+  if(!all.length&&!q) h+='<tr><td colspan="7"><div class="empty"><h3>No payments yet</h3><p>Clients appear here once they have an invoice or credit.</p></div></td></tr>';
+  else if(!page.length) h+='<tr><td colspan="7"><div class="empty"><h3>No records found.</h3><p>Try a different search term, or clear the filters.</p><button class="btn-ghost" id="pm-clear2">Clear Filter</button></div></td></tr>';
   page.forEach(function(r){ var c=r.c, t=r.t;
     h+='<tr class="pmx-row'+(String(PMX.cid)===String(c.id)?' on':'')+'" data-pmc="'+esc(c.id)+'"><td><div class="qt-person">'+clAv({name:c.name})+'<span class="qt-pn"><button class="name-link" data-pmc="'+esc(c.id)+'" title="Open '+esc(c.name)+'’s payments"><span class="name">'+esc(c.name)+'</span></button>'+(c.email?'<small class="ar-sub">'+esc(c.email)+'</small>':'')+'</span></div></td>'+
       '<td class="num r">'+t.n+'</td><td class="num r">'+money(t.inv)+'</td><td class="num r">'+money(t.paid)+'</td>'+
       '<td class="num r">'+(t.owe>0?'<b class="pmx-owe">'+money(t.owe)+'</b>'+(t.over?'<small class="ar-sub pmx-late">'+t.over+' overdue</small>':''):'<span class="ar-dash">'+money(0)+'</span>')+'</td>'+
       '<td class="num r">'+(t.cr>0?'<b class="pmx-in">'+money(t.cr)+'</b>'+(t.un>0?'<small class="ar-sub">'+money(t.un)+' unallocated</small>':''):'<span class="ar-dash">'+money(0)+'</span>')+'</td>'+
-      '<td>'+pmNet(t)+'</td><td class="num nowrap">'+(t.last?upWhen(t.last):'<span class="ar-dash">—</span>')+'</td></tr>'; });
+      '<td class="num nowrap">'+(t.last?upWhen(t.last):'<span class="ar-dash">—</span>')+'</td></tr>'; });
   h+='</tbody></table>'+pager(rows.length)+'</div>';
   content.innerHTML=h;
   var qi=document.getElementById('q'); qi.oninput=function(){ PMX.q=qi.value; state.page=1; render(); var n=document.getElementById('q'); n.focus(); n.setSelectionRange(n.value.length,n.value.length); };
@@ -16608,7 +16608,7 @@ function adjustCredit(cid){
 }
 function pmExport(rows,kind){
   if(!rows.length) return toast('There are no clients to export.',true);
-  var head=['Client','Email','Invoices','Invoiced','Paid','Outstanding','Credit','Unallocated','Position','Last payment'];
+  var head=['Client','Email','Invoices','Invoiced','Paid','Outstanding','Credit','Unallocated','Net balance','Last payment'];
   var data=rows.map(function(r){ var t=r.t; return [r.c.name,r.c.email||'',t.n,t.inv.toFixed(2),t.paid.toFixed(2),t.owe.toFixed(2),t.cr.toFixed(2),t.un.toFixed(2),t.net>0?'Owes '+t.net.toFixed(2):t.net<0?'In credit '+(-t.net).toFixed(2):'Settled',t.last?upWhen(t.last):'']; });
   if(kind==='csv'){ var q=function(v){ v=String(v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
     var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+[head].concat(data).map(function(r){ return r.map(q).join(','); }).join('\r\n')],{type:'text/csv;charset=utf-8'})); a.download='client-payments-'+dmyOf(Date.now())+'.csv';
@@ -16623,7 +16623,7 @@ var PM_PRINT_CSS='.ex{background:#fff;max-width:1100px;margin:0 auto;padding:28p
   '@page{size:A4 landscape;margin:12mm}@media print{.ex{padding:0;max-width:none}}';
 function pmStatementPdf(c,t,led){
   var tbl='<div class="ex"><h1>Statement of account</h1><p>'+escH(c.name)+(c.email?' · '+escH(c.email):'')+' · at '+dmyOf(Date.now())+' · '+escH(FIRM.name)+'</p>'+
-    '<dl><div><dt>Total invoiced</dt><dd>'+money(t.inv)+'</dd></div><div><dt>Total paid</dt><dd>'+money(t.paid)+'</dd></div><div><dt>Outstanding</dt><dd>'+money(t.owe)+'</dd></div><div><dt>Credit available</dt><dd>'+money(t.cr)+'</dd></div><div><dt>Position</dt><dd>'+(t.net>0?'Owes '+money(t.net):t.net<0?'In credit '+money(-t.net):'Settled')+'</dd></div></dl>'+
+    '<dl><div><dt>Total invoiced</dt><dd>'+money(t.inv)+'</dd></div><div><dt>Total paid</dt><dd>'+money(t.paid)+'</dd></div><div><dt>Outstanding</dt><dd>'+money(t.owe)+'</dd></div><div><dt>Credit available</dt><dd>'+money(t.cr)+'</dd></div><div><dt>Net balance</dt><dd>'+(t.net>0?'Owes '+money(t.net):t.net<0?'In credit '+money(-t.net):'Settled')+'</dd></div></dl>'+
     '<table><thead><tr><th>Date</th><th>Details</th><th>Invoice</th><th class="r">Debit</th><th class="r">Credit</th><th class="r">Balance</th></tr></thead><tbody>'+
     led.map(function(e){ return '<tr><td>'+upWhen(e.t)+'</td><td>'+escH(e.what)+(e.ref?' · ref '+escH(e.ref):'')+'</td><td>'+escH(e.sale||'')+'</td><td class="r">'+(e.dr?money(e.dr):'')+'</td><td class="r">'+(e.cr?money(e.cr):'')+'</td><td class="r">'+(e.bal<0?money(-e.bal)+' CR':money(e.bal))+'</td></tr>'; }).join('')+'</tbody></table></div>';
   if(!printPage('Statement · '+c.name,tbl,PM_PRINT_CSS)) toast('Allow pop-ups to download the statement',true);
